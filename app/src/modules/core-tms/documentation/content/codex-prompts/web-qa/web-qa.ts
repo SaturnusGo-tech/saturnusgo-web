@@ -1,0 +1,32 @@
+import { code, paragraph, section, type DocArticle } from "../../../model/article";
+
+export const webQaPrompts: DocArticle = {
+  id: "codex-prompts-web-qa",
+  title: "Web QA and evidence",
+  description: "Plan checks from a requirement or URL, record observed results, and recover interrupted work.",
+  group: "codex-prompts",
+  keywords: ["web QA", "browser", "Figma", "PDF", "evidence", "resume", "Request update"],
+  related: ["codex-prompts", "codex-web-qa", "codex-prompts-runs", "codex-prompts-defects"],
+  sections: [
+    section("execute-reviewed", "Run reviewed browser checks",
+      paragraph("Use this when suitable cases already exist. Codex proposes the browser scope, the run and the data it may change."),
+      code("prompt", "Execute reviewed web coverage",
+        `Use Falcon Web QA for [project] at [target URL] on [build or deployment label]. Start with [case IDs or suite] and the authorized [environment]. Only these data changes are allowed [list, or none]. Show the cases and revisions, expected results, allowed origins and effects for review. After I approve and the required confirmations are in place, record observed steps with private evidence. Mark unavailable checks blocked with the reason. Report saved outcomes and unfinished work.`)),
+    section("research-url", "Research a page with no existing coverage",
+      paragraph("Use this for a new flow. The browser inspection gives you evidence of the current page and a proposal to review."),
+      code("prompt", "Prepare coverage from a URL",
+        `Inspect [target URL] for Falcon project [project] using read-only browser navigation. Look for existing cases before proposing new coverage. Compare what you see with [requirement or expected behavior]. Flag unclear expectations as assumptions. If the URL is the only research source and existing cases are insufficient, show the need for a private capture. Give me proposed cases and the exact scope for review before creating a run or recording any result.`)),
+    section("source-design", "Test a design or specification change",
+      paragraph("Use this with a Figma node or a section of a PDF when the requirement lives outside Falcon."),
+      code("prompt", "Trace checks to a Figma node or PDF",
+        `For [project] and [target URL], compare [Figma node or PDF page and requirement] with existing Falcon cases. Map each relevant requirement to a case revision or propose a new check with an observable action and expected result. Cite the exact node or page. Flag inaccessible or ambiguous source details and wait for my review before creating or revising cases.`)),
+    section("recover-interruption", "Resume after the browser closes",
+      paragraph("Use this after a disconnect or interrupted upload. Codex checks what Falcon saved before repeating any work."),
+      code("prompt", "Recover a partially completed Web QA run",
+        `Recover Falcon workflow [workflow or run link] after [interruption]. Read the current plan, run items, attempts, recorded actions and private evidence receipts. Distinguish what was committed, what is awaiting evidence and what remains unknown. Reconcile uncertain outcomes before repeating an action. Show the remaining work and any renewed permission needed before resuming.`)),
+    section("request-update", "Flag an outdated case discovered during QA",
+      paragraph("Use this when the case needs maintenance. The mark is separate from the case text, run snapshot and results."),
+      code("prompt", "Request a case update with evidence",
+        `In [run link], inspect [case ID or item] and its latest relevant attempt. The discrepancy I observed is [description]. Compare it with the pinned revision and draft a Request update mark with the reason and source attempt. If the proposal matches my request, open the supported Falcon approval for that exact case and give me the review link. Apply the mark only after Falcon records my approval. Preserve the case text, run snapshot and result.`)),
+  ],
+};

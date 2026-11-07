@@ -2,9 +2,8 @@
 
 import { useState, type MouseEvent } from "react";
 import type { DocumentationFolder } from "../../core-tms/documentation/model/library";
-import { DocumentationIcon } from "../../core-tms/documentation/presentation/icons/DocumentationIcon";
+import { DocumentationDisclosureIcon, DocumentationIcon } from "../../core-tms/documentation/presentation/icons/DocumentationIcon";
 import type { DocArticle } from "../../core-tms/documentation/model/article";
-import { PublicDocsIcon } from "./PublicDocsIcon";
 import styles from "./documentation.module.css";
 
 function Folder({ folder, articles, activeId, href, onNavigate, depth = 0 }: {
@@ -14,7 +13,7 @@ function Folder({ folder, articles, activeId, href, onNavigate, depth = 0 }: {
   const panelId = `public-folder-${folder.id.replace(/[^a-z0-9-]/gi, "-")}`;
   return <div className={styles.navFolder} data-depth={depth}>
     <button type="button" className={styles.folderToggle} aria-expanded={expanded} aria-controls={panelId} onClick={() => setExpanded(value => !value)}>
-      <span>{folder.title}</span><PublicDocsIcon name="chevron" />
+      <span>{folder.title}</span><DocumentationDisclosureIcon expanded={expanded} />
     </button>
     <div className={styles.folderPanel} data-expanded={expanded} id={panelId} aria-hidden={!expanded} ref={node => { node?.toggleAttribute("inert", !expanded); }}>
       <div className={styles.folderContents}>

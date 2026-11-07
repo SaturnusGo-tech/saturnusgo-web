@@ -1,0 +1,32 @@
+import { code, paragraph, section, type DocArticle } from "../../../model/article";
+
+export const runPrompts: DocArticle = {
+  id: "codex-prompts-runs",
+  title: "Runs and iterations",
+  description: "Review a run before creating it, prepare a retest, and explain what really happened.",
+  group: "codex-prompts",
+  keywords: ["smoke", "batch", "release", "owner", "run", "retest", "attempt"],
+  related: ["codex-prompts", "codex-prompts-web-qa", "create-run", "retest"],
+  sections: [
+    section("draft-smoke", "Prepare a release smoke run",
+      paragraph("Use this when a build is ready for QA. Codex checks the scope and creates a draft once you approve the selection."),
+      code("prompt", "Prepare a draft for release smoke testing",
+        `In [project], prepare a draft smoke run for [build] in [environment] using [suite or case list]. Set [person] as owner if this connection supports it. Show the cases, exact case and shared-step revisions, environment, build and owner first. Once I approve, create the draft and return its link. Leave it unstarted.`)),
+    section("plan-batch", "Coordinate a release across projects",
+      paragraph("Use this to coordinate one release across multiple projects selected in your Codex connection."),
+      code("prompt", "Plan a multi-project release batch",
+        `Plan one Falcon release batch for [release] covering [project A and scope] and [project B and scope]. Check access to every project. For each project show the resolved cases and revisions, shared-step revisions, environment and build. Ask me to approve the full batch before creating any draft. If a project is inaccessible, show what access is missing and leave the batch untouched.`)),
+    section("pause-run", "Pause a run with a reason",
+      paragraph("Use this when the team needs to stop testing a build. Codex reads back the actual state after the approved transition."),
+      code("prompt", "Pause a run without changing results",
+        `Open [run link] in Falcon and check its current lifecycle state. I want to pause it because [reason]. Show the run and planned transition for review. After I confirm, pause it if the transition is allowed. Read back the saved state, report what remains unexecuted, and keep all existing results as they are.`)),
+    section("retest-item", "Open a new attempt after a fix",
+      paragraph("Use this when there is a new build to verify. A retest preserves the original attempt for comparison."),
+      code("prompt", "Prepare a retest for a failed item",
+        `In Falcon run [run link], find [case ID] and inspect its latest attempt and evidence. Show the current attempt, the observed failure and the build or environment recorded on the run. I want to retest on [fix build]. Tell me if that requires a new run. Show the exact retest action before applying it and leave execution for a separate request.`)),
+    section("explain-results", "Explain what remains before release",
+      paragraph("Use this to brief a release owner. It separates recorded failures, blockers and checks that still need to be run."),
+      code("prompt", "Summarize a run from saved results",
+        `Summarize Falcon run [run link] for [release]. Use its actual lifecycle state and item results. List passed, failed, blocked and unexecuted counts separately. For each failure or blocker, give the latest attempt, reason or failing step, and evidence or defect link if available. Say which facts are missing and what checks still need to run. Keep this read-only.`)),
+  ],
+};

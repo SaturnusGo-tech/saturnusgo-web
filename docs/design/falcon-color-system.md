@@ -55,6 +55,8 @@ Decorative empty-state rasters in case selection, first-project onboarding, empt
 
 ## Verification and maintenance
 
+Use the shared stroked plus/minus icon for disclosure in Falcon documentation, including integration guides. Hide browser-default disclosure markers on native `summary` elements and avoid triangular arrows or chevrons for expanding sections.
+
 Run `npm run test:tms-theme` for the captured role contract, contrast checks, route/portal scoping and the global stylesheet guard. The guard scans every Falcon stylesheet, rejects new literal UI colors and missing role definitions, and rejects unused exception entries. Keep content exceptions precise: file + selector + property + exact value + reason.
 
 For an intentional future palette update, record the reference and its limits, update the source mapping and foundation together, and review the light/dark browser matrix. Component CSS must not create a new local palette. The original color migration preserved product behavior, typography and authorization; its four decorative empty-state artwork footprints became compact icons. The later shell refinement keeps the existing 16px upper content corners visible by placing the chrome surface behind them. Notifications use compact flat rows and theme-aware vector icons while retaining their existing actions.

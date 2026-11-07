@@ -1,5 +1,6 @@
 import { ArrowRight } from "@openai/apps-sdk-ui/components/Icon";
 import { useState } from "react";
+import { writeClipboardText } from "../../../../../shared/lib/clipboard";
 import { CodexMark } from "../branding/CodexMark";
 import css from "./preview.module.css";
 
@@ -15,7 +16,7 @@ export function CodexPluginPreview({ ru }: { ru: boolean }) {
     "Review the latest run: what failed, which defects are open, and what should we check next?",
   ];
   const copy = async (prompt: string) => {
-    try { await navigator.clipboard.writeText(prompt); setCopied("done"); }
+    try { await writeClipboardText(prompt); setCopied("done"); }
     catch { setCopied("error"); }
   };
   return <div className={css.preview}>

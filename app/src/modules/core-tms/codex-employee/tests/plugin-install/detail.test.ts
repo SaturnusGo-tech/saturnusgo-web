@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { componentHarness, invoke, nodes, type Node } from "../../../portfolios/tests/support/component-harness";
+import { documentationLink } from "../../../documentation/navigation/documentation-link";
+import type { IntegrationGuideLink } from "../../../presentation/hooks/shared/theme/IntegrationGuideLink";
 import type { CodexDetail } from "../../presentation/setup/CodexDetail";
 import type { PluginInstallAction } from "../../../presentation/hooks/shared/plugin-install/PluginInstallAction";
 import type { useCodexEmployee } from "../../application/state/useCodexEmployee";
@@ -35,6 +37,52 @@ test("Codex detail delegates installation states and Manage while company activa
   phase = "error"; assert.ok(nodes(render()).find(node => node.props.role === "alert"));
   assert.equal(Boolean(action().props.disabled), false); h.dispose();
 });
+test("Codex detail opens the playbook panel and preserves the workspace URL", () => {
+  const h = componentHarness();
+  const linkHarness = componentHarness("https://falcon.test/work/?workspaceId=team&projectId=release&view=hooks&integration=codex");
+  let opened: [string, unknown] | undefined;
+  const { IntegrationGuideLink: Guide } = linkHarness.load<{ IntegrationGuideLink: typeof IntegrationGuideLink }>(
+    new URL("../../../presentation/hooks/shared/theme/IntegrationGuideLink.tsx", import.meta.url), name => {
+      if (name.endsWith("documentation-link")) return { documentationLink };
+      if (name.endsWith("workspace-history")) return { HISTORY_CHANGE: "falcon:navigation" };
+      if (name.endsWith("GuidePanelProvider")) return { useIntegrationGuide: () => ({ open: (article: string, trigger: unknown) => { opened = [article, trigger]; } }) };
+    });
+  const { CodexDetail: View } = h.load<{ CodexDetail: typeof CodexDetail }>(
+    new URL("../../presentation/setup/CodexDetail.tsx", import.meta.url), name => {
+      if (name.endsWith("useCodexInstall")) return { useCodexInstall: () => ({ phase: "idle", prepared: false }) };
+    });
+
+  const render = (locale: "en" | "ru") => nodes(h.render(() => View({ state: state(), locale, onBack() {} })))
+    .find(node => node.type === "IntegrationGuideLink" && node.props.article === "codex-prompts");
+  const playbook = render("en");
+  assert.ok(playbook);
+  assert.equal(text(playbook), "Codex playbook");
+  assert.equal(text(render("ru")), "Сценарии для Codex");
+
+  const props = playbook.props as Parameters<typeof Guide>[0];
+  linkHarness.render(() => Guide(props));
+  const link = linkHarness.render(() => Guide(props));
+  const target = "/work/?workspaceId=team&projectId=release&view=help&article=codex-prompts";
+  assert.equal(link.props.href, target);
+
+  let prevented = false;
+  const trigger = {};
+  const click = { button: 0, currentTarget: trigger, preventDefault() { prevented = true; } };
+  invoke(link, "onClick", { ...click, metaKey: true });
+  assert.equal(prevented, false);
+  assert.equal(opened, undefined);
+  invoke(link, "onClick", click);
+  assert.equal(prevented, true);
+  assert.deepEqual(opened, ["codex-prompts", trigger]);
+
+  linkHarness.navigate("https://falcon.test/work/?workspaceId=team&projectId=another&view=hooks");
+  linkHarness.emit("falcon:navigation");
+  assert.equal(linkHarness.render(() => Guide(props)).props.href,
+    "/work/?workspaceId=team&projectId=another&view=help&article=codex-prompts");
+  linkHarness.dispose();
+  h.dispose();
+});
+
 function actionHarness(initial: Partial<Parameters<typeof PluginInstallAction>[0]> = {}) {
   const listeners = new Map<string, (event: { target: unknown }) => void>();
   const h = componentHarness("https://falcon.test/", { document: {

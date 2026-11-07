@@ -12,6 +12,8 @@ import { useWorkspaceModel } from "../../state/model/useWorkspaceModel";
 import { Navigation } from "../navigation/Navigation";
 import { WorkspaceDialogs } from "../workspace-dialogs/WorkspaceDialogs";
 import { WorkspaceStage } from "../workspace-stage/WorkspaceStage";
+import { GuidePanelProvider } from "../../documentation/panel/GuidePanelProvider";
+import guideStyles from "../../documentation/panel/guide-panel.module.css";
 import styles from "../../tms.module.css";
 import { WorkspaceHeader } from "./WorkspaceHeader";
 import { VerificationQueueControl } from "../../runs/verification/presentation/queue/VerificationQueueControl";
@@ -97,8 +99,10 @@ export function LocalizedWorkspace() {
               {t("workspace.demoNotice")}
             </div>
           )}
-          <div className={`${styles.stageContent} ${motion.content}`} ref={pageRef} data-workspace-content>
-            <WorkspaceStage model={model} />
+          <div className={`${styles.stageContent} ${motion.content} ${guideStyles.workspaceContent}`} ref={pageRef} data-workspace-content>
+            <GuidePanelProvider scope={JSON.stringify([model.data.workspace.id, model.project?.id, model.view])} contentRef={pageRef}>
+              <WorkspaceStage model={model} />
+            </GuidePanelProvider>
           </div>
         </main>
         <VerificationQueueControl state={model.verification} workspaceId={model.data.workspace.id} />

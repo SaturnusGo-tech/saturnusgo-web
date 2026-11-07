@@ -5,10 +5,12 @@ import type { documentationCopy } from "../../localization/ui-copy";
 import type { DocArticle, DocBlock } from "../../model/article";
 import { documentationArticleImage } from "../../model/library";
 import type { useDocumentationNavigation } from "../../navigation/useDocumentationNavigation";
-import { DocumentationIcon } from "../icons/DocumentationIcon";
+import { DocumentationDisclosureIcon, DocumentationIcon } from "../icons/DocumentationIcon";
 import styles from "./reading.module.css";
 
-type ArticleNavigation = Pick<ReturnType<typeof useDocumentationNavigation>, "link" | "navigate">;
+export type ArticleNavigation = Pick<ReturnType<typeof useDocumentationNavigation>, "link" | "navigate"> & {
+  navigateSection?: ReturnType<typeof useDocumentationNavigation>["navigate"];
+};
 type ArticleCopy = { [Key in keyof typeof documentationCopy.en]: string };
 
 export function DocumentationArticleSections({ article, navigation, sectionLinkLabel, renderBlocks }: {
@@ -18,7 +20,7 @@ export function DocumentationArticleSections({ article, navigation, sectionLinkL
   renderBlocks: (blocks: DocBlock[]) => ReactNode;
 }) {
   return <>{article.sections.map(section => <section key={section.id} id={section.id} className={styles.articleSection} data-doc-section>
-    <h2>{section.title}<a href={navigation.link(article.id, section.id)} aria-label={`${sectionLinkLabel}: ${section.title}`}><LinkIcon size={16} /></a></h2>
+    <h2>{section.title}<a href={navigation.link(article.id, section.id)} onClick={event => navigation.navigateSection?.(event, article.id, section.id)} aria-label={`${sectionLinkLabel}: ${section.title}`}><LinkIcon size={16} /></a></h2>
     {renderBlocks(section.blocks)}
   </section>)}</>;
 }
@@ -43,8 +45,8 @@ export function DocumentationArticleContent({ article, navigation, copy, locale 
       {article.status === "planned" && <span className={styles.planned}>{copy.comingToFalcon}</span>}
       {image && <figure className={styles.articleImage}><img src={image.src} alt={image.alt} width={image.width} height={image.height} decoding="async" /></figure>}
     </header>
-    <details className={styles.mobileToc}><summary>{copy.onThisPage}</summary><nav aria-label={copy.articleContents}>
-      {article.sections.map((s) => <a key={s.id} href={navigation.link(article.id, s.id)}>{s.title}</a>)}</nav></details>
+    <details className={styles.mobileToc}><summary>{copy.onThisPage}<DocumentationDisclosureIcon /></summary><nav aria-label={copy.articleContents}>
+      {article.sections.map((s) => <a key={s.id} href={navigation.link(article.id, s.id)} onClick={event => navigation.navigateSection?.(event, article.id, s.id)}>{s.title}</a>)}</nav></details>
     <DocumentationArticleSections article={article} navigation={navigation} sectionLinkLabel={copy.sectionLink} renderBlocks={renderBlocks} />
     {article.sources && <section className={styles.sources} aria-label={copy.officialDocumentation}>
       <h2>{copy.officialDocumentation}</h2><p>{copy.serviceSetup}</p>
@@ -53,9 +55,9 @@ export function DocumentationArticleContent({ article, navigation, copy, locale 
     {related.length > 0 && <section className={styles.related} aria-label={copy.relatedArticles}><h2>{copy.relatedArticles}</h2>
       {related.map(neighbor => <a key={neighbor.id} href={navigation.link(neighbor.id)}
         onClick={(event) => navigation.navigate(event, neighbor.id)}><DocumentationIcon articleId={neighbor.id} size={16} /><span>{neighbor.title}</span><ArrowUpRight size={13} /></a>)}</section>}
-    <nav className={styles.pagination} aria-label={copy.adjacentArticles}>{adjacent.map(({ label, article: neighbor, Icon }) => neighbor
+    {(previous || next) && <nav className={styles.pagination} aria-label={copy.adjacentArticles}>{adjacent.map(({ label, article: neighbor, Icon }) => neighbor
       ? <a key={label} href={navigation.link(neighbor.id)} onClick={(event) => navigation.navigate(event, neighbor.id)}>
-        <span>{label}</span><strong><Icon size={15} />{neighbor.title}</strong></a> : <span key={label} />)}</nav>
+        <span>{label}</span><strong><Icon size={15} />{neighbor.title}</strong></a> : <span key={label} />)}</nav>}
     <footer className={styles.articleFooter}><span>{copy.updated}</span>
       {articleLink}
     </footer>

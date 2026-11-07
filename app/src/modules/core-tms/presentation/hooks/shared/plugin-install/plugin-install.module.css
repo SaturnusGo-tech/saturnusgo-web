@@ -1,5 +1,5 @@
 .root { --install-action: var(--falcon-action); --install-on-action: var(--falcon-on-action); --install-panel: var(--falcon-panel); --install-text: var(--falcon-text); --install-line: var(--falcon-border);
-  display: inline-flex; align-items: center; justify-content: flex-end; gap: 10px; max-width: 100%; font: inherit; }
+  display: inline-flex; flex-wrap: var(--install-action-wrap, nowrap); align-items: center; justify-content: flex-end; gap: 10px; max-width: 100%; font: inherit; }
 .slot { position: relative; flex: 0 0 164px; width: 164px; height: 36px; }
 .action, .secondary { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; border: 1px solid transparent; border-radius: 12px; padding: 6px 12px; cursor: pointer; font: inherit; white-space: nowrap; }
 .action { position: absolute; inset: 0; width: 100%; color: var(--install-on-action); background: var(--install-action); opacity: 1; transform: translateY(0);

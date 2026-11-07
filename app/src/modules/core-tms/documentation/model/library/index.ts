@@ -36,6 +36,11 @@ const subfolders: Readonly<Record<string, readonly FolderDefinition[]>> = {
     { id: "communication", title: { en: "Team communication", ru: "Командная работа" }, articleIds: ["slack", "confluence"] },
     { id: "apis", title: { en: "Connected APIs", ru: "Подключённые API" }, articleIds: ["swagger"] },
   ],
+  "codex-prompts": [
+    { id: "coverage", title: { en: "Coverage and setup", ru: "Покрытие и настройки" }, articleIds: ["codex-prompts-repository", "codex-prompts-configuration"] },
+    { id: "execution", title: { en: "Execution and follow-up", ru: "Проверки и дефекты" }, articleIds: ["codex-prompts-runs", "codex-prompts-web-qa", "codex-prompts-defects"] },
+    { id: "reporting", title: { en: "Reports and monitoring", ru: "Отчёты и мониторинг" }, articleIds: ["codex-prompts-reporting"] },
+  ],
   reference: [
     { id: "access", title: { en: "Settings and access", ru: "Настройки и доступ" }, articleIds: ["settings", "company-administration", "permissions"] },
   ],

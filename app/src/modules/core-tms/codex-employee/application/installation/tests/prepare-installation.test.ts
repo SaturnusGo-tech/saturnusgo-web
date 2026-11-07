@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import { prepareCodexInstallation, CODEX_PLUGIN_VERSION } from "../prepareCodexInstallation";
 import type { CodexEmployee } from "../../../domain/model/codex-employee";
@@ -11,6 +12,12 @@ test("internal registration accepts each current tenant without changing its end
     Object.freeze(value.scopes); Object.freeze(value);
     assert.equal(await prepareCodexInstallation(value), undefined); assert.deepEqual(value, original);
   }
+});
+test("internal registration accepts the workspace setup scopes advertised by the Falcon API", async () => {
+  const contract = JSON.parse(readFileSync(new URL("../../../../../../core/tms/generated/tms-openapi.json", import.meta.url), "utf8"));
+  const scopes = contract.components.schemas.CodexSetup.properties.server.properties.scopes.items.enum;
+  assert.ok(scopes.includes("falcon:dashboard-reminders:write"));
+  await prepareCodexInstallation({ ...setup("company.test"), scopes });
 });
 test("credentials, query tokens, fragments, insecure transport and cross-company URLs are rejected", async () => {
   for (const mcpUrl of ["https://user:password@company.test/api/v1/mcp", "https://company.test/api/v1/mcp?token=secret", "https://company.test/mcp#fragment", "http://company.test/mcp", "file:///tmp/mcp"])

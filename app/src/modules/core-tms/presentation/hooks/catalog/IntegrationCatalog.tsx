@@ -3,6 +3,7 @@ import { ArrowRotateCw, Search, X } from "@openai/apps-sdk-ui/components/Icon";
 import type { Provider } from "../../../connectors/model/connector-types";
 import { isProvider } from "../../../connectors/model/connector-types";
 import type { HooksCopy } from "../shared/hooks-copy";
+import { IntegrationGuideLink } from "../shared/theme/IntegrationGuideLink";
 import type { IntegrationId } from "./integration-definitions";
 import { catalogEntries, filterCatalog, type CatalogFilter, type CatalogGroup, type CatalogSource } from "./model/catalog-model";
 import { CatalogSidebar } from "./browser/CatalogSidebar";
@@ -43,10 +44,15 @@ export function IntegrationCatalog(props: CatalogSource & {
         </div>
         <p className={styles.subtitle}>{russian ? "Подключите инструменты команды к Falcon." : "Connect your team’s tools to Falcon."}</p>
       </header>
-      <nav className={styles.filters} aria-label={russian ? "Статус подключения" : "Connection status"}>
-        <button type="button" aria-pressed={filter === "all"} onClick={() => setFilter("all")}>{russian ? "Все сервисы" : "All services"}</button>
-        <button type="button" aria-pressed={filter === "connected"} onClick={() => setFilter("connected")}>{russian ? "Подключённые" : "Connected"}</button>
-      </nav>
+      <div className={styles.catalogTools}>
+        <nav className={styles.filters} aria-label={russian ? "Статус подключения" : "Connection status"}>
+          <button type="button" aria-pressed={filter === "all"} onClick={() => setFilter("all")}>{russian ? "Все сервисы" : "All services"}</button>
+          <button type="button" aria-pressed={filter === "connected"} onClick={() => setFilter("connected")}>{russian ? "Подключённые" : "Connected"}</button>
+        </nav>
+        {props.showCodex && <IntegrationGuideLink article="codex-prompts" className={styles.playbook}>
+          {russian ? "Сценарии для Codex" : "Codex playbook"}
+        </IntegrationGuideLink>}
+      </div>
       {(statusFailed || connectorState === "error") && <p className={styles.warning} role="status">{russian
         ? "Часть статусов недоступна. Обновите список или откройте сервис для проверки подключения."
         : "Some statuses are unavailable. Refresh the list or open a service to check its connection."}</p>}

@@ -1,0 +1,32 @@
+import { code, paragraph, section, type DocArticle } from "../../../model/article";
+
+export const reportingPrompts: DocArticle = {
+  id: "codex-prompts-reporting",
+  title: "Dashboards and reminders",
+  description: "Investigate a metric, adjust your private view, and schedule a report or threshold alert.",
+  group: "codex-prompts",
+  keywords: ["dashboard", "report", "metric", "threshold", "automation", "schedule", "reminder"],
+  related: ["codex-prompts", "dashboard", "codex-prompts-runs"],
+  sections: [
+    section("investigate-metric", "Find the runs behind a dashboard number",
+      paragraph("Use this when a dashboard number needs an explanation. Compare the server summary with the records behind the same period."),
+      code("prompt", "Drill into a failed-run count",
+        `For [project] and [dashboard], explain the failed-run count over the last 7 days. Read the saved dashboard and Falcon's project summary. List the completed failed runs behind the metric using the same period, including their links and build labels where available. Distinguish measurements from saved widget settings and say if any records were inaccessible. Keep this read-only.`)),
+    section("personal-view", "Tune my private dashboard view",
+      paragraph("Use this to change your workbench preferences or personal layout while leaving the team's shared settings in place."),
+      code("prompt", "Preview a private layout change",
+        `Read my private preferences for [dashboard] in [project]. I want [desired widget order or preference]. Show what changes in my personal view and what stays in the shared configuration. Wait for approval, then save the supported personal changes and verify the resulting view.`)),
+    section("shared-dashboard", "Review a shared dashboard change",
+      paragraph("Use this when the team needs a different saved view. Codex checks all member projects and reviews the complete widget list."),
+      code("prompt", "Review a shared dashboard layout",
+        `Open shared Falcon dashboard [dashboard] across [all member projects]. Propose adding [widget or metric] while preserving the other widgets. Show the complete resulting widget list, current default status and exact member projects before saving. If any project is outside my connection, tell me which one and stop the change.`)),
+    section("schedule-digest", "Schedule a weekly QA digest",
+      paragraph("Use this for a personal digest on a recurring schedule. Each run checks the current connection and reads the agreed project again."),
+      code("prompt", "Schedule a weekly dashboard summary",
+        `If Codex scheduling is available, set up a personal digest every Monday at 09:00 [IANA time zone] for [project and dashboard]. Summarize the previous 7 days of Falcon project metrics, with relevant links and missing-data notes. Check the saved dashboard and current access each time. Show the schedule and exact Falcon scope before saving it. Deliver the digest to me in Codex.`)),
+    section("threshold-alert", "Alert me when open defects reach a threshold",
+      paragraph("Use this for a personal alert based on a supported metric. The first sample sets the baseline. Future polls notify you when Falcon reports a new crossing."),
+      code("prompt", "Set an alert for a shared dashboard",
+        `On [shared dashboard] with [all member projects], set up a personal Falcon alert when open defects reach at least [count] for the 7-day period. Use the same anchor project and full member list for every check. Review the rule and check every hour in [IANA time zone] through an authorized Codex schedule. Save the first reading as the baseline. Alert me only when Falcon returns a new alert, including value, threshold and dashboard link.`)),
+  ],
+};

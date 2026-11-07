@@ -1,0 +1,32 @@
+import { code, paragraph, section, type DocArticle } from "../../../model/article";
+
+export const repositoryPrompts: DocArticle = {
+  id: "codex-prompts-repository",
+  title: "Test repository",
+  description: "Find coverage, plan revisions, import reviewed cases, and export a folder with its structure.",
+  group: "codex-prompts",
+  keywords: ["Falcon Query", "filter", "bulk", "import", "export", "revision", "coverage"],
+  related: ["codex-prompts", "import-export", "organize-cases", "edit-test-case"],
+  sections: [
+    section("filter-cases", "Find current coverage",
+      paragraph("Use this before writing cases. Codex returns matching cases with their folder paths and highlights checks you may be able to reuse."),
+      code("prompt", "Find cases with Falcon Query",
+        `In Falcon project [project], inspect [folder] and its subfolders. Find ready regression cases tagged [tag] and exclude cases tagged deprecated. Use Falcon Query and the folder filter if available. Follow the results through all pages. Give me case IDs, titles, folder paths and links. Flag any results marked Needs update. Keep this read-only.`)),
+    section("review-coverage", "Compare a requirement with existing cases",
+      paragraph("Use this when a story changes. The result is a reviewable proposal with separate additions and revisions."),
+      code("prompt", "Compare existing cases with a requirement",
+        `In Falcon project [project], compare [requirement or link] with the cases in [folder]. For each requirement, show which current case and revision covers it, which needs a revision, and which has no coverage. Cite the relevant part of the source. Draft full steps and expected results for the gaps. Label assumptions and wait for my approval before changing any case.`)),
+    section("preview-import", "Preview a JSON import",
+      paragraph("Use this with a portable Falcon JSON file. Review the destination, matches and issues before asking Codex to apply the import."),
+      code("prompt", "Check a case import before applying",
+        `Preview importing [Falcon JSON file] into [project], under [destination folder]. Show the resolved folder, proposed paths, case count, existing matches and validation issues. Tell me if the match scan is incomplete. Wait for me to approve the exact file and destination before applying. If the preview reports a blocker or changes, get a new review.`)),
+    section("bulk-change", "Review a bulk priority change",
+      paragraph("Use this for a whole filter result. Falcon can pin the matching case IDs and versions so the review and the write refer to the same selection."),
+      code("prompt", "Review and pin a bulk selection",
+        `In [project], pin the active cases in [folder] and its descendants that match [Falcon Query expression]. Show every selected case, its current priority and the proposed change to [new priority]. Stop after the preview. If any selection expires or changes before I approve, make a fresh preview for review.`)),
+    section("export-folder", "Export a folder for migration",
+      paragraph("Use this for a repository subtree including empty folders. Larger exports may arrive as several private, time-limited files."),
+      code("prompt", "Export an intact folder tree",
+        `Export [folder] and its subfolders in [project] as a portable Falcon JSON package. Include empty folders and exclude archived cases. Save the complete package to [approved local path]. If Falcon returns multiple private files, save them in the listed order and verify their SHA-256 values. Report case and folder totals and any omissions. Keep private download URLs out of the response.`)),
+  ],
+};

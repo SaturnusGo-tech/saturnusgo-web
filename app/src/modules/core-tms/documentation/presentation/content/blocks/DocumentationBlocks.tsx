@@ -12,7 +12,7 @@ type BlockContext = {
   navigation: Navigation;
   articleById: ReadonlyMap<string, DocArticle>;
   renderWalkthrough?: (block: Extract<DocBlock, { kind: "walkthrough" }>) => ReactNode;
-  renderCopy?: (value: string) => ReactNode;
+  renderCopy?: (value: string, isPrompt: boolean) => ReactNode;
 };
 
 export function DocumentationBlocks({ blocks, ...context }: { blocks: DocBlock[] } & BlockContext) {
@@ -38,10 +38,15 @@ function Block({ block, navigation, articleById, renderWalkthrough, renderCopy }
         <Icon size={16} aria-hidden="true" /><div><strong>{block.title}</strong><p><InlineText text={block.text} /></p></div>
       </aside>;
     }
-    case "code": return <figure className={styles.codeBlock}>
-      <figcaption><span>{block.caption}</span>{renderCopy?.(block.text)}</figcaption>
-      <pre tabIndex={0} aria-label={block.caption}><code>{block.text}</code></pre><span className={styles.codeLanguage}>{block.language}</span>
-    </figure>;
+    case "code": {
+      const isPrompt = block.language === "prompt";
+      return <figure className={styles.codeBlock} data-prompt={isPrompt || undefined}>
+        <figcaption><span>{block.caption}</span>{renderCopy?.(block.text, isPrompt)}</figcaption>
+        {isPrompt
+          ? <div className={styles.promptText}>{block.text}</div>
+          : <><pre tabIndex={0} aria-label={block.caption}><code>{block.text}</code></pre><span className={styles.codeLanguage}>{block.language}</span></>}
+      </figure>;
+    }
     case "table": return <div className={styles.tableScroll} role="region" aria-label={block.columns.join(" · ")} tabIndex={0}>
       <table><thead><tr>{block.columns.map((column) => <th key={column} scope="col">{column}</th>)}</tr></thead>
         <tbody>{block.rows.map((row, i) => <tr key={i}>{row.map((cell, j) => j === 0

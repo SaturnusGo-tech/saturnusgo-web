@@ -7,7 +7,7 @@ export const codexQaArticle: DocArticle = {
   id: "codex-web-qa", title: "Codex: подключённый веб-QA", group: "integrations",
   description: "Подключите Codex к своему пространству, согласуйте план веб-QA, выполняйте наблюдаемые проверки и продолжайте работу по сохранённым данным Falcon.",
   keywords: ["Codex", "QA", "виртуальный сотрудник", "Figma", "PDF", "URL", "существующие кейсы", "браузер", "согласие", "продолжить", "ретест"],
-  related: ["integration-overview", "falcon-ai-writing", "execute-run", "integration-troubleshooting"],
+  related: ["codex-prompts", "integration-overview", "falcon-ai-writing", "execute-run", "integration-troubleshooting"],
   sections: [
     section("purpose", "Выберите нужного помощника", paragraph("Меню аватара → Помощь → Falcon AI отвечает на вопросы по этому руководству. Falcon AI в редакторе улучшает выделенный текст. Подключённый плагин Falcon в Codex может выполнять разрешённые QA-действия и сохранять результаты в Falcon."),
       note("Доступность", "Возможности зависят от функций компании, вашей роли, разрешений подключения и поддерживаемого браузера Codex.")),

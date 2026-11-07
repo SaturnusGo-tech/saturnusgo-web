@@ -1,11 +1,12 @@
 import { createElement } from "react";
 import {
-  ArchiveRestore, ArrowRightLeft, Bell, Blocks, BookA, BookOpen, Braces,
+  ArchiveRestore, ArrowRightLeft, Bell, Blocks, BookA, BookOpen, BookOpenText, Braces,
   Bug, CirclePlay, CirclePlus, Copy, FilePenLine, FilePlus2, FileText,
   Folders, Highlighter, Layers3, LayoutDashboard, LifeBuoy, Link2,
   ListChecks, ListFilter, MessagesSquare, MonitorCheck, PanelLeft,
   PanelsTopLeft, Rocket, RotateCcw, ScrollText, Settings2, ShieldCheck,
   SlidersHorizontal, Sparkles, UserRound, UsersRound,
+  ChartNoAxesCombined, ClipboardCheck, FolderSearch, Globe, ListTodo, Wrench,
 } from "lucide-react";
 import { FaConfluence, FaGithub, FaGitlab, FaJenkins, FaJira, FaSlack, FaTrello } from "react-icons/fa6";
 import { SiLinear, SiSwagger, SiTeamcity, SiTelegram } from "react-icons/si";
@@ -43,6 +44,13 @@ const articleIcons = {
   "telegram-notifications": SiTelegram,
   "browser-notifications": MonitorCheck,
   "integration-overview": Blocks,
+  "codex-prompts": BookOpenText,
+  "codex-prompts-repository": FolderSearch,
+  "codex-prompts-runs": ClipboardCheck,
+  "codex-prompts-web-qa": Globe,
+  "codex-prompts-defects": ListTodo,
+  "codex-prompts-reporting": ChartNoAxesCombined,
+  "codex-prompts-configuration": Wrench,
   jira: FaJira,
   linear: SiLinear,
   trello: FaTrello,
@@ -78,4 +86,12 @@ export function DocumentationIcon({ articleId, size = 18, className }: {
   const Icon = Object.prototype.hasOwnProperty.call(articleIcons, articleId)
     ? articleIcons[articleId as keyof typeof articleIcons] : FileText;
   return createElement(Icon, { size, className, "aria-hidden": true, focusable: false, strokeWidth: 1.65, style: { flexShrink: 0 } });
+}
+
+export function DocumentationDisclosureIcon({ expanded = false }: { expanded?: boolean }) {
+  return <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+    strokeWidth="1.5" strokeLinecap="round" aria-hidden="true" focusable="false">
+    <path d="M4 8h8" />
+    {!expanded && <path d="M8 4v8" data-disclosure-stem />}
+  </svg>;
 }

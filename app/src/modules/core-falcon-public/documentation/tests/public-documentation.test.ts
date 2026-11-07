@@ -3,6 +3,34 @@ import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import test from "node:test";
 import { htmlLanguageForPath, isFalconPublicPath } from "../../../../shared/_components/route-flags";
+import { documentationCatalog } from "../../../core-tms/documentation/localization/catalog/locale-catalog";
+import { buildDocumentationFolders } from "../../../core-tms/documentation/model/library";
+import { searchArticles } from "../../../core-tms/documentation/model/search";
+import { publicDocumentationCatalog } from "../catalog";
+
+test("both readers expose the complete localized Codex playbook", () => {
+  const locales = ["en", "ru"] as const;
+  const sectionsByLocale = locales.map(locale => {
+    const { articles, groups } = publicDocumentationCatalog(locale);
+    const workspace = documentationCatalog(locale, false);
+    const publicPlaybook = articles.filter(article => article.group === "codex-prompts");
+    const workspacePlaybook = workspace.docArticles.filter(article => article.group === "codex-prompts");
+    const library = publicPlaybook.find(article => article.id === "codex-prompts");
+    assert.ok(library);
+    assert.equal(publicPlaybook.length, 7);
+    assert.deepEqual(publicPlaybook.map(article => article.sections), workspacePlaybook.map(article => article.sections));
+    const libraryFolder = buildDocumentationFolders(articles, groups, locale).find(folder => folder.id === "codex-prompts");
+    assert.deepEqual(libraryFolder?.articleIds, [library.id]);
+    assert.equal(libraryFolder.children.flatMap(folder => folder.articleIds).length, publicPlaybook.length - 1);
+    assert.equal(searchArticles(articles, locale === "ru" ? "сценарии codex" : "codex playbook", locale)[0]?.article.id, library.id);
+    const prompts = publicPlaybook.flatMap(article => article.sections.flatMap(section => section.blocks))
+      .filter(block => block.kind === "code" && block.language === "prompt");
+    assert.ok(prompts.length >= 24);
+    assert.ok(prompts.every(prompt => "text" in prompt && prompt.text.trim().length > 100));
+    return publicPlaybook.map(article => [article.id, article.sections.map(section => section.id)]);
+  });
+  assert.deepEqual(sectionsByLocale[0], sectionsByLocale[1]);
+});
 
 test("the public guide exposes only curated text in both languages", async () => {
   const module = await import("../catalog").catch(() => null);

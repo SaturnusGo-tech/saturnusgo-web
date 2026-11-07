@@ -1,0 +1,32 @@
+import { code, paragraph, section, type DocArticle } from "../../../model/article";
+
+export const configurationPrompts: DocArticle = {
+  id: "codex-prompts-configuration",
+  title: "Suites, environments and access",
+  description: "Configure reusable QA scope, organize projects and understand what your Codex connection permits.",
+  group: "codex-prompts",
+  keywords: ["suite", "environment", "staging", "portfolio", "custom field", "permissions", "access"],
+  related: ["codex-prompts", "test-suites", "portfolios", "custom-fields", "permissions"],
+  sections: [
+    section("dynamic-suite", "Build a dynamic smoke suite",
+      paragraph("Use this when membership should follow case filters. Review the rule independently of the cases it matches today."),
+      code("prompt", "Propose a rule-based test suite",
+        `In [project], propose a dynamic suite called [suite name] for ready cases tagged [tag] in [folder]. Show the supported rules and cases that currently match them. Flag criteria Falcon cannot express for a dynamic suite. Wait for approval before creating the suite and confirm the saved definition and server-resolved membership.`)),
+    section("staging-environment", "Prepare a staging environment",
+      paragraph("Use this to set up a browser target before planning a run. The base URL is enough for setup. Sign-in happens separately."),
+      code("prompt", "Configure a new staging environment",
+        `In [project], check for an existing staging environment with the same origin as [base URL]. If none exists, propose the key [key], display name [name], base URL and description [description]. Keep the current default. Show the exact change and wait for approval before creating it. Return the environment ID and approved origin. Use only URLs without credentials.`)),
+    section("review-field", "Add a missing field value",
+      paragraph("Use this when a category is missing from the catalog. Codex checks existing options and the intended parent before proposing a new value."),
+      code("prompt", "Review a new option in a custom field",
+        `In [project], look up the [custom field] definition and its available values. I need the option [new value] under [parent, if applicable]. Compare existing or similar options and show whether an existing value fits. If a new option is necessary, show the exact definition and parent before creating it. Leave existing cases untouched.`)),
+    section("move-portfolio", "Move a project between portfolios",
+      paragraph("Use this when restructuring project navigation. Codex needs access to the complete member lists of both portfolios for a reviewed move."),
+      code("prompt", "Review a portfolio move",
+        `In [workspace], prepare a move of [project] from [current portfolio] to [target portfolio]. Inspect the actual membership of both portfolios and show the full before and after lists. If the active connection cannot read every member project, explain the missing scope and stop. Apply the move only after I approve it, then verify the resulting membership.`)),
+    section("diagnose-access", "Understand a permission error",
+      paragraph("Use this when an action is unavailable or denied. Codex can identify whether the issue is with the connection, project selection or allowed action."),
+      code("prompt", "Diagnose Falcon access without changing it",
+        `In [workspace] and [project], I tried to [action] and got [error code or message]. Check the Falcon connection and the capabilities it advertises. Tell me whether this looks like a missing connection, a project outside the grant, or a missing capability or role. Separate what you can verify from what an administrator must confirm. Keep this read-only and tell me the supported way to reconnect if needed.`)),
+  ],
+};

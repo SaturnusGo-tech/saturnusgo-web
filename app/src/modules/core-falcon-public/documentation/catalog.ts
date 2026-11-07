@@ -11,6 +11,8 @@ const publicArticleIds = new Set([
   "colored-marker", "case-comments", "shared-steps", "organize-cases", "import-export", "test-suites",
   "create-run", "execute-run", "retest", "create-defect", "link-defect", "notifications",
   "telegram-notifications", "browser-notifications", "integration-overview", "codex-web-qa",
+  "codex-prompts", "codex-prompts-repository", "codex-prompts-runs", "codex-prompts-web-qa",
+  "codex-prompts-defects", "codex-prompts-reporting", "codex-prompts-configuration",
   "youtrack", "jira", "linear", "trello", "github", "slack", "confluence", "swagger",
   "integration-troubleshooting", "api-testing", "permissions", "glossary", "contact-support",
 ]);

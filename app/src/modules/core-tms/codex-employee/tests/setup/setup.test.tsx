@@ -5,10 +5,14 @@ import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { connection, status } from "../support/employee-fixture";
 import type { useCodexEmployee } from "../../application/state/useCodexEmployee";
 (globalThis as typeof globalThis & { React: typeof React }).React = React;
-Object.defineProperty(globalThis, "window", { value: { location: { href: "https://company.test/?view=config&settings=plugins&plugin=codex" } }, configurable: true });
+Object.defineProperty(globalThis, "window", {
+  value: Object.assign(new EventTarget(), { location: { href: "https://company.test/?view=config&settings=plugins&plugin=codex" } }),
+  configurable: true,
+});
 const previous = require.extensions[".css"];
 require.extensions[".css"] = module => { module.exports = {}; };
 const { CodexPluginManager } = require("../../presentation/plugin-management/CodexPluginManager") as typeof import("../../presentation/plugin-management/CodexPluginManager");
+const { CodexPluginPreview } = require("../../presentation/plugin-preview/CodexPluginPreview") as typeof import("../../presentation/plugin-preview/CodexPluginPreview");
 if (previous) require.extensions[".css"] = previous; else delete require.extensions[".css"];
 const state = { employee: { ...status, etag: '"3"' }, connections: [], loading: false, pending: false, error: null, connectionsError: null, refresh: () => {}, deactivate: async () => {}, revoke: async () => {} } satisfies ReturnType<typeof useCodexEmployee>;
 const render = (value: ReturnType<typeof useCodexEmployee> = state, locale: "en" | "ru" = "en") => create(<CodexPluginManager state={value} locale={locale} onBack={() => {}} onViewDetails={() => {}} />);
@@ -40,6 +44,28 @@ test("copy feedback reports clipboard success and failure without losing the con
     await act(async () => { await button.props.onClick(); }); assert.match(text(view), /Copy failed/); assert.equal(button.props.title, "Copy server URL");
     assert.equal(view.root.findByProps({ id: "codex-server-name" }).props.value, "falcon-company_2etest");
   } finally { act(() => view.unmount()); if (original) Object.defineProperty(globalThis, "navigator", original); else Reflect.deleteProperty(globalThis, "navigator"); }
+});
+test("copying a Codex example still works when the native shell denies the Clipboard API", async t => {
+  const writeText = async () => { throw new DOMException("Write permission denied", "NotAllowedError"); };
+  const originalNavigator = Object.getOwnPropertyDescriptor(globalThis, "navigator");
+  Object.defineProperty(globalThis, "navigator", { value: { clipboard: { writeText } }, configurable: true });
+  t.after(() => { if (originalNavigator) Object.defineProperty(globalThis, "navigator", originalNavigator); else Reflect.deleteProperty(globalThis, "navigator"); });
+  const view = create(<CodexPluginPreview ru={false} />);
+  t.after(() => act(() => view.unmount()));
+  let selected = false, removed = false, restoredFocus = false;
+  const field = { value: "", readOnly: false, style: {}, focus() {}, select() { selected = true; }, remove() { removed = true; } };
+  const activeElement = { focus() { restoredFocus = true; } };
+  const doc = { activeElement, getSelection: () => null, createElement: () => field, body: { appendChild() {} },
+    execCommand: (command: string) => command === "copy" && selected && !removed };
+  const originalDocument = Object.getOwnPropertyDescriptor(globalThis, "document");
+  Object.defineProperty(globalThis, "document", { value: doc, configurable: true });
+  t.after(() => { if (originalDocument) Object.defineProperty(globalThis, "document", originalDocument); else Reflect.deleteProperty(globalThis, "document"); });
+
+  await act(async () => { view.root.findAllByType("button")[0].props.onClick(); });
+
+  assert.match(text(view), /Copied\. Paste the task into Codex\./);
+  assert.equal(field.value, "Review this website and draft registration test cases. Organize the coverage into Falcon folders.");
+  assert.equal(removed && restoredFocus, true);
 });
 test("manual configuration is initially hidden, can be expanded and retains localized copy actions", () => {
   for (const locale of ["en", "ru"] as const) {

@@ -9,13 +9,9 @@ export const jiraWalkthrough = walkthrough("Connect Jira in Falcon", [
 ]);
 
 export const linearWalkthrough = walkthrough("Connect a Linear team", [
-  shot("integrations-01-catalog-20260914-en-20260928", "Choose the service in the catalog",
-    "Open **Integrations** in the current project and choose **Linear**. A plus action opens setup; a Connected label represents the saved connection state.",
-    "The current **Plugins** catalog includes the **Linear** row and its setup control. Confirm the intended Falcon project before opening the connection; viewing the catalog does not enable or configure it.",
-    "English Falcon Plugins catalog with the available Linear row and setup control."),
-  shot("linear-01-connection-20260914-en-20260928", "Link Falcon to a team",
-    "In **Settings → Plugins → Linear**, open **Connection setup → Connection**. Enter the **API key** and **Linear team ID**, then select **Verify access**. A short issue prefix does not replace the team ID. Save while disabled, create an Issues webhook for that team and copy its signing secret into Falcon.",
-    "Statuses and issues belong to the chosen team. The API key and webhook signing secret have different roles and must not be interchanged.",
+  shot("linear-01-connection-20260914-en-20260928", "Connection fields",
+    "Enter the **API key** and **Linear team ID** under **Service access**. Use **Incoming events** to copy the Falcon webhook URL and save Linear's signing secret.",
+    "The webhook URL appears after you save the connection.",
     "Linear connection with key, team and callback fields and no secret values entered."),
 ]);
 

@@ -14,5 +14,5 @@ export function ArticleBlocks({ blocks, navigation }: { blocks: DocBlock[]; navi
   const { articleById } = useDocumentationCatalog();
   return <DocumentationBlocks blocks={blocks} navigation={navigation} articleById={articleById}
     renderWalkthrough={block => <ArticleWalkthrough block={block} />}
-    renderCopy={value => <CopyButton value={value} label={copy.copyExample} />} />;
+    renderCopy={(value, isPrompt) => <CopyButton value={value} label={isPrompt ? copy.copyPrompt : copy.copyExample} />} />;
 }

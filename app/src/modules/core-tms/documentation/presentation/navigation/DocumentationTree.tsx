@@ -1,9 +1,10 @@
 "use client";
 import { useDocumentationCopy } from "../../localization/useDocumentationCopy";
 import { useDocumentationCatalog } from "../../access/useDocumentationCatalog";
-import { ChevronDown, Search, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { useEffect, useState, type RefObject } from "react";
 import type { useDocumentationNavigation } from "../../navigation/useDocumentationNavigation";
+import { DocumentationDisclosureIcon } from "../icons/DocumentationIcon";
 import styles from "../documentation.module.css";
 
 export function DocumentationTree({ navigation, query, onQuery, searchRef, onNavigate, onSearch }: {
@@ -25,7 +26,7 @@ export function DocumentationTree({ navigation, query, onQuery, searchRef, onNav
       {docGroups.map((item) => <section key={item.id} className={styles.treeGroup}>
         <button type="button" className={styles.groupToggle} aria-expanded={!closed.includes(item.id)} aria-controls={`docs-group-${item.id}`}
           onClick={() => setClosed((current) => current.includes(item.id) ? current.filter((id) => id !== item.id) : [...current, item.id])}>
-          <ChevronDown size={13} aria-hidden="true" /><span>{item.title}</span>
+          <DocumentationDisclosureIcon expanded={!closed.includes(item.id)} /><span>{item.title}</span>
         </button>
         <ul id={`docs-group-${item.id}`} hidden={closed.includes(item.id)}>{docArticles.filter((article) => article.group === item.id).map((article) =>
           <li key={article.id}><a href={navigation.link(article.id)} aria-current={!query && article.id === navigation.articleId ? "page" : undefined}

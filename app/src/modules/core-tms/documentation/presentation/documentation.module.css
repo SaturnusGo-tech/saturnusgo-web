@@ -80,8 +80,7 @@
 .tree { flex: 1; min-height: 0; overflow-y: auto; padding: 0 0 24px; scrollbar-width: thin; scrollbar-color: var(--docs-scrollbar) transparent; }
 .treeGroup { margin: 0 0 24px; }
 .groupToggle { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 3px 8px 9px; color: var(--docs-ink); background: transparent; border: 0; text-align: left; font-size: 12px !important; font-weight: 500 !important; line-height: 18px; }
-.groupToggle > svg { order: 1; flex-shrink: 0; color: var(--docs-muted); transition: transform 120ms ease; }
-.groupToggle[aria-expanded="false"] > svg { transform: rotate(-90deg); }
+.groupToggle > svg { order: 1; flex-shrink: 0; color: var(--docs-muted); }
 .treeGroup ul { list-style: none; padding: 0; margin: 0; }
 .treeGroup li { margin: 0; }
 .treeGroup a { --yt-link: var(--falcon-link); display: flex; gap: 6px; align-items: center; min-height: 33px; padding: 6px 8px; color: var(--docs-muted); border-radius: 8px; font-size: 14px; line-height: 21px; }
@@ -219,4 +218,3 @@
   .article, .searchResults { padding-inline: 18px; }
   .article h1, .searchResults h1 { font-size: 28px; line-height: 36px; }
 }
-@media (prefers-reduced-motion: reduce) { .groupToggle > svg { transition: none; } }

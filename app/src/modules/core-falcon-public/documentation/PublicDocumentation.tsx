@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type MouseEvent, type ReactNode } from "react";
+import { writeClipboardText } from "../../../shared/lib/clipboard";
 import type { DocArticle } from "../../core-tms/documentation/model/article";
 import { buildDocumentationFolders } from "../../core-tms/documentation/model/library";
 import { documentationCopy } from "../../core-tms/documentation/localization/ui-copy";
@@ -30,11 +31,18 @@ export type DocumentationReaderProps = {
   aiHref?: string;
   appHref?: string;
   embedded?: boolean;
+  panelLocation?: { id: string; section?: string };
 };
 
-export function DocumentationReader({ catalog: { articles, groups }, locale, activeId, href, onNavigate, renderArticle, renderHome, onAskAI, onLocaleChange, aiHref, appHref, embedded = false }: DocumentationReaderProps) {
+export function DocumentationReader({ catalog: { articles, groups }, locale, activeId, href, onNavigate, renderArticle, renderHome, onAskAI, onLocaleChange, aiHref, appHref, embedded = false, panelLocation }: DocumentationReaderProps) {
   const labels = publicDocLabels(locale);
-  const layoutRef = useRef<HTMLDivElement>(null);
+  const panel = Boolean(panelLocation);
+  const panelNavigationId = useId();
+  const navigationId = panel ? panelNavigationId : "public-doc-nav";
+  const readerRef = useRef<HTMLDivElement>(null);
+  const layoutRef = useRef<HTMLDivElement | null>(null);
+  const navigationToggleRef = useRef<HTMLButtonElement>(null);
+  const restoreArticleFocus = useRef(false);
   const [navigationOpen, setNavigationOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
@@ -45,30 +53,35 @@ export function DocumentationReader({ catalog: { articles, groups }, locale, act
   const folders = buildDocumentationFolders(articles, groups, locale);
   const groupTitle = groups.find(group => group.id === active.group)?.title;
   const articleById = new Map(articles.map(article => [article.id, article]));
-  const navigation = { link: href, navigate };
+  const navigation = { link: href, navigate, navigateSection: panel ? navigate : undefined };
+  const renderCopy = (value: string, isPrompt: boolean) => <ArticleCopyButton value={value} locale={locale} isPrompt={isPrompt} />;
 
   useEffect(() => {
     try { setLightTheme(window.localStorage.getItem("falcon-docs-theme") === "light"); } catch { /* Theme switching also works without storage. */ }
     const keyboard = (event: KeyboardEvent) => {
+      if (event.defaultPrevented || (panel && !readerRef.current?.parentElement?.contains(document.activeElement))) return;
       if (event.key === "Escape") { setNavigationOpen(false); setSearchOpen(false); }
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") { event.preventDefault(); setSearchOpen(true); }
     };
     window.addEventListener("keydown", keyboard);
     return () => window.removeEventListener("keydown", keyboard);
-  }, []);
+  }, [panel]);
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
-      let section = "";
-      try { section = decodeURIComponent(window.location.hash.slice(1)); } catch { /* An invalid hash opens the article from the top. */ }
-      const target = active.sections.some(item => item.id === section) ? document.getElementById(section) : null;
-      if (target && layoutRef.current?.contains(target)) target.scrollIntoView({ block: "start" });
+      let section = panelLocation?.section ?? "";
+      if (!panelLocation) try { section = decodeURIComponent(window.location.hash.slice(1)); } catch { /* An invalid hash opens the article from the top. */ }
+      const target = active.sections.some(item => item.id === section) ? layoutRef.current?.querySelector(`#${CSS.escape(section)}`) : null;
+      if (target) target.scrollIntoView({ block: "start" });
       else if (embedded) layoutRef.current?.scrollTo({ top: 0, behavior: "instant" });
       else window.scrollTo({ top: 0, behavior: "instant" });
-      layoutRef.current?.querySelector<HTMLElement>("#docs-article-title")?.focus({ preventScroll: true });
+      if (!panel || restoreArticleFocus.current) {
+        (target?.querySelector<HTMLAnchorElement>("h2 a") ?? layoutRef.current?.querySelector<HTMLElement>("#docs-article-title"))?.focus({ preventScroll: true });
+        restoreArticleFocus.current = false;
+      }
     });
     return () => window.cancelAnimationFrame(frame);
-  }, [active.id, embedded, locale]);
+  }, [active.id, embedded, locale, panel, panelLocation]);
 
   useEffect(() => {
     setActiveSection(active.sections[0]?.id ?? "");
@@ -77,13 +90,24 @@ export function DocumentationReader({ catalog: { articles, groups }, locale, act
       const visible = entries.filter(entry => entry.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
       if (visible[0]) setActiveSection(visible[0].target.id);
     }, { root: embedded ? layoutRef.current : null, rootMargin: "-90px 0px -65% 0px", threshold: 0 });
-    active.sections.forEach(section => { const element = document.getElementById(section.id); if (element) observer.observe(element); });
+    active.sections.forEach(section => {
+      const element = layoutRef.current?.querySelector(`#${CSS.escape(section.id)}`);
+      if (element) observer.observe(element);
+    });
     return () => observer.disconnect();
   }, [active, isHome, embedded]);
 
   function navigate(event: MouseEvent<HTMLAnchorElement>, id: string, section?: string) {
-    if (!event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) { setNavigationOpen(false); setSearchOpen(false); setCopied(false); }
+    if (!event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
+      restoreArticleFocus.current = panel;
+      setNavigationOpen(false); setSearchOpen(false); setCopied(false);
+    }
     onNavigate(event, id, section);
+  }
+
+  function closeNavigation() {
+    setNavigationOpen(false);
+    if (panel) navigationToggleRef.current?.focus({ preventScroll: true });
   }
 
   function changeTheme() {
@@ -103,21 +127,51 @@ export function DocumentationReader({ catalog: { articles, groups }, locale, act
         if (block.kind === "articles") return block.ids.flatMap(id => articleById.get(id)?.title ?? []).join("\n");
         return block.title;
       })])].join("\n\n");
-      await navigator.clipboard.writeText(text); setCopied(true);
+      await writeClipboardText(text); setCopied(true);
       window.setTimeout(() => setCopied(false), 1800);
     } catch { setCopied(false); }
   }
 
   const defaultArticle = <DocumentationArticleContent article={active} navigation={navigation} copy={documentationCopy[locale]} locale={locale}
     related={active.related.flatMap(id => articleById.get(id) ?? [])} previous={articles[articles.indexOf(active) - 1]} next={articles[articles.indexOf(active) + 1]}
-    renderBlocks={blocks => <DocumentationBlocks blocks={blocks} navigation={navigation} articleById={articleById} renderCopy={value => <ArticleCopyButton value={value} locale={locale} />} />} />;
+    renderBlocks={blocks => <DocumentationBlocks blocks={blocks} navigation={navigation} articleById={articleById} renderCopy={renderCopy} />} />;
 
-  return <div className={styles.page} lang={locale} data-documentation-reader data-theme={lightTheme ? "light" : "dark"} data-embedded={embedded}>
-    <a className={styles.skipLink} href="#public-doc-content">{labels.onPage}</a>
-    {navigationOpen && <button className={styles.mobileBackdrop} type="button" aria-label={labels.close} onClick={() => setNavigationOpen(false)} />}
-    <aside id="public-doc-nav" className={`${styles.sidebar} ${navigationOpen ? styles.sidebarOpen : ""}`} aria-label={labels.browse}>
+  const header = <header className={styles.header}>
+    <button ref={navigationToggleRef} className={styles.mobileToggle} type="button" onClick={() => navigationOpen ? closeNavigation() : setNavigationOpen(true)}
+      aria-expanded={navigationOpen} aria-controls={navigationId} aria-label={navigationOpen ? labels.close : labels.browse} title={navigationOpen ? labels.close : labels.browse}>
+      <PublicDocsIcon name={navigationOpen ? "close" : "menu"} />
+    </button>
+    <nav className={styles.breadcrumbs} aria-label={labels.browse}>
+      {panel
+        ? <span className={styles.panelTitle}>{active.title}</span>
+        : <><a href={href("introduction")} onClick={event => navigate(event, "introduction")}>{isHome ? "Falcon Docs" : groupTitle}</a>{!isHome && <><span className={styles.breadcrumbDivider} aria-hidden="true" /><span>{active.title}</span></>}</>}
+    </nav>
+    <div className={styles.headerActions}>
+      <button className={`${styles.iconButton} ${styles.mobileSearch}`} type="button" onClick={() => setSearchOpen(true)} aria-label={labels.search} title={labels.search}><PublicDocsIcon name="search" /></button>
+      {!panel && <button className={styles.iconButton} type="button" onClick={changeTheme} aria-label={labels.theme} title={labels.theme} aria-pressed={lightTheme}><PublicDocsIcon name="theme" /></button>}
+      <button className={styles.copyPage} type="button" onClick={copyPage} aria-label={copied ? labels.copied : labels.copyPage} title={copied ? labels.copied : labels.copyPage}><PublicDocsIcon name={copied ? "check" : "copy"} /><span aria-live="polite">{copied ? labels.copied : labels.copyPage}</span></button>
+      {!panel && <a className={styles.openApp} href={appHref ?? `/cloud-login/?lang=${locale}`}>{labels.open}<PublicDocsIcon name="arrow" /></a>}
+    </div>
+  </header>;
+
+  return <div ref={readerRef} className={styles.page} lang={locale} data-documentation-reader data-theme={lightTheme ? "light" : "dark"} data-embedded={embedded} data-guide-panel={panel || undefined}
+    onKeyDown={panel ? event => {
+      if (event.key === "Escape" && navigationOpen && !(event.target as HTMLElement).closest("dialog[open]")) {
+        event.preventDefault(); event.stopPropagation(); closeNavigation();
+      }
+    } : undefined}>
+    <a className={styles.skipLink} href="#public-doc-content" onClick={panel ? event => {
+      event.preventDefault();
+      const content = layoutRef.current?.querySelector<HTMLElement>("#public-doc-content");
+      content?.focus({ preventScroll: true });
+      content?.scrollIntoView({ block: "start" });
+    } : undefined}>{labels.onPage}</a>
+    {panel && header}
+    {navigationOpen && <button className={styles.mobileBackdrop} type="button" tabIndex={panel ? -1 : undefined} aria-label={labels.close} onClick={closeNavigation} />}
+    <aside id={navigationId} className={`${styles.sidebar} ${navigationOpen ? styles.sidebarOpen : ""}`} aria-label={labels.browse}
+      ref={element => { if (element && panel) element.inert = !navigationOpen; }}>
       <div className={styles.sidebarBrand}>
-        <a href={locale === "ru" ? "/ru/" : "/"} className={styles.brand} aria-label={labels.home}><img src={mark} alt="" width="24" height="24" /><span>Falcon</span></a>
+        <a href={panel ? href("introduction") : locale === "ru" ? "/ru/" : "/"} onClick={panel ? event => navigate(event, "introduction") : undefined} className={styles.brand} aria-label={labels.home}><img src={mark} alt="" width="24" height="24" /><span>Falcon</span></a>
         <span className={styles.brandDivider} />
         <a href={href("introduction")} className={styles.docLabel} onClick={event => navigate(event, "introduction")}>Docs</a>
         <button type="button" className={styles.searchButton} onClick={() => setSearchOpen(true)} aria-label={labels.search} title={`${labels.search} (⌘K)`}><PublicDocsIcon name="search" /></button>
@@ -125,27 +179,21 @@ export function DocumentationReader({ catalog: { articles, groups }, locale, act
       <div className={styles.sidebarScroll}><PublicDocsNavigation folders={folders} articles={articles} activeId={active.id} href={href} onNavigate={navigate} /></div>
       <footer className={styles.sidebarFooter}>
         <a href={href("contact-support")} onClick={event => navigate(event, "contact-support")}>{labels.support}<PublicDocsIcon name="arrow" /></a>
-        <a href={locale === "ru" ? "/ru/" : "/"}>{labels.website}<PublicDocsIcon name="external" /></a>
-        <div className={styles.languages} aria-label={labels.language}><a href={`/docs/?article=${active.id}`} aria-current={locale === "en" ? "page" : undefined} lang="en" onClick={onLocaleChange ? event => { event.preventDefault(); onLocaleChange("en"); } : undefined}>English</a><span>/</span><a href={`/ru/docs/?article=${active.id}`} aria-current={locale === "ru" ? "page" : undefined} lang="ru" onClick={onLocaleChange ? event => { event.preventDefault(); onLocaleChange("ru"); } : undefined}>Русский</a></div>
+        {!panel && <a href={locale === "ru" ? "/ru/" : "/"}>{labels.website}<PublicDocsIcon name="external" /></a>}
+        {!panel && <div className={styles.languages} aria-label={labels.language}><a href={`/docs/?article=${active.id}`} aria-current={locale === "en" ? "page" : undefined} lang="en" onClick={onLocaleChange ? event => { event.preventDefault(); onLocaleChange("en"); } : undefined}>English</a><span>/</span><a href={`/ru/docs/?article=${active.id}`} aria-current={locale === "ru" ? "page" : undefined} lang="ru" onClick={onLocaleChange ? event => { event.preventDefault(); onLocaleChange("ru"); } : undefined}>Русский</a></div>}
       </footer>
     </aside>
-    <header className={styles.header}>
-      <button className={styles.mobileToggle} type="button" onClick={() => setNavigationOpen(value => !value)} aria-expanded={navigationOpen} aria-controls="public-doc-nav" aria-label={navigationOpen ? labels.close : labels.browse}><PublicDocsIcon name={navigationOpen ? "close" : "menu"} /></button>
-      <nav className={styles.breadcrumbs} aria-label={labels.browse}><a href={href("introduction")} onClick={event => navigate(event, "introduction")}>{isHome ? "Falcon Docs" : groupTitle}</a>{!isHome && <><PublicDocsIcon name="chevron" /><span>{active.title}</span></>}</nav>
-      <div className={styles.headerActions}>
-        <button className={`${styles.iconButton} ${styles.mobileSearch}`} type="button" onClick={() => setSearchOpen(true)} aria-label={labels.search}><PublicDocsIcon name="search" /></button>
-        <button className={styles.iconButton} type="button" onClick={changeTheme} aria-label={labels.theme} title={labels.theme} aria-pressed={lightTheme}><PublicDocsIcon name="theme" /></button>
-        <button className={styles.copyPage} type="button" onClick={copyPage} aria-label={copied ? labels.copied : labels.copyPage}><PublicDocsIcon name={copied ? "check" : "copy"} /><span aria-live="polite">{copied ? labels.copied : labels.copyPage}</span></button>
-        <a className={styles.openApp} href={appHref ?? `/cloud-login/?lang=${locale}`}>{labels.open}<PublicDocsIcon name="arrow" /></a>
-      </div>
-    </header>
-    <div ref={layoutRef} className={`${styles.layout} ${isHome ? styles.homeLayout : ""}`}>
-      <main id="public-doc-content" className={`${styles.main} ${isHome ? styles.homeMain : ""}`}>
-        {isHome ? renderHome?.(active) ?? <DocumentationHome catalog={{ docArticles: articles, docGroups: groups, articleById, locale }} href={href} onNavigate={navigate} renderIntroduction={article => <DocumentationArticleSections article={article} navigation={navigation} sectionLinkLabel={documentationCopy[locale].sectionLink} renderBlocks={blocks => <DocumentationBlocks blocks={blocks} navigation={navigation} articleById={articleById} renderCopy={value => <ArticleCopyButton value={value} locale={locale} />} />} />} /> : renderArticle?.(active) ?? defaultArticle}
+    {!panel && header}
+    <div ref={element => {
+      layoutRef.current = element;
+      if (element && panel) element.inert = navigationOpen;
+    }} className={`${styles.layout} ${isHome ? styles.homeLayout : ""}`}>
+      <main id="public-doc-content" tabIndex={panel ? -1 : undefined} className={`${styles.main} ${isHome ? styles.homeMain : ""}`}>
+        {isHome ? renderHome?.(active) ?? <DocumentationHome catalog={{ docArticles: articles, docGroups: groups, articleById, locale }} href={href} onNavigate={navigate} renderIntroduction={article => <DocumentationArticleSections article={article} navigation={navigation} sectionLinkLabel={documentationCopy[locale].sectionLink} renderBlocks={blocks => <DocumentationBlocks blocks={blocks} navigation={navigation} articleById={articleById} renderCopy={renderCopy} />} />} /> : renderArticle?.(active) ?? defaultArticle}
       </main>
-      {!isHome && <aside className={styles.outline} aria-label={labels.onPage}><p>{labels.onPage}</p><nav>{active.sections.map(section => <a key={section.id} href={href(active.id, section.id)} aria-current={activeSection === section.id ? "location" : undefined} onClick={() => setActiveSection(section.id)}>{section.title}</a>)}</nav></aside>}
+      {!isHome && <aside className={styles.outline} aria-label={labels.onPage}><p>{labels.onPage}</p><nav>{active.sections.map(section => <a key={section.id} href={href(active.id, section.id)} aria-current={activeSection === section.id ? "location" : undefined} onClick={event => { setActiveSection(section.id); if (panel) navigate(event, active.id, section.id); }}>{section.title}</a>)}</nav></aside>}
     </div>
-    <a className={styles.aiPill} href={aiHref ?? `/cloud-login/?lang=${locale}&guide=chat`} aria-label={onAskAI ? "Falcon AI" : labels.ai} onClick={onAskAI}><img src={mark} alt="" width="20" height="20" /><span>Falcon AI</span></a>
+    {!panel && <a className={styles.aiPill} href={aiHref ?? `/cloud-login/?lang=${locale}&guide=chat`} aria-label={onAskAI ? "Falcon AI" : labels.ai} onClick={onAskAI}><img src={mark} alt="" width="20" height="20" /><span>Falcon AI</span></a>}
     {searchOpen && <PublicDocsSearch articles={articles} locale={locale} href={href} onClose={() => setSearchOpen(false)} onNavigate={navigate} />}
   </div>;
 }

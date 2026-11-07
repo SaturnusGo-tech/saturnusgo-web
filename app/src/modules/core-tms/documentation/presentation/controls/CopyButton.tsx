@@ -1,6 +1,7 @@
 import { useDocumentationCopy } from "../../localization/useDocumentationCopy";
 import { Check, Copy } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { writeClipboardText } from "../../../../../shared/lib/clipboard";
 import styles from "../documentation.module.css";
 
 export function CopyButton({ value, label }: { value: string | (() => string); label: string }) {
@@ -9,7 +10,7 @@ export function CopyButton({ value, label }: { value: string | (() => string); l
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => () => clearTimeout(timer.current), []);
   async function copyToClipboard() {
-    try { await navigator.clipboard.writeText(typeof value === "function" ? value() : value); setState("copied"); }
+    try { await writeClipboardText(typeof value === "function" ? value() : value); setState("copied"); }
     catch { setState("failed"); }
     clearTimeout(timer.current); timer.current = setTimeout(() => setState("idle"), 3000);
   }

@@ -1,4 +1,5 @@
 import { codexQaArticle } from "./integrations/codex/codex-qa";
+import { codexPromptArticles } from "./codex-prompts";
 import { navigationArticle } from "./navigation/sidebar";
 import { settingsArticle } from "./navigation/settings";
 import { customFieldsArticle } from "./custom-fields/overview";
@@ -37,6 +38,7 @@ export const docGroups = [
   { id: "defects", title: "Работа с дефектами" },
   { id: "notifications", title: "Уведомления" },
   { id: "integrations", title: "Интеграции" },
+  { id: "codex-prompts", title: "Сценарии для Codex" },
   { id: "reference", title: "Справочник" },
 ] as const;
 export const docArticles: readonly DocArticle[] = [
@@ -44,6 +46,6 @@ export const docArticles: readonly DocArticle[] = [
   ...gettingStarted, navigationArticle, settingsArticle, ...companyAccessArticles, portfoliosArticle, dashboardArticle, ...caseAuthoring, customFieldsArticle, customFieldValuesArticle, writingAssistantArticle, coloredMarkerArticle, caseCommentsArticle, ...caseOrganization,
   suitesArticle, ...executionArticles, ...defectArticles, notificationsArticle, ...notificationChannelArticles, integrationOverview, codexQaArticle,
   boardAndYouTrack[1], ...trackerArticles, boardAndYouTrack[0], githubArticle,
-  ...communicationArticles, swaggerArticle, ...plannedIntegrations, troubleshootingArticle, toolsArticle, ...referenceArticles,
+  ...communicationArticles, swaggerArticle, ...plannedIntegrations, troubleshootingArticle, ...codexPromptArticles, toolsArticle, ...referenceArticles,
 ];
 export const articleById = new Map(docArticles.map((article) => [article.id, article]));

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, ChevronRight, Copy } from "@openai/apps-sdk-ui/components/Icon";
+import { writeClipboardText } from "../../../../../shared/lib/clipboard";
 import type { CodexEmployee } from "../../domain/model/codex-employee";
 import { defaultServerName, validServerName } from "../setup/setup-name";
 import surface from "../plugin-surface/plugin.module.css";
@@ -19,7 +20,7 @@ export function CodexConnectionSetup({ employee, setup: connection, locale, open
   const command = `codex mcp login ${name} --scopes ${setup.scopes.join(",")}`;
   useEffect(() => { if (panel.current) panel.current.inert = !open; if (open) input.current?.focus({ preventScroll: true }); }, [open]);
   const copy = async (value: string, id: string) => {
-    try { await navigator.clipboard.writeText(value); setCopied({ url: setup.mcpUrl, id, result: "copied" }); }
+    try { await writeClipboardText(value); setCopied({ url: setup.mcpUrl, id, result: "copied" }); }
     catch { setCopied({ url: setup.mcpUrl, id, result: "error" }); }
   };
   const copyButton = (id: string, value: string, label: string, disabled = false) => {

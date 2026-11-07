@@ -1,7 +1,8 @@
+.detailActions a.playbook, .detailActions a.playbook:hover { border-radius: 999px; padding-inline: 14px; color: var(--plugin-on-action); }
 .description { margin: 30px 0 0; font-size: 15px; line-height: 25px; color: var(--plugin-text); }
 .connection { display: flex; align-items: center; gap: 16px; width: 100%; min-height: 84px; padding: 16px; background: transparent; border: 0; border-top: 1px solid var(--plugin-line); border-bottom: 1px solid var(--plugin-line); border-radius: 12px; color: var(--plugin-text); text-align: left; cursor: pointer; }
 .connection:hover { background: var(--plugin-panel); }
 .connection strong { display: block; font-size: 15px; font-weight: 500; }
 .connection strong + span { display: block; margin-top: 4px; color: var(--plugin-muted); line-height: 21px; }
 .status { color: var(--plugin-muted); font-size: 13px; white-space: nowrap; }
-@media(max-width: 650px) { .connection { gap: 12px; } .status { display: none; } .description { font-size: 14px; line-height: 23px; } }
+@media(max-width: 650px) { .detailActions { --install-action-wrap: wrap; min-width: 0; } .connection { gap: 12px; } .status { display: none; } .description { font-size: 14px; line-height: 23px; } }

@@ -1,0 +1,32 @@
+import { code, paragraph, section, type DocArticle } from "../../../model/article";
+
+export const defectPrompts: DocArticle = {
+  id: "codex-prompts-defects",
+  title: "Defects and fixes",
+  description: "Check for duplicates, prepare a traceable report, and verify a fix against observed evidence.",
+  group: "codex-prompts",
+  keywords: ["bug", "duplicate", "triage", "YouTrack", "Jira", "evidence", "retest"],
+  related: ["codex-prompts", "create-defect", "link-defect", "codex-prompts-web-qa"],
+  sections: [
+    section("find-duplicate", "Check whether a bug is already tracked",
+      paragraph("Use this before opening a report. Codex compares actual symptoms and linked occurrences."),
+      code("prompt", "Find a matching defect",
+        `In [project], look for defects matching [symptom] in [component or flow]. Check open and recently closed matches and read the strongest candidates. Compare reproduction steps, affected environment and case or run links. Separate likely duplicates from similar symptoms with different evidence. Return Falcon links and keep this read-only.`)),
+    section("draft-defect", "Draft a defect from a failed step",
+      paragraph("Use this when a run provides the evidence. Review the report and any configured tracker routing before it is created."),
+      code("prompt", "Draft a defect with the run occurrence",
+        `Draft a Falcon defect for [run link], [case ID or item], [step]. Use the saved attempt to write the observed behavior, expected behavior, reproducible steps and evidence references. Suggest a severity and explain it. Check for duplicates and check whether filing would create or update an issue in an external tracker. Show the exact draft and routing for approval before creating anything.`)),
+    section("trace-case", "Trace defects back to a case",
+      paragraph("Use this when a recurring failure might already have history across runs. Include defects linked directly to the case as well as those reported from attempts."),
+      code("prompt", "Map a case to its known defects",
+        `For [case ID] in [project], find defects linked directly to the case or through run occurrences. Group repeated occurrences by defect. Include the recorded status, relevant run, item, attempt and any verified tracker link. Point out gaps in accessible history and keep this read-only.`)),
+    section("handoff-comment", "Prepare a handoff with a Falcon mention",
+      paragraph("Use this when someone needs to pick up a defect. Review who will receive the Falcon inbox notification and what the comment says."),
+      code("prompt", "Draft a defect comment and verify the recipient",
+        `In [defect link], review the latest discussion and draft a concise handoff for [name] with the observed issue, the evidence link and the next check. Resolve the recipient against eligible Falcon users. Show me the exact comment and recipient before posting. Keep the notification in Falcon.`)),
+    section("confirm-fix", "Verify a fix using its retest evidence",
+      paragraph("Use this once the relevant attempt has been run. A passing retest for the exact occurrence is the basis for confirmation."),
+      code("prompt", "Review an observed fix",
+        `Review [defect link] against the saved retest at [run link and case]. Match the original occurrence and applicable step to the actual passing evidence in the latest attempt. If the evidence is sufficient, propose the exact fix confirmation and any tracker effect for approval. Otherwise show which checks or evidence are missing. Confirm only after the review and required authorization.`)),
+  ],
+};

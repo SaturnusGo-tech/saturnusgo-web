@@ -86,6 +86,15 @@
 .codeBlock figcaption > span:first-child { flex: 1; }
 .codeBlock pre { margin: 0; padding: 18px; overflow: auto; color: var(--docs-copy); font: 13px/24px var(--font-geist-mono), ui-monospace, monospace; tab-size: 2; scrollbar-width: thin; scrollbar-color: var(--docs-scrollbar) transparent; }
 .codeLanguage { display: block; padding: 0 18px 14px; color: var(--docs-muted); font: 11px var(--font-geist-mono), ui-monospace, monospace; }
+.codeBlock[data-prompt] {
+  margin: 16px 0 0;
+  border-color: var(--docs-prompt-border, color-mix(in srgb, var(--docs-ink) 16%, var(--docs-bg)));
+  border-radius: 12px;
+  background: var(--docs-prompt-surface, color-mix(in srgb, var(--docs-ink) 6%, var(--docs-bg)));
+}
+.codeBlock[data-prompt] figcaption { border-color: inherit; }
+.codeBlock[data-prompt] figcaption > span:first-child { color: var(--docs-ink); font-weight: 500; }
+.promptText { padding: 16px 18px; color: var(--docs-ink); font-size: 14px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
 .articleLinks { display: grid; gap: 3px; margin: 20px 0 28px; }
 .articleLinks > a { display: flex; align-items: flex-start; gap: 11px; padding: 10px 0; }
 .articleLinks > a > svg { flex-shrink: 0; margin-top: 4px; color: var(--docs-muted); }
@@ -110,7 +119,11 @@
 .pagination a:last-child strong > svg { order: 1; }
 .articleFooter { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 38px; color: var(--docs-muted); font-size: 12px; line-height: 20px; }
 .mobileToc { display: none; margin-bottom: 34px; padding: 12px 0; border-block: 1px solid var(--docs-line); font-size: 14px; line-height: 24px; }
-.mobileToc summary { cursor: pointer; color: var(--docs-copy); }
+.mobileToc summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; list-style: none; cursor: pointer; color: var(--docs-copy); }
+.mobileToc summary::marker { content: ""; }
+.mobileToc summary::-webkit-details-marker { display: none; }
+.mobileToc summary svg { color: var(--docs-muted); }
+.mobileToc[open] summary [data-disclosure-stem] { visibility: hidden; }
 .mobileToc nav { padding-top: 10px; }
 .mobileToc a { display: block; padding: 5px 0; color: var(--docs-muted); }
 .mobileToc a:hover { color: var(--docs-ink); }

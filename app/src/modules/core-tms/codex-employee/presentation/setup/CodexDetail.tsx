@@ -6,6 +6,7 @@ import { CodexMark } from "../branding/CodexMark";
 import { CodexResourceState } from "../shared/CodexResourceState";
 import { CodexPluginPreview } from "../plugin-preview/CodexPluginPreview";
 import { useCodexInstall } from "./installation/useCodexInstall";
+import { IntegrationGuideLink } from "../../../presentation/hooks/shared/theme/IntegrationGuideLink";
 import { PluginInstallAction } from "../../../presentation/hooks/shared/plugin-install/PluginInstallAction";
 import surface from "../plugin-surface/plugin.module.css";
 import css from "./setup.module.css";
@@ -26,8 +27,13 @@ export function CodexDetail({ state, locale, onBack, onManage = () => {}, accoun
       <header className={surface.header}>
         <div className={surface.identity}><div className={surface.logo}><CodexMark /></div><div><h1 ref={title} tabIndex={-1}>Codex</h1>
           <p>{ru ? "Falcon · Полный QA-цикл из Codex" : "Falcon · Your QA workflow in Codex"}</p></div></div>
-        <div className={surface.actions}><PluginInstallAction installed={prepared} installing={installing} disabled={state.loading || !(state.connection ?? employee?.setup)} ru={ru}
-          canManage={state.canConnect ?? employee?.status === "active"} onInstall={() => void installation.install()} onManage={onManage} /></div>
+        <div className={`${surface.actions} ${css.detailActions}`}>
+          <IntegrationGuideLink article="codex-prompts" className={`${surface.primary} ${css.playbook}`}>
+            {ru ? "Сценарии для Codex" : "Codex playbook"}
+          </IntegrationGuideLink>
+          <PluginInstallAction installed={prepared} installing={installing} disabled={state.loading || !(state.connection ?? employee?.setup)} ru={ru}
+            canManage={state.canConnect ?? employee?.status === "active"} onInstall={() => void installation.install()} onManage={onManage} />
+        </div>
       </header>
       <CodexResourceState loading={state.loading} error={state.error} locale={locale} retry={state.refresh} />
       {state.readOnly && <p className={surface.notice}>{ru ? "Доступны только чтение и экспорт. Изменения и выполнение отключены." : "Read and export access only. Changes and execution are disabled."}</p>}

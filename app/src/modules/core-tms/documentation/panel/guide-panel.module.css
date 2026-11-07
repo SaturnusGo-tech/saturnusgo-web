@@ -1,0 +1,79 @@
+.panel {
+  position: fixed;
+  z-index: 90;
+  inset: max(var(--falcon-native-toolbar, 0px), var(--falcon-desktop-caption, 0px)) 0 0 auto;
+  width: var(--guide-panel-width, 50%);
+  overflow: hidden;
+  container: integration-guide / inline-size;
+  background: var(--falcon-surface);
+  outline: none;
+  box-shadow: -10px 0 36px var(--falcon-scrim);
+  transition: width 320ms cubic-bezier(.16, 1, .3, 1);
+}
+
+.panel[data-expanded="true"] { width: 100%; }
+.panel[data-exiting="true"] { pointer-events: none; }
+.panel[data-dragging="true"] { transition: none; }
+
+.resizeHandle {
+  position: absolute;
+  z-index: 9;
+  inset: 0 auto 0 0;
+  width: 12px;
+  border-inline-start: 1px solid var(--falcon-border-strong);
+  cursor: col-resize;
+  touch-action: none;
+  user-select: none;
+}
+
+.resizeHandle::after {
+  content: "";
+  position: absolute;
+  inset: calc(50% - 16px) auto auto 3px;
+  width: 3px;
+  height: 32px;
+  border-radius: 3px;
+  background: var(--falcon-text-muted);
+  transition: background 150ms ease;
+}
+
+.resizeHandle:is(:hover, :focus-visible)::after,
+.panel[data-dragging="true"] .resizeHandle::after { background: var(--falcon-text); }
+.resizeHandle:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: -2px; }
+
+.workspaceContent { margin-inline-end: var(--integration-guide-reserve, 0px); }
+
+.actions {
+  position: absolute;
+  z-index: 8;
+  inset: 0 16px auto auto;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.actions button {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--falcon-text-muted);
+  cursor: pointer;
+}
+
+.actions button:hover { color: var(--falcon-text); background: var(--falcon-hover); }
+.actions button:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 2px; }
+
+@media (max-width: 760px) {
+  .panel { width: 100%; }
+  .actions .resize { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel, .resizeHandle::after { transition: none; }
+}
