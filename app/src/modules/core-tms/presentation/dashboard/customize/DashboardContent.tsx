@@ -16,7 +16,9 @@ import { dashboardSections, widgetSection, sectionMoveTarget, sectionLabels } fr
 import surface from "../dashboard.module.css";
 import styles from "./layout.module.css";
 
-export function DashboardContent({ onOpenRow, layout, model }: DashboardViewProps & { layout: DashboardLayoutModel; model: DashboardModel }) {
+export function DashboardContent({ onOpenRow, layout, model, personalEditing }: DashboardViewProps & {
+  layout: DashboardLayoutModel; model: DashboardModel; personalEditing: boolean;
+}) {
   const { languageTag, t, locale } = useTmsLocale();
   const { analytics, workbench, snapshot, preferences } = model;
   const { period, filtersOpen } = preferences.value;
@@ -37,11 +39,12 @@ export function DashboardContent({ onOpenRow, layout, model }: DashboardViewProp
       <AnimatedSelect compact className={styles.period} label={t("dashboard.period")} value={period} onChange={(value) => preferences.update({ period: value as DashboardPeriod })}
         options={[{value:"7d",label:t("dashboard.period7")},{value:"30d",label:t("dashboard.period30")},{value:"90d",label:t("dashboard.period90")}]} />
       <button type="button" className={surface.refreshButton} aria-label={t("dashboard.refresh")}
-        onClick={() => { analytics.refresh(); workbench.refresh(); }}><RefreshCw size={15} /></button></div></div>
+        onClick={() => { analytics.refresh(); workbench.refresh(); void preferences.refresh(); }}><RefreshCw size={15} /></button></div></div>
     <AnimatePresence initial={false}>{filtersOpen && <motion.div initial={{height:0,opacity:0}} animate={{height:"auto",opacity:1}} exit={{height:0,opacity:0}} transition={{duration:reduced ? 0 : .2}} style={{position:"relative",zIndex:30,overflow:"visible",display:"flow-root"}}><WorkbenchContextBar model={workbench} /></motion.div>}</AnimatePresence>
     {analytics.summaryError && <p className={surface.syncError} role="alert">{t(snapshot ? "dashboard.staleAnalytics" : "dashboard.summaryError")}
       <button onClick={analytics.refresh}>{t("dashboard.retry")}</button></p>}
-    {!preferences.stored && <p className={surface.syncError}>{locale === "ru" ? "Браузер не разрешил сохранить контекст. В этой сессии настройки продолжат работать." : "The browser could not save your context. Settings still work in this session."}</p>}
+    {!preferences.stored && <p className={surface.syncError} role="alert">{t("dashboardLayout.personalSyncError")}
+      <button type="button" onClick={() => void preferences.refresh()}>{t("dashboardLayout.retry")}</button></p>}
     <div className={styles.sections}>
       {sections.filter(section => selected === "all" || section === selected).map(section => <section key={section} className={styles.dashboardSection} data-dashboard-section={section}>
         <div className={styles.sectionHeading}><div><h2>{sectionLabels[section][locale === "ru" ? "ru" : "en"]}</h2>
@@ -50,7 +53,7 @@ export function DashboardContent({ onOpenRow, layout, model }: DashboardViewProp
         <WidgetGrid widgets={widgets.filter(widget => widgetSection(widgetKey(widget)) === section)} editing={editing}
           disabled={layout.saving || layout.retryPending || layout.failure === "conflict"}
           onMove={(id, index) => { const to = sectionMoveTarget(widgets, section, index); if (to >= 0) layout.controller.move(id, to); }}
-          onRemove={layout.controller.remove} onResize={layout.controller.resize}
+          onRemove={personalEditing ? undefined : layout.controller.remove} onResize={layout.controller.resize}
           render={(widget, title) => <WidgetRenderer widget={widgetKey(widget)} title={title} model={model} onOpenRow={onOpenRow} />} />
       </section>)}
     </div>

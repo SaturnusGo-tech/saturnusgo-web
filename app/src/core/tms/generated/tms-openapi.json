@@ -5127,6 +5127,160 @@
         }
       }
     },
+    "/projects/{projectId}/dashboard-personal-view": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+        },
+        {
+          "name": "dashboardId",
+          "in": "query",
+          "required": false,
+          "description": "Omit for project dashboard filters. Supply a dashboard ID for private widget positions.",
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        },
+        {
+          "name": "projectIds",
+          "in": "query",
+          "required": false,
+          "description": "Comma-separated project IDs for shared dashboards. The anchor project must be present.",
+          "schema": {
+            "type": "string",
+            "maxLength": 3224
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Dashboards"
+        ],
+        "summary": "Read your private dashboard preferences or widget positions",
+        "operationId": "getDashboardPersonalView",
+        "responses": {
+          "200": {
+            "description": "Current private dashboard view",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardPersonalViewEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Dashboards"
+        ],
+        "summary": "Update your private dashboard preferences or widget positions",
+        "operationId": "updateDashboardPersonalView",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DashboardPersonalViewPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Current private dashboard view",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardPersonalViewEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          }
+        }
+      }
+    },
     "/dashboards": {
       "parameters": [
         {
@@ -21573,6 +21727,189 @@
           }
         },
         "x-tms-idempotency": "not-applicable"
+      }
+    },
+    "/codex/maintenance-approvals/{approvalId}/review": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "approvalId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "workspaceId",
+          "in": "query",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "projectId",
+          "in": "query",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "locale",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "en",
+              "ru"
+            ],
+            "default": "en"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Test cases"
+        ],
+        "security": [
+          {
+            "cloudSession": []
+          },
+          {
+            "managedTenant": []
+          }
+        ],
+        "summary": "Review a Codex case maintenance approval",
+        "description": "Authenticated QA review page for the human who authorized the exact project grant. Opening this page does not record a decision.",
+        "operationId": "reviewCodexCaseMaintenance",
+        "responses": {
+          "200": {
+            "description": "Private approval review page.",
+            "headers": {
+              "X-Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Test cases"
+        ],
+        "security": [
+          {
+            "cloudSession": []
+          },
+          {
+            "managedTenant": []
+          }
+        ],
+        "summary": "Approve or revoke a Codex case maintenance approval",
+        "description": "Requires the matching human Falcon session, workspace permission and same-origin submission. Approval requires a live grant and current reviewed binding. The decision alone does not mutate cases.",
+        "operationId": "decideCodexCaseMaintenance",
+        "x-tms-idempotency": "not-applicable",
+        "x-tms-auth-redirect": true,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "decision"
+                ],
+                "properties": {
+                  "decision": {
+                    "type": "string",
+                    "enum": [
+                      "approve",
+                      "revoke"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "303": {
+            "description": "Return to the review page.",
+            "headers": {
+              "X-Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              },
+              "Location": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          }
+        }
       }
     },
     "/test-cases/{caseId}/maintenance": {
@@ -40723,6 +41060,297 @@
           }
         }
       },
+      "DashboardPersonalViewEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "preferences"
+                  },
+                  "rowVersion": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "preferences": {
+                    "$ref": "#/components/schemas/DashboardPersonalPreferences"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "rowVersion",
+                  "updatedAt",
+                  "preferences"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "layout"
+                  },
+                  "rowVersion": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "dashboardId": {
+                    "$ref": "#/components/schemas/Identifier"
+                  },
+                  "dashboardRowVersion": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "positions": {
+                    "type": "array",
+                    "maxItems": 100,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "widgetId": {
+                          "$ref": "#/components/schemas/Identifier"
+                        },
+                        "position": {
+                          "$ref": "#/components/schemas/DashboardWidgetPosition"
+                        }
+                      },
+                      "required": [
+                        "widgetId",
+                        "position"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "kind",
+                  "rowVersion",
+                  "updatedAt",
+                  "dashboardId",
+                  "dashboardRowVersion",
+                  "positions"
+                ]
+              }
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "DashboardPersonalPreferences": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "section": {
+            "type": "string",
+            "enum": [
+              "all",
+              "overview",
+              "runs",
+              "defects",
+              "library"
+            ]
+          },
+          "period": {
+            "type": "string",
+            "enum": [
+              "7d",
+              "30d",
+              "90d"
+            ]
+          },
+          "filtersOpen": {
+            "type": "boolean"
+          },
+          "environmentId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": ""
+              },
+              {
+                "$ref": "#/components/schemas/Identifier"
+              }
+            ]
+          },
+          "buildReference": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "queueTab": {
+            "type": "string",
+            "enum": [
+              "activeRuns",
+              "readyForRetest"
+            ]
+          },
+          "freshnessPage": {
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ]
+          }
+        },
+        "required": [
+          "section",
+          "period",
+          "filtersOpen",
+          "environmentId",
+          "buildReference",
+          "queueTab",
+          "freshnessPage"
+        ]
+      },
+      "DashboardPersonalViewPatch": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "change": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "preferences"
+                  },
+                  "patch": {
+                    "minProperties": 1,
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "section": {
+                        "type": "string",
+                        "enum": [
+                          "all",
+                          "overview",
+                          "runs",
+                          "defects",
+                          "library"
+                        ]
+                      },
+                      "period": {
+                        "type": "string",
+                        "enum": [
+                          "7d",
+                          "30d",
+                          "90d"
+                        ]
+                      },
+                      "filtersOpen": {
+                        "type": "boolean"
+                      },
+                      "environmentId": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "const": ""
+                          },
+                          {
+                            "$ref": "#/components/schemas/Identifier"
+                          }
+                        ]
+                      },
+                      "buildReference": {
+                        "type": "string",
+                        "maxLength": 500
+                      },
+                      "queueTab": {
+                        "type": "string",
+                        "enum": [
+                          "activeRuns",
+                          "readyForRetest"
+                        ]
+                      },
+                      "freshnessPage": {
+                        "type": "integer",
+                        "enum": [
+                          0,
+                          1
+                        ]
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "kind",
+                  "patch"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "layout"
+                  },
+                  "expectedDashboardRowVersion": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "positions": {
+                    "type": "array",
+                    "maxItems": 100,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "widgetId": {
+                          "$ref": "#/components/schemas/Identifier"
+                        },
+                        "position": {
+                          "$ref": "#/components/schemas/DashboardWidgetPosition"
+                        }
+                      },
+                      "required": [
+                        "widgetId",
+                        "position"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "kind",
+                  "expectedDashboardRowVersion",
+                  "positions"
+                ]
+              }
+            ]
+          }
+        },
+        "required": [
+          "change"
+        ]
+      },
       "DashboardWidgetType": {
         "type": "string",
         "enum": [
@@ -49774,11 +50402,16 @@
                     "falcon:defects:write",
                     "falcon:attachments:write",
                     "falcon:workflows:write",
+                    "falcon:catalog:write",
+                    "falcon:dashboards:write",
+                    "falcon:projects:manage",
+                    "falcon:dashboard-preferences:write",
+                    "falcon:dashboard-reminders:write",
                     "offline_access"
                   ]
                 },
-                "minItems": 13,
-                "maxItems": 13,
+                "minItems": 16,
+                "maxItems": 16,
                 "uniqueItems": true
               },
               "authentication": {
@@ -50682,7 +51315,7 @@
           },
           "scopes": {
             "type": "array",
-            "maxItems": 12,
+            "maxItems": 15,
             "items": {
               "type": "string",
               "enum": [
@@ -50697,7 +51330,12 @@
                 "falcon:execution:write",
                 "falcon:defects:write",
                 "falcon:attachments:write",
-                "falcon:workflows:write"
+                "falcon:workflows:write",
+                "falcon:catalog:write",
+                "falcon:dashboards:write",
+                "falcon:projects:manage",
+                "falcon:dashboard-preferences:write",
+                "falcon:dashboard-reminders:write"
               ]
             }
           },
@@ -54674,10 +55312,15 @@
                     "falcon:defects:write",
                     "falcon:attachments:write",
                     "falcon:workflows:write",
+                    "falcon:catalog:write",
+                    "falcon:dashboards:write",
+                    "falcon:projects:manage",
+                    "falcon:dashboard-preferences:write",
+                    "falcon:dashboard-reminders:write",
                     "offline_access"
                   ]
                 },
-                "maxItems": 13
+                "maxItems": 16
               },
               "authentication": {
                 "type": "string",

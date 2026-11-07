@@ -2,7 +2,7 @@ import { dashboardSections, type DashboardSection } from "../sections/widget-sec
 import type { DashboardPeriod } from "../../model/dashboard-analytics";
 export type DashboardPreferences = {
   section: DashboardSection | "all"; period: DashboardPeriod; filtersOpen: boolean;
-  environmentId: string; buildReference: string; queueTab: "activeRuns" | "readyForRetest"; freshnessPage: number;
+  environmentId: string; buildReference: string; queueTab: "activeRuns" | "readyForRetest"; freshnessPage: 0 | 1;
 };
 export const defaultPreferences: DashboardPreferences = { section: "overview", period: "30d", filtersOpen: false,
   environmentId: "", buildReference: "", queueTab: "activeRuns", freshnessPage: 0 };
@@ -23,4 +23,10 @@ export function parsePreferences(raw: string | null): DashboardPreferences {
       queueTab: p.queueTab === "readyForRetest" ? "readyForRetest" : "activeRuns", freshnessPage: p.freshnessPage === 1 ? 1 : 0,
     };
   } catch { return { ...defaultPreferences }; }
+}
+
+export function readLegacyPreferences(raw: string): DashboardPreferences | null {
+  const value = parsePreferences(raw);
+  if (!/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(value.environmentId)) value.environmentId = "";
+  return JSON.stringify(value) === JSON.stringify(defaultPreferences) ? null : value;
 }

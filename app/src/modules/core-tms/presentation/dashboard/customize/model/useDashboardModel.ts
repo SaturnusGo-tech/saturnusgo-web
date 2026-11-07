@@ -8,7 +8,7 @@ import { useDashboardAnalytics } from "../../controller/useDashboardAnalytics";
 import type { DashboardViewProps } from "../../dashboard-view";
 export function useDashboardModel({ data, projectId, serverAnalytics = false, analyticsSource }: DashboardViewProps) {
   const http = useTmsHttpClient();
-  const preferences = useDashboardPreferences(data.workspace.id, projectId);
+  const preferences = useDashboardPreferences(data.workspace.id, projectId, serverAnalytics);
   const scope = useMemo(() => ({ workspaceId: data.workspace.id, projectId }), [data.workspace.id, projectId]);
   const { period, environmentId, buildReference, queueTab } = preferences.value;
   const query = useMemo(() => ({ ...scope, period }), [scope, period]);

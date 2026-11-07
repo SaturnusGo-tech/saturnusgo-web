@@ -12,7 +12,7 @@ import styles from "../layout.module.css";
 
 export function SortableWidget({ widget, title, editing, disabled, alignRows, onRemove, onResize, children }: {
   widget: BoardWidget; title: string; editing: boolean; disabled: boolean; alignRows: boolean;
-  onRemove: (id: string) => void; onResize: (id: string, width: number) => void; children: ReactNode;
+  onRemove?: (id: string) => void; onResize: (id: string, width: number) => void; children: ReactNode;
 }) {
   const { t } = useTmsLocale(); const reduced = useReducedMotion();
   const measured = useWidgetRows(!alignRows);
@@ -36,7 +36,7 @@ export function SortableWidget({ widget, title, editing, disabled, alignRows, on
         onChange={(value) => onResize(widget.id, Number(value))} options={[
           {value:"3",label:t("dashboardLayout.small")},{value:"6",label:t("dashboardLayout.medium")},{value:"12",label:t("dashboardLayout.large")},
         ]} />}
-      <button type="button" disabled={disabled} onClick={() => onRemove(widget.id)} aria-label={t("dashboardLayout.remove",name)}><X size={14} /></button>
+      {onRemove && <button type="button" disabled={disabled} onClick={() => onRemove(widget.id)} aria-label={t("dashboardLayout.remove",name)}><X size={14} /></button>}
     </div>}
     <motion.div className={styles.widgetContent} initial={reduced ? false : { opacity: 0, scale: .985 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: .18 }}
       ref={content}>{children}</motion.div>

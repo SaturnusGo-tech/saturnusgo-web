@@ -1,6 +1,9 @@
 export const ruDashboardLayoutMessages = {
   "dashboardLayout.emptyTitle": "Ваш проект. Ваш взгляд.",
   "dashboardLayout.emptyText": "Соберите дашборд под задачи команды. Выберите виджеты, расположите их по-своему и следите за качеством проекта.",
+  "dashboardLayout.personalEdit": "Личная раскладка",
+  "dashboardLayout.personalEditHint": "Расположите виджеты и измените их ширину в своём виде.",
+  "dashboardLayout.personalSyncError": "Не удалось синхронизировать настройки дашборда.",
   "dashboardLayout.edit": "Настроить",
   "dashboardLayout.add": "Добавить виджеты", "dashboardLayout.addAll": "Добавить все виджеты",
   "dashboardLayout.save": "Сохранить", "dashboardLayout.cancel": "Отмена",

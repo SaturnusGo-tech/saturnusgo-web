@@ -11,7 +11,7 @@ import styles from "../layout.module.css";
 
 export function WidgetGrid({ widgets, editing, disabled, onMove, onRemove, onResize, render }: {
   widgets: BoardWidget[]; editing: boolean; disabled: boolean;
-  onMove: (id: string, index: number) => void; onRemove: (id: string) => void; onResize: (id: string, width: number) => void;
+  onMove: (id: string, index: number) => void; onRemove?: (id: string) => void; onResize: (id: string, width: number) => void;
   render: (widget: BoardWidget, title: string) => ReactNode;
 }) {
   const { locale, t } = useTmsLocale(); const reduced = useReducedMotion();

@@ -21,7 +21,7 @@ export function WidgetRenderer({ widget, title, model, onOpenRow }: {
   if (definition.width === 3 || widget === "readyForRetest") return <MetricWidget metric={widget}
     title={title ?? (locale === "ru" ? definition.ru : definition.en)} snapshot={snapshot} model={workbench} openDrill={analytics.openDrill} />;
   if (widget === "queue") return <WorkbenchPanel model={workbench} onOpenRow={onOpenRow} />;
-  if (widget === "freshness") return <FreshnessPanel model={workbench} page={preferences.value.freshnessPage} onPageChange={freshnessPage => preferences.update({ freshnessPage })} />;
+  if (widget === "freshness") return <FreshnessPanel model={workbench} page={preferences.value.freshnessPage} onPageChange={freshnessPage => preferences.update({ freshnessPage: freshnessPage === 1 ? 1 : 0 })} />;
   if (!snapshot) return <div className={styles.unavailable} role="status"><LoaderCircle size={18} />{t("dashboard.summaryLoading")}</div>;
   if (widget === "trend") return <DashboardTrendChart snapshot={snapshot} onOpenDrill={analytics.openDrill} />;
   if (widget === "portfolio") return <DashboardPortfolio snapshot={snapshot} onOpenDrill={analytics.openDrill} />;

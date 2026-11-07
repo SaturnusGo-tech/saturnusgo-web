@@ -16,22 +16,29 @@ export class DashboardLayoutController {
     this.state = { ...this.state, ...patch }; this.listeners.forEach((listener) => listener());
   }
   dispose = () => { this.reader?.abort(); this.generation += 1; };
-  load = async () => {
+  load = () => this.read(true);
+  refresh = () => this.state.draft || this.state.loading || this.reader ? undefined : this.read(false);
+  private async read(reset: boolean) {
     this.reader?.abort(); const reader = new AbortController(); this.reader = reader;
     const generation = ++this.generation;
-    this.attempt = null;
-    this.emit({ loading: true, failure: null, draft: null, saving: false, retryPending: false });
+    if (reset) {
+      this.attempt = null;
+      this.emit({ loading: true, failure: null, draft: null, saving: false, retryPending: false });
+    }
     try {
       const board = await this.source.load(this.scope, reader.signal);
-      if (generation === this.generation && !reader.signal.aborted) this.emit({ board: board ? { ...board, widgets: consolidateWidgets(board.widgets) } : null, loading: false });
+      if (generation === this.generation && !reader.signal.aborted && !this.state.draft) this.emit({ failure: null, board: board ? { ...board, widgets: consolidateWidgets(board.widgets) } : null, loading: false });
     } catch (error) {
-      if (generation === this.generation && !reader.signal.aborted) {
+      if (reset && generation === this.generation && !reader.signal.aborted) {
         this.emit({ loading: false, failure: error instanceof LayoutError ? error.kind : "unavailable" });
       }
+    } finally {
+      if (this.reader === reader) this.reader = null;
     }
-  };
+  }
   edit = (name: string) => {
     if (this.state.loading || this.state.saving || this.state.retryPending) return;
+    this.reader?.abort();
     const board = this.state.board;
     this.emit({ draft: board ? { name: board.name, widgets: placeWidgets(board.widgets) } : { name, widgets: [] }, failure: null });
   };

@@ -1499,6 +1499,36 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{projectId}/dashboard-personal-view": {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                /** @description Omit for project dashboard filters. Supply a dashboard ID for private widget positions. */
+                dashboardId?: components["schemas"]["Identifier"];
+                /** @description Comma-separated project IDs for shared dashboards. The anchor project must be present. */
+                projectIds?: string;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        /** Read your private dashboard preferences or widget positions */
+        get: operations["getDashboardPersonalView"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update your private dashboard preferences or widget positions */
+        patch: operations["updateDashboardPersonalView"];
+        trace?: never;
+    };
     "/dashboards": {
         parameters: {
             query?: never;
@@ -5266,6 +5296,39 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/codex/maintenance-approvals/{approvalId}/review": {
+        parameters: {
+            query: {
+                workspaceId: string;
+                projectId: string;
+                locale?: "en" | "ru";
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                approvalId: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * Review a Codex case maintenance approval
+         * @description Authenticated QA review page for the human who authorized the exact project grant. Opening this page does not record a decision.
+         */
+        get: operations["reviewCodexCaseMaintenance"];
+        put?: never;
+        /**
+         * Approve or revoke a Codex case maintenance approval
+         * @description Requires the matching human Falcon session, workspace permission and same-origin submission. Approval requires a live grant and current reviewed binding. The decision alone does not mutate cases.
+         */
+        post: operations["decideCodexCaseMaintenance"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/test-cases/{caseId}/maintenance": {
         parameters: {
             query?: never;
@@ -8885,6 +8948,68 @@ export interface components {
             data: components["schemas"]["ExternalLink"][];
             meta: components["schemas"]["PageMeta"];
         };
+        DashboardPersonalViewEnvelope: {
+            data: {
+                /** @constant */
+                kind: "preferences";
+                rowVersion: number;
+                /** Format: date-time */
+                updatedAt: string | null;
+                preferences: components["schemas"]["DashboardPersonalPreferences"];
+            } | {
+                /** @constant */
+                kind: "layout";
+                rowVersion: number;
+                /** Format: date-time */
+                updatedAt: string | null;
+                dashboardId: components["schemas"]["Identifier"];
+                dashboardRowVersion: number;
+                positions: {
+                    widgetId: components["schemas"]["Identifier"];
+                    position: components["schemas"]["DashboardWidgetPosition"];
+                }[];
+            };
+        };
+        DashboardPersonalPreferences: {
+            /** @enum {string} */
+            section: "all" | "overview" | "runs" | "defects" | "library";
+            /** @enum {string} */
+            period: "7d" | "30d" | "90d";
+            filtersOpen: boolean;
+            environmentId: "" | components["schemas"]["Identifier"];
+            buildReference: string;
+            /** @enum {string} */
+            queueTab: "activeRuns" | "readyForRetest";
+            /** @enum {integer} */
+            freshnessPage: 0 | 1;
+        };
+        DashboardPersonalViewPatch: {
+            change: {
+                /** @constant */
+                kind: "preferences";
+                patch: {
+                    /** @enum {string} */
+                    section?: "all" | "overview" | "runs" | "defects" | "library";
+                    /** @enum {string} */
+                    period?: "7d" | "30d" | "90d";
+                    filtersOpen?: boolean;
+                    environmentId?: "" | components["schemas"]["Identifier"];
+                    buildReference?: string;
+                    /** @enum {string} */
+                    queueTab?: "activeRuns" | "readyForRetest";
+                    /** @enum {integer} */
+                    freshnessPage?: 0 | 1;
+                };
+            } | {
+                /** @constant */
+                kind: "layout";
+                expectedDashboardRowVersion: number;
+                positions: {
+                    widgetId: components["schemas"]["Identifier"];
+                    position: components["schemas"]["DashboardWidgetPosition"];
+                }[];
+            };
+        };
         /** @enum {string} */
         DashboardWidgetType: "summary" | "run_progress" | "recent_activity" | "defects" | "assigned_to_me";
         DashboardWidgetPosition: {
@@ -10859,7 +10984,7 @@ export interface components {
                 resource: string;
                 /** Format: uri */
                 oauthIssuer: string;
-                scopes: ("falcon:read" | "falcon:cases:create" | "falcon:runs:create" | "falcon:cases:write" | "falcon:repository:write" | "falcon:suites:write" | "falcon:environments:write" | "falcon:runs:manage" | "falcon:execution:write" | "falcon:defects:write" | "falcon:attachments:write" | "falcon:workflows:write" | "offline_access")[];
+                scopes: ("falcon:read" | "falcon:cases:create" | "falcon:runs:create" | "falcon:cases:write" | "falcon:repository:write" | "falcon:suites:write" | "falcon:environments:write" | "falcon:runs:manage" | "falcon:execution:write" | "falcon:defects:write" | "falcon:attachments:write" | "falcon:workflows:write" | "falcon:catalog:write" | "falcon:dashboards:write" | "falcon:projects:manage" | "falcon:dashboard-preferences:write" | "falcon:dashboard-reminders:write" | "offline_access")[];
                 /** @constant */
                 authentication: "oauth";
             };
@@ -11053,7 +11178,7 @@ export interface components {
                 /** @description Null when a historically referenced project is unavailable. The client renders a localized unavailable-project label. */
                 name: string | null;
             }[];
-            scopes: ("falcon:read" | "falcon:cases:create" | "falcon:runs:create" | "falcon:cases:write" | "falcon:repository:write" | "falcon:suites:write" | "falcon:environments:write" | "falcon:runs:manage" | "falcon:execution:write" | "falcon:defects:write" | "falcon:attachments:write" | "falcon:workflows:write")[];
+            scopes: ("falcon:read" | "falcon:cases:create" | "falcon:runs:create" | "falcon:cases:write" | "falcon:repository:write" | "falcon:suites:write" | "falcon:environments:write" | "falcon:runs:manage" | "falcon:execution:write" | "falcon:defects:write" | "falcon:attachments:write" | "falcon:workflows:write" | "falcon:catalog:write" | "falcon:dashboards:write" | "falcon:projects:manage" | "falcon:dashboard-preferences:write" | "falcon:dashboard-reminders:write")[];
             /** @enum {string} */
             status: "active" | "revoked" | "expired";
             /** Format: date-time */
@@ -11935,7 +12060,7 @@ export interface components {
                 /** Format: uri */
                 issuer: string;
                 connectionName: string;
-                scopes: ("falcon:read" | "falcon:cases:create" | "falcon:runs:create" | "falcon:cases:write" | "falcon:repository:write" | "falcon:suites:write" | "falcon:environments:write" | "falcon:runs:manage" | "falcon:execution:write" | "falcon:defects:write" | "falcon:attachments:write" | "falcon:workflows:write" | "offline_access")[];
+                scopes: ("falcon:read" | "falcon:cases:create" | "falcon:runs:create" | "falcon:cases:write" | "falcon:repository:write" | "falcon:suites:write" | "falcon:environments:write" | "falcon:runs:manage" | "falcon:execution:write" | "falcon:defects:write" | "falcon:attachments:write" | "falcon:workflows:write" | "falcon:catalog:write" | "falcon:dashboards:write" | "falcon:projects:manage" | "falcon:dashboard-preferences:write" | "falcon:dashboard-reminders:write" | "offline_access")[];
                 /** @enum {string} */
                 authentication: "oauth";
                 /** @enum {string} */
@@ -15864,6 +15989,98 @@ export interface operations {
             404: components["responses"]["NotFound"];
             500: components["responses"]["InternalError"];
             503: components["responses"]["AnalyticsUnavailable"];
+        };
+    };
+    getDashboardPersonalView: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                /** @description Omit for project dashboard filters. Supply a dashboard ID for private widget positions. */
+                dashboardId?: components["schemas"]["Identifier"];
+                /** @description Comma-separated project IDs for shared dashboards. The anchor project must be present. */
+                projectIds?: string;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Current private dashboard view */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    ETag: components["headers"]["ETag"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DashboardPersonalViewEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    updateDashboardPersonalView: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                /** @description Omit for project dashboard filters. Supply a dashboard ID for private widget positions. */
+                dashboardId?: components["schemas"]["Identifier"];
+                /** @description Comma-separated project IDs for shared dashboards. The anchor project must be present. */
+                projectIds?: string;
+            };
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DashboardPersonalViewPatch"];
+            };
+        };
+        responses: {
+            /** @description Current private dashboard view */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    ETag: components["headers"]["ETag"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DashboardPersonalViewEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
         };
     };
     listDashboards: {
@@ -23760,6 +23977,85 @@ export interface operations {
             413: components["responses"]["PayloadTooLarge"];
             415: components["responses"]["UnsupportedMediaType"];
             429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    reviewCodexCaseMaintenance: {
+        parameters: {
+            query: {
+                workspaceId: string;
+                projectId: string;
+                locale?: "en" | "ru";
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                approvalId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Private approval review page. */
+            200: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    decideCodexCaseMaintenance: {
+        parameters: {
+            query: {
+                workspaceId: string;
+                projectId: string;
+                locale?: "en" | "ru";
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                approvalId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/x-www-form-urlencoded": {
+                    /** @enum {string} */
+                    decision: "approve" | "revoke";
+                };
+            };
+        };
+        responses: {
+            /** @description Return to the review page. */
+            303: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    Location?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            412: components["responses"]["PreconditionFailed"];
             500: components["responses"]["InternalError"];
         };
     };
