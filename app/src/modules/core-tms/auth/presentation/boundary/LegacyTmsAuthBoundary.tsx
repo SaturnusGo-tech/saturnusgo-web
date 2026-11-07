@@ -8,6 +8,7 @@ import type { CloudSession } from "../../cloud/cloud-auth-client";
 import { cloudWorkspacePathFromLocation, readCloudSession } from "../../cloud/cloud-auth-client";
 import { resolveCloudSessionProbe } from "../../cloud/cloud-session-probe";
 import { readTmsAuth0Configuration } from "../../config/auth0-config";
+import { ManagedOAuthResume } from "../../managed/oauth/ManagedOAuthResume";
 import {
   safeTmsReturnPath,
   shouldUseAdminAuth,
@@ -110,7 +111,9 @@ export function LegacyTmsAuthBoundary({ children, verifiedSession = null }: { re
   }
   if (probe.stage === "cloud") {
     const content = <AuthContinuation workspaceId={probe.session.workspace.id} explicitContext={probe.explicitContext}>
-      <CloudTmsGate apiBase="/api/v1" session={probe.session}>{children}</CloudTmsGate>
+      <ManagedOAuthResume>
+        <CloudTmsGate apiBase="/api/v1" session={probe.session}>{children}</CloudTmsGate>
+      </ManagedOAuthResume>
     </AuthContinuation>;
     return <AuthContinuation key={probe.session.workspace.id} workspaceId={probe.session.workspace.id} deferBrowserContinuation>
       {probe.session.workspaceHandoff === true ? <AuthenticatedWorkspaceHandoff workspaceId={probe.session.workspace.id} routeTarget={probe.explicitContext ? "workspace" : "company_home"}>
