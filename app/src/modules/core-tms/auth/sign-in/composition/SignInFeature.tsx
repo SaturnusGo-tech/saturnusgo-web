@@ -16,6 +16,9 @@ import { WorkspaceMfaHandoff } from "../../workspace-handoff/composition/Workspa
 import { SignInScreen } from "../presentation/screen/SignInScreen";
 import { readPlanRequestIntent } from "../../../billing/requests/domain/plan-request";
 import { useBrowserSignInMethod } from "./browser-method/useBrowserSignInMethod";
+import { TMS_AUTH_PRODUCTION_SIGNED_OUT_URL } from "../../navigation/tms-auth-route";
+import { companyAddress } from "../../../../core-falcon-public/company-entry/domain/company-address";
+import { isFalconDesktop } from "../domain/desktop-mode";
 
 export function SignInFeature({ signup = false }: { readonly signup?: boolean }) {
   useEffect(() => {
@@ -71,7 +74,23 @@ function MethodSignInFeature({ signup }: { readonly signup: boolean }) {
   const proof = useMemo(() => typeof window === "undefined" ? null : googleEmailProof(window.location.search), []);
   const intent = proof?.intent ?? (signup ? "signup" : "login");
   const signIn = useSignIn(client, intent, proof);
+  const [invitedCompany] = useState(() => {
+    if (typeof window === "undefined" || signup || proof || planIntent || isFalconDesktop() || hasBrowserDesktopAttempt()) return;
+    const { origin, pathname, search } = window.location;
+    if (`${origin}${pathname}` !== TMS_AUTH_PRODUCTION_SIGNED_OUT_URL) return;
+    const query = new URLSearchParams(search);
+    const [hostname, duplicate] = query.getAll("company");
+    if (!hostname || duplicate !== undefined || query.has("workspaceId")) return;
+    const suffix = process.env.NEXT_PUBLIC_FALCON_COMPANY_DOMAIN_SUFFIX ?? "saturnusgo.com";
+    return companyAddress(hostname, suffix) === `https://${hostname}/` ? hostname : undefined;
+  });
+  const openedCompanyForm = useRef(false);
   useBrowserSignInMethod(signIn, { proof: Boolean(proof) });
+  useEffect(() => {
+    if (!invitedCompany || openedCompanyForm.current || !signIn.state.methods) return;
+    openedCompanyForm.current = true;
+    signIn.select("company");
+  }, [invitedCompany, signIn]);
   useEffect(() => {
     if (!proof) return;
     const url = new URL(window.location.href);
@@ -88,5 +107,5 @@ function MethodSignInFeature({ signup }: { readonly signup: boolean }) {
       rememberBrowserContinuation(); window.location.assign(destination.href);
     }
   }, [signIn.state.destination, signIn.state.step, locale]);
-  return <SignInScreen signIn={signIn} signup={intent === "signup"} planIntent={planIntent} />;
+  return <SignInScreen signIn={signIn} signup={intent === "signup"} planIntent={planIntent} organization={invitedCompany} />;
 }

@@ -11,10 +11,11 @@ import { setPlanRequestIntent } from "../../../continuation/domain/continuation-
 import { ProofForm } from "../forms/ProofForm";
 import styles from "../../../managed/presentation/screen/access.module.css";
 
-export function SignInScreen({ signIn, signup = false, planIntent = null }: {
+export function SignInScreen({ signIn, signup = false, planIntent = null, organization }: {
   readonly signIn: ReturnType<typeof useSignIn>;
   readonly signup?: boolean;
   readonly planIntent?: ReturnType<typeof readPlanRequestIntent>;
+  readonly organization?: string;
 }) {
   const { locale, setLocale } = useTmsLocale();
   const copy = signInCopy(locale);
@@ -38,7 +39,7 @@ export function SignInScreen({ signIn, signup = false, planIntent = null }: {
       {!state.loading && !state.methods && <button className={styles.secondary} onClick={signIn.retryMethods}>{copy.retry}</button>}
       {signupRequired ? <a href={`/signup/?${entryParams}`} className={styles.primary}>{copy.signupLink}</a>
         : state.step === "methods" ? <SignInMethods signIn={signIn} copy={copy} signup={signup} locale={locale} />
-        : <ProofForm signIn={signIn} copy={copy} />}
+        : <ProofForm signIn={signIn} copy={copy} organization={state.step === "company" ? organization : undefined} />}
       <footer className={styles.footer}>
         {state.step !== "methods" ? <button className={styles.linkButton} onClick={signIn.back}><ArrowLeft size={16} aria-hidden="true" />{copy.back}</button>
           : <a href={`${signup ? "/cloud-login/" : "/signup/"}?${entryParams}`}>{signup ? copy.loginLink : copy.signupLink}</a>}
