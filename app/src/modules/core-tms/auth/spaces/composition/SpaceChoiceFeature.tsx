@@ -3,7 +3,8 @@ import { useEffect, useMemo } from "react";
 import { createSpaceChoiceClient } from "../data/space-choice-client";
 import { useSpaceChoice } from "../application/useSpaceChoice";
 import { SpaceChoiceScreen } from "../presentation/SpaceChoiceScreen";
-import { rememberBrowserContinuation } from "../../continuation/application/browser-continuation";
+import { peekBrowserContinuation, rememberBrowserContinuation } from "../../continuation/application/browser-continuation";
+import { continuationFromLocation, scopedPlanContinuation, setPlanRequestIntent } from "../../continuation/domain/continuation-path";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 export function SpaceChoiceFeature() {
   const { locale } = useTmsLocale();
@@ -17,11 +18,20 @@ export function SpaceChoiceFeature() {
   useEffect(() => {
     if (!model.state.destination) return;
     const destination = new URL(model.state.destination, window.location.origin);
-    if (destination.pathname === "/cloud-login/" && destination.searchParams.has("workspaceId")) {
+    const workspaceId = destination.searchParams.get("workspaceId");
+    if (destination.pathname === "/cloud-login/" && workspaceId) {
       if (destination.searchParams.get("workspaceHandoff") !== "1") destination.searchParams.set("method", "company");
       destination.searchParams.set("lang", locale);
+      const current = continuationFromLocation(window.location);
+      const plan = scopedPlanContinuation(current, origin, workspaceId)
+        ?? scopedPlanContinuation(peekBrowserContinuation(workspaceId), origin, workspaceId);
+      if (plan) {
+        destination.searchParams.set("view", "config");
+        destination.searchParams.set("settings", "billing");
+        setPlanRequestIntent(destination.searchParams, plan);
+      }
       rememberBrowserContinuation(); window.location.assign(destination.href);
     } else { rememberBrowserContinuation(); window.location.assign(model.state.destination); }
-  }, [model.state.destination, locale]);
+  }, [model.state.destination, locale, origin]);
   return <SpaceChoiceScreen model={model} />;
 }

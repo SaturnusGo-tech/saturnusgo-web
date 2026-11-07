@@ -1,4 +1,5 @@
 import type { WorkspaceHandoffNavigation, WorkspaceHandoffStart, WorkspaceTransitionTarget } from "./handoff-port";
+import { scopedPlanContinuation, setPlanRequestIntent } from "../../continuation/domain/continuation-path";
 const path = "/work/";
 const keys = ["projectId", "view", "settings", "integration", "plugin", "pluginSetup", "caseId", "folderId", "suiteId", "runId", "runItemId", "attemptId", "defectId", "environmentId", "portfolioId", "catalogProjectId", "article", "tab", "page"];
 const presentationKeys = new Set(["article", "tab", "page"]);
@@ -10,7 +11,15 @@ export function workspaceHandoffNavigation(target: WorkspaceTransitionTarget, wo
   if (target.workspaceId !== workspaceId || !identifier(workspaceId) || !Number.isSafeInteger(target.generation) || target.generation < 1
     || target.destinationOrigin !== destination.origin || destination.protocol !== "https:" || destination.username || destination.password || destination.port
     || !(destination.hostname === "tms.saturnusgo.com" || (slug.length >= 2 && slug.length <= 48 && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)))) throw new Error("Invalid workspace target");
-  if (source.origin === destination.origin) return null;
+  if (source.origin === destination.origin) {
+    if (typeof target.planRequestId !== "string" || !/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(target.planRequestId)) return null;
+    const existing = scopedPlanContinuation(source.href, source.origin, workspaceId);
+    if (existing?.kind === "request" && existing.id === target.planRequestId) return null;
+    const recovery = new URL(path, source.origin);
+    recovery.search = new URLSearchParams({ workspaceId, view: "config", settings: "billing", planRequest: target.planRequestId, lang: locale }).toString();
+    return { kind: "local", url: recovery.href };
+  }
+  if (target.routeTarget === "company_admin") routeTarget = target.routeTarget;
   const route = new URL(routeTarget === "company_admin" ? "/admin/" : path, source.origin);
   if (routeTarget === "company_admin") route.searchParams.set("account", "personal");
   route.searchParams.set("workspaceId", workspaceId);
@@ -19,6 +28,10 @@ export function workspaceHandoffNavigation(target: WorkspaceTransitionTarget, wo
     const value = source.searchParams.get(key);
     const safe = presentationKeys.has(key) ? typeof value === "string" && /^[A-Za-z][A-Za-z0-9_-]{0,64}$/.test(value) : identifier(value);
     if (value !== null && safe && source.searchParams.getAll(key).length === 1) route.searchParams.set(key, value);
+  }
+  if (routeTarget === "workspace") {
+    const plan = scopedPlanContinuation(source.href, source.origin, workspaceId);
+    if (plan) setPlanRequestIntent(route.searchParams, plan);
   }
   route.searchParams.set("lang", locale);
   const continuation = !desktop && typeof desktopAttempt === "string" && /^[A-Za-z0-9_-]{43}$/.test(desktopAttempt)

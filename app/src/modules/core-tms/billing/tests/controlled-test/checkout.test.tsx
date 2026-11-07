@@ -5,6 +5,7 @@ import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { TmsHttpClientProvider } from "../../../auth/http/TmsHttpClientContext";
 import { TmsSessionProvider } from "../../../auth/presentation/session/TmsSessionContext";
 import { TmsLocaleContext } from "../../../localization/context/TmsLocaleProvider";
+import type { PlanRequest } from "../../requests/domain/plan-request";
 import type { TmsHttpClient } from "../../../../../core/tms/transport/http";
 
 (globalThis as typeof globalThis & { React: typeof React }).React = React;
@@ -15,15 +16,35 @@ if (previousCss) require.extensions[".css"] = previousCss; else delete require.e
 const ready = { id: "ready-setup", version: 4, displayName: "Team", slug: "team", hostname: "team-falcon.saturnusgo.com", status: "ready", expiresAt: "2027-11-06T12:30:00Z" };
 const plan = { id: "startup", seats: 5, amount: 5900, currency: "USD", workspaceKind: "company" };
 const quote = { planId: "startup", subtotal: 5900, currency: "USD", periodEnd: "2027-12-06T00:00:00Z", prorated: false };
-function fixture(locale: "ru" | "en", mode = "controlled_test", accountMode = mode, enabled = true) {
+function fixture(locale: "ru" | "en", mode = "controlled_test", accountMode = mode, enabled = true, manual?: "approved" | "new") {
+  const requestsPath = "/workspaces/space/plan-requests";
+  const requestId = "fbdd6cf0-c89e-4a4b-b272-5130651f471a";
+  const initialRequest: PlanRequest = {
+    id: requestId, reference: "FR-1042", planId: "startup", status: "approved", locale, workspaceId: "space",
+    workspaceName: "My workspace", workspaceKind: "personal", applicantName: "QA", applicantEmail: "qa@example.com",
+    note: null, createdAt: "2026-11-06T12:00:00Z", updatedAt: "2026-11-06T12:00:00Z", version: 1,
+    activationExpiresAt: "2027-11-06T12:30:00Z", accessEndsAt: null, setupId: null, companyHostname: null, preparationError: null,
+    actions: ["activate", "withdraw"],
+  };
+  let request = manual === "approved" ? initialRequest : null;
   const writes: { path: string; input: unknown }[] = [];
   const http = { async getResource(path: string) {
     if (path.startsWith("/billing/summary")) return { data: { workspaceKind: "personal", canManage: true, status: "trial", planId: null, checkoutMode: mode, enabled }, etag: null };
-    if (path.startsWith("/billing/startup-setup")) return { data: { setup: ready }, etag: null };
+    if (path.startsWith("/billing/startup-setup")) return { data: { setup: manual ? { ...ready, status: "reserved" } : ready }, etag: null };
+    if (manual && path === requestsPath) return { data: { requests: request ? [request] : [], applicant: { displayName: "QA", email: "qa@example.com" },
+      workspace: { id: "space", kind: "personal", name: "My workspace" }, access: null, eligiblePlanIds: ["individual", "startup", "enterprise"] }, etag: null };
     return { data: { plans: [plan], subscription: null, checkout: null, occupiedSeats: 1, checkoutQuotes: [quote], suggestedPlanId: "startup",
       allowedCheckoutPlanIds: ["startup"], allowedChangePlanIds: [], provider: "mock", testMode: true, checkoutMode: accountMode, enabled }, etag: null };
   }, async get() { return { data: [], meta: { limit: 30 } }; }, async mutateResource(path: string, _method: string, input: unknown) {
     writes.push({ path, input });
+    if (manual && path === requestsPath) {
+      request = { ...initialRequest, status: "requested", actions: ["withdraw"] };
+      return { data: { request } };
+    }
+    if (manual && path === `${requestsPath}/${requestId}/activate`) {
+      request = { ...initialRequest, status: "activating", setupId: ready.id, actions: [] };
+      return { data: { request } };
+    }
     return { data: { subscription: null, checkout: { id: "test-checkout", workspaceId: "space", ...quote, provider: "mock", testMode: true,
       status: "open", createdAt: "2026-11-06T12:00:00Z", expiresAt: "2027-11-06T12:30:00Z" }, invoice: null, provider: "mock", testMode: true, checkoutMode: accountMode } };
   } } as unknown as TmsHttpClient;
@@ -82,4 +103,42 @@ test("development mock rows without a server capability cannot enable checkout",
     const checkout = await setup(view, "en"); assert.equal(checkout.props.disabled, true);
     await act(async () => checkout.props.onClick()); assert.equal(h.writes.length, 0);
   } finally { await act(async () => view?.unmount()); if (environment === undefined) Reflect.deleteProperty(process.env, "NODE_ENV"); else Reflect.set(process.env, "NODE_ENV", environment); }
+});
+
+test("manual request submits only after confirmation and never opens checkout", async () => {
+  const h = fixture("ru", "disabled", "disabled", false, "new");
+  let view!: ReactTestRenderer;
+  try {
+    await act(async () => { view = create(h.tree); });
+    await act(async () => view.root.findByProps({ "data-plan": "startup" }).props.onClick());
+    assert.equal(h.writes.length, 0);
+    assert.ok(view.root.findByType("dialog"));
+    await act(async () => view.root.findByType("textarea").props.onChange({ target: { value: "  Хотим подключить команду  " } }));
+    await act(async () => view.root.findByType("form").props.onSubmit({ preventDefault() {} }));
+    assert.deepEqual(h.writes, [{ path: "/workspaces/space/plan-requests", input: { planId: "startup", locale: "ru", note: "Хотим подключить команду" } }]);
+    assert.ok(view.root.findByType("h2").children.includes("Заявка отправлена"));
+  } finally { await act(async () => view?.unmount()); }
+});
+
+test("approved Startup activates with explicit consent while its saved address is being prepared", async () => {
+  const h = fixture("en", "disabled", "disabled", false, "approved");
+  let view!: ReactTestRenderer;
+  try {
+    await act(async () => { view = create(h.tree); });
+    await act(async () => view.root.findByProps({ "data-plan": "startup" }).props.onClick());
+    const configure = view.root.findAllByType("button").find(node => node.children.includes("Set up company"))!;
+    await act(async () => configure.props.onClick());
+    await act(async () => view.root.findByProps({ "data-wizard-next": "name" }).props.onClick());
+    await act(async () => view.root.findByProps({ "data-wizard-next": "address" }).props.onClick());
+    const activate = () => view.root.findByProps({ "data-wizard-checkout": true });
+    assert.equal(activate().props.disabled, true);
+    await act(async () => activate().props.onClick());
+    assert.equal(h.writes.length, 0);
+    await act(async () => view.root.findByProps({ id: "startup-consent" }).props.onChange({ target: { checked: true } }));
+    assert.ok(activate().children.includes("Activate Startup"));
+    await act(async () => activate().props.onClick());
+    assert.deepEqual(h.writes, [{ path: "/workspaces/space/plan-requests/fbdd6cf0-c89e-4a4b-b272-5130651f471a/activate",
+      input: { setupId: ready.id, setupVersion: ready.version } }]);
+    assert.ok(view.root.findAllByType("h1").some(node => node.children.includes("Preparing your company. Just a moment.")));
+  } finally { await act(async () => view?.unmount()); }
 });

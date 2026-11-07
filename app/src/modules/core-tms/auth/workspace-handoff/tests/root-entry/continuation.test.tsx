@@ -9,7 +9,7 @@ import {DESKTOP_ATTEMPT_KEY} from "../../../continuation/desktop/attempt-storage
 import {clearBrowserDesktopAttempt} from "../../../continuation/desktop/browser-desktop-attempt";
 import type {CloudSession} from "../../../cloud/cloud-auth-client";
 
-async function page(t:TestContext,mode:"company"|"preparing"|"personal"|"denied"|"legacy"|"reauth",{saved=true,desktop=false,entryPath="/testcases/umbrella-home/work/",legacyCapability=""}={}) {
+async function page(t:TestContext,mode:"company"|"preparing"|"personal"|"denied"|"legacy"|"reauth",{saved=true,desktop=false,entryPath="/testcases/umbrella-home/work/",legacyCapability="",savedPath="/testcases/umbrella-home/work/?workspaceId=space&view=config&settings=billing"}={}) {
  const require=createRequire(import.meta.url),css=require.extensions[".css"];
  require.extensions[".css"]=module=>{module.exports={};};
  const reactDom=require("react-dom"),portal=Object.getOwnPropertyDescriptor(reactDom,"createPortal")!;
@@ -17,7 +17,7 @@ async function page(t:TestContext,mode:"company"|"preparing"|"personal"|"denied"
  const previous=["window","document","React","fetch"].map(key=>[key,Object.getOwnPropertyDescriptor(globalThis,key)] as const);
  const origin="https://tms.saturnusgo.com",billing="/work/?workspaceId=space&view=config&settings=billing";
  const destinations:string[]=[],requests:string[]=[],forms:{action:string;method:string;fields:Record<string,string>}[]=[],values=new Map<string,string>();
- if(saved)values.set(CONTINUATION_KEY,JSON.stringify({version:1,origin,createdAt:Date.now(),path:"/testcases/umbrella-home/work/?workspaceId=space&view=config&settings=billing"}));
+ if(saved)values.set(CONTINUATION_KEY,JSON.stringify({version:1,origin,createdAt:Date.now(),path:savedPath}));
  if(desktop)values.set(DESKTOP_ATTEMPT_KEY,JSON.stringify({version:1,origin,createdAt:Date.now(),attempt:"a".repeat(43)}));
  const location=(path:string)=>Object.assign(new URL(path,origin),{replace:(path:string)=>destinations.push(path),assign:(path:string)=>destinations.push(path)});
  const browser=Object.assign(new EventTarget(),{location:location(entryPath),
@@ -104,4 +104,23 @@ test("a handoff-capable personal session never falls through after authoritative
 test("an explicit help article follows the purchased company instead of becoming a generic help page",async t=>{
  const h=await page(t,"company",{entryPath:"/testcases/umbrella-home/work/?view=help&article=falcon-ai-chat"});
  assert.equal(h.forms[0]?.fields.route,"/work/?workspaceId=space&projectId=project&view=help&article=falcon-ai-chat&lang=en");
+});
+
+
+test("a verified approval link follows its workspace to the company alias", async t => {
+ const h = await page(t, "company", {savedPath:"/work/?view=config&settings=billing&planRequest=req_1&workspaceId=space"});
+ assert.equal(h.forms[0]?.fields.route,"/work/?workspaceId=space&projectId=project&view=config&settings=billing&planRequest=req_1&lang=en");
+ assert.equal(h.values.has(CONTINUATION_KEY),true, "the browser retry can still recover the scoped plan route");
+});
+test("a company handoff never forwards another workspace's approval link", async t => {
+ const h = await page(t, "company", {savedPath:"/work/?view=config&settings=billing&planRequest=req_1&workspaceId=other"});
+ assert.equal(h.forms[0]?.fields.route,"/work/?workspaceId=space&projectId=project&lang=en");
+});
+test("a pending company retains its approval link across refresh", async t => {
+ const h = await page(t, "preparing", {savedPath:"/work/?view=config&settings=billing&planRequest=req_1&workspaceId=space"});
+ assert.equal(h.values.has(CONTINUATION_KEY),true);
+});
+test("an explicit case still wins over a saved approval link", async t => {
+ const h = await page(t, "company", {entryPath:"/work/?caseId=current-case",savedPath:"/work/?view=config&settings=billing&planRequest=req_1&workspaceId=space"});
+ assert.equal(h.forms[0]?.fields.route,"/work/?workspaceId=space&projectId=project&caseId=current-case&lang=en");
 });

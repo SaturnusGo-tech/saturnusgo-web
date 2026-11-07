@@ -3,12 +3,20 @@
 import { useCallback, useEffect, useState } from "react";
 import { transitionContent } from "../../../presentation/workspace/motion/transition/content-transition";
 
-export type AdministrationRoute = { readonly section?: "sandbox" | "admin" | "profile"; readonly id: string | null; readonly creating: boolean; readonly page?: "company" | "audit" | "codex" | "sso" };
+export type CompanyAdministrationTab = "company" | "audit" | "codex" | "sso";
+
+export type AdministrationRoute = { readonly section?: "sandbox" | "admin" | "profile"; readonly id: string | null; readonly creating: boolean; readonly page?: CompanyAdministrationTab | "plan-requests" };
+export function administrationPage(section: string | undefined, page: string | null): AdministrationRoute["page"] {
+  if (section === "sandbox" && page === "plan-requests") return page;
+  if (page === "company" || page === "audit" || page === "codex" || page === "sso") return page;
+  return undefined;
+}
+
 function currentRoute(): AdministrationRoute {
   const query = new URLSearchParams(window.location.search);
-  const page = query.get("page");
   const section = window.location.pathname.split("/")[1];
-  return { ...(section === "sandbox" || section === "admin" || section === "profile" ? { section } : {}), id: query.get("id"), creating: query.get("create") === "true", ...(page === "company" || page === "audit" || page === "codex" || page === "sso" ? { page } : {}) };
+  const page = administrationPage(section, query.get("page"));
+  return { ...(section === "sandbox" || section === "admin" || section === "profile" ? { section } : {}), id: query.get("id"), creating: query.get("create") === "true", ...(page ? { page } : {}) };
 }
 export function useAdministrationNavigation() {
   const [route, setRoute] = useState<AdministrationRoute>(() => typeof window === "undefined" ? { id: null, creating: false } : currentRoute());

@@ -57,3 +57,19 @@ test("a validated desktop attempt follows only the verified target through its e
   assert.equal(ignored.kind,"browser");if(ignored.kind==="browser")assert.equal(ignored.fields.route,"/work/?workspaceId=space&projectId=project&lang=en");
  }
 });
+test("a verified first Startup handoff resumes at company administration", () => {
+ const result = workspaceHandoffNavigation({ ...target, routeTarget: "company_admin" }, "space",
+   "https://tms.saturnusgo.com/cloud-login/?workspaceId=space&workspaceHandoff=1", "en", false);
+ assert.equal(result?.kind, "browser");
+ if (result?.kind !== "browser") return;
+ assert.equal(result.fields.route, "/admin/?account=personal&workspaceId=space&page=company&lang=en");
+});
+test("a recoverable Startup conflict opens its local request once", () => {
+ const requestId = "050071d6-aa31-49c8-870d-3fa0de92eb60";
+ const recoveryTarget = { ...target, destinationOrigin: "https://tms.saturnusgo.com", planRequestId: requestId };
+ const result = workspaceHandoffNavigation(recoveryTarget, "space", href, "ru", false);
+ assert.deepEqual(result, { kind: "local", url: `https://tms.saturnusgo.com/work/?workspaceId=space&view=config&settings=billing&planRequest=${requestId}&lang=ru` });
+ if (result?.kind !== "local") return;
+ assert.equal(workspaceHandoffNavigation(recoveryTarget, "space", result.url, "ru", false), null);
+ assert.equal(workspaceHandoffNavigation({ ...recoveryTarget, planRequestId: "https://evil.test" }, "space", href, "ru", false), null);
+});

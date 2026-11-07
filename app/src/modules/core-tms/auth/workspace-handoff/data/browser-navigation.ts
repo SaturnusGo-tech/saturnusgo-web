@@ -1,5 +1,6 @@
 import type { WorkspaceHandoffNavigation } from "../domain/handoff-port";
 export function navigateWorkspaceHandoff(destination:WorkspaceHandoffNavigation) {
+  if(destination.kind==="local"){window.location.replace(destination.url);return;}
   if(destination.kind==="desktop"){window.location.assign(destination.url);return;}
   const source=new URL(destination.action);
   if(source.origin!==window.location.origin||source.pathname!=="/api/v1/auth/workspace-handoffs"||source.search||source.hash)throw new Error("Invalid handoff form");

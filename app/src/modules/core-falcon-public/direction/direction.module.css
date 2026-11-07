@@ -12,3 +12,31 @@
 @media(max-width:1000px){.navigationInner{gap:18px}.desktopNav{gap:18px}.navActions{gap:14px}.heroCopy{padding-top:144px}.chapterHeading{gap:50px}.resources,.closing{margin-inline:40px}.footer{gap:24px 40px}.footer nav{gap:18px}.hero>.productScene{height:520px}.productScene{height:560px}.sceneOverlay{top:170px}.hero .sceneOverlay{top:250px}.principleGrid article{padding-inline:20px}}
 @media(max-width:760px){.navigation{height:64px}.navigationInner{padding-inline:20px;gap:12px}.brand{font-size:19px}.brand img{width:28px;height:28px}.desktopNav,.docsLink{display:none}.navActions{margin-left:auto;gap:12px}.navActions .primary{min-height:34px;padding-inline:14px}.menuButton{display:grid;place-items:center}.mobileNav{top:63px}.heroCopy{padding:100px 20px 48px}.hero h1{font-size:clamp(38px,7.7vw,58px);line-height:1.08;letter-spacing:-.03em}.heroSubline{display:block;margin-top:25px}.heroSubline p{font-size:15px;max-width:540px}.heroSubline .textLink{margin-top:25px}.hero>.productScene{width:calc(100% - 40px);margin-inline:20px;height:345px}.productScene{height:350px;margin-top:40px}.chapter>.productScene{margin-top:40px}.scenePlane{width:660px;left:-50px;right:auto}.hero .scenePlane{width:700px;left:-40px}.sceneMain{border-radius:8px}.sceneOverlay{border-radius:8px;top:150px;right:-6%;width:67%}.hero .sceneOverlay{top:185px;right:0;width:55%}.productScene[data-scene="execution"] .sceneOverlay,.productScene[data-scene="integrations"] .sceneOverlay{top:140px}.integrations{margin-top:20px;padding:10px 20px 60px}.integrations h2{font-size:13px;margin-bottom:25px}.logoRow{gap:44px;padding-right:44px}.logoRow li{font-size:17px;gap:10px}.motionControl{right:22px;bottom:10px}.principles{padding:76px 20px 80px}.principles>h2{font-size:29px;line-height:1.3}.principleGrid{grid-template-columns:1fr;margin-top:38px;gap:40px}.principleGrid article,.principleGrid article:first-child,.principleGrid article:last-child{padding:0 0 32px;border:0;border-bottom:1px solid var(--landing-line);display:grid;grid-template-columns:1fr 1.1fr;column-gap:24px;align-items:center}.principleGrid img{grid-column:1;grid-row:1/3;aspect-ratio:1/1}.principleGrid h3{margin:0;font-size:16px;align-self:end}.principleGrid p{margin-top:8px;font-size:14px;align-self:start}.chapter{padding:74px 20px 40px}.chapterHeading{grid-template-columns:1fr;gap:28px}.chapterHeading>div>svg{margin-bottom:20px}.chapter h2{font-size:38px}.chapterHeading p{font-size:15px;max-width:52ch}.chapterHeading .textLink{margin-top:18px}.details{grid-template-columns:1fr;gap:26px;margin-top:0;padding-bottom:30px}.details>div{display:grid;grid-template-columns:20px 1fr;gap:0 12px;padding-top:20px}.details svg{margin:2px 0 0}.details p{grid-column:2;max-width:55ch}.sceneFootnote{align-items:start;flex-direction:column;font-size:11px;gap:16px;padding-bottom:25px}.resources,.closing{margin-inline:20px;padding:64px 0;grid-template-columns:1fr;gap:20px}.resources h2{font-size:31px}.resources p{font-size:15px}.resources>a,.closing>a{grid-column:1;grid-row:auto;justify-self:start}.closing h2{font-size:38px}.closing p{font-size:15px}.demoSection{padding:20px 20px 72px}.footer{padding:44px 20px 28px;grid-template-columns:1fr;gap:18px}.footer>p{max-width:360px}.footer nav{grid-column:1;grid-row:auto;justify-content:start;gap:14px 24px;padding-top:14px}.footer small{padding-top:20px}}
 @media(prefers-reduced-motion:reduce){.page *{scroll-behavior:auto!important;animation:none!important;transition:none!important}.scenePlane{transform:none}.marqueeTrack{animation:none}.marqueeWindow{overflow:auto;scrollbar-width:thin}.logoRow[aria-hidden="true"]{display:none}.motionControl{display:none}}
+
+.planGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 48px;
+  border-block: 1px solid var(--landing-line);
+}
+.plan {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 28px clamp(20px, 3.4vw, 48px);
+}
+.plan + .plan { border-inline-start: 1px solid var(--landing-line); }
+.plan:first-child { padding-inline-start: 0; }
+.plan:last-child { padding-inline-end: 0; }
+.plan h3 { font-size: 16px; font-weight: 500; }
+.planPrice { display: flex; gap: 8px; align-items: baseline; margin-top: 18px; }
+.planPrice strong { font-size: clamp(29px, 3vw, 43px); line-height: 1.08; font-weight: 500; letter-spacing: -.04em; }
+.planPrice span, .planMeta, .planDescription { color: var(--landing-muted); font-size: 14px; line-height: 1.55; }
+.planMeta { margin-top: 8px; }
+.planDescription { flex: 1; margin-block: 22px; max-width: 30ch; }
+@media (max-width: 760px) {
+  .planGrid { grid-template-columns: 1fr; margin-top: 30px; }
+  .plan, .plan:first-child, .plan:last-child { padding: 24px 0; }
+  .plan + .plan { border-inline-start: 0; border-block-start: 1px solid var(--landing-line); }
+  .planDescription { margin-block: 16px; }
+}

@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { useStartupSetup } from "../../../application/useStartupSetup";
 import { companySlug, companyValues, sameCompanyValues, type CompanyStage, type CompanyValues } from "./wizard-values";
-export function useCompanyWizard(model: ReturnType<typeof useStartupSetup>) {
-  const [stage, go] = useState<CompanyStage>("name");
+export function useCompanyWizard(model: ReturnType<typeof useStartupSetup>, initialStage: CompanyStage = "name") {
+  const [stage, go] = useState<CompanyStage>(initialStage);
   const [edit, setEdit] = useState<CompanyValues | null>(null);
   const [manualSlug, setManualSlug] = useState(false);
   const [confirmed, setConfirmed] = useState<string | null>(null);
@@ -29,7 +29,11 @@ export function useCompanyWizard(model: ReturnType<typeof useStartupSetup>) {
     if (!changed && model.setup && !["expired", "failed"].includes(model.setup.status)) { go("consent"); return; }
     const input = { displayName: values.displayName.trim(), slug: values.slug,
       ...Object.fromEntries((["legalName", "countryCode", "taxId", "address"] as const).filter(key => values[key].trim()).map(key => [key, values[key].trim()])) };
-    if (await model.save(input)) { setEdit(null); setConfirmed(null); go("consent"); }
+    if (!await model.save(input)) return false;
+    setEdit(null);
+    setConfirmed(null);
+    go("consent");
+    return true;
   }
   return { stage, go, values, change, changed, locked, consented, confirm: (checked: boolean) => setConfirmed(checked ? context : null), reserve, snapshot: snapshot.current };
 }

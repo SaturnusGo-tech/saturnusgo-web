@@ -10,9 +10,9 @@ export function rememberContinuation(storage: Store, location: Pick<Location, "o
     storage.setItem(CONTINUATION_KEY, JSON.stringify({ version: 1, origin: location.origin, path, createdAt: now }));
   } catch { /* Per-tab continuation is optional when browser storage is unavailable. */ }
 }
-export function takeContinuation(storage: Store, origin: string, workspaceId?: string | null, now = Date.now()): string | null {
+export function peekContinuation(storage: Store, origin: string, workspaceId?: string | null, now = Date.now()): string | null {
   try {
-    const raw = storage.getItem(CONTINUATION_KEY); storage.removeItem(CONTINUATION_KEY);
+    const raw = storage.getItem(CONTINUATION_KEY);
     if (!raw || raw.length > 8192) return null;
     const value = JSON.parse(raw);
     if (value?.version !== 1 || value.origin !== origin || !Number.isFinite(value.createdAt)
@@ -21,5 +21,12 @@ export function takeContinuation(storage: Store, origin: string, workspaceId?: s
     if (!path) return null;
     const storedWorkspace = new URL(path, origin).searchParams.get("workspaceId");
     return storedWorkspace && workspaceId && storedWorkspace !== workspaceId ? null : path;
+  } catch { return null; }
+}
+export function takeContinuation(storage: Store, origin: string, workspaceId?: string | null, now = Date.now()): string | null {
+  try {
+    const path = peekContinuation(storage, origin, workspaceId, now);
+    storage.removeItem(CONTINUATION_KEY);
+    return path;
   } catch { return null; }
 }

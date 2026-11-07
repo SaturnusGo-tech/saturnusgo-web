@@ -1,8 +1,12 @@
+import type { PlanRequestAction, PlanRequestChange, PlanRequestDetail, PlanRequestStatus, PlanRequestSummary } from "../../domain/plan-requests/plan-request";
 import type { ManagedAvatarGrant } from "../../../auth/managed/domain/managed-avatar";
 import type { JournalFilter, AdministrationEvent, CompanyOptions, Company, CompanyDraft, CompanyChange, CompanyCreated, CompanyMember, MemberDraft, MemberChange,
   MemberMutation, Profile, ProfileDetails, PasswordChange, SessionReauthentication, DeviceSession, ResultPage } from "../../domain/administration";
 
 export interface AdministrationPort {
+  planRequests(status: PlanRequestStatus | "", cursor: string | null, signal: AbortSignal): Promise<ResultPage<PlanRequestSummary>>;
+  planRequest(id: string, signal: AbortSignal): Promise<PlanRequestDetail>;
+  changePlanRequest(id: string, action: PlanRequestAction, change: PlanRequestChange, key: string, signal: AbortSignal): Promise<PlanRequestDetail>;
   companyOptions(signal: AbortSignal): Promise<CompanyOptions>;
   ownCompany(signal: AbortSignal): Promise<Company>;
   journal(platform: boolean, companyId: string | null, cursor: string | null, signal: AbortSignal, filter?: JournalFilter): Promise<ResultPage<AdministrationEvent>>;

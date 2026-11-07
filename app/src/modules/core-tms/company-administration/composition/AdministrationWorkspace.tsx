@@ -21,6 +21,7 @@ import { CreateCompany } from "../presentation/companies/CreateCompany";
 import { CompanyDetail } from "../presentation/company-detail/CompanyDetail";
 import { MemberWorkspace } from "../presentation/directory/MemberWorkspace";
 import { ProfilePage } from "../presentation/profile-page/ProfilePage";
+import { PlanRequests } from "../presentation/plan-requests/PlanRequests";
 
 export function AdministrationWorkspace({ session, logout, section: initialSection }: {
   readonly session: SignedInCompanySession; readonly logout: () => Promise<void>; readonly section: "sandbox" | "admin" | "profile";
@@ -53,6 +54,10 @@ export function AdministrationWorkspace({ session, logout, section: initialSecti
       : section === "admin" && route.page === "codex" ? <CompanyCodexAdminFeature http={http} status={codex} locale={locale} allowed={canReadCompany} onChanged={company.refresh} />
       : route.page === "audit" ? <AdministrationJournal client={client} platform={session.audience === "platform"} />
       : section === "admin" && route.page === "company" ? <CompanyOverview resource={company} />
+      : section === "sandbox" && route.page === "plan-requests" ? <PlanRequests client={client} id={route.id} locale={locale}
+          onOpen={(id) => navigate({ section: "sandbox", page: "plan-requests", id, creating: false })}
+          onBack={() => navigate({ section: "sandbox", page: "plan-requests", id: null, creating: false })}
+          onOpenCompany={(id) => navigate({ section: "sandbox", id, creating: false })} />
       : section === "sandbox" ? (route.creating ? <CreateCompany client={client} onBack={onBack} onCreated={onOpen} />
         : route.id ? <CompanyDetail key={route.id} id={route.id} client={client} onBack={onBack} />
           : <CompanyList client={client} onOpen={onOpen} onCreate={onCreate} />)

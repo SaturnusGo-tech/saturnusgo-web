@@ -15,6 +15,12 @@ import { billingPaymentsAvailable } from "../domain/catalog/billing-availability
 import { billingCheckoutMode } from "../domain/capabilities/checkout-capability";
 import { useStartupWorkspaceTransition } from "../startup/composition/useStartupWorkspaceTransition";
 import { StartupHandoffStatus } from "../startup/presentation/StartupHandoffStatus";
+import type { BillingPlanId } from "../domain/billing";
+import { usePlanRequests } from "../requests/application/usePlanRequests";
+import { createPlanRequestApi } from "../requests/data/plan-request-api";
+import { readPlanRequestIntent, withoutPlanRequestIntent, type PlanRequest } from "../requests/domain/plan-request";
+import { PlanRequestDialog } from "../requests/presentation/PlanRequestDialog";
+import { planRequestOffers } from "../requests/presentation/plan-request-offers";
 import { BillingScreen } from "../presentation/screen/BillingScreen";
 import { createAdministrationClient } from "../../company-administration/data/administration-client";
 import { BillingIdentityConfirmation } from "../startup/presentation/confirmation/BillingIdentityConfirmation";
@@ -47,18 +53,63 @@ export function ConnectedBillingFeature({ workspaceId, preview = false, onClose 
   const restoredStartup = !!billing.pendingCommand && (billing.pendingCommand.intent.kind === "confirm" || billing.pendingCommand.intent.kind === "checkout" && billing.pendingCommand.intent.planId === "startup");
   useEffect(() => { if (restoredStartup) setRecoveryWorkspace(workspaceId); }, [restoredStartup, workspaceId]);
   const checkoutMode = billingCheckoutMode(billing.summary, billing.account, process.env.NODE_ENV !== "production");
+  const paymentsAvailable = billingPaymentsAvailable || checkoutMode !== "disabled";
+  const manualAvailable = Boolean(http && session && billing.canManage && !isolatedPreview && !paymentsAvailable);
+  const manualApi = useMemo(() => manualAvailable && http ? createPlanRequestApi(http, workspaceId) : null, [manualAvailable, http, workspaceId]);
+  const [intent, setIntent] = useState<ReturnType<typeof readPlanRequestIntent>>(null);
+  const [offer, setOffer] = useState<BillingPlanId | null>(null);
+  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
+  const [manualSetupId, setManualSetupId] = useState<string | null>(null);
+  const [manualTransitionId, setManualTransitionId] = useState<string | null>(null);
+  useEffect(() => {
+    if (typeof window !== "undefined") setIntent(readPlanRequestIntent(window.location?.search ?? ""));
+  }, [workspaceId]);
+  const deepRequestId = intent?.kind === "request" && intent.workspaceId === workspaceId ? intent.id : null;
+  const manual = usePlanRequests(manualApi, deepRequestId, locale);
+  const selectedRequest = manual.data?.requests.find(item => item.id === selectedRequestId)
+    ?? (deepRequestId ? manual.request : null);
+  const activationRequest = manual.data?.requests.find(item => item.id === manualSetupId)
+    ?? (manual.request?.id === manualSetupId ? manual.request : null);
+  const transitioningRequest = manual.data?.requests.find(item => item.id === manualTransitionId)
+    ?? (deepRequestId ? manual.request : null);
+  const manualHandoff = transitioningRequest?.status === "active" && transitioningRequest.planId === "startup"
+    && session?.kind === "cloud" && transitioningRequest.companyHostname ? `manual:${transitioningRequest.id}` : null;
   const setupFlowOpen = setupOpen || restoredStartup || recoveryWorkspace === workspaceId || checkoutMode === "controlled_test" && billing.checkout?.status === "open" && billing.checkout.planId === "startup";
   const settledReentry = !setupOpen && !billing.loading && activeStartupWorkspace(billing.summary, billing.account, workspaceId);
   const handoff = useStartupWorkspaceTransition(billing.lastMutation, billing.summary, billing.account, workspaceId, locale, isolatedPreview,
-    !billing.loading && (!setupFlowOpen || settledReentry || transitionRequested && activated), transitionRequested ? "company_admin" : "company_home");
+    !billing.loading && (!setupFlowOpen || settledReentry || transitionRequested && activated || Boolean(manualHandoff)),
+    transitionRequested || manualHandoff ? "company_admin" : "company_home", manualHandoff);
   useEffect(() => {
-    if (transitionRequested && activated && handoff.phase === "complete" && typeof window !== "undefined") {
+    if ((transitionRequested && activated || manualHandoff) && handoff.phase === "complete" && typeof window !== "undefined") {
       window.location.assign(personalAdministrationUrl(window.location.href, workspaceId, "company"));
     }
-  }, [transitionRequested, activated, handoff.phase, workspaceId]);
+  }, [transitionRequested, activated, handoff.phase, workspaceId, manualHandoff]);
   const setupApi = useMemo(() => http ? createStartupSetupApi(http, setupLocale) : null, [http, setupLocale]);
-  const setup = useStartupSetup(setupApi, workspaceId, setupOpen && billing.canManage && billing.summary?.workspaceKind === "personal");
-  const paymentsAvailable = billingPaymentsAvailable || checkoutMode !== "disabled";
+  const setup = useStartupSetup(setupApi, workspaceId, (setupOpen || Boolean(manualSetupId)) && billing.canManage && billing.summary?.workspaceKind === "personal");
+  const ru = locale === "ru";
+
+  function clearIntent() {
+    if (!intent) return;
+    setIntent(null);
+    window.history.replaceState(window.history.state, "", withoutPlanRequestIntent(window.location.href));
+  }
+  function dismissRequest() { clearIntent(); setOffer(null); setSelectedRequestId(null); }
+  async function activateRequest(request: PlanRequest) {
+    if (request.planId === "startup" && request.workspaceKind === "personal") {
+      setSetupLocale(locale);
+      setManualSetupId(request.id);
+      setSelectedRequestId(request.id);
+      return;
+    }
+    const updated = await manual.act(request, "activate");
+    if (!updated) return;
+    if (updated.planId === "startup") setManualTransitionId(updated.id);
+    billing.reload();
+  }
+  const pendingRequest = manual.current;
+  const manualOffers = manualAvailable && manual.data ? planRequestOffers(manual.data, pendingRequest, ru, (planId, requestId) => {
+    clearIntent(); setOffer(planId); setSelectedRequestId(requestId);
+  }) : undefined;
   const recovery = useStartupCheckoutRecovery({ port: setupApi, workspaceId, command: billing.pendingCommand, checkout: billing.checkout,
     enabled: !!billing.pendingCommand && !billing.loading && billing.canManage && paymentsAvailable && billing.summary?.workspaceKind === "personal"
       && (billing.pendingCommand.intent.kind === "confirm" || !!billing.summary.allowedCheckoutPlanIds?.includes("startup") && !!billing.account?.allowedCheckoutPlanIds?.includes("startup")), resume: billing.retryCommand });
@@ -87,6 +138,25 @@ export function ConnectedBillingFeature({ workspaceId, preview = false, onClose 
       if (billing.canRetryCommand) { if (paymentsAvailable) void billing.retryCommand(); } else billing.reload();
     }}>{billing.canRetryCommand ? (locale === "ru" ? "Повторить то же действие" : "Retry the same action") : (locale === "ru" ? "Обновить данные" : "Refresh details")}</button>
   </div>);
+  if (manualAvailable && !manualSetupId && (transitioningRequest?.status === "activating" && !transitioningRequest.preparationError || handoff.phase === "loading" && manualHandoff)) {
+    return <CompanyPreparationScreen ru={ru} preparing name={setup.setup?.displayName ?? transitioningRequest?.workspaceName} />;
+  }
+  const editAddress = activationRequest?.actions.includes("edit_address") ?? false;
+  if (manualAvailable && activationRequest && (activationRequest.actions.includes("activate") || editAddress)) {
+    return <StartupSetupScreen key={manualSetupId} model={setup} ru={ru} manualAccess canCheckout paymentsAvailable={false} busy={manual.busy}
+      onAddressReplaced={editAddress ? () => {
+        setManualTransitionId(activationRequest.id);
+        setManualSetupId(null);
+        manual.reload();
+      } : undefined}
+      checkoutNotice={manual.failed && <p role="alert">{ru ? "Не удалось начать активацию. Данные компании сохранены." : "Couldn’t start activation. Your company details are saved."}</p>}
+      onBack={() => setManualSetupId(null)} onCheckout={async () => {
+        if (!setup.setup) return;
+        const updated = await manual.act(activationRequest, "activate", { setupId: setup.setup.id, setupVersion: setup.setup.version });
+        if (updated) { setManualTransitionId(updated.id); setManualSetupId(null); billing.reload(); }
+        else setup.reload();
+      }} />;
+  }
   if (handoff.phase === "loading" || !setupOpen && setupFlowOpen && billing.loading) return <TmsAuthState kind="loading" />;
   if (handoff.phase === "preparing" || handoff.phase === "opening") return <CompanyPreparationScreen ru={locale === "ru"} preparing={handoff.phase === "preparing"} name={setup.setup?.displayName} />;
   if (setupFlowOpen && !settledReentry) return <StartupSetupScreen key={`${workspaceId}:${setupRevision}`} model={setup} ru={locale === "ru"}
@@ -105,5 +175,25 @@ export function ConnectedBillingFeature({ workspaceId, preview = false, onClose 
     onBack={() => { setSetupOpen(false); setRecoveryWorkspace(null); }} onCheckout={async () => {
       if (paymentsAvailable && setup.setup?.status === "ready") await billing.startCheckout("startup", { startupSetupId: setup.setup.id, startupSetupVersion: setup.setup.version, confirmWorkspaceConversion: true });
     }} />;
-  return <><StartupHandoffStatus state={handoff} ru={locale === "ru"} /><BillingScreen key={workspaceId} {...billing} error={checkoutRecovery ? null : billing.error} identityConfirmation={checkoutRecovery} ru={locale === "ru"} paymentsAvailable={paymentsAvailable} checkoutMode={checkoutMode} onStartupSetup={openStartupSetup} onClose={onClose} /></>;
+  const openOffer = offer ?? (intent?.kind === "offer" ? intent.planId : null);
+  const dialogRequest = selectedRequest ?? (openOffer ? pendingRequest ?? manual.data?.requests.find(item => item.planId === openOffer && item.status === "active") ?? null : null);
+  const offerUnavailable = Boolean(openOffer && manual.data && !manual.data.eligiblePlanIds.includes(openOffer));
+  return <>
+    <StartupHandoffStatus state={handoff} ru={ru} />
+    <BillingScreen key={workspaceId} {...billing} error={checkoutRecovery && !manualAvailable ? null : billing.error}
+      identityConfirmation={manualAvailable ? null : checkoutRecovery} manualOffers={manualOffers}
+      ru={ru} paymentsAvailable={paymentsAvailable} checkoutMode={checkoutMode} onStartupSetup={openStartupSetup} onClose={onClose} />
+    {manualAvailable && (openOffer || selectedRequestId || deepRequestId) && <PlanRequestDialog planId={dialogRequest?.planId ?? openOffer ?? "individual"} ru={ru}
+      data={manual.data} request={dialogRequest} busy={manual.busy} loading={manual.loading || Boolean(deepRequestId && !dialogRequest && !manual.error)}
+      error={manual.error} unavailable={!dialogRequest && offerUnavailable}
+      failed={manual.failed} onClose={dismissRequest} onReload={manual.reload}
+      onSubmit={async note => {
+        if (!openOffer || deepRequestId) return;
+        const created = await manual.submit(openOffer, note);
+        if (created) setSelectedRequestId(created.id);
+      }}
+      onActivate={request => void activateRequest(request)} onEditAddress={request => {
+        setSetupLocale(locale); setManualSetupId(request.id); setSelectedRequestId(request.id);
+      }} onWithdraw={request => void manual.act(request, "withdraw")} />}
+  </>;
 }

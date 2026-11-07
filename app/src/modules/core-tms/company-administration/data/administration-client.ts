@@ -1,3 +1,4 @@
+import type { PlanRequestDetail, PlanRequestSummary } from "../domain/plan-requests/plan-request";
 import { avatarFileBase64 } from "./avatar-file";
 import type { TmsHttpClient } from "../../../../core/tms/transport/http";
 import { TmsApiError } from "../../../../core/tms/transport/http";
@@ -23,7 +24,17 @@ export function createAdministrationClient(http: TmsHttpClient): AdministrationP
     (await http.mutateResource<T>(path, method, body, { signal, idempotencyKey: key,
       ...(version === undefined ? {} : { ifMatch: `"${version}"` }) })).data);
   const avatarPath = (id: string | null) => id === null ? "/profile/avatar" : `/company/members/${encodeURIComponent(id)}/avatar`;
+  const planRequestsPath = "/platform/plan-requests";
+  const planRequestPath = (id: string) => `${planRequestsPath}/${encodeURIComponent(id)}`;
   return {
+    planRequests: async (status, cursor, signal) => {
+      const query = new URLSearchParams({ limit: "30", ...(status ? { status } : {}), ...(cursor ? { cursor } : {}) });
+      const { requests, nextCursor } = await get<{ requests: PlanRequestSummary[]; nextCursor: string | null }>(`${planRequestsPath}?${query}`, signal);
+      return { items: requests, nextCursor };
+    },
+    planRequest: async (id, signal) => (await get<{ request: PlanRequestDetail }>(planRequestPath(id), signal)).request,
+    changePlanRequest: async (id, action, change, key, signal) => (await mutate<{ request: PlanRequestDetail }>(
+      `${planRequestPath(id)}/${action}`, "POST", change, signal, key)).request,
     companyOptions: (signal) => get<CompanyOptions>("/platform/company-options", signal),
     ownCompany: (signal) => get<Company>("/company", signal),
     journal: (platform, id, cursor, signal, filter) => list<AdministrationEvent>(platform

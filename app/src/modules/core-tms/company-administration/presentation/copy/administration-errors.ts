@@ -13,6 +13,8 @@ export function administrationError(code: string, locale: "ru" | "en"): string {
     ACCESS_DENIED: ["Недостаточно прав для этого действия.", "You do not have permission for this action."],
     SESSION_REQUIRED: ["Сессия завершена. Войдите снова.", "Your session has ended. Sign in again."],
     TENANT_UNAVAILABLE: ["Доступ компании приостановлен.", "Company access is unavailable."],
+    PLAN_REQUEST_NOT_FOUND: ["Заявка не найдена или недоступна.", "This request was not found or is unavailable."],
+    PLAN_REQUEST_FORBIDDEN: ["Нет доступа к заявкам на планы.", "You do not have access to plan requests."],
     NOT_FOUND: ["Запись не найдена или недоступна.", "This record was not found or is unavailable."],
     INVALID_INPUT: ["Проверьте заполненные поля.", "Please check the form fields."],
     VALIDATION_ERROR: ["Проверьте заполненные поля.", "Please check the form fields."],

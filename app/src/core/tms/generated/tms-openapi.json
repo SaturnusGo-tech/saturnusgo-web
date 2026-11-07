@@ -24819,6 +24819,1035 @@
         }
       }
     },
+    "/workspaces/{workspaceId}/plan-requests": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        }
+      ],
+      "get": {
+        "operationId": "listCustomerPlanRequests",
+        "tags": [
+          "Billing"
+        ],
+        "description": "Lists requests owned by the current workspace administrator, effective access, and eligible plans.",
+        "security": [
+          {
+            "cloudSession": []
+          },
+          {
+            "managedTenant": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current plan request state.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerPlanRequestsEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "operationId": "submitCustomerPlanRequest",
+        "tags": [
+          "Billing"
+        ],
+        "description": "Creates a request or returns the existing open request. A request grants no access and initiates no payment.",
+        "security": [
+          {
+            "cloudSession": []
+          },
+          {
+            "managedTenant": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current plan request state.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerPlanRequestEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitPlanRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workspaces/{workspaceId}/plan-requests/{id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "readCustomerPlanRequest",
+        "tags": [
+          "Billing"
+        ],
+        "description": "Returns current state for the applicant. Knowing the request ID grants no access.",
+        "security": [
+          {
+            "cloudSession": []
+          },
+          {
+            "managedTenant": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current plan request state.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerPlanRequestEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/platform/plan-requests": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "operationId": "listOperatorPlanRequests",
+        "tags": [
+          "Billing"
+        ],
+        "description": "Lists plan requests with the next cursor in the response body.",
+        "security": [
+          {
+            "managedPlatform": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current plan request state.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperatorPlanRequestsEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "requested",
+                "contacted",
+                "approved",
+                "activating",
+                "active",
+                "declined",
+                "withdrawn",
+                "expired",
+                "revoked"
+              ]
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 30
+            }
+          }
+        ]
+      }
+    },
+    "/platform/plan-requests/{id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "readOperatorPlanRequest",
+        "tags": [
+          "Billing"
+        ],
+        "description": "Reads applicant and delivery details with the operator audit history.",
+        "security": [
+          {
+            "managedPlatform": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current plan request state.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperatorPlanRequestEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/workspaces/{workspaceId}/plan-requests/{id}/activate": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "activateCustomerPlanRequest",
+        "tags": [
+          "Billing"
+        ],
+        "description": "Starts a currently approved pilot. Startup conversion requires a saved setup and version after explicit confirmation. Repeating the command returns the current state.",
+        "security": [
+          {
+            "cloudSession": []
+          },
+          {
+            "managedTenant": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current plan request state.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerPlanRequestEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivatePlanRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workspaces/{workspaceId}/plan-requests/{id}/withdraw": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "withdrawCustomerPlanRequest",
+        "tags": [
+          "Billing"
+        ],
+        "description": "Withdraws a request before activation begins. Repeating the command returns the current state.",
+        "security": [
+          {
+            "cloudSession": []
+          },
+          {
+            "managedTenant": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current plan request state.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerPlanRequestEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "x-tms-idempotency": "not-applicable"
+      }
+    },
+    "/platform/plan-requests/{id}/contact": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "contactOperatorPlanRequest",
+        "tags": [
+          "Billing"
+        ],
+        "description": "Marks a request as contacted and records an optional internal note.",
+        "security": [
+          {
+            "managedPlatform": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current plan request state.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperatorPlanRequestEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "x-tms-idempotency": "required",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperatorPlanRequestCommand"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/plan-requests/{id}/approve": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "approveOperatorPlanRequest",
+        "tags": [
+          "Billing"
+        ],
+        "description": "Approves a pilot with an activation deadline and records an optional duration. Enterprise requests cannot be self-service approved.",
+        "security": [
+          {
+            "managedPlatform": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current plan request state.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperatorPlanRequestEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "x-tms-idempotency": "required",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperatorPlanRequestCommand"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/plan-requests/{id}/decline": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "declineOperatorPlanRequest",
+        "tags": [
+          "Billing"
+        ],
+        "description": "Closes an unactivated request as declined.",
+        "security": [
+          {
+            "managedPlatform": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current plan request state.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperatorPlanRequestEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "x-tms-idempotency": "required",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperatorPlanRequestCommand"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/plan-requests/{id}/revoke": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "revokeOperatorPlanRequest",
+        "tags": [
+          "Billing"
+        ],
+        "description": "Revokes the manual grant with a required reason. Separate financial access remains independently evaluated.",
+        "security": [
+          {
+            "managedPlatform": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current plan request state.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperatorPlanRequestEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "x-tms-idempotency": "required",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperatorPlanRequestCommand"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/plan-requests/{id}/reissue": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "reissueOperatorPlanRequest",
+        "tags": [
+          "Billing"
+        ],
+        "description": "Reissues an unused approval whose activation deadline has passed.",
+        "security": [
+          {
+            "managedPlatform": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current plan request state.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperatorPlanRequestEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "x-tms-idempotency": "required",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperatorPlanRequestCommand"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/plan-requests/{id}/retry": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "retryOperatorPlanRequest",
+        "tags": [
+          "Billing"
+        ],
+        "description": "Retries preparation for the same Startup request. Address conflicts require a different address from the applicant.",
+        "security": [
+          {
+            "managedPlatform": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current plan request state.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperatorPlanRequestEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "x-tms-idempotency": "required",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperatorPlanRequestCommand"
+              }
+            }
+          }
+        }
+      }
+    },
     "/billing/startup-setup": {
       "parameters": [
         {
@@ -52602,6 +53631,931 @@
           "idempotencyKey"
         ]
       },
+      "CustomerPlanRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "planId": {
+            "type": "string",
+            "enum": [
+              "individual",
+              "startup",
+              "enterprise"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "requested",
+              "contacted",
+              "approved",
+              "activating",
+              "active",
+              "declined",
+              "withdrawn",
+              "expired",
+              "revoked"
+            ]
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "en",
+              "ru"
+            ]
+          },
+          "workspaceId": {
+            "type": "string"
+          },
+          "workspaceName": {
+            "type": "string"
+          },
+          "workspaceKind": {
+            "type": "string",
+            "enum": [
+              "personal",
+              "company"
+            ]
+          },
+          "applicantName": {
+            "type": "string"
+          },
+          "applicantEmail": {
+            "type": "string",
+            "format": "email"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "activationExpiresAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "accessEndsAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "setupId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "companyHostname": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "preparationError": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "withdraw",
+                "activate",
+                "edit_address"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "reference",
+          "planId",
+          "status",
+          "locale",
+          "workspaceId",
+          "workspaceName",
+          "workspaceKind",
+          "applicantName",
+          "applicantEmail",
+          "note",
+          "createdAt",
+          "updatedAt",
+          "version",
+          "activationExpiresAt",
+          "accessEndsAt",
+          "setupId",
+          "companyHostname",
+          "preparationError",
+          "actions"
+        ],
+        "additionalProperties": false
+      },
+      "OperatorPlanRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "planId": {
+            "type": "string",
+            "enum": [
+              "individual",
+              "startup",
+              "enterprise"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "requested",
+              "contacted",
+              "approved",
+              "activating",
+              "active",
+              "declined",
+              "withdrawn",
+              "expired",
+              "revoked"
+            ]
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "en",
+              "ru"
+            ]
+          },
+          "workspaceId": {
+            "type": "string"
+          },
+          "workspaceName": {
+            "type": "string"
+          },
+          "workspaceKind": {
+            "type": "string",
+            "enum": [
+              "personal",
+              "company"
+            ]
+          },
+          "applicantName": {
+            "type": "string"
+          },
+          "applicantEmail": {
+            "type": "string",
+            "format": "email"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "activationExpiresAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "accessEndsAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "setupId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "companyHostname": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "preparationError": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "contact",
+                "approve",
+                "decline",
+                "revoke",
+                "reissue",
+                "retry"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "reference",
+          "planId",
+          "status",
+          "locale",
+          "workspaceId",
+          "workspaceName",
+          "workspaceKind",
+          "applicantName",
+          "applicantEmail",
+          "note",
+          "createdAt",
+          "updatedAt",
+          "version",
+          "activationExpiresAt",
+          "accessEndsAt",
+          "setupId",
+          "companyHostname",
+          "preparationError",
+          "actions"
+        ],
+        "additionalProperties": false
+      },
+      "OperatorPlanRequestDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "planId": {
+            "type": "string",
+            "enum": [
+              "individual",
+              "startup",
+              "enterprise"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "requested",
+              "contacted",
+              "approved",
+              "activating",
+              "active",
+              "declined",
+              "withdrawn",
+              "expired",
+              "revoked"
+            ]
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "en",
+              "ru"
+            ]
+          },
+          "workspaceId": {
+            "type": "string"
+          },
+          "workspaceName": {
+            "type": "string"
+          },
+          "workspaceKind": {
+            "type": "string",
+            "enum": [
+              "personal",
+              "company"
+            ]
+          },
+          "applicantName": {
+            "type": "string"
+          },
+          "applicantEmail": {
+            "type": "string",
+            "format": "email"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "activationExpiresAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "accessEndsAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "setupId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "companyHostname": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "preparationError": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "contact",
+                "approve",
+                "decline",
+                "revoke",
+                "reissue",
+                "retry"
+              ]
+            }
+          },
+          "applicantIdentityId": {
+            "type": "string"
+          },
+          "applicantRole": {
+            "type": "string"
+          },
+          "access": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "planId": {
+                    "type": "string",
+                    "enum": [
+                      "individual",
+                      "startup",
+                      "enterprise"
+                    ]
+                  },
+                  "endsAt": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "planId",
+                  "endsAt"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "durationDays": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 90
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "basis": {
+            "const": "pilot"
+          },
+          "history": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "action": {
+                  "type": "string"
+                },
+                "actorLabel": {
+                  "type": "string"
+                },
+                "note": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 1000
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "action",
+                "actorLabel",
+                "note",
+                "createdAt"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 100
+          },
+          "mail": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "operator_request",
+                    "request_received",
+                    "approved",
+                    "company_ready"
+                  ]
+                },
+                "status": {
+                  "type": "string"
+                },
+                "attempts": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "errorCode": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "kind",
+                "status",
+                "attempts",
+                "errorCode"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "id",
+          "reference",
+          "planId",
+          "status",
+          "locale",
+          "workspaceId",
+          "workspaceName",
+          "workspaceKind",
+          "applicantName",
+          "applicantEmail",
+          "note",
+          "createdAt",
+          "updatedAt",
+          "version",
+          "activationExpiresAt",
+          "accessEndsAt",
+          "setupId",
+          "companyHostname",
+          "preparationError",
+          "actions",
+          "applicantIdentityId",
+          "applicantRole",
+          "access",
+          "durationDays",
+          "basis",
+          "history",
+          "mail"
+        ],
+        "additionalProperties": false
+      },
+      "CustomerPlanRequestsEnvelope": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "requests": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CustomerPlanRequest"
+                },
+                "maxItems": 50
+              },
+              "applicant": {
+                "type": "object",
+                "properties": {
+                  "displayName": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                },
+                "required": [
+                  "displayName",
+                  "email"
+                ],
+                "additionalProperties": false
+              },
+              "workspace": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "personal",
+                      "company"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "name",
+                  "kind"
+                ],
+                "additionalProperties": false
+              },
+              "access": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "planId": {
+                        "type": "string",
+                        "enum": [
+                          "individual",
+                          "startup",
+                          "enterprise"
+                        ]
+                      },
+                      "endsAt": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "planId",
+                      "endsAt"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "eligiblePlanIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "individual",
+                    "startup",
+                    "enterprise"
+                  ]
+                },
+                "uniqueItems": true,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "requests",
+              "applicant",
+              "workspace",
+              "access",
+              "eligiblePlanIds"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "CustomerPlanRequestEnvelope": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "request": {
+                "$ref": "#/components/schemas/CustomerPlanRequest"
+              }
+            },
+            "required": [
+              "request"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "OperatorPlanRequestsEnvelope": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "requests": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/OperatorPlanRequest"
+                },
+                "maxItems": 100
+              },
+              "nextCursor": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "requests",
+              "nextCursor"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "OperatorPlanRequestEnvelope": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "request": {
+                "$ref": "#/components/schemas/OperatorPlanRequestDetail"
+              }
+            },
+            "required": [
+              "request"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "SubmitPlanRequest": {
+        "type": "object",
+        "properties": {
+          "planId": {
+            "type": "string",
+            "enum": [
+              "individual",
+              "startup",
+              "enterprise"
+            ]
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "en",
+              "ru"
+            ]
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "planId",
+          "locale"
+        ],
+        "additionalProperties": false
+      },
+      "ActivatePlanRequest": {
+        "type": "object",
+        "properties": {
+          "setupId": {
+            "type": "string"
+          },
+          "setupVersion": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "OperatorPlanRequestCommand": {
+        "type": "object",
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "durationDays": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 90
+          }
+        },
+        "required": [
+          "expectedVersion"
+        ],
+        "additionalProperties": false
+      },
       "StartupSetupEnvelope": {
         "type": "object",
         "additionalProperties": false,
@@ -52848,6 +54802,16 @@
           "generation": {
             "type": "integer",
             "minimum": 1
+          },
+          "routeTarget": {
+            "type": "string",
+            "const": "company_admin",
+            "description": "Resume the initial company administration handoff for this verified Startup applicant."
+          },
+          "planRequestId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The signed-in applicant's Startup request requiring preparation recovery on the central host."
           }
         }
       },

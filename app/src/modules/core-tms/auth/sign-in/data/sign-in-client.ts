@@ -3,9 +3,10 @@ import type { SignInPort } from "../application/sign-in-port";
 import { browserDesktopAttempt } from "../../continuation/desktop/browser-desktop-attempt";
 import { scopedAuthRequestPath } from "../../navigation/request-scope/auth-request-path";
 
-export function createSignInClient(send: typeof fetch = fetch, locale?: () => "en" | "ru"): SignInPort {
+export function createSignInClient(send: typeof fetch = fetch, locale?: () => "en" | "ru", { scopeWorkspace = true } = {}): SignInPort {
   async function request<T>(path: string, body?: unknown, signal?: AbortSignal): Promise<T> {
-    const response = await send(scopedAuthRequestPath(`/api/v1${path}`), { method: body === undefined ? "GET" : "POST",
+    const endpoint = `/api/v1${path}`;
+    const response = await send(scopeWorkspace ? scopedAuthRequestPath(endpoint) : endpoint, { method: body === undefined ? "GET" : "POST",
       credentials: "include", cache: "no-store", redirect: "error", signal,
       headers: { accept: "application/json", ...(body === undefined ? {} : { "content-type": "application/json" }) },
       ...(body === undefined ? {} : { body: JSON.stringify(body) }) });

@@ -60,6 +60,19 @@ void test("the chooser flag probes only verified spaces, is removed from the URL
     assert.equal(new URL(destinations[0]).searchParams.has("method"), false, "personal authentication must not be recast as managed password login");
     await act(async () => view.unmount());
   }
+  selectedRedirect = "https://alpha-falcon.saturnusgo.com/cloud-login/?workspaceId=company-1";
+  for (const [search, expected] of [
+    ["&planRequest=request_1&workspaceId=company-1", "&view=config&settings=billing&planRequest=request_1"],
+    ["&planRequest=request_1&workspaceId=other", ""],
+    ["&requestPlan=enterprise", "&view=config&settings=billing&requestPlan=enterprise"],
+  ]) {
+    browser.location.search = `?chooseSpace=1${search}`; destinations.length = 0;
+    await act(async () => { view = create(<TmsLocaleContext.Provider value={locale}><SignInFeature /></TmsLocaleContext.Provider>); });
+    const choice = view.root.findAllByType("button").find(button => button.findAllByType("strong").some(value => value.children.includes("Alpha")));
+    await act(async () => choice!.props.onClick());
+    assert.deepEqual(destinations, [`${selectedRedirect}&method=company&lang=en${expected}`]);
+    await act(async () => view.unmount());
+  }
 });
 void test("space selection sends only an unexpired current-origin desktop attempt to the server", async t => {
   const prior = Object.getOwnPropertyDescriptor(globalThis, "window"), origin = "https://tms.saturnusgo.com", attempt = "a".repeat(43);

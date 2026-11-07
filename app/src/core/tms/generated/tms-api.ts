@@ -6002,6 +6002,272 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/workspaces/{workspaceId}/plan-requests": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+            };
+            cookie?: never;
+        };
+        /** @description Lists requests owned by the current workspace administrator, effective access, and eligible plans. */
+        get: operations["listCustomerPlanRequests"];
+        put?: never;
+        /** @description Creates a request or returns the existing open request. A request grants no access and initiates no payment. */
+        post: operations["submitCustomerPlanRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/plan-requests/{id}": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** @description Returns current state for the applicant. Knowing the request ID grants no access. */
+        get: operations["readCustomerPlanRequest"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/plan-requests": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Lists plan requests with the next cursor in the response body. */
+        get: operations["listOperatorPlanRequests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/plan-requests/{id}": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** @description Reads applicant and delivery details with the operator audit history. */
+        get: operations["readOperatorPlanRequest"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/plan-requests/{id}/activate": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Starts a currently approved pilot. Startup conversion requires a saved setup and version after explicit confirmation. Repeating the command returns the current state. */
+        post: operations["activateCustomerPlanRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/plan-requests/{id}/withdraw": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Withdraws a request before activation begins. Repeating the command returns the current state. */
+        post: operations["withdrawCustomerPlanRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/plan-requests/{id}/contact": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Marks a request as contacted and records an optional internal note. */
+        post: operations["contactOperatorPlanRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/plan-requests/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Approves a pilot with an activation deadline and records an optional duration. Enterprise requests cannot be self-service approved. */
+        post: operations["approveOperatorPlanRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/plan-requests/{id}/decline": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Closes an unactivated request as declined. */
+        post: operations["declineOperatorPlanRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/plan-requests/{id}/revoke": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Revokes the manual grant with a required reason. Separate financial access remains independently evaluated. */
+        post: operations["revokeOperatorPlanRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/plan-requests/{id}/reissue": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Reissues an unused approval whose activation deadline has passed. */
+        post: operations["reissueOperatorPlanRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/plan-requests/{id}/retry": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Retries preparation for the same Startup request. Address conflicts require a different address from the applicant. */
+        post: operations["retryOperatorPlanRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/billing/startup-setup": {
         parameters: {
             query?: never;
@@ -11477,6 +11743,175 @@ export interface components {
             expectedVersion: number;
             idempotencyKey: string;
         };
+        CustomerPlanRequest: {
+            /** Format: uuid */
+            id: string;
+            reference: string;
+            /** @enum {string} */
+            planId: "individual" | "startup" | "enterprise";
+            /** @enum {string} */
+            status: "requested" | "contacted" | "approved" | "activating" | "active" | "declined" | "withdrawn" | "expired" | "revoked";
+            /** @enum {string} */
+            locale: "en" | "ru";
+            workspaceId: string;
+            workspaceName: string;
+            /** @enum {string} */
+            workspaceKind: "personal" | "company";
+            applicantName: string;
+            /** Format: email */
+            applicantEmail: string;
+            note: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+            activationExpiresAt: string | null;
+            accessEndsAt: string | null;
+            setupId: string | null;
+            companyHostname: string | null;
+            preparationError: string | null;
+            actions: ("withdraw" | "activate" | "edit_address")[];
+        };
+        OperatorPlanRequest: {
+            /** Format: uuid */
+            id: string;
+            reference: string;
+            /** @enum {string} */
+            planId: "individual" | "startup" | "enterprise";
+            /** @enum {string} */
+            status: "requested" | "contacted" | "approved" | "activating" | "active" | "declined" | "withdrawn" | "expired" | "revoked";
+            /** @enum {string} */
+            locale: "en" | "ru";
+            workspaceId: string;
+            workspaceName: string;
+            /** @enum {string} */
+            workspaceKind: "personal" | "company";
+            applicantName: string;
+            /** Format: email */
+            applicantEmail: string;
+            note: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+            activationExpiresAt: string | null;
+            accessEndsAt: string | null;
+            setupId: string | null;
+            companyHostname: string | null;
+            preparationError: string | null;
+            actions: ("contact" | "approve" | "decline" | "revoke" | "reissue" | "retry")[];
+        };
+        OperatorPlanRequestDetail: {
+            /** Format: uuid */
+            id: string;
+            reference: string;
+            /** @enum {string} */
+            planId: "individual" | "startup" | "enterprise";
+            /** @enum {string} */
+            status: "requested" | "contacted" | "approved" | "activating" | "active" | "declined" | "withdrawn" | "expired" | "revoked";
+            /** @enum {string} */
+            locale: "en" | "ru";
+            workspaceId: string;
+            workspaceName: string;
+            /** @enum {string} */
+            workspaceKind: "personal" | "company";
+            applicantName: string;
+            /** Format: email */
+            applicantEmail: string;
+            note: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+            activationExpiresAt: string | null;
+            accessEndsAt: string | null;
+            setupId: string | null;
+            companyHostname: string | null;
+            preparationError: string | null;
+            actions: ("contact" | "approve" | "decline" | "revoke" | "reissue" | "retry")[];
+            applicantIdentityId: string;
+            applicantRole: string;
+            access: {
+                /** @enum {string} */
+                planId: "individual" | "startup" | "enterprise";
+                endsAt: string | null;
+            } | null;
+            durationDays: number | null;
+            /** @constant */
+            basis: "pilot";
+            history: {
+                action: string;
+                actorLabel: string;
+                note: string | null;
+                /** Format: date-time */
+                createdAt: string;
+            }[];
+            mail: {
+                /** @enum {string} */
+                kind: "operator_request" | "request_received" | "approved" | "company_ready";
+                status: string;
+                attempts: number;
+                errorCode: string | null;
+            }[];
+        };
+        CustomerPlanRequestsEnvelope: {
+            data: {
+                requests: components["schemas"]["CustomerPlanRequest"][];
+                applicant: {
+                    displayName: string;
+                    /** Format: email */
+                    email: string;
+                };
+                workspace: {
+                    id: string;
+                    name: string;
+                    /** @enum {string} */
+                    kind: "personal" | "company";
+                };
+                access: {
+                    /** @enum {string} */
+                    planId: "individual" | "startup" | "enterprise";
+                    endsAt: string | null;
+                } | null;
+                eligiblePlanIds: ("individual" | "startup" | "enterprise")[];
+            };
+        };
+        CustomerPlanRequestEnvelope: {
+            data: {
+                request: components["schemas"]["CustomerPlanRequest"];
+            };
+        };
+        OperatorPlanRequestsEnvelope: {
+            data: {
+                requests: components["schemas"]["OperatorPlanRequest"][];
+                nextCursor: string | null;
+            };
+        };
+        OperatorPlanRequestEnvelope: {
+            data: {
+                request: components["schemas"]["OperatorPlanRequestDetail"];
+            };
+        };
+        SubmitPlanRequest: {
+            /** @enum {string} */
+            planId: "individual" | "startup" | "enterprise";
+            /** @enum {string} */
+            locale: "en" | "ru";
+            note?: string;
+        };
+        ActivatePlanRequest: {
+            setupId?: string;
+            setupVersion?: number;
+        };
+        OperatorPlanRequestCommand: {
+            expectedVersion: number;
+            note?: string;
+            reason?: string;
+            durationDays?: number;
+        };
         StartupSetupEnvelope: {
             data: {
                 setup: components["schemas"]["StartupSetup"] | null;
@@ -11530,6 +11965,16 @@ export interface components {
             /** Format: uri */
             destinationOrigin: string;
             generation: number;
+            /**
+             * @description Resume the initial company administration handoff for this verified Startup applicant.
+             * @constant
+             */
+            routeTarget?: "company_admin";
+            /**
+             * Format: uuid
+             * @description The signed-in applicant's Startup request requiring preparation recovery on the central host.
+             */
+            planRequestId?: string;
         };
         WorkspaceHandoffStart: {
             workspaceId: string;
@@ -24923,6 +25368,490 @@ export interface operations {
             409: components["responses"]["Conflict"];
             500: components["responses"]["InternalError"];
             503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listCustomerPlanRequests: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Current plan request state. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerPlanRequestsEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    submitCustomerPlanRequest: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubmitPlanRequest"];
+            };
+        };
+        responses: {
+            /** @description Current plan request state. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerPlanRequestEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    readCustomerPlanRequest: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Current plan request state. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerPlanRequestEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listOperatorPlanRequests: {
+        parameters: {
+            query?: {
+                status?: "requested" | "contacted" | "approved" | "activating" | "active" | "declined" | "withdrawn" | "expired" | "revoked";
+                cursor?: string;
+                limit?: number;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Current plan request state. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperatorPlanRequestsEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    readOperatorPlanRequest: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Current plan request state. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperatorPlanRequestEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    activateCustomerPlanRequest: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ActivatePlanRequest"];
+            };
+        };
+        responses: {
+            /** @description Current plan request state. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerPlanRequestEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    withdrawCustomerPlanRequest: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Current plan request state. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerPlanRequestEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    contactOperatorPlanRequest: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OperatorPlanRequestCommand"];
+            };
+        };
+        responses: {
+            /** @description Current plan request state. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperatorPlanRequestEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    approveOperatorPlanRequest: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OperatorPlanRequestCommand"];
+            };
+        };
+        responses: {
+            /** @description Current plan request state. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperatorPlanRequestEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    declineOperatorPlanRequest: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OperatorPlanRequestCommand"];
+            };
+        };
+        responses: {
+            /** @description Current plan request state. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperatorPlanRequestEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    revokeOperatorPlanRequest: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OperatorPlanRequestCommand"];
+            };
+        };
+        responses: {
+            /** @description Current plan request state. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperatorPlanRequestEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    reissueOperatorPlanRequest: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OperatorPlanRequestCommand"];
+            };
+        };
+        responses: {
+            /** @description Current plan request state. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperatorPlanRequestEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    retryOperatorPlanRequest: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OperatorPlanRequestCommand"];
+            };
+        };
+        responses: {
+            /** @description Current plan request state. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperatorPlanRequestEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
         };
     };
     readStartupSetup: {

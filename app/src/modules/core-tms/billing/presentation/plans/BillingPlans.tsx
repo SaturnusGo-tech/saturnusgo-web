@@ -9,7 +9,13 @@ export type BillingOffers = {
   allowedChangePlanIds: readonly BillingPlanId[];
   contactSales: boolean;
 };
+export type ManualBillingOffers = {
+  suggestedPlanId?: BillingPlanId;
+  action(planId: BillingPlanId): { label: string; disabled?: boolean; onClick(): void };
+  notice?: string;
+};
 type Props = {
+  manualOffers?: ManualBillingOffers;
   plans: readonly BillingPlan[]; current: BillingSubscription | null; occupiedSeats: number;
   workspaceKind: "personal" | "company"; canManage: boolean; busy: boolean; ru: boolean;
   offers?: BillingOffers; quotes?: readonly { planId: BillingPlanId; subtotal: number; currency: "USD"; periodEnd: string | null; prorated: boolean }[];
@@ -18,16 +24,16 @@ type Props = {
 };
 const names = { individual: "Individual", startup: "Startup", enterprise: "Enterprise" };
 const order: BillingPlanId[] = ["individual", "startup", "enterprise"];
-export function BillingPlans({ plans, current, occupiedSeats, workspaceKind, canManage, busy, ru, offers, quotes, children, checkoutRecovery, restriction, paymentsAvailable = true, setupAvailable = false, controlledTest = false, onClose, onChoose }: Props) {
+export function BillingPlans({ plans, current, occupiedSeats, workspaceKind, canManage, busy, ru, offers, manualOffers, quotes, children, checkoutRecovery, restriction, paymentsAvailable = true, setupAvailable = false, controlledTest = false, onClose, onChoose }: Props) {
   const [selection, setSelection] = useState<{ id: BillingPlanId; context: string } | null>(null);
   const [showOptions, setShowOptions] = useState(false);
   const active = current && current.status !== "canceled" ? current : null;
   const fallback = !active && workspaceKind === "personal" ? "individual" : active?.planId === "individual" ? "startup" : "enterprise";
-  const context = `${current?.planId}:${current?.status}:${offers?.suggestedPlanId}`;
-  const selectedId = controlledTest ? "startup" : selection?.context === context ? selection.id : offers?.suggestedPlanId ?? fallback;
+  const context = `${current?.planId}:${current?.status}:${manualOffers?.suggestedPlanId ?? offers?.suggestedPlanId}`;
+  const selectedId = controlledTest ? "startup" : selection?.context === context ? selection.id : manualOffers?.suggestedPlanId ?? offers?.suggestedPlanId ?? fallback;
   const plan = plans.find(item => item.id === selectedId);
   const enterprise = selectedId === "enterprise";
-  const quote = quotes?.find(item => item.planId === selectedId);
+  const quote = manualOffers ? undefined : quotes?.find(item => item.planId === selectedId);
   const money = (amount: number, currency: string) => new Intl.NumberFormat(ru ? "ru-RU" : "en-US", { style: "currency", currency, maximumFractionDigits: amount % 100 ? 2 : 0 }).format(amount / 100);
   const checkoutAllowed = offers?.allowedCheckoutPlanIds.includes(selectedId);
   const available = offers ? Boolean(checkoutAllowed || offers.allowedChangePlanIds.includes(selectedId))
@@ -37,6 +43,7 @@ export function BillingPlans({ plans, current, occupiedSeats, workspaceKind, can
   const unavailable = paymentsAvailable && !enterprise && !available;
   const preparing = setupAvailable && selectedId === "startup" && available;
   const disabled = (!paymentsAvailable && !preparing) || busy || Boolean(restriction) || unavailable || isCurrent || scheduled;
+  const requestAction = manualOffers?.action(selectedId);
   const seats = plan?.seats;
   const features = [
     { icon: UsersRound, title: enterprise ? (ru ? "Ваша команда" : "Your team") : seats ? `${seats} ${ru ? seats === 1 ? "место" : "мест" : seats === 1 ? "seat" : "seats"}` : (ru ? "Ваше пространство" : "Your workspace"),
@@ -70,7 +77,10 @@ export function BillingPlans({ plans, current, occupiedSeats, workspaceKind, can
         {showOptions && <div id="billing-other-plans" className={css.options} role="group" aria-label={ru ? "Выбрать тариф для просмотра" : "Choose a plan to view"}>{order.map(id => <button type="button" key={id} data-view-plan={id} aria-pressed={id === selectedId} onClick={() => select(id)}>{names[id]}{id === selectedId && <Check size={14} aria-hidden="true" />}</button>)}</div>}
       </div>}{children}</div></div>
       {reason && <p className={css.reason} role="status">{reason}</p>}
-      {checkoutRecovery || <>{(canManage || !paymentsAvailable) && (enterprise && paymentsAvailable ? <a className={css.action} href="mailto:falcon@saturnusgo.com">{ru ? "Связаться с нами" : "Contact us"}<ArrowRight size={16} aria-hidden="true" /></a>
+      {requestAction ? <>
+        <button type="button" data-plan={selectedId} className={css.action} disabled={requestAction.disabled} onClick={requestAction.onClick}>{requestAction.label}<ArrowRight size={16} aria-hidden="true" /></button>
+        {manualOffers?.notice && <p className={css.terms} role="status">{manualOffers.notice}</p>}
+      </> : checkoutRecovery || <>{(canManage || !paymentsAvailable) && (enterprise && paymentsAvailable ? <a className={css.action} href="mailto:falcon@saturnusgo.com">{ru ? "Связаться с нами" : "Contact us"}<ArrowRight size={16} aria-hidden="true" /></a>
         : <button type="button" data-plan={selectedId} className={css.action} disabled={disabled} onClick={paymentsAvailable || preparing ? () => onChoose(selectedId) : undefined}>{enterprise ? <>{ru ? "Связаться с нами" : "Contact us"}<ArrowRight size={16} aria-hidden="true" /></> : isCurrent ? <><Check size={16} aria-hidden="true" />{ru ? "Текущий тариф" : "Current plan"}</> : scheduled ? (ru ? "Переход запланирован" : "Change scheduled") : busy ? (ru ? "Подождите…" : "Please wait…") : restriction ? (ru ? "Сначала восстановите подписку" : "Resolve subscription first") : preparing ? (ru ? "Подготовить компанию" : "Set up company") : <>{ru ? `Выбрать ${names[selectedId]}` : `Choose ${names[selectedId]}`}<ArrowRight size={16} aria-hidden="true" /></>}</button>)}
       {controlledTest ? <p className={css.terms} role="status">{ru ? "Тестовый режим · без списаний" : "Test mode · no charge"}</p> : !paymentsAvailable ? <p className={css.terms} role="status">{ru ? "Оплата скоро станет доступна" : "Payments are coming soon"}</p>
         : !enterprise && <p className={css.terms}>{quote?.prorated ? (ru ? "Доплата за остаток периода. Дата продления не изменится." : "Prorated for the remaining period. Your renewal date stays the same.") : active && !checkoutAllowed ? (ru ? "Изменение вступит в силу при следующем продлении." : "Changes take effect at your next renewal.") : (ru ? "Проверьте и подтвердите подключение на следующем шаге." : "Review and confirm your subscription in the next step.")}</p>}</>}

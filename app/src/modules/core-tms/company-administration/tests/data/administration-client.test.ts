@@ -74,3 +74,29 @@ void test("employee activity uses exact identity filtering with bounded paginati
   assert.equal(url.searchParams.get("cursor"), "event-30");
   assert.equal(url.searchParams.get("limit"), "30");
 });
+
+void test("platform plan requests use bounded queries and versioned, idempotent commands", async () => {
+  const requests: { url: URL; init: RequestInit }[] = [];
+  const request = { id: "request:one", version: 4, status: "approved" };
+  const http = createTmsHttpClient({ apiBase: "https://sandbox-falcon.example.test/api/v1", credentials: "include", production: true,
+    fetch: async (url, init) => {
+      requests.push({ url: new URL(String(url)), init: init ?? {} });
+      return new Response(JSON.stringify({ data: requests.length === 1
+        ? { requests: [request], nextCursor: "request:two" } : { request } }));
+    } });
+  const client = createAdministrationClient(http);
+  const signal = new AbortController().signal;
+  assert.deepEqual(await client.planRequests("requested", "request:previous", signal), { items: [request], nextCursor: "request:two" });
+  assert.equal(requests[0].url.pathname, "/api/v1/platform/plan-requests");
+  assert.equal(requests[0].url.searchParams.get("limit"), "30");
+  assert.equal(requests[0].url.searchParams.get("status"), "requested");
+  assert.equal(requests[0].url.searchParams.get("cursor"), "request:previous");
+  assert.deepEqual(await client.planRequest("request:one", signal), request);
+  assert.equal(requests[1].url.pathname, "/api/v1/platform/plan-requests/request%3Aone");
+  assert.deepEqual(await client.changePlanRequest("request:one", "approve", { expectedVersion: 3, durationDays: 14, note: "Pilot reviewed" }, "plan-approve-key", signal), request);
+  assert.equal(requests[2].url.pathname, "/api/v1/platform/plan-requests/request%3Aone/approve");
+  assert.equal(requests[2].init.method, "POST");
+  assert.equal(requests[2].init.credentials, "include");
+  assert.equal(new Headers(requests[2].init.headers).get("idempotency-key"), "plan-approve-key");
+  assert.deepEqual(JSON.parse(String(requests[2].init.body)), { expectedVersion: 3, durationDays: 14, note: "Pilot reviewed" });
+});

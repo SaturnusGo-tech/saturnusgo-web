@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { continuationFromLocation, hasContinuationContext } from "../domain/continuation-path";
+import { continuationFromLocation, hasContinuationContext, scopedPlanContinuation } from "../domain/continuation-path";
 import { takeBrowserContinuation } from "../application/browser-continuation";
 import { TmsAuthState } from "../../presentation/state/TmsAuthState";
 import { captureBrowserDesktopAttempt, takeBrowserDesktopAttempt } from "../desktop/browser-desktop-attempt";
@@ -22,7 +22,13 @@ export function AuthContinuation({ children, workspaceId, managedWorkspace = fal
     const saved = deferBrowserContinuation ? null : takeBrowserContinuation(workspaceId);
     const current = continuationFromLocation(window.location);
     const explicit = explicitContext ?? (current && hasContinuationContext(current, window.location.origin));
-    const destination = !workspaceHandoff && saved && !explicit && saved !== `${window.location.pathname}${window.location.search}${window.location.hash}` ? saved : null;
+    const here = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+    const origin = window.location.origin;
+    const handoffPlan = workspaceHandoff && workspaceId && (
+      scopedPlanContinuation(current, origin, workspaceId) ? current : scopedPlanContinuation(saved, origin, workspaceId) ? saved : null
+    );
+    const next = workspaceHandoff ? handoffPlan : !explicit ? saved : null;
+    const destination = next && next !== here ? next : null;
     setTarget(destination);
     if (destination) window.location.replace(destination);
   }, [workspaceId, managedWorkspace, workspaceHandoff, deferBrowserContinuation, explicitContext]);

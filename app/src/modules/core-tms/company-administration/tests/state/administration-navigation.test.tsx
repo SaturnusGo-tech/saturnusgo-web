@@ -40,3 +40,34 @@ void test("admin tabs use local history, discard detail state and restore the se
     if (original) Object.defineProperty(globalThis, "window", original); else Reflect.deleteProperty(globalThis, "window");
   }
 });
+
+void test("plan request links retain the Sandbox scope and open company records outside the queue", async () => {
+  const original = Object.getOwnPropertyDescriptor(globalThis, "window");
+  const events = new EventTarget();
+  let url = new URL("https://sandbox.example/sandbox/?page=plan-requests&id=request-a");
+  Object.defineProperty(globalThis, "window", { configurable: true, value: {
+    get location() { return url; },
+    history: { pushState(_state: unknown, _title: string, href: string) { url = new URL(href, url); } },
+    addEventListener: events.addEventListener.bind(events), removeEventListener: events.removeEventListener.bind(events), scrollTo() {},
+  }});
+  let current!: ReturnType<typeof useAdministrationNavigation>;
+  function Probe() { current = useAdministrationNavigation(); return null; }
+  let renderer!: ReactTestRenderer;
+  try {
+    await act(async () => { renderer = create(<Probe />); });
+    assert.equal(current.route.section, "sandbox");
+    assert.equal(current.route.page, "plan-requests");
+    assert.equal(current.route.id, "request-a");
+    await act(async () => current.navigate({ section: "sandbox", page: "plan-requests", id: null, creating: false }));
+    assert.equal(current.route.page, "plan-requests");
+    assert.equal(current.route.id, null);
+    await act(async () => current.navigate({ section: "sandbox", id: "company-a", creating: false }));
+    assert.equal(current.route.page, undefined);
+    assert.equal(current.route.id, "company-a");
+    await act(async () => { url = new URL("https://tenant.example/admin/?page=plan-requests"); events.dispatchEvent(new Event("popstate")); });
+    assert.equal(current.route.page, undefined);
+  } finally {
+    await act(async () => renderer?.unmount());
+    if (original) Object.defineProperty(globalThis, "window", original); else Reflect.deleteProperty(globalThis, "window");
+  }
+});
