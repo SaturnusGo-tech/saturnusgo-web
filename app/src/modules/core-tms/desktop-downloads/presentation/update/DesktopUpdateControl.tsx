@@ -20,7 +20,7 @@ export function DesktopUpdateControl() {
 
   if (!update) return null;
   const label = locale === "ru" ? `Скачать обновление Falcon ${update.version}` : `Download Falcon ${update.version} update`;
-  const icon = <Download size={19} strokeWidth={1.8} aria-hidden="true" />;
+  const icon = <span className={css.updateBadge} aria-hidden="true"><Download size={15} strokeWidth={1.8} /></span>;
   const attributes = { className: css.update, "aria-label": label, "data-nav-label": label, "data-testid": "desktop-update", title: label };
   if (update.installer) {
     return <a {...attributes} href={update.installer.href} download={update.installer.file}>{icon}</a>;

@@ -14,16 +14,21 @@ export function CompanyAdminFrame({ back, companyName, page, navigation, account
 }) {
   const { locale } = useTmsLocale();
   const copy = administrationCopy(locale);
+  const returnLabel = locale === "ru" ? "Вернуться в Falcon" : "Back to Falcon";
   return <div className={styles.page} data-falcon-shell data-company-admin data-section="admin" data-directory={!page}>
     <header className={styles.topBar}>
       <a className={styles.brand} href={back}><img src="/falcon/falcon-mark-light.png" alt="" />Falcon</a>
       <span className={styles.workspaceName}>{companyName}</span>
-      <a className={styles.returnLink} href={back}><ArrowLeft size={16} aria-hidden="true" />{locale === "ru" ? "В Falcon" : "Back to Falcon"}</a>
     </header>
     <aside className={styles.sidebar}>
       <p className={styles.navTitle}>{copy.admin}</p>
       {navigation}
-      <div className={styles.sidebarBottom}>{account}</div>
+      <div className={styles.sidebarBottom}>
+        <a className={styles.returnLink} href={back} aria-label={returnLabel} title={returnLabel}>
+          <ArrowLeft size={18} aria-hidden="true" />
+        </a>
+        {account}
+      </div>
     </aside>
     <main className={styles.main} key={page ?? "people"}><div className={styles.canvas}>{children}</div></main>
   </div>;
