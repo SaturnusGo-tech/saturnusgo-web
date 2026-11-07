@@ -124,7 +124,8 @@ export function CaseInspectorContent({
     <aside className={css.sideRail} aria-label={ru ? "Свойства тест-кейса" : "Test case properties"}>
       <InspectorSectionView title={ru ? "Поля" : "Custom fields"} {...controls("component")}>
         {sectionEditing("component") && !inlineComponent && editor && <FolderPathPicker value={editor.folderPath} folders={editor.folders} onChange={editor.onFolderPath} ru={ru} disabled={editor.submitting} />}
-        <CaseCustomFields onRequestEdit={requestField("component")} projectId={editor?.projectId} revision={value} editing={sectionEditing("component")} canCreate={editor?.canCreateFieldValues} disabled={editor?.submitting || editor?.attachmentsPending} ru={ru} onPatch={patch} />
+        <CaseCustomFields onRequestEdit={requestField("component")} projectId={editor?.projectId} revision={value} editing={sectionEditing("component")}
+          requiredFields={editor?.requiredFields} canCreate={editor?.canCreateFieldValues} disabled={editor?.submitting || editor?.attachmentsPending} ru={ru} onPatch={patch} />
       </InspectorSectionView>
       <InspectorSectionView title={ru ? "Свойства" : "Properties"} editLabel={ru ? "Изменить свойства" : "Edit properties"} {...controls("properties")}>
         <CaseMetadataControls onRequestEdit={requestField("properties")} locale={locale} revision={value} archived={archived} editing={sectionEditing("properties")}

@@ -81,6 +81,8 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
     headerReturnFocus.current = null;
   }, [props.testCase?.id, creating]);
   useCaseActivityNavigation(props.testCase?.projectId, props.testCase?.id, setTab);
+  const requiredFields = props.editor?.requiredFields;
+  useEffect(() => { if (requiredFields) setTab("overview"); }, [requiredFields]);
   useEffect(() => {
     const closed = editorSessionClosed(editorWasOpen.current, editorOpen);
     editorWasOpen.current = editorOpen;

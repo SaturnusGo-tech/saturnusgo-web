@@ -1,5 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
+import { DesktopUpdateControl } from "../../../desktop-downloads/presentation/update/DesktopUpdateControl";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { administrationCopy } from "../copy/administration-copy";
 import styles from "./administration.module.css";
@@ -24,6 +25,7 @@ export function CompanyAdminFrame({ back, companyName, page, navigation, account
       <p className={styles.navTitle}>{copy.admin}</p>
       {navigation}
       <div className={styles.sidebarBottom}>
+        <DesktopUpdateControl />
         <a className={styles.returnLink} href={back} aria-label={returnLabel} title={returnLabel}>
           <ArrowLeft size={18} aria-hidden="true" />
         </a>

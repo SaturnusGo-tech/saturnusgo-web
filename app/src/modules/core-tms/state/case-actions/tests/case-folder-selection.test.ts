@@ -35,7 +35,7 @@ function harness(folderPath: string, folderId: string | null | undefined, archiv
       if (name === "react") return { useRef: (current: unknown) => ({ current }), useState: (value: unknown) => [value, () => {}] };
       if (name.endsWith("pending-operation")) return { resolvePendingOperation };
       if (name.endsWith("case-maintenance")) return { reconcileMaintenance };
-      if (name.endsWith("mutation-failure")) return { toTmsMutationFailure: (value: unknown) => value, formatTmsMutationFailure: () => "Unexpected failure" };
+      if (name.endsWith("mutation-failure")) return { isRequiredCustomFieldFailure: () => false, toTmsMutationFailure: (value: unknown) => value, formatTmsMutationFailure: () => "Unexpected failure" };
       if (name.endsWith("TmsHttpClientContext")) return { useTmsHttpClient: () => ({}) };
       if (name.endsWith("AttachmentClientProvider")) return { useAttachmentClient: () => ({ upload }) };
       if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en", t: (key: string) => key }) };

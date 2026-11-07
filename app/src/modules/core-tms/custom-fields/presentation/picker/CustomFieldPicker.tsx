@@ -12,9 +12,9 @@ import css from "./customFieldPicker.module.css";
 
 export type CustomFieldPickerProps = CustomFieldScope & { field: CustomFieldDefinition;
   selected: readonly CustomFieldSelection[]; onChange(values: readonly CustomFieldSelection[]): void;
-  parentValueId?: string | null; canCreate?: boolean; disabled?: boolean; placeholder?: string; invalid?: boolean; autoOpen?: boolean };
+  parentValueId?: string | null; canCreate?: boolean; disabled?: boolean; placeholder?: string; invalid?: boolean; errorId?: string; autoOpen?: boolean };
 export function CustomFieldPicker({ field, selected, onChange, parentValueId, canCreate = false,
-  disabled = false, placeholder, invalid, autoOpen = false, workspaceId, projectId }: CustomFieldPickerProps) {
+  disabled = false, placeholder, invalid, errorId, autoOpen = false, workspaceId, projectId }: CustomFieldPickerProps) {
   const { locale } = useTmsLocale(); const ru = locale === "ru"; const id = useId();
   const [open, setOpen] = useState(false); const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null); const panel = useRef<HTMLDivElement>(null); const search = useRef<HTMLInputElement>(null);
@@ -54,7 +54,7 @@ export function CustomFieldPicker({ field, selected, onChange, parentValueId, ca
     }
   }} onBlur={event => { if (event.relatedTarget && !root.current?.contains(event.relatedTarget as Node)) close(); }}>
     <button ref={trigger} type="button" className={css.trigger} disabled={disabled} aria-label={label}
-      aria-invalid={invalid || undefined} aria-haspopup="dialog" aria-expanded={open} aria-controls={open ? id : undefined}
+      aria-invalid={invalid || undefined} aria-describedby={errorId} aria-haspopup="dialog" aria-expanded={open} aria-controls={open ? id : undefined}
       onClick={() => { write.reset(); page.setSearch(""); setOpen(value => !value); }}>
       <span>{selected.length ? selected.map(value => customValueLabel(value, ru)).join(", ") : placeholder ?? (ru ? "Выберите значение" : "Select a value")}</span>
       <ChevronDown size={14} aria-hidden="true" />

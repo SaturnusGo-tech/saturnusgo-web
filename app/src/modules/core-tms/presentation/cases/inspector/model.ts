@@ -46,6 +46,7 @@ export type CaseInspectorEditor = {
   mode: "edit" | "create";
   projectId?: string;
   canCreateFieldValues?: boolean;
+  requiredFields?: boolean;
   value: TestCaseRevision;
   folderPath: string;
   folders: string[];

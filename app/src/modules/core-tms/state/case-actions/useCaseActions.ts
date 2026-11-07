@@ -3,6 +3,7 @@ import type { FormEvent } from "react";
 import type { TestCase, TestCaseSummary } from "../../../../core/tms/contracts/legacy-contract";
 import {
   formatTmsMutationFailure,
+  isRequiredCustomFieldFailure,
   toTmsMutationFailure,
 } from "../../../../core/tms/errors/mutation-failure";
 import {
@@ -39,6 +40,7 @@ export function useCaseActions(
   const caseOperation = useRef<PendingOperation | null>(null);
   const saveCheckpoint = useRef<CaseSaveCheckpoint | null>(null);
   const [caseAttachmentRecovery, setCaseAttachmentRecovery] = useState(false);
+  const [caseRequiredFields, setCaseRequiredFields] = useState(false);
 
   function commit(testCase: TestCase, etag: string | null, append = false) {
     const summary: TestCaseSummary = state.connection === "demo"
@@ -62,6 +64,7 @@ export function useCaseActions(
     caseOperation.current = null;
     saveCheckpoint.current = null;
     setCaseAttachmentRecovery(false);
+    setCaseRequiredFields(false);
     state.setCaseDraft(createEmptyRevision(locale));
     state.setCaseFolderPath(folderPath);
     state.setEditing(false);
@@ -73,6 +76,7 @@ export function useCaseActions(
     caseOperation.current = null;
     saveCheckpoint.current = null;
     setCaseAttachmentRecovery(false);
+    setCaseRequiredFields(false);
     state.setCaseDraft(structuredClone(derived.selectedRevision));
     state.setCaseFolderPath(derived.selectedCase?.folderPath ?? "/Unsorted");
     state.setEditing(true);
@@ -83,6 +87,7 @@ export function useCaseActions(
     event.preventDefault();
     if (state.editing && derived.selectedCase?.archivedAt) return;
     if (!derived.project || !state.caseDraft.title.trim() || !state.beginCaseSubmission()) return;
+    setCaseRequiredFields(false);
     const input = {
       projectId: derived.project.id,
       folderPath: state.caseFolderPath || "/Unsorted",
@@ -134,6 +139,10 @@ export function useCaseActions(
           : "Could not finish saving attachments. Select Save to retry."));
         return;
       }
+      if (isRequiredCustomFieldFailure(caught)) {
+        setCaseRequiredFields(true);
+        return;
+      }
       const fallback = state.editing
         ? t("actions.caseRevisionSaveError")
         : t("actions.caseCreateError");
@@ -180,5 +189,5 @@ export function useCaseActions(
     notify(restoring ? t("actions.caseRestored") : t("actions.caseArchived"));
   }
 
-  return { caseAttachmentRecovery, openNewCase, openEditCase, saveCase, cloneCase, toggleArchiveCase };
+  return { caseAttachmentRecovery, caseRequiredFields, openNewCase, openEditCase, saveCase, cloneCase, toggleArchiveCase };
 }

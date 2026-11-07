@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
+import { TmsApiError } from "../../../../../core/tms/transport/http";
 import type { BillingPlanId } from "../../domain/billing";
 import type { createPlanRequestApi } from "../data/plan-request-api";
 import { pendingPlanStatuses, type PlanRequest, type PlanRequestList } from "../domain/plan-request";
 
 type Api = ReturnType<typeof createPlanRequestApi>;
+type RequestState = { api: Api; data: PlanRequestList | null; request: PlanRequest | null; error: boolean; accessDenied?: boolean };
 
 export function usePlanRequests(api: Api | null, requestId: string | null, locale: "en" | "ru") {
-  const [state, setState] = useState<{ api: Api; data: PlanRequestList | null; request: PlanRequest | null; error: boolean } | null>(null);
+  const [state, setState] = useState<RequestState | null>(null);
   const [revision, setRevision] = useState(0);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -25,8 +27,12 @@ export function usePlanRequests(api: Api | null, requestId: string | null, local
       if (!Array.isArray(value?.requests) || !Array.isArray(value?.eligiblePlanIds)) throw new Error("Invalid plan request list");
       const request = requestId ? value.requests.find(item => item.id === requestId) ?? await api.get(requestId, controller.signal).catch(() => null) : null;
       if (!controller.signal.aborted) setState({ api, data: value, request, error: Boolean(requestId && !request) });
-    }).catch(() => {
-      if (!controller.signal.aborted) setState(value => value?.api === api ? { ...value, error: true } : { api, data: null, request: null, error: true });
+    }).catch((error: unknown) => {
+      if (controller.signal.aborted) return;
+      const accessDenied = error instanceof TmsApiError && error.status === 403 && String(error.code) === "PLAN_REQUEST_FORBIDDEN";
+      setState(value => !accessDenied && value?.api === api
+        ? { ...value, error: true, accessDenied: false }
+        : { api, data: null, request: null, error: !accessDenied, accessDenied });
     });
     return () => controller.abort();
   }, [api, requestId, revision]);
@@ -57,7 +63,8 @@ export function usePlanRequests(api: Api | null, requestId: string | null, local
     }
   }
 
-  return { data, current, request: read?.request ?? null, loading: Boolean(api && !read), error: read?.error ?? false, busy, failed,
+  return { data, current, request: read?.request ?? null, loading: Boolean(api && !read),
+    error: read?.error ?? false, accessDenied: read?.accessDenied ?? false, busy, failed,
     reload: () => { setFailed(false); setRevision(value => value + 1); },
     submit: (plan: BillingPlanId, note: string) => mutate(client => client.submit(plan, locale, note)),
     act: (request: PlanRequest, action: "withdraw" | "activate", setup?: { setupId: string; setupVersion: number }) => mutate(client => client.act(request, action, setup)),

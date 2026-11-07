@@ -6,6 +6,13 @@ export type TmsMutationFailure = Readonly<{
   requestId: string | null;
 }>;
 
+export function isRequiredCustomFieldFailure(error: unknown): boolean {
+  return error instanceof TmsApiError
+    && error.code === "VALIDATION_ERROR"
+    && error.validationField === "customFields"
+    && error.details?.reason === "requiredCustomField";
+}
+
 export function toTmsMutationFailure(error: unknown): TmsMutationFailure {
   if (!(error instanceof TmsApiError)) {
     return { message: null, code: null, requestId: null };

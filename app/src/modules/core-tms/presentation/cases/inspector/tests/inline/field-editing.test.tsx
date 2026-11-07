@@ -62,3 +62,32 @@ test("a legacy Regression tap resolves the catalog and opens only that field", (
   assert.equal(pickers[0].props.autoOpen, true);
   act(() => view.unmount());
 });
+
+test("a required field failure points to Product while leaving optional fields unchanged", () => {
+  const Fields = loadFieldComponent("../../fields/CaseCustomFields.tsx", "CaseCustomFields", [
+    { id: "group", name: "Product group", systemKey: "product_group", required: false },
+    { id: "product", name: "Product", systemKey: "product", required: true },
+  ]);
+  const props = { revision, ru: false, requiredFields: true, onPatch: () => {} };
+  let view!: ReactTestRenderer;
+  let edits = 0;
+  act(() => { view = create(<Fields {...props} editing={false} onRequestEdit={() => { edits++; }} />); });
+  const action = view.root.findByType("button");
+  assert.equal(action.props.children, "Edit custom fields");
+  act(() => { action.props.onClick(); view.update(<Fields {...props} editing />); });
+  assert.equal(edits, 1);
+  const [group, product] = byType(view, "custom-picker");
+  assert.equal(Boolean(group.props.invalid), false);
+  assert.equal(product.props.invalid, true);
+  const error = view.root.findByProps({ role: "alert" });
+  assert.equal(error.props.children, "Choose a value for Product.");
+  assert.equal(product.props.errorId, error.props.id);
+  const updated = { ...revision, customFields: [{
+    fieldId: "product", name: "Product", type: "string", systemKey: "product",
+    values: [{ id: "web", label: "Web", value: "Web", parentValueId: null }],
+  }] };
+  act(() => view.update(<Fields {...props} revision={updated} editing />));
+  assert.equal(view.root.findAllByProps({ role: "alert" }).length, 0);
+  assert.equal(Boolean(byType(view, "custom-picker")[1].props.invalid), false);
+  act(() => view.unmount());
+});

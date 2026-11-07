@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { TmsApiError } from "../../../../../core/tms/transport/http";
+import * as mutationFailure from "../../../../../core/tms/errors/mutation-failure";
 import type { TestCase } from "../../../../../core/tms/contracts/legacy-contract";
 import { resolvePendingOperation } from "../../../../../core/tms/idempotency/pending-operation";
 import { createEmptyRevision, normalizeRevisionTags } from "../../../helpers/cases/caseRevision";
@@ -9,7 +11,9 @@ import type { useCaseActions } from "../useCaseActions";
 import type { useCaseEditorState } from "../../case-editor/useCaseEditorState";
 import { reconcileMaintenance } from "../../../test-cases/maintenance/model/case-maintenance";
 
-function setup() {
+function setup(saveError?: TmsApiError) {
+  const notices: string[] = [];
+  let failure = saveError;
   const h = componentHarness(undefined, { structuredClone });
   const original = { id: "case-original", projectId: "project", folderPath: "/Login", folderId: "login", current: createEmptyRevision() } as TestCase;
   const created = { ...original, id: "case-created", current: { ...original.current, title: "New scenario" } };
@@ -18,16 +22,21 @@ function setup() {
   const editor = h.load<{ useCaseEditorState: typeof useCaseEditorState }>(new URL("../../case-editor/useCaseEditorState.ts", import.meta.url), name => {
     if (name.endsWith("caseRevision")) return { createEmptyRevision };
   });
+  const save = async () => {
+    if (failure) throw failure;
+    return { data: created, etag: '"created:1"' };
+  };
   const actions = h.load<{ useCaseActions: typeof useCaseActions }>(new URL("../useCaseActions.ts", import.meta.url), name => {
     if (name.endsWith("TmsHttpClientContext")) return { useTmsHttpClient: () => ({}) };
     if (name.endsWith("AttachmentClientProvider")) return { useAttachmentClient: () => ({}) };
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en", t: (key: string) => key }) };
     if (name.endsWith("caseRevision")) return { createEmptyRevision, normalizeRevisionTags };
+    if (name.endsWith("mutation-failure")) return mutationFailure;
     if (name.endsWith("pending-operation")) return { resolvePendingOperation };
     if (name.endsWith("case-maintenance")) return { reconcileMaintenance };
     if (name.endsWith("pendingCaseAttachment")) return { pendingCaseAttachmentSignature: () => "" };
     if (name.endsWith("saveCaseWithAttachments")) return { saveCaseWithAttachments };
-    if (name.endsWith("test-case-api")) return { createTestCase: async () => ({ data: created, etag: '"created:1"' }), getTestCase: async () => ({ data: created, etag: '"created:1"' }) };
+    if (name.endsWith("test-case-api")) return { createTestCase: save, reviseTestCase: save, getTestCase: save };
   });
   const render = () => h.render(() => {
     const state = { ...editor.useCaseEditorState("en", () => { dialog = null; }), connection: "connected", selectedFolder: "/Login",
@@ -38,9 +47,9 @@ function setup() {
       setData: (update: (data: { testCases: TestCase[] }) => { testCases: TestCase[] }) => { items = update({ testCases: items }).testCases; },
     };
     const derived = { project: { id: projectId }, projectCases: items, selectedCase: items.find(item => item.id === selectedId), selectedRevision: detail?.current };
-    return { state, actions: actions.useCaseActions(state as never, derived as never, () => {}) };
+    return { state, actions: actions.useCaseActions(state as never, derived as never, (message) => notices.push(message)) };
   });
-  return { original, created, render, selection: () => ({ selectedId, detail, etag, dialog }),
+  return { original, created, render, notices, allowSave() { failure = undefined; }, selection: () => ({ selectedId, detail, etag, dialog }),
     leaveProject() { projectId = "other-project"; selectedId = ""; detail = null; etag = null; dialog = null; }, dispose: h.dispose };
 }
 
@@ -74,4 +83,28 @@ test("resetting an abandoned draft after project navigation never revives the ol
   f.render().state.resetCaseEditor("/");
   assert.deepEqual(f.selection(), { selectedId: "", detail: null, etag: null, dialog: null });
   f.dispose();
+});
+
+
+test("create and revision keep their draft open on required field validation and can retry", async () => {
+  for (const mode of ["create", "edit"]) {
+    const f = setup(new TmsApiError("Test-case input is invalid.", 400, null, "VALIDATION_ERROR",
+      "customFields", { field: "customFields", reason: "requiredCustomField" }));
+    const actions = f.render().actions;
+    if (mode === "create") actions.openNewCase();
+    else actions.openEditCase();
+    const draft = { ...f.render().state.caseDraft, title: "Unsubmitted scenario" };
+    f.render().state.setCaseDraft(draft);
+    await f.render().actions.saveCase({ preventDefault() {} } as never);
+    assert.equal(f.render().actions.caseRequiredFields, true, mode);
+    assert.equal(f.render().state.caseDraft, draft, mode);
+    assert.equal(f.selection().dialog, "case", mode);
+    assert.deepEqual(f.notices, [], mode);
+
+    f.allowSave();
+    await f.render().actions.saveCase({ preventDefault() {} } as never);
+    assert.equal(f.render().actions.caseRequiredFields, false, mode);
+    assert.equal(f.selection().dialog, null, mode);
+    f.dispose();
+  }
 });

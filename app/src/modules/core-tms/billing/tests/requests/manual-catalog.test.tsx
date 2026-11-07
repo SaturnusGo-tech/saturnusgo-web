@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import React from "react";
 import { act, create, type ReactTestInstance, type ReactTestRenderer } from "react-test-renderer";
-import type { TmsHttpClient } from "../../../../../core/tms/transport/http";
+import { TmsApiError, type TmsHttpClient } from "../../../../../core/tms/transport/http";
 import { TmsHttpClientProvider } from "../../../auth/http/TmsHttpClientContext";
 import { TmsSessionProvider } from "../../../auth/presentation/session/TmsSessionContext";
 import { TmsLocaleContext } from "../../../localization/context/TmsLocaleProvider";
@@ -18,7 +18,9 @@ function button(root: ReactTestInstance, label: string) {
   return root.findAllByType("button").find(candidate => candidate.children.includes(label));
 }
 
-async function withBilling(check: (root: ReactTestInstance) => Promise<void>, failFirstRequest = false) {
+async function withBilling(check: (root: ReactTestInstance) => Promise<void>, {
+  workspaceKind = "personal", failFirstRequest = false, denyRequests = false,
+}: { workspaceKind?: "company" | "personal"; failFirstRequest?: boolean; denyRequests?: boolean } = {}) {
   const previousEnvironment = process.env.NODE_ENV;
   Reflect.set(process.env, "NODE_ENV", "production");
   const requestPath = "/workspaces/space/plan-requests";
@@ -37,14 +39,17 @@ async function withBilling(check: (root: ReactTestInstance) => Promise<void>, fa
         };
       }
       assert.equal(path, requestPath);
+      if (denyRequests) {
+        throw new TmsApiError("The plan request could not be completed.", 403, null, "PLAN_REQUEST_FORBIDDEN" as TmsApiError["code"]);
+      }
       if (failFirstRequest && reads.filter(value => value === requestPath).length === 1) {
         throw new Error("Temporary request list failure");
       }
       return {
         data: {
           requests: [], applicant: { displayName: "QA", email: "qa@example.com" },
-          workspace: { id: "space", kind: "personal", name: "My workspace" },
-          access: null, eligiblePlanIds: ["individual", "startup", "enterprise"],
+          workspace: { id: "space", kind: workspaceKind, name: "My workspace" },
+          access: null, eligiblePlanIds: workspaceKind === "company" ? ["enterprise"] : ["individual", "startup", "enterprise"],
         },
         etag: null,
       };
@@ -60,7 +65,7 @@ async function withBilling(check: (root: ReactTestInstance) => Promise<void>, fa
     await act(async () => {
       view = create(
         <TmsLocaleContext.Provider value={{ locale: "en", languageTag: "en-US", setLocale() {}, t: key => key }}>
-          <TmsSessionProvider value={{ kind: "cloud", subject: "cloud:owner", workspaceId: "space", workspaceKind: "personal",
+          <TmsSessionProvider value={{ kind: workspaceKind === "company" ? "managed" : "cloud", subject: "owner", workspaceId: "space", workspaceKind,
             workspaceRole: "workspace_admin", label: "QA", signOut: async () => undefined }}>
             <TmsHttpClientProvider client={http}><BillingFeature workspaceId="space" /></TmsHttpClientProvider>
           </TmsSessionProvider>
@@ -115,5 +120,29 @@ test("a production workspace admin can retry after the manual plans fail to load
     const requestAccess = button(root, "Request access");
     assert.ok(requestAccess);
     assert.equal(requestAccess.props.disabled, false);
-  }, true);
+  }, { failFirstRequest: true });
+});
+
+test("a company admin denied plan requests can contact Falcon about Enterprise without retrying the request", async () => {
+  await withBilling(async root => {
+    assert.equal(button(root, "Retry loading plans"), undefined);
+    const contact = button(root, "Contact us");
+    assert.ok(contact);
+    await act(async () => contact.props.onClick());
+    const dialog = root.findByType("dialog");
+    assert.ok(button(dialog, "Copy email address"));
+    assert.ok(dialog.findAllByType("a").some(link => link.props.href === "mailto:falcon@saturnusgo.com"));
+    assert.equal(button(dialog, "Send request"), undefined);
+  }, { workspaceKind: "company", denyRequests: true });
+});
+
+test("an eligible company admin can still open the Enterprise request form", async () => {
+  await withBilling(async root => {
+    const contact = button(root, "Contact us");
+    assert.ok(contact);
+    await act(async () => contact.props.onClick());
+    const send = button(root.findByType("dialog"), "Send request");
+    assert.ok(send);
+    assert.equal(send.props.disabled, false);
+  }, { workspaceKind: "company" });
 });

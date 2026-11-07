@@ -184,18 +184,20 @@ export function ConnectedBillingFeature({ workspaceId, preview = false, onClose 
     }} />;
   const openOffer = offer ?? (intent?.kind === "offer" ? intent.planId : null);
   const dialogRequest = selectedRequest ?? (openOffer ? pendingRequest ?? manual.data?.requests.find(item => item.planId === openOffer && item.status === "active") ?? null : null);
-  const offerUnavailable = Boolean(openOffer && manual.data && !manual.data.eligiblePlanIds.includes(openOffer));
+  const contactOnly = manual.accessDenied && workspaceKind === "company" && openOffer === "enterprise" && !deepRequestId;
+  const offerUnavailable = manual.accessDenied || Boolean(openOffer && manual.data && !manual.data.eligiblePlanIds.includes(openOffer));
   const showManualCatalog = manualAvailable && (Boolean(manualOffers) || !billing.canManage);
   return <>
     <StartupHandoffStatus state={handoff} ru={ru} />
     {showManualCatalog ? <ManualPlanCatalog key={workspaceId} workspaceKind={manual.data?.workspace.kind ?? workspaceKind}
-      offers={manualOffers} ru={ru} failed={manual.error} onReload={manual.reload} onClose={onClose} />
+      offers={manualOffers} ru={ru} failed={manual.error} accessDenied={manual.accessDenied} onReload={manual.reload}
+      onContact={workspaceKind === "company" ? () => { clearIntent(); setOffer("enterprise"); setSelectedRequestId(null); } : undefined} onClose={onClose} />
       : <BillingScreen key={workspaceId} {...billing} error={checkoutRecovery ? null : billing.error}
         identityConfirmation={checkoutRecovery} ru={ru} paymentsAvailable={paymentsAvailable} checkoutMode={checkoutMode}
         onStartupSetup={openStartupSetup} onClose={onClose} />}
     {manualAvailable && (openOffer || selectedRequestId || deepRequestId) && <PlanRequestDialog planId={dialogRequest?.planId ?? openOffer ?? "individual"} ru={ru}
-      data={manual.data} request={dialogRequest} busy={manual.busy} loading={manual.loading || Boolean(deepRequestId && !dialogRequest && !manual.error)}
-      error={manual.error} unavailable={!dialogRequest && offerUnavailable}
+      data={manual.data} request={dialogRequest} busy={manual.busy} loading={manual.loading || Boolean(deepRequestId && !dialogRequest && !manual.error && !manual.accessDenied)}
+      error={manual.error} unavailable={!dialogRequest && offerUnavailable} contactOnly={contactOnly}
       failed={manual.failed} onClose={dismissRequest} onReload={manual.reload}
       onSubmit={async note => {
         if (!openOffer || deepRequestId) return;

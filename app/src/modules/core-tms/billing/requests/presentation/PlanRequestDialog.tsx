@@ -7,11 +7,11 @@ import css from "./plan-request.module.css";
 
 type Props = {
   planId: BillingPlanId; ru: boolean; data: PlanRequestList | null; request: PlanRequest | null;
-  busy: boolean; loading: boolean; error: boolean; failed: boolean; unavailable: boolean;
+  busy: boolean; loading: boolean; error: boolean; failed: boolean; unavailable: boolean; contactOnly?: boolean;
   onClose(): void; onReload(): void; onSubmit(note: string): void; onActivate(request: PlanRequest): void; onEditAddress(request: PlanRequest): void; onWithdraw(request: PlanRequest): void;
 };
 
-export function PlanRequestDialog({ planId, ru, data, request, busy, loading, error, failed, unavailable, onClose, onReload, onSubmit, onActivate, onEditAddress, onWithdraw }: Props) {
+export function PlanRequestDialog({ planId, ru, data, request, busy, loading, error, failed, unavailable, contactOnly = false, onClose, onReload, onSubmit, onActivate, onEditAddress, onWithdraw }: Props) {
   const modal = useRef<HTMLDialogElement>(null);
   const closeButton = useRef<HTMLButtonElement>(null);
   const titleId = useId();
@@ -25,7 +25,9 @@ export function PlanRequestDialog({ planId, ru, data, request, busy, loading, er
   const draft = request ? planRequestDraft(request, ru) : null;
   const draftText = draft ? `${draft.subject}\n\n${draft.body}` : "";
   const desktop = typeof navigator !== "undefined" && /(?:^|\s)FalconDesktop\//.test(navigator.userAgent);
-  const title = request ? planRequestStatus(request, ru) : ru ? "Запросить подключение" : "Request access";
+  const title = request ? planRequestStatus(request, ru) : contactOnly
+    ? (ru ? "Связаться с Falcon" : "Contact Falcon")
+    : (ru ? "Запросить подключение" : "Request access");
   const subtitle = request
     ? `${plan} · ${request.reference}`
     : ru ? `Доступ к Falcon ${plan}` : `Access to Falcon ${plan}`;
@@ -78,7 +80,8 @@ export function PlanRequestDialog({ planId, ru, data, request, busy, loading, er
             <div><strong>Falcon</strong><span>{ru ? "от Saturnus Go" : "by Saturnus Go"}</span></div>
             <span className={css.label}>{ru ? "По заявке" : "By request"}</span>
           </div>
-          {!request && <p>{ru ? "Пока мы настраиваем онлайн-оплату, подключаем Falcon по заявке. Напишите нам из приложения, и мы ответим на ваш email, чтобы обсудить условия и подключение." : "While we set up online payments, we’re arranging Falcon access by request. Send us a request here and we’ll reply by email to discuss access and terms."}</p>}
+          {contactOnly && <p>{ru ? "Напишите нам, чтобы обсудить подключение Enterprise для вашей компании." : "Email us to discuss Enterprise for your company."}</p>}
+          {!request && !unavailable && <p>{ru ? "Пока мы настраиваем онлайн-оплату, подключаем Falcon по заявке. Напишите нам из приложения, и мы ответим на ваш email, чтобы обсудить условия и подключение." : "While we set up online payments, we’re arranging Falcon access by request. Send us a request here and we’ll reply by email to discuss access and terms."}</p>}
           {request?.status === "requested" || request?.status === "contacted" ? <p>{ru ? "Заявка сохранена. Команда Falcon свяжется с вами по email." : "Your request is saved. The Falcon team will follow up by email."}</p> : null}
           {request?.status === "activating" && <p>{request.preparationError === "DOMAIN_CONFLICT"
             ? (ru ? "Этот адрес уже занят. Выберите другой, чтобы продолжить настройку компании." : "This address is already taken. Choose another one to continue setting up your company.")
@@ -97,7 +100,7 @@ export function PlanRequestDialog({ planId, ru, data, request, busy, loading, er
             <textarea maxLength={1000} rows={2} value={note} disabled={busy} onChange={event => setNote(event.target.value)} placeholder={ru ? "Необязательно" : "Optional"} />
           </label>}
         </div>
-        {unavailable && <p className={css.message} role="status">{ru ? "Этот тариф недоступен для текущего пространства." : "This plan is unavailable for your current workspace."}</p>}
+        {unavailable && !contactOnly && <p className={css.message} role="status">{ru ? "Этот тариф недоступен для текущего пространства." : "This plan is unavailable for your current workspace."}</p>}
         {loading && <p className={css.message} role="status">{ru ? "Загружаем данные заявки…" : "Loading request details…"}</p>}
         {((error && !request) || failed) && <p className={css.error} role="alert">{ru ? "Не удалось обновить заявку. Попробуйте ещё раз." : "Couldn’t update the request. Please try again."} <button type="button" onClick={onReload}>{ru ? "Обновить" : "Refresh"}</button></p>}
         {!request && !unavailable && <button type="submit" className={css.primary} disabled={busy || closing || !data?.applicant.email || error}>{busy ? (ru ? "Отправляем…" : "Sending…") : (ru ? "Отправить заявку" : "Send request")}</button>}
@@ -113,6 +116,7 @@ export function PlanRequestDialog({ planId, ru, data, request, busy, loading, er
             ? (ru ? "Подтвердить отмену" : "Confirm withdrawal") : (ru ? "Отменить заявку" : "Withdraw request")}</button>
         </div>}
         <div className={css.contact}>
+          {contactOnly && <a href={`mailto:${planSupportEmail}`}>{planSupportEmail}<ArrowUpRight size={14} aria-hidden="true" /></a>}
           {draft && (desktop
             ? <button type="button" onClick={() => void copy("draft")}><Copy size={14} aria-hidden="true" />{ru ? "Скопировать черновик письма" : "Copy email draft"}</button>
             : <a href={draft.href}>{ru ? "Открыть черновик письма" : "Open email draft"}<ArrowUpRight size={14} aria-hidden="true" /></a>)}

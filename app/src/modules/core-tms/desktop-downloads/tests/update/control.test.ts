@@ -132,3 +132,30 @@ test("the Russian update control opens the Mac-only chooser when the CPU is unkn
   assert.equal(panel?.props.open, true);
   h.dispose();
 });
+
+
+test("company administration offers an update to an outdated Mac build", async () => {
+  const h = componentHarness(undefined, {
+    navigator: { userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) FalconDesktop/0.2.6" },
+  });
+  const useTmsLocale = () => ({ locale: "en" });
+  const { DesktopUpdateControl } = h.load<{ DesktopUpdateControl: () => unknown }>(
+    new URL("../../presentation/update/DesktopUpdateControl.tsx", import.meta.url), name => {
+      if (name.endsWith("useTmsLocale")) return { useTmsLocale };
+      if (name.endsWith("/update")) return { getDesktopUpdate };
+    });
+  const { CompanyAdminFrame } = h.load<{ CompanyAdminFrame: (props: { back: string }) => unknown }>(
+    new URL("../../../company-administration/presentation/layout/CompanyAdminFrame.tsx", import.meta.url), name => {
+      if (name.endsWith("useTmsLocale")) return { useTmsLocale };
+      if (name.endsWith("administration-copy")) return { administrationCopy: () => ({ admin: "Company administration" }) };
+      if (name.endsWith("DesktopUpdateControl")) return { DesktopUpdateControl };
+    });
+  const frame = nodes(h.render(() => CompanyAdminFrame({ back: "/work/" })));
+  const update = frame.find(node => node.type === (DesktopUpdateControl as unknown));
+  assert.ok(update, "the admin frame mounts the desktop update control");
+  h.render(DesktopUpdateControl);
+  await new Promise(setImmediate);
+  const action = nodes(h.render(DesktopUpdateControl)).find(node => node.props["data-testid"] === "desktop-update");
+  assert.equal(action?.props["aria-label"], `Download Falcon ${release.version} update`);
+  h.dispose();
+});

@@ -44,7 +44,8 @@ export function CaseCreationSections({
         <FolderPathPicker value={editor.folderPath} folders={editor.folders} onChange={editor.onFolderPath} ru={ru} disabled={editor.submitting} />
       </CreationSection>
       <CreationSection title={ru ? "Поля" : "Custom fields"}>
-        <CaseCustomFields projectId={editor.projectId} revision={revision} editing canCreate={editor.canCreateFieldValues} disabled={editor.submitting} ru={ru} onPatch={patch} />
+        <CaseCustomFields projectId={editor.projectId} revision={revision} editing requiredFields={editor.requiredFields}
+          canCreate={editor.canCreateFieldValues} disabled={editor.submitting} ru={ru} onPatch={patch} />
       </CreationSection>
       <CreationSection title={ru ? "Свойства" : "Properties"}>
         <CaseMetadataControls locale={locale} revision={revision} editing showLabels onChange={editor.onChange} />

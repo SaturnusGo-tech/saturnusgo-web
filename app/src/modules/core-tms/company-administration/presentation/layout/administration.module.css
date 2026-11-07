@@ -203,7 +203,7 @@
 .page[data-company-admin] .nav { display: grid; gap: 3px; }
 .page[data-company-admin] .nav a { gap: 10px; padding: 9px 10px; min-height: 38px; font-size: 13px; }
 .page[data-company-admin] .nav svg { flex: none; }
-.page[data-company-admin] .sidebarBottom { position: static; max-width: none; gap: 6px; margin-top: auto; }
+.page[data-company-admin] .sidebarBottom { --nav-inset: 5px; position: static; max-width: none; gap: 6px; margin-top: auto; }
 
 .returnLink {
   display: grid;
@@ -275,7 +275,7 @@
   .page[data-company-admin] .nav { display: flex; flex-wrap: nowrap; gap: 2px; flex: 1; overflow-x: auto; scrollbar-width: thin; padding: 3px; }
   .page[data-company-admin] .nav a { flex: none; padding: 7px 9px; }
   .page[data-company-admin] .nav a:focus-visible { outline-offset: -2px; }
-  .page[data-company-admin] .sidebarBottom { flex: none; width: 38px; margin: 0; }
+  .page[data-company-admin] .sidebarBottom { flex: none; width: 44px; margin: 0; }
   .page[data-company-admin] .main { margin-inline: var(--admin-frame-gap); }
   .topBar { --admin-header-inset: 12px; gap: 8px; }
   .returnLink { justify-self: center; margin-inline-start: 0; }

@@ -6,3 +6,6 @@
 .facts>div { display:grid; gap:4px; min-width:0; }
 .facts dd { margin:0; font-size:13px; overflow-wrap:anywhere; }
 .editing { gap:14px; }
+
+.error { margin: 6px 0; color: var(--falcon-danger); font-size: 12px; line-height: 1.45; }
+.error button { display: block; margin-top: 4px; padding: 3px 0; border: 0; background: transparent; color: var(--falcon-text); font: inherit; text-decoration: underline; cursor: pointer; }
