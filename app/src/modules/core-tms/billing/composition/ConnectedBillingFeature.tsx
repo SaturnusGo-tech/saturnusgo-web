@@ -20,6 +20,7 @@ import { usePlanRequests } from "../requests/application/usePlanRequests";
 import { createPlanRequestApi } from "../requests/data/plan-request-api";
 import { readPlanRequestIntent, withoutPlanRequestIntent, type PlanRequest } from "../requests/domain/plan-request";
 import { PlanRequestDialog } from "../requests/presentation/PlanRequestDialog";
+import { ManualPlanCatalog } from "../requests/presentation/ManualPlanCatalog";
 import { planRequestOffers } from "../requests/presentation/plan-request-offers";
 import { BillingScreen } from "../presentation/screen/BillingScreen";
 import { createAdministrationClient } from "../../company-administration/data/administration-client";
@@ -54,7 +55,11 @@ export function ConnectedBillingFeature({ workspaceId, preview = false, onClose 
   useEffect(() => { if (restoredStartup) setRecoveryWorkspace(workspaceId); }, [restoredStartup, workspaceId]);
   const checkoutMode = billingCheckoutMode(billing.summary, billing.account, process.env.NODE_ENV !== "production");
   const paymentsAvailable = billingPaymentsAvailable || checkoutMode !== "disabled";
-  const manualAvailable = Boolean(http && session && billing.canManage && !isolatedPreview && !paymentsAvailable);
+  const checkoutResolving = billing.loading && !billing.account && billing.summary?.enabled === true
+    && billing.summary.checkoutMode !== "disabled";
+  // Plan requests are authorized separately from the controlled checkout.
+  const manualAvailable = Boolean(http && (session?.kind === "cloud" || session?.kind === "managed")
+    && session.workspaceRole === "workspace_admin" && !isolatedPreview && !paymentsAvailable && !checkoutResolving);
   const manualApi = useMemo(() => manualAvailable && http ? createPlanRequestApi(http, workspaceId) : null, [manualAvailable, http, workspaceId]);
   const [intent, setIntent] = useState<ReturnType<typeof readPlanRequestIntent>>(null);
   const [offer, setOffer] = useState<BillingPlanId | null>(null);
@@ -85,7 +90,10 @@ export function ConnectedBillingFeature({ workspaceId, preview = false, onClose 
     }
   }, [transitionRequested, activated, handoff.phase, workspaceId, manualHandoff]);
   const setupApi = useMemo(() => http ? createStartupSetupApi(http, setupLocale) : null, [http, setupLocale]);
-  const setup = useStartupSetup(setupApi, workspaceId, (setupOpen || Boolean(manualSetupId)) && billing.canManage && billing.summary?.workspaceKind === "personal");
+  const editAddress = activationRequest?.actions.includes("edit_address") ?? false;
+  const manualStartupSetup = manualAvailable && activationRequest?.planId === "startup" && activationRequest.workspaceKind === "personal"
+    && (activationRequest.actions.includes("activate") || editAddress);
+  const setup = useStartupSetup(setupApi, workspaceId, manualStartupSetup || setupOpen && billing.canManage && billing.summary?.workspaceKind === "personal");
   const ru = locale === "ru";
 
   function clearIntent() {
@@ -141,8 +149,7 @@ export function ConnectedBillingFeature({ workspaceId, preview = false, onClose 
   if (manualAvailable && !manualSetupId && (transitioningRequest?.status === "activating" && !transitioningRequest.preparationError || handoff.phase === "loading" && manualHandoff)) {
     return <CompanyPreparationScreen ru={ru} preparing name={setup.setup?.displayName ?? transitioningRequest?.workspaceName} />;
   }
-  const editAddress = activationRequest?.actions.includes("edit_address") ?? false;
-  if (manualAvailable && activationRequest && (activationRequest.actions.includes("activate") || editAddress)) {
+  if (manualStartupSetup && activationRequest) {
     return <StartupSetupScreen key={manualSetupId} model={setup} ru={ru} manualAccess canCheckout paymentsAvailable={false} busy={manual.busy}
       onAddressReplaced={editAddress ? () => {
         setManualTransitionId(activationRequest.id);
@@ -178,11 +185,14 @@ export function ConnectedBillingFeature({ workspaceId, preview = false, onClose 
   const openOffer = offer ?? (intent?.kind === "offer" ? intent.planId : null);
   const dialogRequest = selectedRequest ?? (openOffer ? pendingRequest ?? manual.data?.requests.find(item => item.planId === openOffer && item.status === "active") ?? null : null);
   const offerUnavailable = Boolean(openOffer && manual.data && !manual.data.eligiblePlanIds.includes(openOffer));
+  const showManualCatalog = manualAvailable && (Boolean(manualOffers) || !billing.canManage);
   return <>
     <StartupHandoffStatus state={handoff} ru={ru} />
-    <BillingScreen key={workspaceId} {...billing} error={checkoutRecovery && !manualAvailable ? null : billing.error}
-      identityConfirmation={manualAvailable ? null : checkoutRecovery} manualOffers={manualOffers}
-      ru={ru} paymentsAvailable={paymentsAvailable} checkoutMode={checkoutMode} onStartupSetup={openStartupSetup} onClose={onClose} />
+    {showManualCatalog ? <ManualPlanCatalog key={workspaceId} workspaceKind={manual.data?.workspace.kind ?? workspaceKind}
+      offers={manualOffers} ru={ru} failed={manual.error} onReload={manual.reload} onClose={onClose} />
+      : <BillingScreen key={workspaceId} {...billing} error={checkoutRecovery ? null : billing.error}
+        identityConfirmation={checkoutRecovery} ru={ru} paymentsAvailable={paymentsAvailable} checkoutMode={checkoutMode}
+        onStartupSetup={openStartupSetup} onClose={onClose} />}
     {manualAvailable && (openOffer || selectedRequestId || deepRequestId) && <PlanRequestDialog planId={dialogRequest?.planId ?? openOffer ?? "individual"} ru={ru}
       data={manual.data} request={dialogRequest} busy={manual.busy} loading={manual.loading || Boolean(deepRequestId && !dialogRequest && !manual.error)}
       error={manual.error} unavailable={!dialogRequest && offerUnavailable}

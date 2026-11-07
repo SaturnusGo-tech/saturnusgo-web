@@ -29,7 +29,7 @@ function fixture(locale: "ru" | "en", mode = "controlled_test", accountMode = mo
   let request = manual === "approved" ? initialRequest : null;
   const writes: { path: string; input: unknown }[] = [];
   const http = { async getResource(path: string) {
-    if (path.startsWith("/billing/summary")) return { data: { workspaceKind: "personal", canManage: true, status: "trial", planId: null, checkoutMode: mode, enabled }, etag: null };
+    if (path.startsWith("/billing/summary")) return { data: { workspaceKind: "personal", canManage: !manual, status: manual ? "unsubscribed" : "trial", planId: null, checkoutMode: mode, enabled }, etag: null };
     if (path.startsWith("/billing/startup-setup")) return { data: { setup: manual ? { ...ready, status: "reserved" } : ready }, etag: null };
     if (manual && path === requestsPath) return { data: { requests: request ? [request] : [], applicant: { displayName: "QA", email: "qa@example.com" },
       workspace: { id: "space", kind: "personal", name: "My workspace" }, access: null, eligiblePlanIds: ["individual", "startup", "enterprise"] }, etag: null };
@@ -110,6 +110,8 @@ test("manual request submits only after confirmation and never opens checkout", 
   let view!: ReactTestRenderer;
   try {
     await act(async () => { view = create(h.tree); });
+    await act(async () => view.root.findAllByType("button").find(node => node.children.includes("Другие тарифы"))!.props.onClick());
+    await act(async () => view.root.findByProps({ "data-view-plan": "startup" }).props.onClick());
     await act(async () => view.root.findByProps({ "data-plan": "startup" }).props.onClick());
     assert.equal(h.writes.length, 0);
     assert.ok(view.root.findByType("dialog"));
