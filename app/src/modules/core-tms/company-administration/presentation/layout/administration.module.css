@@ -145,29 +145,39 @@
   overscroll-behavior: none;
 }
 
+/* The desktop shell reserves a separate title bar for routes without the workspace toolbar.
+   The admin header now occupies that space itself. */
+:global(html):has(.page[data-company-admin]) :global(body) { padding-top: 0 !important; }
+:global(html):has(.page[data-company-admin]) :global(body)::before { display: none; }
+:global(html):has(.page[data-company-admin]) :global(#app-main[data-falcon-shell]) { height: 100dvh !important; }
+
 .page[data-company-admin] {
   --admin-nav-width: 222px;
   --admin-gutter: clamp(24px, 4vw, 52px);
   --admin-frame-gap: 8px;
+  --admin-header-height: max(36px, var(--falcon-native-toolbar, 0px), var(--falcon-desktop-caption, 0px));
   background: var(--falcon-chrome);
   display: grid;
   grid-template-columns: var(--admin-nav-width) minmax(0, 1fr);
-  grid-template-rows: 40px minmax(0, 1fr);
+  grid-template-rows: var(--admin-header-height) minmax(0, 1fr);
   height: 100dvh;
   min-height: 0;
   font-size: 14px;
 }
 
 .topBar {
+  --admin-header-inset: 16px;
   grid-column: 1 / -1;
   display: flex;
   align-items: center;
   gap: 12px;
   min-width: 0;
-  padding: 0 16px;
+  padding-inline-start: max(var(--admin-header-inset), calc(var(--falcon-native-leading, 0px) + 12px));
+  padding-inline-end: clamp(var(--admin-header-inset), calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw) + 12px), 160px);
+  -webkit-app-region: drag;
 }
 
-.topBar .brand { padding: 0; gap: 7px; font-size: 15px; letter-spacing: -.3px; flex-shrink: 0; }
+.topBar .brand { padding: 0; gap: 7px; font-size: 15px; letter-spacing: -.3px; flex-shrink: 0; -webkit-app-region: no-drag; }
 .topBar .brand img { width: 21px; height: 21px; }
 .workspaceName { min-width: 0; color: var(--admin-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .workspaceName:not(:empty) { border-inline-start: 1px solid var(--admin-line); padding-inline-start: 12px; }
@@ -253,7 +263,7 @@
 }
 
 @media (max-width: 760px) {
-  .page[data-company-admin] { grid-template-columns: minmax(0, 1fr); grid-template-rows: 40px auto minmax(0, 1fr); --admin-gutter: 18px; }
+  .page[data-company-admin] { grid-template-columns: minmax(0, 1fr); grid-template-rows: var(--admin-header-height) auto minmax(0, 1fr); --admin-gutter: 18px; }
   .page[data-company-admin] .sidebar { flex-direction: row; align-items: center; padding: 3px 8px 8px; gap: 6px; }
   .page[data-company-admin] .navTitle { display: none; }
   .page[data-company-admin] .nav { display: flex; flex-wrap: nowrap; gap: 2px; flex: 1; overflow-x: auto; scrollbar-width: thin; padding: 3px; }
@@ -261,6 +271,6 @@
   .page[data-company-admin] .nav a:focus-visible { outline-offset: -2px; }
   .page[data-company-admin] .sidebarBottom { flex: none; width: 38px; margin: 0; }
   .page[data-company-admin] .main { margin-inline: var(--admin-frame-gap); }
-  .topBar { padding-inline: 12px; gap: 8px; }
+  .topBar { --admin-header-inset: 12px; gap: 8px; }
   .returnLink { justify-self: center; margin-inline-start: 0; }
 }
