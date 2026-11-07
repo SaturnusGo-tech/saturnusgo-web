@@ -17,7 +17,7 @@ export function CompanyAdminFrame({ back, companyName, page, navigation, account
   const returnLabel = locale === "ru" ? "Вернуться в Falcon" : "Back to Falcon";
   return <div className={styles.page} data-falcon-shell data-company-admin data-section="admin" data-directory={!page}>
     <header className={styles.topBar}>
-      <a className={styles.brand} href={back}><img src="/falcon/falcon-mark-light.png" alt="" />Falcon</a>
+      <a className={styles.brand} href={back}><span className={styles.brandMark} aria-hidden="true" />Falcon</a>
       <span className={styles.workspaceName}>{companyName}</span>
     </header>
     <aside className={styles.sidebar}>

@@ -172,13 +172,19 @@
   align-items: center;
   gap: 12px;
   min-width: 0;
-  padding-inline-start: max(var(--admin-header-inset), calc(var(--falcon-native-leading, 0px) + 12px));
+  padding-inline-start: max(var(--admin-header-inset), calc(env(titlebar-area-x, 0px) + 12px));
   padding-inline-end: clamp(var(--admin-header-inset), calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw) + 12px), 160px);
   -webkit-app-region: drag;
 }
 
 .topBar .brand { padding: 0; gap: 7px; font-size: 15px; letter-spacing: -.3px; flex-shrink: 0; -webkit-app-region: no-drag; }
-.topBar .brand img { width: 21px; height: 21px; }
+.brandMark {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  background-color: currentColor;
+  mask: url("../../../assets/falcon/falcon-line-mark.svg") center / contain no-repeat;
+}
 .workspaceName { min-width: 0; color: var(--admin-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .workspaceName:not(:empty) { border-inline-start: 1px solid var(--admin-line); padding-inline-start: 12px; }
 
