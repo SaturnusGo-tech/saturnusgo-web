@@ -9,7 +9,7 @@ import type { SidebarPreferences } from "../model/sidebar-preferences";
 import css from "./sidebar-sections-menu.module.css";
 
 const labels: Record<SidebarNavigationId, TmsMessageKey> = {
-  dashboard: "nav.dashboard", cases: "nav.cases", "shared-steps": "nav.sharedSteps", runs: "nav.runs", suites: "nav.suites",
+  dashboard: "nav.dashboard", cases: "nav.cases", "product-docs": "nav.productDocs", "shared-steps": "nav.sharedSteps", runs: "nav.runs", suites: "nav.suites",
   portfolios: "nav.portfolios", "custom-fields": "nav.customFields", api: "nav.apiTesting", hooks: "nav.hooks", reports: "nav.reports",
 };
 type Props = {

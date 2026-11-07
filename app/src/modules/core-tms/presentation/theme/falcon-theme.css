@@ -1,6 +1,12 @@
 /* Captured ChatGPT colors. See reference/chatgpt-colors.json and docs/design/falcon-color-system.md. */
 @import "./compatibility.css";
 
+/* Electron supplies these insets when native window controls are visible. */
+:where(html) {
+  --falcon-native-toolbar: 0px;
+  --falcon-desktop-caption: 0px;
+}
+
 html:has([data-falcon-shell]) {
   --falcon-chrome: #f3f3f3;
   --falcon-surface: #ffffff;

@@ -1,3 +1,4 @@
+import { Requirements } from "../../product-docs/requirements/Requirements";
 import { CaseMaintenanceFeature } from "../../test-cases/maintenance/composition/CaseMaintenanceFeature";
 import { ExecutionHistoryFeature } from "../../codex-employee/execution-history/composition/ExecutionHistoryFeature";
 import { ScenarioLayoutToggle } from "../common/scenario/ScenarioLayoutToggle";
@@ -111,6 +112,7 @@ export function RunsView({ executionPending = false, emptyFiltered = false, navi
         <div className={`${runStyles.overviewLayout} ${focusStyles.overview}`} data-properties-open={propertiesOpen}>
           <div className={`${runStyles.primaryColumn} ${focusStyles.primary}`}>
             {verificationContext}
+            <Requirements projectId={selectedRun.projectId} subject={{runId: selectedRun.id, itemId: selectedItem.id}} ru={locale === "ru"} />
             <section className={runStyles.contentSection}>
               <header><h2>{locale === "ru" ? "Описание" : "Description"}</h2></header>
               <MarkdownField value={selectedItem.snapshot.description ?? ""} label={locale === "ru" ? "Описание" : "Description"} emptyLabel={locale === "ru" ? "Описание не указано." : "No description."} allowAttachments={false} />

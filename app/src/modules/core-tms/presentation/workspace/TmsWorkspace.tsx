@@ -11,6 +11,10 @@ import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { useWorkspaceModel } from "../../state/model/useWorkspaceModel";
 import { Navigation } from "../navigation/Navigation";
 import { WorkspaceDialogs } from "../workspace-dialogs/WorkspaceDialogs";
+import { useProductDocsAccess } from "../../product-docs/composition/useProductDocsAccess";
+import { ProductDocsWorkspace } from "../../product-docs/composition/ProductDocsWorkspace";
+import { CompanyFeatureUnavailable } from "../../auth/managed/presentation/permissions/CompanyFeatureUnavailable";
+import { TessiqLoader } from "../common/loading/TessiqLoader";
 import { WorkspaceStage } from "../workspace-stage/WorkspaceStage";
 import { GuidePanelProvider } from "../../documentation/panel/GuidePanelProvider";
 import guideStyles from "../../documentation/panel/guide-panel.module.css";
@@ -32,6 +36,7 @@ export function LocalizedWorkspace() {
   const pageRef = usePageAppearance([model.view, model.project?.id, model.repositoryScope.key, model.connection].join(":"));
   useHistoryScroll(pageRef);
   const { t } = useTmsLocale();
+  const docs = useProductDocsAccess(model.data.workspace.id, model.project?.id ?? "", model.connection === "connected");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
 
   useEffect(() => {
@@ -81,6 +86,7 @@ export function LocalizedWorkspace() {
         onCollapsedChange={changeSidebar}
         workspaceId={model.data.workspace.id}
         activeRunCount={model.activeProjectRuns.length}
+        productDocs={docs.enabled}
         userCapabilities={model.data.meta.authorization.capabilities}
       />
       <div className={shellStyles.workspaceColumn}>
@@ -101,7 +107,12 @@ export function LocalizedWorkspace() {
           )}
           <div className={`${styles.stageContent} ${motion.content} ${guideStyles.workspaceContent}`} ref={pageRef} data-workspace-content>
             <GuidePanelProvider scope={JSON.stringify([model.data.workspace.id, model.project?.id, model.view])} contentRef={pageRef}>
-              <WorkspaceStage model={model} />
+              <ProductDocsWorkspace api={docs.api} enabled={docs.enabled} scope={docs.scope}
+                visible={model.view === "product-docs"} projectName={model.project?.name} contentRef={pageRef}
+                fallback={docs.pending || model.connection === "loading" ? <TessiqLoader pane label={t("common.loading")} />
+                  : <CompanyFeatureUnavailable onReturn={() => changeView("cases")} />}>
+                <WorkspaceStage model={model} />
+              </ProductDocsWorkspace>
             </GuidePanelProvider>
           </div>
         </main>

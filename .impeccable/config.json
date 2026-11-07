@@ -82,6 +82,24 @@
         "value": "falcon store sans",
         "createdAt": "2026-11-06T11:41:18.246Z",
         "reason": "Agent: Existing authenticated Integration catalog font; DESIGN.md explicitly governs public marketing only."
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "*",
+        "files": [
+          "app/src/modules/core-tms/product-docs/**"
+        ],
+        "createdAt": "2026-11-07T23:20:34.856Z",
+        "reason": "DESIGN.md governs public marketing only; the authenticated Product Docs interface follows the approved Confluence density and Falcon product theme."
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "*",
+        "files": [
+          "app/src/modules/core-tms/product-docs/**"
+        ],
+        "createdAt": "2026-11-07T23:20:35.018Z",
+        "reason": "DESIGN.md governs public marketing only; the authenticated Product Docs interface follows the approved Confluence density and Falcon product theme."
       }
     ]
   }

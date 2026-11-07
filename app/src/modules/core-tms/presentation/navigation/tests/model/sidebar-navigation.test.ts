@@ -4,12 +4,12 @@ import { getSidebarNavigation, SIDEBAR_NAVIGATION_IDS } from "../../model/sideba
 import type { View } from "../../../../state/types/workspace";
 
 const core = ["dashboard", "cases", "shared-steps", "runs", "suites", "reports"];
-const navigation = (view: View, pinned: readonly View[] = [], availableIds: readonly View[] = SIDEBAR_NAVIGATION_IDS, mode = "all" as "all" | "contextual") =>
+const navigation = (view: View, pinned: readonly View[] = [], availableIds: readonly View[] = SIDEBAR_NAVIGATION_IDS.filter(id => id !== "product-docs"), mode = "all" as "all" | "contextual") =>
   getSidebarNavigation({ activeView: view, availableIds, preferences: { mode, pinned } });
 
 test("legacy modes keep the six primary sections visible and rare services in overflow", () => {
   for (const mode of ["all", "contextual"] as const) {
-    const result = navigation("cases", [], [...SIDEBAR_NAVIGATION_IDS].reverse(), mode);
+    const result = navigation("cases", [], SIDEBAR_NAVIGATION_IDS.filter(id => id !== "product-docs").reverse(), mode);
     assert.deepEqual(result.visibleIds, core);
     assert.deepEqual(result.hiddenIds, ["portfolios", "custom-fields", "api", "hooks"]);
     assert.deepEqual(result.groups.map(group => group.id), ["overview", "testing", "insights"]);
@@ -41,4 +41,11 @@ test("utility routes retain primary navigation and an empty capability set has n
   assert.deepEqual(navigation("config").visibleIds, core);
   assert.equal(navigation("config").activeId, null);
   assert.deepEqual(navigation("reports", [], []).groups, []);
+});
+
+test("Product Docs is a primary sidebar entry only in an enabled project", () => {
+  assert.equal(navigation("product-docs").activeId, null);
+  const enabled = navigation("product-docs", [], SIDEBAR_NAVIGATION_IDS);
+  assert.equal(enabled.activeId, "product-docs");
+  assert.deepEqual(enabled.visibleIds, ["dashboard", "cases", "product-docs", "shared-steps", "runs", "suites", "reports"]);
 });

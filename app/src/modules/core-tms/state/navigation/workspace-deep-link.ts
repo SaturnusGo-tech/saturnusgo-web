@@ -2,6 +2,7 @@ import { preserveRepositoryScope } from "../../repository-scope/navigation/repos
 import { isProjectCaseContext } from "../../test-cases/navigation/project/project-case-context";
 import { isProvider } from "../../connectors/model/connector-types";
 import { workspaceViews, type View } from "../types/workspace";
+import { readProductDocSelection, writeProductDocSelection } from "../../product-docs/navigation/product-doc-link";
 import { settingsSections } from "../../presentation/config/navigation/settings-sections";
 import { preserveGuideChatRoute } from "../../documentation/chat/navigation/chat-link";
 
@@ -87,6 +88,7 @@ export function buildWorkspaceDeepLink(href: string, input: {
   }
   if (input.view === "dashboard" && sameScope && detail && detail.length <= 6500) url.searchParams.set("dashboardDetail", detail);
   if (input.view === "profile" && (section === "#security" || section === "#sessions")) url.hash = section;
+  if (input.view === "product-docs" && sameScope) writeProductDocSelection(url, readProductDocSelection(href));
   if (input.view === "help") {
     if (article && /^[a-z][a-z0-9-]{0,63}$/.test(article)) url.searchParams.set("article", article);
     if (/^#[a-z][a-z0-9-]{0,63}$/.test(section)) url.hash = section;

@@ -1,11 +1,11 @@
 import { useLayoutEffect, useRef, useState, type KeyboardEvent, type PointerEvent, type RefObject } from "react";
 
-const preferredWidthKey = "falcon.integration-guide.width.v1";
+const guideWidthKey = "falcon.integration-guide.width.v1";
 const minWidth = 320;
 const minWorkspaceWidth = 320;
 const desktopQuery = "(min-width: 761px)";
 
-export function useGuidePanelWidth(contentRef?: RefObject<HTMLDivElement | null>) {
+export function useGuidePanelWidth(contentRef?: RefObject<HTMLDivElement | null>, preferredWidthKey = guideWidthKey) {
   const preference = useRef<number | null>(null);
   const drag = useRef<{ id: number; x: number; width: number } | null>(null);
   const [dragging, setDragging] = useState(false);
@@ -27,7 +27,7 @@ export function useGuidePanelWidth(contentRef?: RefObject<HTMLDivElement | null>
     const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(measure);
     if (workspace) observer?.observe(workspace);
     return () => { window.removeEventListener("resize", measure); observer?.disconnect(); };
-  }, [contentRef]);
+  }, [contentRef, preferredWidthKey]);
 
   const maxWidth = Math.max(minWidth, viewport.workspace - minWorkspaceWidth);
   const clamp = (next: number) => Math.round(Math.max(minWidth, Math.min(next, maxWidth)));

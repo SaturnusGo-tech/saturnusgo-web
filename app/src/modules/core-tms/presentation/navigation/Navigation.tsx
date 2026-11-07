@@ -19,8 +19,9 @@ import css from "./styles/sidebar-system.module.css";
 import { useSidebarReveal } from "./reveal/useSidebarReveal";
 import { NavigationTooltip } from "./tooltip/NavigationTooltip";
 
-export function Navigation({ view, onChange, disabled, connected, collapsed, onCollapsedChange, workspaceId, activeRunCount, userCapabilities }: {
+export function Navigation({ view, onChange, disabled, connected, collapsed, onCollapsedChange, workspaceId, activeRunCount, userCapabilities, productDocs = false }: {
   view: View; onChange: (view: View) => void; disabled: boolean; collapsed: boolean;
+  productDocs?: boolean;
   onCollapsedChange: (next: boolean) => void; workspaceId: string; connected: boolean; activeRunCount: number; userCapabilities: readonly string[];
 }) {
   const { t, locale } = useTmsLocale();
@@ -30,7 +31,7 @@ export function Navigation({ view, onChange, disabled, connected, collapsed, onC
   const root = useRef<HTMLElement>(null);
   const reveal = useSidebarReveal(root, collapsed, onCollapsedChange);
   const compact = !reveal.revealed;
-  const available = (candidate: View) => companyViewAvailable(candidate, session?.companyCapabilities, codexAvailable) && workspaceViewAllowed(candidate, userCapabilities, codexAvailable);
+  const available = (candidate: View) => (candidate !== "product-docs" || productDocs) && companyViewAvailable(candidate, session?.companyCapabilities, codexAvailable) && workspaceViewAllowed(candidate, userCapabilities, codexAvailable);
   const state = useSidebarPreferences(workspaceId, session?.subject);
   const navigation = getSidebarNavigation({ availableIds: SIDEBAR_NAVIGATION_IDS.filter(available), activeView: view, preferences: state.preferences });
   const navigate = (next: View) => {

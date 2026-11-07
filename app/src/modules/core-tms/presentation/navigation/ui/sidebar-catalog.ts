@@ -1,4 +1,4 @@
-import { BarChart, Batches, CodeSquareSlash, ConnectApps, Document, Folders, Home, Play, Stack, Text } from "@openai/apps-sdk-ui/components/Icon";
+import { BarChart, Batches, BookOpen, CodeSquareSlash, ConnectApps, Document, Folders, Home, Play, Stack, Text } from "@openai/apps-sdk-ui/components/Icon";
 import type { ComponentType, SVGProps } from "react";
 import type { TmsMessageKey } from "../../../localization/catalog/messages";
 import type { SidebarGroupId, SidebarNavigationId } from "../model/sidebar-navigation";
@@ -6,6 +6,7 @@ import type { SidebarGroupId, SidebarNavigationId } from "../model/sidebar-navig
 export const sidebarCatalog = {
   dashboard: { labelKey: "nav.dashboard", icon: Home },
   cases: { labelKey: "nav.cases", icon: Document },
+  "product-docs": { labelKey: "nav.productDocs", icon: BookOpen },
   "shared-steps": { labelKey: "nav.sharedSteps", icon: Batches },
   runs: { labelKey: "nav.runs", icon: Play },
   suites: { labelKey: "nav.suites", icon: Stack },
