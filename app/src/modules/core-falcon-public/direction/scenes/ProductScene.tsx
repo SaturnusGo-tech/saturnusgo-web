@@ -4,6 +4,8 @@ import { falconProductImage } from '../../shared/product-images';
 import styles from '../direction.module.css';
 
 type SceneKind = 'hero' | 'coverage' | 'execution' | 'integrations';
+const compactImageVersion = '20261107';
+
 export function ProductScene({ kind, locale }: { kind: SceneKind; locale: LandingLocale }) {
   const c = directionCopy[locale];
   const main = falconProductImage(kind === 'execution' ? 'dashboard' : kind === 'integrations' ? 'integrations' : 'repository', locale);
@@ -13,11 +15,11 @@ export function ProductScene({ kind, locale }: { kind: SceneKind; locale: Landin
   return <figure className={styles.productScene} data-scene={kind} aria-label={kind === 'hero' ? c.heroAlt : undefined}>
     <div className={styles.scenePlane}>
       <picture className={styles.sceneMain}>
-        <source media="(max-width: 760px)" srcSet={main.compactSrc} />
+        <source media="(max-width: 760px)" srcSet={`${main.compactSrc}?v=${compactImageVersion}`} />
         <img src={main.src} width={main.width} height={main.height} alt={mainAlt} loading={kind === 'hero' ? 'eager' : 'lazy'} fetchPriority={kind === 'hero' ? 'high' : 'auto'} />
       </picture>
       <picture className={styles.sceneOverlay}>
-        <source media="(max-width: 760px)" srcSet={overlay.compactSrc} />
+        <source media="(max-width: 760px)" srcSet={`${overlay.compactSrc}?v=${compactImageVersion}`} />
         <img src={overlay.src} width={overlay.width} height={overlay.height} alt={overlayAlt} loading={kind === 'hero' ? 'eager' : 'lazy'} />
       </picture>
     </div>
