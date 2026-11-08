@@ -1,7 +1,7 @@
 .block { position: relative; min-inline-size: 0; margin-block: 16px; }
 .surface {
-  --structured-surface: var(--falcon-panel);
-  --structured-line: var(--falcon-border);
+  --structured-surface: var(--falcon-selected);
+  --structured-line: var(--falcon-border-strong);
   --structured-tools: var(--falcon-control);
   --structured-tools-border: var(--falcon-border);
   position: relative;
@@ -10,7 +10,7 @@
   gap: 8px;
   min-inline-size: 0;
   padding: 15px 16px;
-  border: .5px solid var(--structured-line);
+  border: 1px solid var(--structured-line);
   border-radius: 7px;
   background: var(--structured-surface);
   color: var(--falcon-text);
@@ -20,6 +20,7 @@
   --structured-line: var(--falcon-doc-link-border);
   --structured-tools: var(--falcon-doc-surface);
   --structured-tools-border: var(--falcon-doc-control);
+  border-width: .5px;
 }
 .surface[data-kind="diagram"] { min-block-size: 121px; }
 .surface[data-kind="math"] { min-block-size: 53px; }
@@ -116,23 +117,44 @@
   font-size: 11px;
 }
 .generate:hover:not(:disabled) { background: var(--falcon-hover); }
-.diagramImage { display: grid; place-items: center; min-inline-size: 0; margin-top: 10px; }
-.diagramImage img { display: block; max-inline-size: 100%; max-block-size: min(380px, 60vh); margin: 0; object-fit: contain; }
-:global(.dark) .diagramImage img { filter: invert(.91); }
+.surface[data-kind="diagram"][data-preview] { padding-block-start: 40px; }
+.previewLoading {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-block-size: 36px;
+  color: var(--falcon-text-secondary);
+  font-size: 12px;
+}
+.previewLoading .previewSpinner { inline-size: 14px; block-size: 14px; flex: none; animation: previewSpin 850ms linear infinite; }
+.previewSpinnerTrack { opacity: .2; }
+@keyframes previewSpin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .previewLoading .previewSpinner { animation: none; } }
 .formula { min-inline-size: 0; overflow: auto; color: var(--falcon-text); text-align: center; }
 .formula math { font-size: 1.12em; }
 .invalid { min-inline-size: 0; }
 .invalid p { margin: 0 84px 8px 0; font-size: 12px; color: var(--falcon-text-secondary); }
-.invalid pre, .expandedBody pre {
+.invalid pre, .expandedBody pre, .readSource {
   margin: 0;
   color: var(--falcon-text);
   font: 13px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace;
   overflow-wrap: anywhere;
   white-space: pre-wrap;
 }
-.expanded { border: 1px solid var(--falcon-border); border-radius: 12px; background: var(--falcon-elevated); color: var(--falcon-text); }
-.expandedBody { padding-block-end: 20px; }
-.expandedBody .diagramImage img { max-block-size: 75vh; }
+.readSource { padding-inline-end: 56px; }
+.expanded.expanded { width: min(1200px, 100%); height: min(880px, calc(100dvh - 32px)); }
+.expandedBody { min-height: 0; padding: 0 16px 14px; }
+.expanded .expandedContent { display: flex; flex: 1; min-block-size: 0; overflow: hidden; }
+.expanded .expandedBody { display: flex; flex: 1; flex-direction: column; min-inline-size: 0; }
+.expanded .invalid { overflow: auto; }
+:global(html:not(.dark)) .expandedBody > :not(pre) {
+  padding: 8px;
+  border: 1px solid var(--falcon-border-strong);
+  border-radius: 7px;
+  background: var(--falcon-selected);
+}
 @media (hover: none) {
   .controls, .handle { opacity: 1; }
   .handle { inset-inline-start: 0; transform: translateX(-100%); }

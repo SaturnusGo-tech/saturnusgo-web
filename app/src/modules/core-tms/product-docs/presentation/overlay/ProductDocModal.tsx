@@ -11,17 +11,19 @@ const dialogMotion: Variants = {
   exit: { opacity: 0, y: 6, scale: 0.985, transition: { duration: 0.14, ease: [0.4, 0, 1, 1] } },
 };
 
-export function ProductDocModal({ title, subtitle, closeLabel, onClose, busy, children, className }: {
+export function ProductDocModal({ title, subtitle, closeLabel, onClose, busy, children, className, bodyClassName, isOpen = true }: {
   title: string;
   subtitle?: string;
   closeLabel: string;
   onClose(): void;
   busy?: boolean;
+  isOpen?: boolean;
   children: ReactNode;
   className?: string;
+  bodyClassName?: string;
 }) {
   const reducedMotion = useReducedMotion();
-  return <Modal isOpen onClose={onClose} isDismissable={!busy} isKeyboardDismissDisabled={busy} hideCloseButton
+  return <Modal isOpen={isOpen} onClose={onClose} isDismissable={!busy} isKeyboardDismissDisabled={busy} hideCloseButton
     disableAnimation={Boolean(reducedMotion)} motionProps={{ variants: dialogMotion }}
     classNames={{ wrapper: styles.wrapper, backdrop: styles.backdrop, base: `${styles.dialog} ${className ?? ""}` }}>
     <ModalContent>
@@ -30,7 +32,7 @@ export function ProductDocModal({ title, subtitle, closeLabel, onClose, busy, ch
         <Button size="sm" radius="full" isIconOnly variant="light" isDisabled={busy} className={styles.close}
           aria-label={closeLabel} onPress={onClose}><X size={17} aria-hidden="true" /></Button>
       </ModalHeader>
-      <ModalBody className={styles.body}>{children}</ModalBody>
+      <ModalBody className={`${styles.body} ${bodyClassName ?? ""}`}>{children}</ModalBody>
     </ModalContent>
   </Modal>;
 }

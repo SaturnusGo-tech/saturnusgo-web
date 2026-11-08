@@ -26,7 +26,7 @@ import { ProductDocRadioReader } from "../../draft/blocks/radio/ProductDocRadio"
 import { productDocRadioName, readRadioOptions } from "../../draft/blocks/radio/radioOptions";
 import { ProductDocCodeSnippet } from "../../draft/blocks/snippet/ProductDocCodeSnippet";
 import { ProductDocCollapseReader } from "../../draft/blocks/collapse/ProductDocCollapse";
-import { ProductDocStructuredBlockReader } from "../../draft/blocks/structured/ProductDocStructuredBlock";
+import { ProductDocStructuredBlockReader } from "../../draft/blocks/structured/reader/ProductDocStructuredBlockReader";
 import { markProductDocCollapse, productDocCollapseName, structuredBlockKind } from "../../../domain/structured/structuredMarkdown";
 import { ProductDocCallout, isProductDocCalloutTone } from "../../draft/blocks/callout/surface/ProductDocCallout";
 import calloutStyles from "../../draft/blocks/callout/product-doc-callout.module.css";

@@ -1,31 +1,20 @@
 "use client";
 
-import { addToast, Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Modal, ModalBody,
-  ModalContent, ModalHeader, Textarea } from "@heroui/react";
+import { addToast, Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Textarea } from "@heroui/react";
 import { $isCodeBlockNode, readOnly$, useCellValue, useCodeBlockEditorContext, type CodeBlockEditorProps } from "@mdxeditor/editor";
 import { $createParagraphNode, $getNodeByKey, $setSelection } from "lexical";
 import { Braces, Copy, EllipsisVertical, Maximize2, MousePointer2, Send, SquareFunction, Trash2, Workflow } from "lucide-react";
-import { useReducedMotion } from "framer-motion";
-import { useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { useContext, useEffect, useRef, useState, type ClipboardEvent } from "react";
 import { writeClipboardText } from "../../../../../../../shared/lib/clipboard";
 import { useTmsLocale } from "../../../../../localization/context/useTmsLocale";
 import { productDocDiagramErrorStatus, useProductDocDiagram } from "../../../../state/diagrams/useProductDocDiagram";
 import { ProductDocEmbedContext } from "../../../embeds/context/productDocEmbedContext";
-import { ProductDocTooltip } from "../../../overlay/ProductDocTooltip";
+import { StructuredAction } from "./controls/StructuredAction";
+import { useProductDocStructuredRender } from "./render/useProductDocStructuredRender";
+import { ProductDocStructuredDialog } from "./viewer/ProductDocStructuredDialog";
 import { ProductDocStructuredPreview } from "./ProductDocStructuredPreview";
 import { canRenderDiagram, isDiagramSource, maximumDiagramPrompt, maximumDiagramSource, maximumFormulaSource, structuredBlockKind } from "../../../../domain/structured/structuredMarkdown";
 import styles from "./product-doc-structured.module.css";
-
-type Kind = NonNullable<ReturnType<typeof structuredBlockKind>>;
-
-function StructuredAction({ label, onPress, disabled, pressed, children }: {
-  label: string; onPress(): void; disabled?: boolean; pressed?: boolean; children: ReactNode;
-}) {
-  return <ProductDocTooltip label={label}><Button type="button" variant="light" size="sm" disableRipple isIconOnly
-    className={styles.action} aria-label={label} isDisabled={disabled} aria-pressed={pressed} onPress={onPress}>
-    {children}
-  </Button></ProductDocTooltip>;
-}
 
 function generationError(error: unknown, ru: boolean) {
   const status = productDocDiagramErrorStatus(error);
@@ -47,18 +36,20 @@ export function ProductDocStructuredBlock({ language, code, nodeKey, focusEmitte
   const activeRequest = useRef<AbortController>(null);
   const blockSource = useRef(code);
   blockSource.current = code;
-  const [preview, setPreview] = useState(false);
+  const [showSource, setShowSource] = useState(false);
+  const [editingSource, setEditingSource] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState("");
-  const reducedMotion = useReducedMotion();
   const isSource = diagram ? isDiagramSource(code) : Boolean(code.trim());
+  const preview = isSource && !showSource && !editingSource;
+  const rendered = useProductDocStructuredRender(kind, code, isSource && (preview || expanded));
   const mayGenerate = diagram && !readOnly && !isSource && Boolean(code.trim() && generateDiagram && scope);
   const title = diagram ? (ru ? "Диаграмма Mermaid" : "Mermaid diagram") : (ru ? "Формула LaTeX" : "LaTeX formula");
   const placeholder = diagram ? (ru ? "Опишите диаграмму…" : "Describe your diagram…")
     : (ru ? "Введите LaTeX, чтобы вставить формулу" : "Type LaTeX to insert a formula");
   const copyLabel = ru ? "Копировать исходник" : "Copy source";
-  const previewLabel = ru ? "Предпросмотр" : "Preview";
+  const previewLabel = preview ? (ru ? "Показать исходник" : "Show source") : (ru ? "Предпросмотр" : "Preview");
   const expandLabel = ru ? "Развернуть" : "Expand";
   const closeLabel = ru ? "Закрыть предпросмотр" : "Close preview";
   const selectLabel = ru ? "Выделить исходник" : "Select source";
@@ -71,6 +62,19 @@ export function ProductDocStructuredBlock({ language, code, nodeKey, focusEmitte
   function change(next: string) {
     setCode(next);
     setError("");
+  }
+
+  function pasteSource(event: ClipboardEvent<HTMLElement>) {
+    const pasted = event.clipboardData.getData("text/plain").replace(/\r\n?/g, "\n");
+    if (!pasted.trim() || !input.current) return;
+    const { selectionStart, selectionEnd } = input.current;
+    const next = code.slice(0, selectionStart) + pasted + code.slice(selectionEnd);
+    if (diagram ? !canRenderDiagram(next) : next.length > maximumFormulaSource) return;
+    event.preventDefault();
+    event.stopPropagation();
+    change(next);
+    setEditingSource(false);
+    setShowSource(false);
   }
 
   async function copy() {
@@ -98,6 +102,8 @@ export function ProductDocStructuredBlock({ language, code, nodeKey, focusEmitte
       if (controller.signal.aborted || blockSource.current !== code) return;
       if (!canRenderDiagram(source)) throw new Error("Unexpected diagram result");
       setCode(source);
+      setEditingSource(false);
+      setShowSource(false);
     } catch (failure) {
       if (!controller.signal.aborted) setError(generationError(failure, ru));
     } finally {
@@ -118,11 +124,12 @@ export function ProductDocStructuredBlock({ language, code, nodeKey, focusEmitte
 
   const toolbar = <div className={styles.controls}>
     <StructuredAction label={copyLabel} disabled={!code} onPress={() => void copy()}><Copy size={14} aria-hidden="true" /></StructuredAction>
-    <StructuredAction label={previewLabel} disabled={!isSource} pressed={preview && isSource}
-      onPress={() => setPreview((value) => !value)}>{preview && isSource ? <Braces size={14} aria-hidden="true" /> : <PreviewIcon size={14} aria-hidden="true" />}</StructuredAction>
+    <StructuredAction label={previewLabel} disabled={!isSource} pressed={preview}
+      onPress={() => { setShowSource(preview); setEditingSource(false); }}>{preview ? <Braces size={14} aria-hidden="true" /> : <PreviewIcon size={14} aria-hidden="true" />}</StructuredAction>
     <StructuredAction label={expandLabel} disabled={!code} onPress={() => setExpanded(true)}><Maximize2 size={14} aria-hidden="true" /></StructuredAction>
   </div>;
-  return <div className={styles.block} data-structured-block={kind} data-editor-dialog contentEditable={false}>
+  return <div className={styles.block} data-structured-block={kind} data-editor-dialog contentEditable={false}
+    onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setEditingSource(false); }}>
     {!readOnly && <Dropdown placement="bottom-start" classNames={{ content: styles.menu }}>
       <DropdownTrigger>
         <Button type="button" variant="light" size="sm" disableRipple isIconOnly className={styles.handle}
@@ -132,7 +139,7 @@ export function ProductDocStructuredBlock({ language, code, nodeKey, focusEmitte
         onAction={(key) => {
           if (key === "copy") void copy();
           if (key === "select") {
-            setPreview(false);
+            setShowSource(true);
             requestAnimationFrame(() => { input.current?.focus(); input.current?.select(); });
           }
           if (key === "delete") remove();
@@ -142,15 +149,16 @@ export function ProductDocStructuredBlock({ language, code, nodeKey, focusEmitte
         <DropdownItem key="delete" startContent={<Trash2 size={14} aria-hidden="true" />}>{removeLabel}</DropdownItem>
       </DropdownMenu>
     </Dropdown>}
-    <div className={styles.surface} data-kind={kind} data-preview={preview && isSource || undefined}>
+    <div className={styles.surface} data-kind={kind} data-preview={preview || undefined}>
       {toolbar}
-      {preview && isSource ? <ProductDocStructuredPreview kind={kind} source={code} /> :
+      {preview ? <ProductDocStructuredPreview kind={kind} source={code} result={rendered} /> :
         <div className={styles.fieldShell} data-input-shell><Textarea ref={input} aria-label={title} placeholder={placeholder} value={code}
           minRows={diagram ? 3 : 1} maxRows={14} maxLength={diagram ? maximumDiagramSource : maximumFormulaSource}
           spellCheck="false" isReadOnly={readOnly} isDisabled={generating}
           classNames={{ base: styles.field, inputWrapper: styles.inputWrapper, input: styles.input }}
           onValueChange={change} onKeyDown={(event) => event.stopPropagation()}
-          onFocus={() => parentEditor.update(() => $setSelection(null))} /></div>}
+          onPaste={pasteSource}
+          onFocus={() => { setEditingSource(true); parentEditor.update(() => $setSelection(null)); }} /></div>}
       {diagram && !isSource && !readOnly && <div className={styles.footer}>
         {error && <p role="alert">{error}</p>}
         {mayGenerate && <Button type="button" size="sm" variant="light" radius="full" disableRipple className={styles.generate}
@@ -158,36 +166,7 @@ export function ProductDocStructuredBlock({ language, code, nodeKey, focusEmitte
           startContent={!generating && <Send size={13} aria-hidden="true" />}>{ru ? "Сгенерировать" : "Generate"}</Button>}
       </div>}
     </div>
-    <Modal isOpen={expanded} onOpenChange={setExpanded} size="4xl" scrollBehavior="inside"
-      disableAnimation={Boolean(reducedMotion)} closeButton={<button aria-label={closeLabel}>×</button>}
-      classNames={{ base: styles.expanded, body: styles.expandedBody }}>
-      <ModalContent>
-        <ModalHeader>{title}</ModalHeader>
-        <ModalBody>
-          {isSource && preview ? <ProductDocStructuredPreview kind={kind} source={code} /> : <pre>{code}</pre>}
-        </ModalBody>
-      </ModalContent>
-    </Modal>
-  </div>;
-}
-
-export function ProductDocStructuredBlockReader({ kind, source }: { kind: Kind; source: string }) {
-  const { locale } = useTmsLocale();
-  const ru = locale === "ru";
-  const reducedMotion = useReducedMotion();
-  const [expanded, setExpanded] = useState(false);
-  const label = kind === "diagram" ? (ru ? "Диаграмма Mermaid" : "Mermaid diagram") : (ru ? "Формула LaTeX" : "LaTeX formula");
-  if (!source.trim()) return null;
-  return <div className={styles.surface} data-kind={kind} data-preview data-structured-block={kind}>
-    <div className={styles.controls}>
-      <StructuredAction label={ru ? "Развернуть" : "Expand"} onPress={() => setExpanded(true)}>
-        <Maximize2 size={14} aria-hidden="true" />
-      </StructuredAction>
-    </div>
-    <ProductDocStructuredPreview kind={kind} source={source} />
-    <Modal isOpen={expanded} onOpenChange={setExpanded} size="4xl" scrollBehavior="inside"
-      disableAnimation={Boolean(reducedMotion)} classNames={{ base: styles.expanded, body: styles.expandedBody }}>
-      <ModalContent><ModalHeader>{label}</ModalHeader><ModalBody><ProductDocStructuredPreview kind={kind} source={source} /></ModalBody></ModalContent>
-    </Modal>
+    <ProductDocStructuredDialog isOpen={expanded} onClose={() => setExpanded(false)} title={title}
+      closeLabel={closeLabel} kind={kind} source={code} result={rendered} showSource={!isSource} />
   </div>;
 }

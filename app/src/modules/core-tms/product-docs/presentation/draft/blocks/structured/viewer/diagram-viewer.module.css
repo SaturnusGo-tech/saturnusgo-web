@@ -1,0 +1,51 @@
+.viewer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-inline-size: 0;
+  min-block-size: 0;
+  color: var(--falcon-text-secondary);
+}
+.viewer[data-expanded] { flex: 1; }
+.viewport {
+  min-inline-size: 0;
+  min-block-size: 0;
+  max-block-size: min(420px, 54dvh);
+  overflow: auto;
+  cursor: grab;
+}
+.viewer[data-expanded] .viewport { flex: 1; max-block-size: none; }
+.viewport:focus-visible { outline: 1px solid var(--falcon-focus); outline-offset: -1px; border-radius: 6px; }
+.viewport[data-dragging] { cursor: grabbing; user-select: none; }
+.stage {
+  display: flex;
+  justify-content: center;
+  box-sizing: border-box;
+  inline-size: max-content;
+  min-inline-size: 100%;
+  padding: 12px;
+}
+.stage img.graphic { display: block; flex: none; max-inline-size: none; max-width: none; max-height: none; margin: 0; }
+:global(.dark) .graphic { filter: invert(.91); }
+.toolbar { display: flex; flex: none; align-items: center; justify-content: flex-end; gap: 2px; }
+.scale { min-inline-size: 38px; text-align: center; font-size: 11px; font-variant-numeric: tabular-nums; }
+.toolbar .button {
+  display: grid;
+  place-items: center;
+  inline-size: 28px;
+  block-size: 28px;
+  min-inline-size: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  color: var(--falcon-icon);
+}
+.toolbar .button:is(:hover, :focus-visible, [aria-pressed="true"]):not(:disabled) {
+  background: var(--falcon-hover);
+  color: var(--falcon-text);
+}
+.toolbar .button:focus-visible { outline: 1px solid var(--falcon-focus); outline-offset: 1px; }
+.toolbar .button:disabled { opacity: .45; cursor: default; }
+@media (pointer: coarse) { .toolbar .button { inline-size: 44px; block-size: 44px; } }
