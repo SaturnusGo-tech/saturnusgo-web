@@ -51,15 +51,14 @@ test("workspace permits shared connector catalog for readers only with a project
     Object.assign(h.window, { localStorage: { getItem: () => null } });
     const model = { view: "cases", project, repositoryScope: { key: "workspace" }, connection: "connected", canManageIntegrations: false, activeProjectRuns: [],
       data: { workspace: { id: "w" }, meta: { authorization: { capabilities: caps } } } };
-    const { default: Workspace } = h.load<{ default: () => unknown }>(new URL("../../workspace/TmsWorkspace.tsx", import.meta.url), name => {
+    const { LocalizedWorkspace } = h.load<{ LocalizedWorkspace: () => unknown }>(new URL("../../workspace/LocalizedWorkspace.tsx", import.meta.url), name => {
       if (name.endsWith("useWorkspaceModel")) return { useWorkspaceModel: () => model };
       if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ t: (key: string) => key }) };
       if (name.endsWith("usePageAppearance")) return { usePageAppearance: () => ({ current: null }) };
       if (name.endsWith("useHistoryScroll")) return { useHistoryScroll: () => {} };
       if (name.endsWith("useProductDocsAccess")) return { useProductDocsAccess: () => ({ enabled: false }) };
     });
-    const shell = nodes(h.render(() => Workspace())).find(node => typeof node.type === "function")!;
-    const content = nodes(h.render(() => (shell.type as unknown as () => unknown)()));
+    const content = nodes(h.render(LocalizedWorkspace));
     assert.equal(content.find(node => node.type === "WorkspaceConnectorProvider")?.props.active, expected);
   }
 });

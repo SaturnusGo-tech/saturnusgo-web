@@ -1,1 +1,1 @@
-export { default as TmsWorkspace } from "./presentation/workspace/TmsWorkspace";
+export { default as TmsWorkspace } from "./presentation/workspace/entry/TmsWorkspace";

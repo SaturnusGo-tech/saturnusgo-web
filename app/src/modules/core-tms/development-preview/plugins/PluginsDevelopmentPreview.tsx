@@ -7,7 +7,7 @@ import { createAuthenticatedTmsHttpClient } from "../../auth/http/createAuthenti
 import { TmsHttpClientProvider } from "../../auth/http/TmsHttpClientContext";
 import { TmsSessionProvider, type TmsSessionIdentity } from "../../auth/presentation/session/TmsSessionContext";
 import { TmsLocaleProvider } from "../../localization/context/TmsLocaleProvider";
-import { LocalizedWorkspace } from "../../presentation/workspace/TmsWorkspace";
+import { LocalizedWorkspace } from "../../presentation/workspace/LocalizedWorkspace";
 
 import { WelcomeDevelopmentPreview } from "./WelcomeDevelopmentPreview";
 

@@ -4,8 +4,6 @@ import { FolderAppearanceProvider } from "../../folders/presentation/appearance/
 import { WorkspaceConnectorProvider } from "../../connectors/application/context/WorkspaceConnectorContext";
 import { WorkspacePeopleProvider } from "../../workspace/members/context/WorkspacePeopleContext";
 import { useEffect, useState } from "react";
-import { TmsAuthBoundary } from "../../auth/presentation/boundary/TmsAuthBoundary";
-import { TmsLocaleProvider } from "../../localization/context/TmsLocaleProvider";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { useWorkspaceModel } from "../../state/model/useWorkspaceModel";
 import { Navigation } from "../navigation/Navigation";
@@ -132,15 +130,5 @@ export function LocalizedWorkspace() {
       <WorkspaceDialogs model={model} />
     </div></WorkspaceConnectorProvider></WorkspacePeopleProvider></FolderAppearanceProvider>
     </WorkspaceUiProvider>
-  );
-}
-
-export default function TmsWorkspace() {
-  return (
-    <TmsLocaleProvider>
-      <TmsAuthBoundary>
-        <LocalizedWorkspace />
-      </TmsAuthBoundary>
-    </TmsLocaleProvider>
   );
 }
