@@ -106,8 +106,8 @@ function testCase(
     preconditions: text(item.preconditions, `testCases[${index}].preconditions`, 20_000),
     type,
     lifecycle: choice(item.lifecycle ?? "draft", `testCases[${index}].lifecycle`, ["draft", "ready", "deprecated"]),
-    priority: choice(item.priority ?? "medium", `testCases[${index}].priority`, ["low", "medium", "high", "critical"]),
-    ...(item.priorityAssigned === false ? { priorityAssigned: false as const } : {}),
+    priority: item.priority === null ? null
+      : choice(item.priority ?? "medium", `testCases[${index}].priority`, ["low", "medium", "high", "critical"]),
     component: text(item.component, `testCases[${index}].component`, 500),
     tags,
     estimatedMinutes: estimate === null || estimate === undefined ? null : integer(estimate, `testCases[${index}].estimatedMinutes`, 0, 100_000),

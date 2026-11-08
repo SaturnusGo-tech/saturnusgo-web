@@ -39,6 +39,14 @@ test("parses one portable test case without reinterpreting product content", () 
   assert.equal(parsed.testCases[0]?.steps[0]?.expectedResult, "Login is visible");
 });
 
+test("retains explicit null priority while preserving the legacy default for omitted priority", () => {
+  const base = JSON.parse(source()) as { testCases: Record<string, unknown>[] };
+  base.testCases[0] = { ...base.testCases[0], priority: null };
+  assert.equal(parseTestCaseExchange(JSON.stringify(base)).testCases[0]?.priority, null);
+  base.testCases[0] = { ...base.testCases[0], priority: undefined };
+  assert.equal(parseTestCaseExchange(JSON.stringify(base)).testCases[0]?.priority, "medium");
+});
+
 test("rejects duplicate source keys", () => {
   const base = JSON.parse(source()) as { testCases: unknown[] };
   assert.throws(

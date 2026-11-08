@@ -31,7 +31,7 @@ function body(projectId: string, item: PortableTestCase): Api["TestCaseCreateReq
     preconditions: item.preconditions,
     type: item.type,
     lifecycle: item.lifecycle,
-    priority: item.priorityAssigned === false ? null : item.priority,
+    priority: item.priority,
     component: item.component,
     ownerIdentityId: null,
     tags: marker && !item.tags.includes(marker) ? [...item.tags, marker] : [...item.tags],
