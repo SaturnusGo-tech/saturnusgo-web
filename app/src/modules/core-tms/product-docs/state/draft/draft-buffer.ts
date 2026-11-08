@@ -1,6 +1,14 @@
+import type { ProductDocTaxonomy } from "../../domain/product-doc-taxonomy";
+import type { ProductDocProperties } from "../../domain/properties/product-doc-properties";
 import type { ProductDocScope, ProductDocSection, ProductDocTitleHighlight } from "../../domain/product-docs";
 
-export interface DraftContent { title: string; sections: ProductDocSection[]; titleHighlights?: ProductDocTitleHighlight[] }
+export interface DraftContent {
+  title: string;
+  sections: ProductDocSection[];
+  titleHighlights?: ProductDocTitleHighlight[];
+  taxonomy?: ProductDocTaxonomy;
+  properties?: ProductDocProperties;
+}
 export interface BufferedProductDocDraft extends DraftContent {
   baseline: DraftContent & { version: number };
 }

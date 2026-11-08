@@ -1,0 +1,52 @@
+.root { flex: 1 1 0; min-inline-size: 0; }
+.list {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.crumb { display: inline-flex; align-items: center; gap: 4px; min-inline-size: 0; }
+.crumb { flex: 0 2 auto; }
+.crumb:first-child:not(:last-child) { min-inline-size: min(80px, 28%); }
+.crumb:last-child { flex-shrink: 1; }
+.item {
+  display: block;
+  min-inline-size: 0;
+  padding: 4px 2px;
+  border-radius: 6px;
+  color: var(--falcon-text-secondary);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.label { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.separator { flex: none; display: flex; color: var(--falcon-icon-muted); }
+.item[data-current="true"] { color: var(--falcon-text); }
+.item[role="link"]:not([aria-disabled="true"]):not([data-current="true"]) { cursor: pointer; }
+.item[role="link"]:not([aria-disabled="true"]):not([data-current="true"]):is(:hover, :focus-visible) {
+  color: var(--falcon-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.item[data-focus-visible="true"] { outline: 1px solid var(--falcon-focus); outline-offset: -1px; }
+.overflow { display: inline-flex; align-items: center; flex: none; gap: 4px; }
+.overflow > span { display: flex; color: var(--falcon-icon-muted); }
+.more {
+  display: grid; place-items: center; width: 26px; height: 26px; min-width: 0; padding: 0;
+  border: 0; border-radius: 6px; color: var(--falcon-text-secondary); background: transparent; cursor: pointer;
+}
+.more:is(:hover, :focus-visible, [aria-expanded="true"]) { color: var(--falcon-text); background: var(--falcon-hover); }
+.positioner { z-index: 130; }
+.menu {
+  min-width: min(208px, calc(100vw - 24px)); max-width: min(320px, calc(100vw - 24px));
+  max-height: min(320px, 50vh); overflow-y: auto; padding: 6px; border: 1px solid var(--falcon-border);
+  border-radius: 12px; background: var(--falcon-elevated); color: var(--falcon-text); box-shadow: var(--falcon-shadow-popover);
+}
+.menuList { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.menuItem { padding: 7px 9px; border-radius: 6px; cursor: pointer; }
+.menuItem:is([data-hover="true"], [data-focus-visible="true"]) { background: var(--falcon-hover); }
+.menuLabel { font-size: 13px; line-height: 1.4; overflow-wrap: anywhere; }

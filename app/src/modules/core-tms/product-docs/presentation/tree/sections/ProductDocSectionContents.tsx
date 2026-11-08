@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import type { TmsLocale } from "../../../../localization/model/locale";
 import type { ProductDocNode, ProductDocsApi, ProductDocScope } from "../../../domain/product-docs";
 import type { ProductDocsCopy } from "../../../localization/copy";
@@ -10,7 +11,7 @@ import { ProductDocSectionIcon } from "../appearance/ProductDocSectionIcon";
 import { ProductDocsDirectory } from "../ProductDocsOverview";
 import styles from "./section-contents.module.css";
 
-export function ProductDocSectionContents({ api, scope, node, copy, locale, refresh, draft, starred, onOpen }: {
+export function ProductDocSectionContents({ api, scope, node, copy, locale, refresh, draft, starred, createPage, onOpen }: {
   api: ProductDocsApi;
   scope: ProductDocScope;
   node: ProductDocNode;
@@ -19,6 +20,7 @@ export function ProductDocSectionContents({ api, scope, node, copy, locale, refr
   refresh: number;
   draft: boolean;
   starred: readonly string[];
+  createPage?: ReactNode;
   onOpen(node: ProductDocNode): void;
 }) {
   const { data, loading, error, retry, more } = useProductDocList(api, scope, { parentId: node.id, refresh, draft });
@@ -26,6 +28,7 @@ export function ProductDocSectionContents({ api, scope, node, copy, locale, refr
     <header className={styles.heading}>
       <ProductDocSectionIcon scope={scope} node={node} size={28} />
       <h1>{node.title}</h1>
+      {createPage}
     </header>
     {(!data || (error && !data.nodes.length))
       ? <ReadState copy={copy} status={error ? "error" : "loading"} retry={retry} />

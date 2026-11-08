@@ -8,9 +8,12 @@ import type { TmsHttpClient } from "../../../../../core/tms/transport/http";
 import { useRunImpact } from "../../application/run/useRunImpact";
 
 const scope = { workspaceId: "w", projectId: "p" };
+const linkedRun = { id: "r", configuration: { impactAnalysisId: "analysis-r", impactApproval: "approved" } };
+const ordinaryRun = { id: "ordinary", configuration: {} };
+type Run = { id: string; configuration: Record<string, string> };
 let state: { enabled: boolean; startBlocked: boolean; error: string | null };
-function Probe() {
-  const { enabled, impact, startBlocked } = useRunImpact(scope, true, false, "r");
+function Probe({ run = linkedRun }: { run?: Run }) {
+  const { enabled, impact, startBlocked } = useRunImpact(scope, true, false, run);
   state = { enabled, error: impact.error, startBlocked };
   return null;
 }
@@ -34,13 +37,17 @@ test("enabled automation keeps pending, errors and unapproved proposals blocked"
   const requests: AbortSignal[] = [];
   const http = { get: (_path: string, signal: AbortSignal) => { requests.push(signal); return new Promise((yes, no) => { resolve = yes; reject = no; }); } } as unknown as TmsHttpClient;
   const session = (capabilities?: string[]) => ({ kind: "managed" as const, label: "QA", subject: "qa", companyCapabilities: capabilities, signOut: async () => {} });
-  const harness = (capabilities?: string[]) => <TmsHttpClientProvider client={http}><TmsSessionProvider value={session(capabilities)}><Probe /></TmsSessionProvider></TmsHttpClientProvider>;
+  const harness = (capabilities?: string[], run?: Run) => <TmsHttpClientProvider client={http}><TmsSessionProvider value={session(capabilities)}><Probe run={run} /></TmsSessionProvider></TmsHttpClientProvider>;
   let renderer!: ReactTestRenderer;
   try {
     await act(async () => { renderer = create(harness(["core", "automation"])); });
     assert.equal(state.enabled, true); assert.equal(state.startBlocked, true);
     await act(async () => reject(new Error("server error")));
     assert.ok(state.error); assert.equal(state.startBlocked, true);
+    const priorRequestCount = requests.length;
+    await act(async () => renderer.update(harness(["core", "automation"], ordinaryRun)));
+    assert.equal(requests.length, priorRequestCount);
+    assert.equal(state.enabled, false); assert.equal(state.error, null); assert.equal(state.startBlocked, false);
     await act(async () => renderer.update(harness(["core"])));
     assert.equal(state.enabled, false); assert.equal(state.startBlocked, false);
     await act(async () => renderer.update(harness(["core", "automation"])));
@@ -54,6 +61,15 @@ test("enabled automation keeps pending, errors and unapproved proposals blocked"
     await act(async () => renderer.update(harness(undefined)));
     await act(async () => resolve({ data: [], nextCursor: null }));
     assert.equal(state.enabled, true); assert.equal(state.startBlocked, false);
+    await act(async () => renderer.update(harness(["core"], { id: "pending", configuration: {
+      impactAnalysisId: "analysis-pending", impactApproval: "pending",
+    } })));
+    assert.equal(state.enabled, false); assert.equal(state.startBlocked, true);
+    await act(async () => renderer.update(harness(["core", "automation"], { id: "failed-build", configuration: {
+      impactAnalysisId: "analysis-failed", impactApproval: "approved", impactBuildReady: "false",
+    } })));
+    await act(async () => resolve({ data: [], nextCursor: null }));
+    assert.equal(state.enabled, true); assert.equal(state.startBlocked, true);
   } finally { await act(async () => renderer?.unmount()); if (original) Object.defineProperty(globalThis, "React", original); else Reflect.deleteProperty(globalThis, "React"); }
 });
 

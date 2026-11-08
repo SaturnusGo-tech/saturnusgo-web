@@ -125,7 +125,7 @@ export function ProductDocsOverview({
   </section>;
 }
 
-export function ProductDocsDirectory({ scope, copy, locale, nodes, starred = [], onOpen, alongside }: {
+export function ProductDocsDirectory({ scope, copy, locale, nodes, starred = [], onOpen, alongside, showPagesHeading = true }: {
   scope: ProductDocScope;
   copy: ProductDocsCopy;
   locale: TmsLocale;
@@ -133,13 +133,14 @@ export function ProductDocsDirectory({ scope, copy, locale, nodes, starred = [],
   starred?: readonly string[];
   onOpen(node: ProductDocNode): void;
   alongside?: ReactNode;
+  showPagesHeading?: boolean;
 }) {
   const sectionsId = useId();
   const pagesId = useId();
   const labels = shelfCopy[locale];
   const sections = nodes.filter((node) => node.kind === "folder");
   const pages = nodes.filter((node) => node.kind === "page");
-
+  const PagesGroup = showPagesHeading ? "section" : "div";
   if (!nodes.length && !alongside) return null;
   return <div className={styles.directory}>
     {sections.length > 0 && <section className={styles.group} aria-labelledby={sectionsId}>
@@ -158,10 +159,10 @@ export function ProductDocsDirectory({ scope, copy, locale, nodes, starred = [],
     </section>}
     {(pages.length > 0 || alongside) && <div className={styles.overviewPages}
       data-split={pages.length > 0 && Boolean(alongside) || undefined}>
-      {pages.length > 0 && <section className={styles.group} aria-labelledby={pagesId}>
-        <h2 id={pagesId}>{labels.pages}</h2>
+      {pages.length > 0 && <PagesGroup className={styles.group} aria-labelledby={showPagesHeading ? pagesId : undefined}>
+        {showPagesHeading && <h2 id={pagesId}>{labels.pages}</h2>}
         <PageRows scope={scope} copy={copy} nodes={pages} starredIds={new Set(starred)} onOpen={onOpen} />
-      </section>}
+      </PagesGroup>}
       {alongside}
     </div>}
   </div>;

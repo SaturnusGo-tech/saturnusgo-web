@@ -17,6 +17,7 @@ type Props = {
   api: ProductDocsApi;
   scope: ProductDocScope;
   locale: TmsLocale;
+  projectName?: string;
   selection?: ProductDocSelection;
   onClose(): void;
   onOpenFull?(selection: ProductDocSelection): void;
@@ -32,7 +33,7 @@ export function ProductDocsPanel(props: Props) {
   </AnimatePresence></AppOverlay>;
 }
 
-function ArticlePanel({ api, scope, locale, selection, onClose, onOpenFull, trigger, contentRef }:
+function ArticlePanel({ api, scope, locale, projectName, selection, onClose, onOpenFull, trigger, contentRef }:
   Omit<Props, "selection"> & { selection: ProductDocSelection }) {
   const copy = productDocsCopy(locale);
   const panel = useRef<HTMLElement>(null);
@@ -44,7 +45,26 @@ function ArticlePanel({ api, scope, locale, selection, onClose, onOpenFull, trig
   const modal = present && !size.desktop;
 
   useLayoutEffect(() => {
-    panel.current?.focus({ preventScroll: true });
+    const element = panel.current;
+    if (!element) return;
+    const focusPanel = () => {
+      if (!element.contains(document.activeElement)) element.focus({ preventScroll: true });
+    };
+    const outgoing = document.activeElement?.closest('[role="dialog"][aria-modal="true"]');
+    if (!outgoing || outgoing === element || outgoing.contains(element)) {
+      focusPanel();
+      return;
+    }
+
+    // The outgoing drawer keeps its focus scope until the exit animation finishes.
+    let frame = 0;
+    const observer = new MutationObserver(() => {
+      if (outgoing.isConnected) return;
+      observer.disconnect();
+      frame = requestAnimationFrame(focusPanel);
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => { observer.disconnect(); cancelAnimationFrame(frame); };
   }, [selection.docId, selection.version, selection.sectionId]);
   useLayoutEffect(() => {
     if (panel.current) panel.current.inert = !present;
@@ -101,7 +121,7 @@ function ArticlePanel({ api, scope, locale, selection, onClose, onOpenFull, trig
     </header>
     <div className={styles.scroll}>
       {article.status === "ready"
-        ? <ProductDocArticle document={article.data} copy={copy} versionPinned={selection.version !== undefined} sectionId={selection.sectionId} />
+        ? <ProductDocArticle document={article.data} copy={copy} scope={scope} locale={locale} projectName={projectName} versionPinned={selection.version !== undefined} sectionId={selection.sectionId} />
         : <ReadState copy={copy} status={article.status} retry={article.retry} />}
     </div>
   </motion.aside>;

@@ -1,10 +1,7 @@
-import { Check, ChevronDown } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
-import type { KeyboardEvent, ReactNode } from "react";
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
+import { ChevronDown } from "lucide-react";
+import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import styles from "./caseMetadata.module.css";
-import popup from "../../../common/popup/caseFieldPopup.module.css";
-import { useMetadataPopover } from "./popover/useMetadataPopover";
-import { nextMetadataOption } from "./navigation/nextMetadataOption";
 
 export type MetadataOption<T extends string> = {
   value: T;
@@ -14,12 +11,7 @@ export type MetadataOption<T extends string> = {
 };
 
 export function MetadataSelect<T extends string>({
-  label,
-  value,
-  options,
-  onChange,
-  autoFocus,
-  autoOpen = false,
+  label, value, options, onChange, autoFocus, autoOpen = false,
 }: {
   label: string;
   value: T;
@@ -28,134 +20,29 @@ export function MetadataSelect<T extends string>({
   autoFocus?: boolean;
   autoOpen?: boolean;
 }) {
+  const trigger = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const rootRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  const menuId = useId();
-  const menuRef = useRef<HTMLDivElement>(null);
-  useMetadataPopover(open, triggerRef, menuRef);
-  const selectedIndex = Math.max(0, options.findIndex((option) => option.value === value));
-  const selected = options[selectedIndex] ?? options[0];
-
-  useEffect(() => { if (autoOpen) openAt(selectedIndex); }, [autoOpen]);
-
-  useEffect(() => {
-    if (!open) return;
-    const close = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
-    };
-    document.addEventListener("pointerdown", close);
-    return () => document.removeEventListener("pointerdown", close);
-  }, [open]);
-
-  function focusOption(index: number) {
-    setActiveIndex(index);
-    requestAnimationFrame(() => optionRefs.current[index]?.focus({ preventScroll: true }));
-  }
-
-  function openAt(index: number) {
+  useLayoutEffect(() => {
+    if (!autoOpen) return;
+    trigger.current?.focus({ preventScroll: true });
     setOpen(true);
-    focusOption(index);
-  }
-
-  function close(restoreFocus = true) {
-    setOpen(false);
-    if (restoreFocus) requestAnimationFrame(() => triggerRef.current?.focus());
-  }
-
-  function move(event: KeyboardEvent, key: "ArrowDown" | "ArrowUp" | "Home" | "End") {
-    event.preventDefault();
-    focusOption(nextMetadataOption(options.length, activeIndex, key));
-  }
-
-  return (
-    <div
-      className={styles.select}
-      ref={rootRef}
-      onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false);
-      }}
-    >
-      <button
-        ref={triggerRef}
-        type="button"
-        className={`${styles.trigger} ${popup.trigger} ${selected?.tone ?? ""}`}
-        aria-label={label}
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        aria-controls={menuId}
-        autoFocus={autoFocus}
-        onClick={() => {
-          if (open) close(false);
-          else openAt(selectedIndex);
-        }}
-        onKeyDown={(event) => {
-          if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-            event.preventDefault();
-            openAt(event.key === "ArrowDown" ? selectedIndex : options.length - 1);
-          }
-          if (event.key === "Escape" && open) {
-            event.preventDefault();
-            event.stopPropagation();
-            close();
-          }
-        }}
-      >
-        <span className={styles.triggerLabel}>{selected?.icon}{selected?.label}</span>
-        <ChevronDown size={13} aria-hidden="true" />
-      </button>
-      <div
-        id={menuId}
-        ref={menuRef}
-        popover="manual"
-        className={`${styles.menu} ${popup.panel}`}
-        role="listbox"
-        aria-label={label}
-        aria-hidden={!open}
-        inert={!open}
-        data-open={open}
-        onKeyDown={(event) => {
-          if (["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
-            move(event, event.key as "ArrowDown" | "ArrowUp" | "Home" | "End");
-          } else if (event.key === "Escape") {
-            event.preventDefault();
-            event.stopPropagation();
-            close();
-          } else if (event.key === "Tab") {
-            setOpen(false);
-          } else if (event.key.length === 1 && !event.metaKey && !event.ctrlKey && !event.altKey) {
-            const query = event.key.toLocaleLowerCase();
-            const index = options.findIndex((option, offset) => {
-              const candidate = options[(activeIndex + offset + 1) % options.length];
-              return candidate?.label.toLocaleLowerCase().startsWith(query);
-            });
-            if (index >= 0) focusOption((activeIndex + index + 1) % options.length);
-          }
-        }}
-      >
-        {options.map((option, index) => (
-          <button
-            key={option.value}
-            ref={(node) => { optionRefs.current[index] = node; }}
-            type="button"
-            role="option"
-            className={popup.option}
-            aria-selected={option.value === value}
-            tabIndex={open && index === activeIndex ? 0 : -1}
-            data-selected={option.value === value}
-            onFocus={() => setActiveIndex(index)}
-            onClick={() => {
-              onChange(option.value);
-              close();
-            }}
-          >
-            <span className={styles.optionLabel}>{option.icon}<span className={popup.optionLabel}>{option.label}</span></span>
-            {option.value === value && <Check size={13} aria-hidden="true" />}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
+  }, [autoOpen]);
+  const selected = options.find((option) => option.value === value) ?? options[0];
+  return <div className={styles.select}>
+    <Dropdown placement="bottom-start" isOpen={open} onOpenChange={setOpen}
+      shouldBlockScroll={false} classNames={{ base: styles.overlay, content: styles.menu }}>
+      <DropdownTrigger>
+        <Button ref={trigger} className={`${styles.trigger} ${selected?.tone ?? ""}`} aria-label={label} autoFocus={autoFocus} size="sm">
+          <span className={styles.triggerLabel}>{selected?.icon}{selected?.label}</span>
+          <ChevronDown size={13} aria-hidden="true" />
+        </Button>
+      </DropdownTrigger>
+      <DropdownMenu aria-label={label} selectionMode="single" disallowEmptySelection selectedKeys={[value]}
+        classNames={{ base: styles.listbox, list: styles.list }} itemClasses={{ base: styles.option, selectedIcon: styles.optionCheck }}>
+        {options.map((option) => <DropdownItem key={option.value} textValue={option.label} onPress={() => onChange(option.value)}>
+          <span className={styles.optionLabel}>{option.icon}<span>{option.label}</span></span>
+        </DropdownItem>)}
+      </DropdownMenu>
+    </Dropdown>
+  </div>;
 }

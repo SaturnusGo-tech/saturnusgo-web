@@ -14,6 +14,7 @@ type Props = {
   headingActions?: React.ReactNode;
   actionsInHeader?: boolean;
   disabled?: boolean;
+  hideEdit?: boolean;
   onEdit: (section: InspectorSection) => void;
   onCancel: (section: InspectorSection) => void;
   onSave: (section: InspectorSection) => void;
@@ -62,7 +63,7 @@ export function InspectorSectionView(props: Props) {
       <h3>{props.title}</h3>
       {props.count !== undefined && <span className={css.count}>{props.count}</span>}
       {props.headingActions}
-      {!props.persistentEditing && !active && <button
+      {!props.hideEdit && !props.persistentEditing && !active && <button
         ref={editButton}
         type="button"
         className={css.iconButton}

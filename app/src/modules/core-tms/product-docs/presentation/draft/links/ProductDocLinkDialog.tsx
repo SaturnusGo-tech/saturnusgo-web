@@ -1,18 +1,25 @@
 "use client";
 
+import { Button, Input, Popover, PopoverContent } from "@heroui/react";
+import { FreeSoloPopover } from "@heroui/popover";
+import { $isLinkNode } from "@lexical/link";
+import { useReducedMotion } from "framer-motion";
 import {
-  activeEditor$, ButtonWithTooltip, editorRootElementRef$, linkDialogState$, openLinkEditDialog$, readOnly$,
+  activeEditor$, editorRootElementRef$, linkDialogState$, openLinkEditDialog$, readOnly$,
   removeLink$, switchFromPreviewToLinkEdit$, updateLink$, type EditLinkDialog,
 } from "@mdxeditor/editor";
 import { Cell, useCellValues, useRealm } from "@mdxeditor/gurx";
-import { $getRoot, $getSelection } from "lexical";
-import { Check, Copy, ExternalLink, Link2, Pencil, Unlink } from "lucide-react";
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { createPortal } from "react-dom";
-import { writeClipboardText } from "../../../../../../shared/lib/clipboard";
+import { $getRoot, $getSelection, $isRangeSelection } from "lexical";
+import { Link2 } from "lucide-react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { TmsLocale } from "../../../../localization/model/locale";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
-import { useAnchoredPopup } from "../../../../presentation/common/popup/useAnchoredPopup";
+import { useProductDocLinkPreview } from "../../../state/links/useProductDocLinkPreview";
+import fields from "../../fields/product-doc-field.module.css";
+import { productDocFieldSlots } from "../../fields/productDocFieldSlots";
+import { ProductDocToolbarButton } from "../toolbar/menu/ProductDocToolbarMenu";
+import { ProductDocSelectedLinkPreview } from "./selected/ProductDocSelectedLinkPreview";
+import { ProductDocEditorLinkHover } from "./smart/ProductDocEditorLinkHover";
 import styles from "./link-dialog.module.css";
 
 const toolbarLinkAnchor$ = Cell<HTMLButtonElement | null>(null);
@@ -21,12 +28,16 @@ export function isProductDocLink(value: string) {
   return /^(?:https?:\/\/[^\s]+|mailto:[^\s]+|#[^\s]*|\/(?![\/\\])[^\s]*)$/i.test(value.trim());
 }
 
-export function ProductDocLinkTrigger({ locale }: { locale: TmsLocale }) {
+export function ProductDocLinkTrigger({ locale, restoreSelection }: {
+  locale: TmsLocale;
+  restoreSelection?: () => boolean;
+}) {
   const realm = useRealm();
+  const button = useRef<HTMLButtonElement>(null);
   const [editor, readOnly, state, anchor] = useCellValues(activeEditor$, readOnly$, linkDialogState$, toolbarLinkAnchor$);
-  const open = state.type === "edit" && Boolean(anchor);
-  return <ButtonWithTooltip title={locale === "ru" ? "Добавить ссылку" : "Create link"} aria-expanded={open}
-    aria-haspopup="dialog" disabled={readOnly} onPointerDown={(event) => event.preventDefault()}
+  const open = state.type === "edit" && Boolean(anchor && anchor === button.current);
+  return <ProductDocToolbarButton ref={button} isIconOnly label={locale === "ru" ? "Добавить ссылку" : "Create link"} aria-expanded={open}
+    aria-haspopup="dialog" isDisabled={readOnly} onPointerDown={(event) => event.preventDefault()}
     onClick={(event) => {
       if (open) {
         realm.pubIn({ [linkDialogState$]: { type: "inactive" }, [toolbarLinkAnchor$]: null });
@@ -34,83 +45,104 @@ export function ProductDocLinkTrigger({ locale }: { locale: TmsLocale }) {
         return;
       }
       if (!editor?.isEditable()) return;
-      if (!editor.getEditorState().read($getSelection)) {
+      if (restoreSelection) {
+        if (!restoreSelection()) return;
+      } else if (!editor.getEditorState().read($getSelection)) {
         editor.update(() => $getRoot().selectEnd(), { discrete: true });
       }
       realm.pub(toolbarLinkAnchor$, event.currentTarget);
       realm.pub(openLinkEditDialog$, undefined);
-    }}><Link2 size={16} aria-hidden="true" /></ButtonWithTooltip>;
+    }}><Link2 size={16} aria-hidden="true" /></ProductDocToolbarButton>;
 }
 
 export function ProductDocLinkDialog() {
   const realm = useRealm();
   const { locale } = useTmsLocale();
+  const reducedMotion = useReducedMotion();
   const ru = locale === "ru";
   const [state, toolbarAnchor, editor, popup, readOnly] = useCellValues(
     linkDialogState$, toolbarLinkAnchor$, activeEditor$, editorRootElementRef$, readOnly$,
   );
-  const root = useRef<HTMLDivElement>(null);
-  const panel = useRef<HTMLDivElement>(null);
+  const selection = useRef<HTMLSpanElement>(null!);
+  const returnFocus = useRef<HTMLElement | null>(null);
   const activeToolbar = state.type === "edit" && toolbarAnchor?.isConnected ? toolbarAnchor : null;
   const open = state.type !== "inactive" && Boolean(popup?.current) && !readOnly;
-  const close = useCallback(() => {
+  function close() {
     realm.pubIn({ [linkDialogState$]: { type: "inactive" }, [toolbarLinkAnchor$]: null });
-  }, [realm]);
-
-  const anchor = useMemo(() => ({
-    current: activeToolbar ?? (state.type === "inactive" ? null : {
-      contains: () => false,
-      getBoundingClientRect: () => {
-        const inline = editor?.getElementByKey(state.decoratorNodeKey ?? state.linkNodeKey);
-        if (inline) return inline.getBoundingClientRect();
-        const { left, top, width, height } = state.rectangle;
-        return new DOMRect(left, top, width, height);
-      },
-    }),
-  }), [activeToolbar, editor, state]);
-  useAnchoredPopup(open, false, root, anchor, panel, close, state.type === "preview" ? 278 : 336);
-  useLayoutEffect(() => {
-    if (!open || state.type !== "edit") return;
-    const input = panel.current?.querySelector<HTMLInputElement>('[name="url"]');
-    input?.focus({ preventScroll: true });
-    input?.select();
-  }, [open, state.type]);
-
-  function cancel() {
+  }
+  function restoreFocus() {
+    const target = returnFocus.current;
+    returnFocus.current = null;
+    // HeroUI retains its focus scope until the popover has exited.
+    if (target) requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (target.isConnected) target.focus({ preventScroll: true });
+    }));
+  }
+  function closeAndFocus(target: HTMLElement | null | undefined) {
+    returnFocus.current = target ?? null;
     close();
-    if (activeToolbar) activeToolbar.focus({ preventScroll: true });
-    else editor?.focus();
+    if (reducedMotion) restoreFocus();
   }
 
-  if (!open || !popup?.current) return <></>;
+  const anchor = useMemo(() => ({
+    get current() {
+      if (activeToolbar) return activeToolbar;
+      if (state.type === "inactive") return selection.current;
+      return editor?.getElementByKey(state.decoratorNodeKey ?? state.linkNodeKey) ?? selection.current;
+    },
+  }), [activeToolbar, editor, state]);
+
+  function cancel() {
+    closeAndFocus(activeToolbar && !activeToolbar.closest("[inert]") ? activeToolbar : editor?.getRootElement());
+  }
+
   const label = state.type === "preview" ? (ru ? "Ссылка" : "Link")
-    : state.initialUrl ? (ru ? "Редактировать ссылку" : "Edit link") : (ru ? "Добавить ссылку" : "Add link");
-  return createPortal(<div ref={root}>
-    <div ref={panel} role="dialog" aria-label={label} className={styles.panel} data-mode={state.type} popover="manual"
-      onBlur={(event) => {
-        if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget)
-          && !activeToolbar?.contains(event.relatedTarget)) close();
-      }}
-      onKeyDown={(event) => {
+    : state.type === "edit" && state.initialUrl ? (ru ? "Редактировать ссылку" : "Edit link")
+      : (ru ? "Добавить ссылку" : "Add link");
+  const rectangle = state.type === "inactive" ? undefined : state.rectangle;
+  const overlay = {
+    onOpenChange: (next: boolean) => { if (!next) close(); }, triggerRef: anchor,
+    portalContainer: popup?.current ?? undefined, placement: "bottom-start" as const, offset: 6, containerPadding: 10,
+    shouldBlockScroll: false, shouldCloseOnScroll: false, disableAnimation: Boolean(reducedMotion),
+    updatePositionDeps: [state.type], style: { zIndex: 160 },
+  };
+  return <>
+    <ProductDocEditorLinkHover blocked={state.type !== "inactive"} />
+    <Popover {...overlay} isOpen={open && state.type === "edit"} classNames={{ content: styles.panel }}
+      motionProps={{ onAnimationComplete: (phase) => { if (phase === "exit") restoreFocus(); } }}>
+      <span ref={selection} aria-hidden="true" className={styles.selectionAnchor}
+        style={rectangle && { left: rectangle.left, top: rectangle.top, width: rectangle.width, height: rectangle.height }} />
+      <PopoverContent aria-label={label} data-editor-dialog onKeyDownCapture={(event) => {
         if (event.key !== "Escape") return;
         event.preventDefault();
         event.stopPropagation();
         cancel();
       }}>
-      {state.type === "edit" ? <LinkEditor key={state.linkNodeKey} state={state} ru={ru} label={label}
-        onCancel={cancel} onSave={(values) => {
-          realm.pub(updateLink$, values);
-          close();
-          editor?.focus();
-        }} /> : <LinkPreview key={state.url} url={state.url} ru={ru}
+        {state.type === "edit" && <LinkEditor key={state.linkNodeKey} state={state} ru={ru} label={label}
+          onCancel={cancel} onSave={(values) => {
+            realm.pub(updateLink$, values);
+            editor?.update(() => {
+              const range = $getSelection();
+              if (!$isRangeSelection(range)) return;
+              const node = range.focus.getNode();
+              const link = $isLinkNode(node) ? node : node.getParent();
+              if ($isLinkNode(link)) link.selectNext(0, 0);
+            }, { discrete: true });
+            closeAndFocus(editor?.getRootElement());
+          }} />}
+      </PopoverContent>
+    </Popover>
+    {open && state.type === "preview" && <FreeSoloPopover {...overlay} isOpen disableDialogFocus shouldCloseOnBlur={false}
+      dialogProps={{ "aria-label": label }} classNames={{ content: `${styles.panel} ${styles.previewPanel}` }} data-editor-dialog>
+      <ProductDocSelectedLinkPreview key={state.url} href={isProductDocLink(state.url) ? state.url : undefined} url={state.url} ru={ru}
         onEdit={() => realm.pub(switchFromPreviewToLinkEdit$, undefined)}
         onRemove={() => {
           realm.pub(removeLink$, undefined);
           close();
           editor?.focus();
-        }} />}
-    </div>
-  </div>, popup.current);
+        }} />
+    </FreeSoloPopover>}
+  </>;
 }
 
 function LinkEditor({ state, ru, label, onCancel, onSave }: {
@@ -122,6 +154,12 @@ function LinkEditor({ state, ru, label, onCancel, onSave }: {
 }) {
   const input = useRef<HTMLInputElement>(null);
   const [error, setError] = useState(false);
+  const [address, setAddress] = useState(state.url);
+  const { preview } = useProductDocLinkPreview(isProductDocLink(address) ? address : undefined);
+  useLayoutEffect(() => {
+    input.current?.focus({ preventScroll: true });
+    input.current?.select();
+  }, []);
   return <form className={styles.form} onSubmit={(event) => {
     event.preventDefault();
     const values = new FormData(event.currentTarget);
@@ -131,53 +169,27 @@ function LinkEditor({ state, ru, label, onCancel, onSave }: {
       input.current?.focus({ preventScroll: true });
       return;
     }
-    onSave({ url, title: String(values.get("title") ?? ""), text: String(values.get("text") ?? "") });
+    onSave({ url, title: String(values.get("title") ?? ""), text: String(values.get("text") ?? "").trim() || preview?.title || "" });
   }}>
     <strong className={styles.heading}>{label}</strong>
-    <label className={styles.field}>{ru ? "Адрес ссылки" : "Link URL"}
-      <input ref={input} name="url" defaultValue={state.url} placeholder="https://example.com"
-        inputMode="url" autoComplete="off" spellCheck={false} aria-invalid={error || undefined}
-        onChange={() => { if (error) setError(false); }} />
-    </label>
-    {error && <p className={styles.error} role="alert">{ru ? "Введите корректный адрес ссылки." : "Enter a valid link URL."}</p>}
-    {state.withAnchorText && <label className={styles.field}>{ru ? "Текст ссылки" : "Display text"}
-      <input name="text" defaultValue={state.text} />
-    </label>}
-    <label className={styles.field}>{ru ? "Подсказка (необязательно)" : "Link title (optional)"}
-      <input name="title" defaultValue={state.title} />
-    </label>
+    <div className={fields.host} data-input-shell>
+      <Input ref={input} name="url" label={ru ? "Адрес ссылки" : "Link URL"} labelPlacement="outside-top"
+        classNames={productDocFieldSlots} defaultValue={state.url} placeholder="https://example.com"
+        inputMode="url" autoComplete="off" spellCheck="false" isInvalid={error} validationBehavior="aria"
+        errorMessage={error ? <span role="alert">{ru ? "Введите корректный адрес ссылки." : "Enter a valid link URL."}</span> : undefined}
+        onBlur={(event) => setAddress(event.target.value)} onValueChange={() => { if (error) setError(false); }} />
+    </div>
+    {state.withAnchorText && <div className={fields.host} data-input-shell>
+      <Input name="text" label={ru ? "Текст ссылки" : "Display text"} labelPlacement="outside-top"
+        classNames={productDocFieldSlots} defaultValue={state.text} placeholder={preview?.title || undefined} />
+    </div>}
+    <div className={fields.host} data-input-shell>
+      <Input name="title" label={ru ? "Подсказка (необязательно)" : "Link title (optional)"} labelPlacement="outside-top"
+        classNames={productDocFieldSlots} defaultValue={state.title} />
+    </div>
     <div className={styles.actions}>
-      <button type="button" onClick={onCancel}>{ru ? "Отмена" : "Cancel"}</button>
-      <button type="submit">{ru ? "Сохранить" : "Save"}</button>
+      <Button type="button" onPress={onCancel}>{ru ? "Отмена" : "Cancel"}</Button>
+      <Button type="submit">{ru ? "Сохранить" : "Save"}</Button>
     </div>
   </form>;
-}
-
-function LinkPreview({ url, ru, onEdit, onRemove }: {
-  url: string; ru: boolean; onEdit(): void; onRemove(): void;
-}) {
-  const [status, setStatus] = useState<"copied" | "failed">();
-  const external = /^https?:\/\//i.test(url);
-  const copyLabel = status === "copied" ? (ru ? "Ссылка скопирована" : "Link copied")
-    : status === "failed" ? (ru ? "Не удалось скопировать ссылку" : "Couldn't copy link")
-      : (ru ? "Скопировать ссылку" : "Copy link");
-  return <div className={styles.preview}>
-    <a href={isProductDocLink(url) ? url : undefined} target={external ? "_blank" : undefined}
-      rel={external ? "noreferrer" : undefined} title={url}>
-      <span>{url}</span>{external && <ExternalLink size={13} aria-hidden="true" />}
-    </a>
-    <button type="button" onPointerDown={(event) => event.preventDefault()} onClick={onEdit}
-      aria-label={ru ? "Редактировать ссылку" : "Edit link"} title={ru ? "Редактировать ссылку" : "Edit link"}>
-      <Pencil size={15} aria-hidden="true" />
-    </button>
-    <button type="button" aria-label={copyLabel} title={copyLabel}
-      onPointerDown={(event) => event.preventDefault()}
-      onClick={() => { void writeClipboardText(url).then(() => setStatus("copied"), () => setStatus("failed")); }}>
-      {status === "copied" ? <Check size={15} aria-hidden="true" /> : <Copy size={15} aria-hidden="true" />}
-    </button>
-    <button type="button" onPointerDown={(event) => event.preventDefault()} onClick={onRemove}
-      aria-label={ru ? "Удалить ссылку" : "Remove link"} title={ru ? "Удалить ссылку" : "Remove link"}>
-      <Unlink size={15} aria-hidden="true" />
-    </button>
-  </div>;
 }

@@ -1,4 +1,4 @@
-.page {
+:is(.page, .widgetTheme) {
   --ink: var(--falcon-text);
   --muted: var(--falcon-text-muted);
   --line: var(--falcon-border);
@@ -20,6 +20,8 @@
   --dash-warning: var(--falcon-warning);
   --dash-aborted: var(--falcon-discovery);
   --chart-grid: var(--falcon-border-subtle);
+}
+.page {
   container: dashboard-page / inline-size;
   width: 100%; min-width: 0; display: flex; flex-direction: column; gap: 16px;
   padding: 25px 28px 32px; color: var(--ink); background: var(--canvas); font-size: 13px;
@@ -281,7 +283,7 @@
 .chartPanel, .operationsPanel { border-radius: 18px; }
 
 /* The glass workspace is opt-in; ordinary dashboard themes retain their palette. */
-:global([data-appearance="glass"]) .page {
+:global([data-appearance="glass"]) :is(.page, .widgetTheme) {
   --ink: var(--falcon-text);
   --muted: var(--falcon-text-muted);
   --line: var(--falcon-border);

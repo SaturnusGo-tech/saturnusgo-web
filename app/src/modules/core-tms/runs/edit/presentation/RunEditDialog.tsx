@@ -9,8 +9,8 @@ import { RunPlatformBuildFields } from "../../builds/presentation/fields/RunPlat
 import { useRunEditor } from "../state/useRunEditor";
 import css from "./runEdit.module.css";
 
-export function RunEditDialog({ run, workspaceId, onClose, onSaved }: {
-  run: TestRunSummary; workspaceId: string; onClose: () => void; onSaved: (run: TestRunSummary) => void;
+export function RunEditDialog({ run, workspaceId, onClose, onSaved, inline = false }: {
+  run: TestRunSummary; workspaceId: string; onClose: () => void; onSaved: (run: TestRunSummary) => void; inline?: boolean;
 }) {
   const { locale } = useTmsLocale(); const ru = locale === "ru";
   const { closing, dismiss, panelRef } = useDrawerDismiss();
@@ -22,7 +22,7 @@ export function RunEditDialog({ run, workspaceId, onClose, onSaved }: {
     if (state.draftDirty || state.uncertain) setConfirm(action);
     else if (action === "close") close(); else void state.reload();
   };
-  return <AppOverlay><Modal drawer title={ru ? "Настройки прогона" : "Run settings"} subtitle={run.key}
+  const dialog = <Modal drawer title={ru ? "Настройки прогона" : "Run settings"} subtitle={run.key}
     panelClassName={css.panel} onClose={() => ask("close")}>
     <form className={css.form} ref={element => { panelRef.current = element?.parentElement ?? null; if (element) element.inert = closing; }} onSubmit={async event => { event.preventDefault(); const updated = await state.save(); if (updated) dismiss(() => onSaved(updated)); }}>
       <div className={css.content} aria-busy={state.phase === "loading" || state.busy}>
@@ -62,5 +62,6 @@ export function RunEditDialog({ run, workspaceId, onClose, onSaved }: {
         <button type="submit" className={css.save} disabled={state.phase !== "ready" || !state.editable || state.busy || state.conflict || state.platformBuilds.uploading || (!state.draftDirty && !state.uncertain)}>
           {state.busy ? (ru ? "Сохраняем…" : "Saving…") : state.uncertain ? (ru ? "Повторить сохранение" : "Retry saving") : (ru ? "Сохранить" : "Save")}</button></footer>
     </form>
-  </Modal></AppOverlay>;
+  </Modal>;
+  return inline ? dialog : <AppOverlay>{dialog}</AppOverlay>;
 }

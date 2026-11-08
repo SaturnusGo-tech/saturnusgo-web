@@ -15,8 +15,10 @@ export function useImpactList(scope: ImpactScope, enabled: boolean, ru: boolean,
   const [loading, setLoading] = useState(false); const [error, setError] = useState<string | null>(null);
   const [resolvedOwner, setResolvedOwner] = useState("");
   const load = useCallback(async (before?: string) => {
-    request.current?.abort(); if (!enabled) return;
-    const controller = new AbortController(); request.current = controller; setLoading(true); setError(null);
+    request.current?.abort();
+    setError(null);
+    if (!enabled) { setLoading(false); return; }
+    const controller = new AbortController(); request.current = controller; setLoading(true);
     try {
       const result = await api.list(scope, controller.signal, before, runId);
       if (controller.signal.aborted || current.current !== owner) return;

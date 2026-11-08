@@ -13,6 +13,9 @@ export function WorkspaceCasesStage({ model }: { model: WorkspaceModel }) {
   const capabilities = model.data.meta.authorization.capabilities;
   return <CasesView key={model.repositoryScope.aggregate ? model.repositoryScope.key : model.project?.id}
     repository={model.repositoryScope.aggregate ? <PortfolioRepository key={model.repositoryScope.key} model={model} /> : undefined}
+    projectName={model.repositoryScope.aggregate
+      ? model.portfolioRepository.catalog?.projects.find((project) => project.id === model.selectedCase?.projectId)?.name
+      : model.project?.name}
     folders={model.folders}
     onImport={() => model.setView("imports")}
     query={model.query}

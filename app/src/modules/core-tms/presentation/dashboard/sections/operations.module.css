@@ -2,7 +2,7 @@
 .heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 18px; padding: 17px 18px 8px; }
 .heading h2 { margin: 0; font-size: 14px; line-height: 1.5; font-weight: 600; }
 .panel .heading button { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 6px; padding: 0; border: 0; background: transparent; color: var(--muted); font-size: 11px; cursor: pointer; }
-.panel .heading button:hover { color: var(--action); }.heading strong { font-weight: 550; }
+.panel .heading button:not(:disabled):hover { color: var(--action); }.heading strong { font-weight: 550; }
 .summary { display: grid; gap: 14px; padding: 3px 18px 12px; }
 .summary > strong { font-size: 40px; line-height: 1; font-weight: 650; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
 .statuses { display: grid; grid-template-columns: minmax(0,1fr); gap: 0 24px; padding: 0 18px 15px; }

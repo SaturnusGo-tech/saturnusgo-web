@@ -1,8 +1,8 @@
 "use client";
 
-import { activeEditor$, ButtonWithTooltip, currentSelection$, readOnly$, rootEditor$, useCellValue } from "@mdxeditor/editor";
+import { activeEditor$, currentSelection$, readOnly$, rootEditor$, useCellValue } from "@mdxeditor/editor";
 import { $getNodeByKey, $getSelection, $isRangeSelection, type NodeKey } from "lexical";
-import { ChevronDown, Columns2, Copy, Trash2 } from "lucide-react";
+import { Columns2, Copy, Trash2 } from "lucide-react";
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { TmsLocale } from "../../../../../localization/model/locale";
@@ -12,6 +12,8 @@ import {
   $duplicateProductDocLayout, $findProductDocLayout, $insertProductDocLayout,
   $removeProductDocLayout, $resizeProductDocLayout,
 } from "../productDocLayouts";
+import { ProductDocTooltip } from "../../../overlay/ProductDocTooltip";
+import { ProductDocToolbarButton, ProductDocToolbarMenu } from "../../toolbar/menu/ProductDocToolbarMenu";
 import styles from "../layouts.module.css";
 
 type LayoutSelection = { key: NodeKey; count: ColumnCount; ratio: LayoutRatio };
@@ -37,9 +39,7 @@ export function ProductDocLayoutTools({ locale }: { locale: TmsLocale }) {
   const readOnly = useCellValue(readOnly$);
   const [selected, setSelected] = useState<LayoutSelection | null>(null);
   const [position, setPosition] = useState({ left: 0, top: 0 });
-  const [countMenu, setCountMenu] = useState(false);
   const controls = useRef<HTMLDivElement>(null);
-  const countButton = useRef<HTMLButtonElement>(null);
   const menuId = useId();
   const ru = locale === "ru";
   const layoutKey = selected?.key;
@@ -92,11 +92,10 @@ export function ProductDocLayoutTools({ locale }: { locale: TmsLocale }) {
   }, [canvas, editor, layoutKey]);
 
   useEffect(() => {
-    setCountMenu(false);
     if (!layoutKey || !editorRoot) return;
     const dismiss = (event: Event) => {
-      if (!(event.target instanceof Node) || controls.current?.contains(event.target)) return;
-      setCountMenu(false);
+      if (!(event.target instanceof Node) || controls.current?.contains(event.target)
+        || (event.target instanceof Element && event.target.closest(`[data-doc-toolbar-overlay="${menuId}"]`))) return;
       if (!editorRoot.contains(event.target)) setSelected(null);
     };
     document.addEventListener("pointerdown", dismiss);
@@ -105,7 +104,7 @@ export function ProductDocLayoutTools({ locale }: { locale: TmsLocale }) {
       document.removeEventListener("pointerdown", dismiss);
       document.removeEventListener("focusin", dismiss);
     };
-  }, [editorRoot, layoutKey]);
+  }, [editorRoot, layoutKey, menuId]);
 
   function insertLayout() {
     if (!editor) return;
@@ -120,7 +119,6 @@ export function ProductDocLayoutTools({ locale }: { locale: TmsLocale }) {
 
   function changeLayout(action: (layout: ProductDocLayoutNode) => void) {
     if (!editor || !layoutKey) return;
-    setCountMenu(false);
     editor.update(() => {
       const layout = $getNodeByKey(layoutKey);
       if (layout instanceof ProductDocLayoutNode) action(layout);
@@ -135,49 +133,44 @@ export function ProductDocLayoutTools({ locale }: { locale: TmsLocale }) {
   const countLabel = (count: ColumnCount) => ru ? `${count} ${count === 5 ? "колонок" : "колонки"}` : `${count} columns`;
 
   return <>
-    <ButtonWithTooltip title={ru ? "Колонки" : "Layouts"}
-      onMouseDown={(event) => event.preventDefault()} onClick={insertLayout}>
+    <ProductDocToolbarButton label={ru ? "Колонки" : "Layouts"} isIconOnly
+      onMouseDown={(event) => event.preventDefault()} onPress={insertLayout}>
       <Columns2 size={16} />
-    </ButtonWithTooltip>
+    </ProductDocToolbarButton>
     {canvas && selected ? createPortal(
       <div className={styles.layoutControls} style={position} ref={controls} role="group"
         data-editor-dialog aria-label={ru ? "Настройки колонок" : "Layout options"}
         onMouseDown={(event) => event.preventDefault()}>
-        <div className={styles.layoutCount} onKeyDown={(event) => {
-          if (countMenu && event.key === "Escape") {
-            event.stopPropagation();
-            setCountMenu(false);
-            countButton.current?.focus();
-          }
-        }}>
-          <button type="button" className={styles.layoutCountButton} ref={countButton} aria-expanded={countMenu}
-            aria-controls={countMenu ? menuId : undefined} onClick={() => setCountMenu(!countMenu)}>
-            {countLabel(selected.count)} <ChevronDown size={12} />
-          </button>
-          {countMenu ? <div className={styles.layoutCountOptions} id={menuId}>
-            {productDocColumnCounts.map((count) => <button key={count} type="button"
-              aria-pressed={selected.count === count}
-              onClick={() => changeLayout((layout) => $resizeProductDocLayout(layout, count))}>
-              <RatioIcon count={count} ratio="even" />
-              {countLabel(count)}
-            </button>)}
-          </div> : null}
-        </div>
+        <ProductDocToolbarMenu title={ru ? "Количество колонок" : "Column count"} menuId={menuId}
+          className={styles.layoutCountButton} selected={String(selected.count)}
+          items={productDocColumnCounts.map((count) => ({
+            value: String(count), label: countLabel(count),
+            content: <span className={styles.layoutCountChoice}><RatioIcon count={count} ratio="even" />{countLabel(count)}</span>,
+          }))} onChoose={(value) => {
+            const count = Number(value);
+            if (isProductDocColumnCount(count)) changeLayout((layout) => $resizeProductDocLayout(layout, count));
+          }}>
+          {countLabel(selected.count)}
+        </ProductDocToolbarMenu>
         {ratios.length ? <div className={styles.layoutRatioOptions}>
-          {ratios.map((ratio) => <button type="button" key={ratio} title={ratioLabels[locale][ratio]}
-            aria-label={ratioLabels[locale][ratio]} aria-pressed={selected.ratio === ratio}
-            onClick={() => changeLayout((layout) => layout.setRatio(ratio))}>
-            <RatioIcon count={selected.count} ratio={ratio} />
-          </button>)}
+          {ratios.map((ratio) => <ProductDocTooltip key={ratio} label={ratioLabels[locale][ratio]}>
+            <button type="button" aria-label={ratioLabels[locale][ratio]} aria-pressed={selected.ratio === ratio}
+              onClick={() => changeLayout((layout) => layout.setRatio(ratio))}>
+              <RatioIcon count={selected.count} ratio={ratio} />
+            </button>
+          </ProductDocTooltip>)}
         </div> : null}
-        <button type="button" className={styles.layoutDuplicate} title={ru ? "Дублировать колонки" : "Duplicate layout"}
-          aria-label={ru ? "Дублировать колонки" : "Duplicate layout"} onClick={() => changeLayout($duplicateProductDocLayout)}>
-          <Copy size={14} />
-        </button>
-        <button type="button" title={ru ? "Убрать колонки" : "Remove layout"}
-          aria-label={ru ? "Убрать колонки" : "Remove layout"} onClick={() => changeLayout($removeProductDocLayout)}>
-          <Trash2 size={14} />
-        </button>
+        <ProductDocTooltip label={ru ? "Дублировать колонки" : "Duplicate layout"}>
+          <button type="button" className={styles.layoutDuplicate}
+            aria-label={ru ? "Дублировать колонки" : "Duplicate layout"} onClick={() => changeLayout($duplicateProductDocLayout)}>
+            <Copy size={14} />
+          </button>
+        </ProductDocTooltip>
+        <ProductDocTooltip label={ru ? "Убрать колонки" : "Remove layout"}>
+          <button type="button" aria-label={ru ? "Убрать колонки" : "Remove layout"} onClick={() => changeLayout($removeProductDocLayout)}>
+            <Trash2 size={14} />
+          </button>
+        </ProductDocTooltip>
       </div>, canvas,
     ) : null}
   </>;

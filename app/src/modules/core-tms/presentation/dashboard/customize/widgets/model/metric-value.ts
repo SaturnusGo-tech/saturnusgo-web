@@ -3,7 +3,7 @@ import type { DashboardWorkbenchModel } from "../../../../../dashboards/workbenc
 import type { WorkbenchKind } from "../../../../../dashboards/workbench/model/workbench";
 
 type Metric = { value: number | null | undefined; percent?: boolean; drill?: DashboardDrill; kind?: WorkbenchKind };
-export function metricValue(key: string, snapshot: DashboardSnapshot | null, workbench: DashboardWorkbenchModel): Metric {
+export function metricValue(key: string, snapshot: DashboardSnapshot | null, workbench: Pick<DashboardWorkbenchModel, "snapshot">): Metric {
   const counts = workbench.snapshot?.counts; const freshness = workbench.snapshot?.freshness;
   const live: Record<string, number | undefined> = {
     activeRuns: counts?.activeRuns, readyForRetest: counts?.readyForRetest,

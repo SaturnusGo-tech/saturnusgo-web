@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { ProductDocFilters } from "../../domain/product-doc-taxonomy";
 import type { ProductDocList, ProductDocsApi, ProductDocScope } from "../../domain/product-docs";
 
 type Loaded = { key: string; data: ProductDocList; error: boolean; loading: boolean };
@@ -11,20 +12,22 @@ export function useProductDocList(api: ProductDocsApi, scope: ProductDocScope, o
   refresh: number;
   draft?: boolean;
   archived?: boolean;
-}) {
+  enabled?: boolean;
+} & ProductDocFilters) {
   const { workspaceId, projectId } = scope;
-  const { parentId, q, refresh, draft, archived } = options;
-  const key = JSON.stringify([workspaceId, projectId, parentId, q, draft, archived]);
+  const { parentId, q, refresh, draft, archived, productGroupId, productId, enabled = true } = options;
+  const key = JSON.stringify([workspaceId, projectId, parentId, q, draft, archived, productGroupId, productId]);
   const pageKey = JSON.stringify([key, refresh]);
   const [loaded, setLoaded] = useState<Loaded>();
   const [page, setPage] = useState<{ key: string; cursor?: string; attempt: number }>();
-  const active = loaded?.key === key ? loaded : undefined;
+  const active = enabled && loaded?.key === key ? loaded : undefined;
   const cursor = page?.key === pageKey ? page.cursor : undefined;
   const attempt = page?.key === pageKey ? page.attempt : undefined;
   useEffect(() => {
+    if (!enabled) return;
     const abort = new AbortController();
     setLoaded((previous) => previous?.key === key ? { ...previous, error: false, loading: true } : undefined);
-    api.list({ workspaceId, projectId }, { parentId, q, draft, archived, cursor, limit: 40, signal: abort.signal }).then((data) => {
+    api.list({ workspaceId, projectId }, { parentId, q, draft, archived, productGroupId, productId, cursor, limit: 40, signal: abort.signal }).then((data) => {
       if (abort.signal.aborted) return;
       setLoaded((previous) => {
         const previousNodes = cursor && previous?.key === key ? previous.data.nodes : [];
@@ -40,7 +43,7 @@ export function useProductDocList(api: ProductDocsApi, scope: ProductDocScope, o
       }));
     });
     return () => abort.abort();
-  }, [api, workspaceId, projectId, parentId, q, draft, archived, key, refresh, cursor, attempt]);
+  }, [api, workspaceId, projectId, parentId, q, draft, archived, productGroupId, productId, key, refresh, cursor, attempt, enabled]);
 
   return {
     data: active?.data,

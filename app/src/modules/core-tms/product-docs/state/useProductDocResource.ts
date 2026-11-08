@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 type Result<T> =
   | { status: "loading" }
-  | { status: "error" }
+  | { status: "error"; error: unknown }
   | { status: "ready"; data: T };
 
 export function useProductDocResource<T>(request: ((signal: AbortSignal) => Promise<T>) | undefined) {
@@ -21,8 +21,8 @@ export function useProductDocResource<T>(request: ((signal: AbortSignal) => Prom
       (data) => {
         if (!controller.signal.aborted) setResult({ request, attempt, value: { status: "ready", data } });
       },
-      () => {
-        if (!controller.signal.aborted) setResult({ request, attempt, value: { status: "error" } });
+      (error: unknown) => {
+        if (!controller.signal.aborted) setResult({ request, attempt, value: { status: "error", error } });
       },
     );
     return () => controller.abort();

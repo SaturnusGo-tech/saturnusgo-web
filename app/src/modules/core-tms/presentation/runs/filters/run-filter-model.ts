@@ -2,6 +2,13 @@ import type { RunRepositoryEntry } from "../../../runs/batches/model/repository/
 export type RunFilterState={owners:string[];projects:string[];results:string[];folders:string[];components:string[];
   types:string[];priorities:string[];statuses:string[];tags:string[];groups:string[];products:string[];productGroups:string[];regression:string[]};
 export const emptyRunFilters=():RunFilterState=>({owners:[],projects:[],results:[],folders:[],components:[],types:[],priorities:[],statuses:[],tags:[],products:[],productGroups:[],regression:[],groups:["project"]});
+export const runFilterValues = {
+  results: ["not_run", "in_progress", "passed", "failed", "blocked", "skipped"],
+  regression: ["true", "false"],
+  types: ["manual", "checklist", "automated"],
+  priorities: ["critical", "high", "medium", "low"],
+  statuses: ["ready", "draft", "deprecated"],
+};
 export function matchesRunFilters(row:RunRepositoryEntry, f:RunFilterState) {
   const c=row.testCase;const includes=(values:readonly string[],value:string)=>!values.length||values.includes(value);
   return includes(f.projects,row.projectId)&&includes(f.results,row.item.status)&&includes(f.owners,row.item.assigneeIdentityId??"unassigned")

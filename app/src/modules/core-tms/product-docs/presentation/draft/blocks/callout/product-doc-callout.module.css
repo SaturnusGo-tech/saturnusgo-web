@@ -1,19 +1,66 @@
 .callout {
-  --callout-tone: var(--falcon-link);
+  --doc-callout-padding: 12px;
+  --doc-callout-leading: 24px;
+  --callout-tone: var(--falcon-icon);
   box-sizing: border-box;
-  inline-size: fit-content;
-  min-inline-size: min(100%, 15ch);
-  max-inline-size: min(100%, 75ch);
-  margin-block: 12px;
-  padding: 9px 12px;
-  border-inline-start: 2px solid var(--callout-tone);
-  border-radius: 7px;
-  background: color-mix(in srgb, var(--callout-tone) 9%, var(--falcon-sidebar));
+  inline-size: min(100%, 75ch);
+  margin: 16px 0;
+  border: 1px solid var(--falcon-border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--falcon-surface) 72%, var(--falcon-selected));
   color: var(--falcon-text);
-  overflow-wrap: anywhere;
+  font-size: 15px;
+  line-height: 1.6;
 }
+
+.prose blockquote:not(:where([data-doc-dashboard] *)) {
+  --quote-rule: var(--falcon-border-strong);
+  position: relative;
+  max-inline-size: 75ch;
+  min-block-size: 24px;
+  margin: 16px 0;
+  padding-inline-start: 14px;
+  border-inline-start: 0;
+  color: inherit;
+}
+
+:global(html.dark) .prose blockquote:not(:where([data-doc-dashboard] *)) { --quote-rule: var(--falcon-doc-quote-rule); }
+
+.prose blockquote:not(:where([data-doc-dashboard] *))::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: 4px;
+  border-radius: 4px;
+  background: var(--quote-rule);
+  pointer-events: none;
+}
+
+.prose blockquote:not(:where([data-doc-dashboard] *)) > :last-child { margin-block-end: 0; }
+.callout[data-tone="info"] { --callout-tone: var(--falcon-info); }
 .callout[data-tone="tip"] { --callout-tone: var(--falcon-success); }
-.callout[data-tone="caution"] { --callout-tone: var(--falcon-warning, var(--falcon-danger)); }
+.callout[data-tone="caution"] { --callout-tone: var(--falcon-warning); }
 .callout[data-tone="danger"] { --callout-tone: var(--falcon-danger); }
-.callout :global([contenteditable]) { padding: 0; }
-.callout p:last-child { margin-block-end: 0; }
+.callout .content {
+  display: grid;
+  gap: 4px;
+  padding-block: var(--doc-callout-padding);
+  padding-inline: var(--doc-callout-padding) 14px;
+  overflow: visible;
+}
+.callout .caption {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--falcon-text);
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: 640;
+  user-select: none;
+}
+.caption svg { flex: none; color: var(--callout-tone); }
+.text { margin-inline-start: var(--doc-callout-leading); overflow-wrap: anywhere; }
+.text :global([contenteditable]) { padding: 0; background: transparent; }
+.callout .text > :last-child, .callout .text :global([contenteditable]) > :last-child { margin-block-end: 0; }

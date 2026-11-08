@@ -5,8 +5,8 @@ import { localizedLabel } from "../../../../localization/format/labels";
 import { isHistoricalRunChoice } from "../../../../runs/model/history/run-history";
 import css from "./run-header.module.css";
 
-export function RunSelector({ ru, choices, value, onChoose, onEdit, disabled }: {
-  ru: boolean; value: string; disabled: boolean; onEdit?: () => void;
+export function RunSelector({ ru, choices, value, onChoose, onEdit, disabled, fixedRun = false }: {
+  ru: boolean; value: string; disabled: boolean; fixedRun?: boolean; onEdit?: () => void;
   choices: { id: string; name: string; tags: string[]; runs: TestRunSummary[] }[]; onChoose: (id: string) => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -52,6 +52,14 @@ export function RunSelector({ ru, choices, value, onChoose, onEdit, disabled }: 
     const close = (event: PointerEvent) => { if (!root.current?.contains(event.target as Node)) setOpen(false); };
     document.addEventListener("pointerdown", close); return () => document.removeEventListener("pointerdown", close);
   }, [visible]);
+  if (fixedRun) return <div className={css.selector}>
+    <div className={css.current}>
+      <strong title={selected?.name}>{selected?.name}</strong>
+      {run && <span className={css.status} data-status={run.status}>{status}</span>}
+      {onEdit && <button type="button" className={css.edit} disabled={disabled} onClick={onEdit}
+        aria-label={ru ? "Редактировать прогон" : "Edit run"} title={ru ? "Редактировать прогон" : "Edit run"}><Pencil size={14} aria-hidden="true" /></button>}
+    </div>
+  </div>;
   return <div className={css.selector} ref={root} onKeyDown={event => {
     if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); setOpen(false); trigger.current?.focus(); }
   }}>

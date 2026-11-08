@@ -1,3 +1,12 @@
 .row { display: flex; align-items: center; flex-wrap: wrap; gap: 0 6px; min-height: 34px; border-bottom: 1px solid var(--falcon-border); }
-.row .tabs { min-width: 0; flex: 0 1 auto; border-bottom: 0; padding-right: 0; }
+.base { display: inline-flex; min-width: 0; }
+.tabs { display: flex; min-width: 0; gap: 2px; overflow-x: auto; scrollbar-width: none; padding-inline-start: 9px; }
+.tabs::-webkit-scrollbar { display: none; }
+.tabs .tab { position: relative; height: 34px; flex: none; padding: 0 7px; color: var(--falcon-text-muted); background: transparent; border: 0; cursor: pointer; font-size: 13px; }
+.tabs .tab:is(:hover, [data-selected="true"]) { color: var(--falcon-text); }
+.tab:focus-visible { outline: 1px solid var(--falcon-focus); outline-offset: -2px; }
+.cursor, .tab[data-selected="true"]:not(:has(.cursor))::after { position: absolute; inset: auto 6px 0; height: 2px; background: var(--falcon-action); pointer-events: none; }
+.tab[data-selected="true"]:not(:has(.cursor))::after { content: ""; }
+.content { display: inline-flex; align-items: center; gap: 6px; color: inherit; white-space: nowrap; }
+.badge { min-width: 18px; height: 18px; display: inline-grid; place-items: center; padding: 0 5px; color: var(--falcon-text-secondary); background: var(--falcon-control); border-radius: 9px; font-size: 10px; }
 .actions { display: inline-flex; align-items: center; margin-right: 12px; }

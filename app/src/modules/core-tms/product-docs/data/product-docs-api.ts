@@ -60,6 +60,9 @@ export function createProductDocsApi(http: TmsHttpClient): ProductDocsApi {
         docPath(scope, id) + "/comments", "POST", { body } satisfies Contract["ProductDocCommentInput"], options,
       )).data;
     },
+    getImpact: (scope, id, options) => read<Contract["ProductDocImpact"]>(
+      docPath(scope, id) + "/impact" + query(options), options?.signal,
+    ),
     listArticleCases: (scope, id, options) => read<Contract["ProductDocArticleCases"]>(
       docPath(scope, id) + "/cases" + query(options), options?.signal,
     ),

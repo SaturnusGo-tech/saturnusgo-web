@@ -81,6 +81,8 @@ html:has([data-falcon-shell]) {
   --falcon-media-text: #ffffff;
   --falcon-media-muted: #afafaf;
   --falcon-mask: #000000;
+  --falcon-doc-paper: #ffffff;
+  --falcon-doc-tooltip-shadow: rgb(0 0 0 / .16);
   color-scheme: light;
 }
 
@@ -158,6 +160,36 @@ html.dark:has([data-falcon-shell]) {
   --falcon-media-text: #ffffff;
   --falcon-media-muted: #afafaf;
   --falcon-mask: #000000;
+  /* Article surfaces and overlays share one palette across the editor and reader. */
+  --falcon-doc-surface: #121213;
+  --falcon-doc-panel: #1a1a1b;
+  --falcon-doc-text: #e5e6e8;
+  --falcon-doc-muted: #959597;
+  --falcon-doc-border: #282829;
+  --falcon-doc-control: #1c1c1d;
+  --falcon-doc-popover: #212122;
+  --falcon-doc-rich-block: #09090a;
+  --falcon-doc-hover: #232424;
+  --falcon-doc-selected: #323234;
+  --falcon-doc-popover-border: #303031;
+  --falcon-doc-link-border: #2c2d2f;
+  --falcon-doc-link-background: #171819;
+  --falcon-doc-link-text: #e3e4e6;
+  --falcon-doc-link-icon: #bfc2c7;
+  --falcon-doc-tooltip-border: #3c3d3f;
+  --falcon-doc-command-text: #fff;
+  --falcon-doc-command-icon: #9c9d9f;
+  --falcon-doc-command-shortcut: #aeb2be;
+  --falcon-doc-tooltip-divider: #303133;
+  --falcon-doc-quote-rule: #28282a;
+  --falcon-doc-code-gutter: #5a5a5d;
+  --falcon-doc-panel-outline: #29292c;
+  --falcon-doc-attachment-border: var(--falcon-doc-panel-outline);
+  --falcon-doc-attachment-viewport: #141415;
+  --falcon-doc-attachment-meta: #99999c;
+  --falcon-doc-attachment-icon: #5c5d5f;
+  --falcon-doc-attachment-focus: #5e6ad2;
+  --falcon-doc-attachment-shadow: #0007;
   color-scheme: dark;
 }
 

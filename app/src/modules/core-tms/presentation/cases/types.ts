@@ -13,6 +13,7 @@ import type { SharedStep, SharedStepSummary } from "../../shared-steps/model/sha
 
 export type CasesViewProps = {
   repository?: ReactNode;
+  projectName?: string;
   folders?: FolderResource;
   onImport?: () => void;
   query: string;

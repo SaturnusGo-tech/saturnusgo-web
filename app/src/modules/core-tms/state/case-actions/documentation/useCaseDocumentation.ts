@@ -16,8 +16,8 @@ export function useCaseDocumentation(http: TmsHttpClient, locale: TmsLocale, not
   const applied = useRef(new Map<string, string | null | undefined>());
   return {
     fields: {caseDocumentation, setCaseDocumentation, caseDocumentationRetry},
-    reset() {
-      setCaseDocumentation([]);
+    reset(requirements: readonly DraftProductDocRequirement[] = []) {
+      setCaseDocumentation(requirements);
       setCaseDocumentationRetry(false);
       applied.current.clear();
     },
@@ -32,7 +32,13 @@ export function useCaseDocumentation(http: TmsHttpClient, locale: TmsLocale, not
         return true;
       } catch (caught) {
         setCaseDocumentationRetry(true);
-        notify(formatTmsMutationFailure(toTmsMutationFailure(caught), locale === "ru"
+        const failure = toTmsMutationFailure(caught);
+        if (failure.code === "PRODUCT_DOC_NOT_FOUND") {
+          notify(locale === "ru" ? "Кейс сохранён. Выберите доступную статью или уберите устаревшую ссылку перед повторным сохранением."
+            : "The case was saved. Choose an available article or remove the outdated link before saving again.");
+          return false;
+        }
+        notify(formatTmsMutationFailure(failure, locale === "ru"
           ? "Кейс сохранён. Повторите сохранение, чтобы привязать оставшиеся статьи."
           : "The case was saved. Save again to link the remaining pages."));
         return false;

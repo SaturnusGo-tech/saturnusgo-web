@@ -1,4 +1,3 @@
-.root { position: relative; }
 .action {
   display: inline-flex;
   min-height: 30px;
@@ -15,28 +14,28 @@
   cursor: pointer;
 }
 .action:hover:not(:disabled) { background: var(--falcon-hover); }
-.action:focus-visible, .notice :is(a, button):focus-visible {
+.action:focus-visible, .panel :is(a, button):focus-visible {
   outline: 2px solid var(--falcon-focus);
   outline-offset: 2px;
 }
 .action:disabled { color: var(--falcon-text-secondary); cursor: default; }
 .action .mark { width: 18px; height: 18px; }
-.notice {
-  position: absolute;
-  z-index: 7;
-  inset-block-start: calc(100% + 8px);
-  inset-inline-end: 0;
-  width: min(264px, calc(100vw - 28px));
-  padding: 11px 12px;
+.panel {
+  display: grid;
+  gap: 10px;
+  width: min(290px, calc(100vw - 24px));
+  padding: 12px;
   border: 1px solid var(--falcon-border);
-  border-radius: 10px;
+  border-radius: 14px;
   background: var(--falcon-elevated);
   color: var(--falcon-text);
   box-shadow: var(--falcon-shadow-popover);
   font-size: 12px;
 }
-.notice p { margin: 0 17px 9px 0; line-height: 1.4; }
-.notice button, .notice a {
+.heading { display: flex; align-items: center; gap: 7px; }
+.heading strong { flex: 1; font-size: 14px; }
+.panel p { margin: 0; color: var(--falcon-text-secondary); line-height: 1.45; }
+.links :is(button, a), .dismiss {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -49,11 +48,25 @@
   text-decoration: none;
   cursor: pointer;
 }
-.notice :is(a, button):hover { background: var(--falcon-hover); }
-.notice .dismiss {
-  position: absolute;
-  inset-block-start: 5px;
-  inset-inline-end: 5px;
+.links :is(a, button):hover, .dismiss:hover { background: var(--falcon-hover); }
+.dismiss {
+  width: 26px;
+  height: 26px;
+  justify-content: center;
   color: var(--falcon-text-secondary);
 }
 .links { display: flex; flex-wrap: wrap; gap: 6px; }
+.primary {
+  justify-self: start;
+  min-height: 30px;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--falcon-action);
+  color: var(--falcon-on-action);
+  font: inherit;
+  font-weight: 550;
+  cursor: pointer;
+}
+.primary:hover:not(:disabled) { background: var(--falcon-action-hover); }
+.primary:disabled { opacity: .6; cursor: default; }

@@ -1,5 +1,6 @@
-import { createRootEditorSubscription$, realmPlugin, TableNode } from "@mdxeditor/editor";
+import { addTableCellEditorChild$, createRootEditorSubscription$, realmPlugin, TableNode } from "@mdxeditor/editor";
 import type { LexicalEditor } from "lexical";
+import { ProductDocTableEditing } from "./editing/ProductDocTableEditing";
 
 export function registerProductDocTableGuard(editor: LexicalEditor) {
   return editor.registerNodeTransform(TableNode, (table) => {
@@ -9,5 +10,8 @@ export function registerProductDocTableGuard(editor: LexicalEditor) {
 }
 
 export const productDocTableGuardPlugin = realmPlugin({
-  init(realm) { realm.pub(createRootEditorSubscription$, registerProductDocTableGuard); },
+  init(realm) {
+    realm.pub(createRootEditorSubscription$, registerProductDocTableGuard);
+    realm.pub(addTableCellEditorChild$, ProductDocTableEditing);
+  },
 });

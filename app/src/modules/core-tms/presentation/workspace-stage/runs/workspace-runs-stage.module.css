@@ -1,0 +1,29 @@
+.pane {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  container-type: inline-size;
+}
+
+.error {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 12px;
+  min-block-size: 160px;
+  block-size: 100%;
+  padding: 24px;
+  color: var(--falcon-text-secondary);
+  text-align: center;
+}
+.error p { margin: 0; }
+.error button {
+  padding: 7px 14px;
+  border: 1px solid var(--falcon-border);
+  border-radius: 999px;
+  background: var(--falcon-control);
+  color: var(--falcon-text);
+  cursor: pointer;
+}
+.error button:hover { background: var(--falcon-hover); }
+.error button:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 2px; }

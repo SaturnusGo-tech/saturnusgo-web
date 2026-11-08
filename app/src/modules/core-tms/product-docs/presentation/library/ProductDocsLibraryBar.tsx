@@ -1,15 +1,23 @@
 "use client";
 
+import { Input } from "@heroui/react";
 import { PanelLeft, Search } from "lucide-react";
-import type { ReactNode, RefObject } from "react";
+import type { RefObject } from "react";
+import type { ProductDocTaxonomy } from "../../domain/product-doc-taxonomy";
+import type { ProductDocScope } from "../../domain/product-docs";
+import { ProductDocTaxonomyFields } from "../taxonomy/control/ProductDocTaxonomyFields";
 import type { ProductDocsCopy } from "../../localization/copy";
 import { ProductDocsMark } from "../tree/empty/ProductDocsMark";
 import styles from "../product-docs.module.css";
+import searchStyles from "./library-search.module.css";
 
 export function ProductDocsLibraryBar({
-  copy, treeButton, treeId, treeOpen, query, onToggleTree, onHome, onSearch, onSearchClose, children,
+  copy, scope, treeButton, treeId, treeOpen, query, taxonomy, onTaxonomy, onToggleTree, onHome, onSearch, onSearchClose,
 }: {
   copy: ProductDocsCopy;
+  scope: ProductDocScope;
+  taxonomy: ProductDocTaxonomy;
+  onTaxonomy(value: ProductDocTaxonomy): void;
   treeButton: RefObject<HTMLButtonElement | null>;
   treeId: string;
   treeOpen: boolean;
@@ -18,7 +26,6 @@ export function ProductDocsLibraryBar({
   onHome(): void;
   onSearch(query: string): void;
   onSearchClose(): void;
-  children?: ReactNode;
 }) {
   return <header className={styles.libraryBar}>
     <div className={styles.libraryIdentity}>
@@ -28,12 +35,12 @@ export function ProductDocsLibraryBar({
         <ProductDocsMark /> <span>{copy.title}</span>
       </button>
     </div>
-    <label className={styles.librarySearch} data-input-shell>
-      <Search size={16} aria-hidden="true" />
-      <input type="search" aria-label={copy.search} placeholder={copy.search} value={query} maxLength={120}
-        onChange={(event) => onSearch(event.target.value)}
+    <div className={`${styles.librarySearch} ${searchStyles.search}`} role="search" aria-label={copy.search} data-input-shell>
+      <Input type="search" size="sm" aria-label={copy.search} placeholder={copy.search} value={query} maxLength={120}
+        classNames={{ base: searchStyles.input, inputWrapper: searchStyles.inputWrapper, innerWrapper: searchStyles.inputInner }}
+        startContent={<Search size={16} aria-hidden="true" />} onValueChange={onSearch}
         onKeyDown={(event) => { if (event.key === "Escape") onSearchClose(); }} />
-    </label>
-    {children}
+      <ProductDocTaxonomyFields scope={scope} value={taxonomy} onChange={onTaxonomy} filter />
+    </div>
   </header>;
 }

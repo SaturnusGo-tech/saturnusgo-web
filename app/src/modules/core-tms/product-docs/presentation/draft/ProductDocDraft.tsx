@@ -1,36 +1,41 @@
 "use client";
 
 import type { MDXEditorMethods } from "@mdxeditor/editor";
-import dynamic from "next/dynamic";
-import { useCallback, useLayoutEffect, useRef, useState, type RefObject } from "react";
+import { useImperativeHandle, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import type { TmsLocale } from "../../../localization/model/locale";
-import { productDocErrorCode } from "../../domain/errors/product-doc-response";
+import { productDocSaveError } from "./actions/navigation/productDocSaveError";
+import { emptyProductDocTaxonomy } from "../../domain/product-doc-taxonomy";
 import type { ProductDocDetail, ProductDocScope, ProductDocsApi } from "../../domain/product-docs";
 import { productDocsCopy, type ProductDocsCopy } from "../../localization/copy";
 import { productDocDraftKey, type ProductDocDraftBuffer } from "../../state/draft/draft-buffer";
-import chrome from "../product-docs.module.css";
+import { useProductDocMarkdownImport } from "./import/useProductDocMarkdownImport";
+import { useBufferedProductDocDraft } from "../../state/draft/buffer/useBufferedProductDocDraft";
+import { ProductDocReviewAction } from "../review/ProductDocReviewAction";
+import { emptyProductDocProperties } from "../../domain/properties/product-doc-properties";
+import { ProductDocDraftNavigation } from "./actions/navigation/ProductDocDraftNavigation";
+import { ProductDocPublishPreview } from "./impact/ProductDocPublishPreview";
 import { DraftActions } from "./actions/DraftActions";
-import { ProductDocTitleInput } from "./title/ProductDocTitleInput";
 import { changeTitleHighlights, trimTitleHighlights } from "./title/model/productDocTitleHighlights";
 import styles from "./editor.module.css";
-import { editorMarkdownToSections, readProductDocImport, sectionsToEditorMarkdown } from "./sections/productDocMarkdown";
+import { ProductDocDraftSurface } from "./surface/ProductDocDraftSurface";
+import { editorMarkdownToSections, sectionsToEditorMarkdown } from "./sections/productDocMarkdown";
+export type RequestNewProductDoc = (create: () => void) => void;
 
-const RichProductSection = dynamic(() => import("./RichProductSection"), {
-  ssr: false, loading: () => <div className={styles.editorLoading} aria-busy="true" />,
-});
-
-export function ProductDocDraft({ api, scope, document, copy, locale, drafts, editorActionsRef, onClose, onSaved, onPublished }: {
+export function ProductDocDraft({ api, scope, document, copy, locale, drafts, editorActionsRef, requestNewPageRef, projectName, subdocs, onClose, onSaved, onPublished }: {
   api: ProductDocsApi;
   scope: ProductDocScope;
   document: ProductDocDetail;
   copy: ProductDocsCopy;
+  projectName: string;
+  subdocs?: ReactNode;
   locale: TmsLocale;
   onClose(): void;
   onSaved(): void;
   onPublished(): void;
   drafts: ProductDocDraftBuffer;
   editorActionsRef?: RefObject<HTMLDivElement | null>;
+  requestNewPageRef?: RefObject<RequestNewProductDoc | null>;
 }) {
   const ru = locale === "ru";
   const folder = document.kind === "folder";
@@ -45,74 +50,56 @@ export function ProductDocDraft({ api, scope, document, copy, locale, drafts, ed
   const [titleHighlights, setTitleHighlights] = useState(initial?.titleHighlights ?? document.titleHighlights ?? []);
   const [sections, setSections] = useState(initial?.sections ?? document.sections);
   const [editorSeed, setEditorSeed] = useState(() => ({ markdown: sectionsToEditorMarkdown(sections), epoch: 0 }));
-  const [baseline, setBaseline] = useState(initial?.baseline
-    ?? { title: startingTitle, titleHighlights: document.titleHighlights, sections: document.sections, version: document.draftVersion });
+  const [taxonomy, setTaxonomy] = useState(initial?.taxonomy ?? document.taxonomy ?? emptyProductDocTaxonomy);
+  const [properties, setProperties] = useState(initial?.properties ?? document.properties ?? emptyProductDocProperties);
+  const { baseline, setBaseline, dirty, titleFormattingChanged, taxonomyChanged, draftTaxonomy,
+    propertiesChanged, draftProperties } = useBufferedProductDocDraft(
+    drafts, bufferKey, initial?.baseline ?? { title: startingTitle, titleHighlights: document.titleHighlights,
+      sections: document.sections, taxonomy: document.taxonomy, properties: document.properties, version: document.draftVersion },
+    { title, titleHighlights, sections, taxonomy, properties },
+  );
   const [validMarkup, setValidMarkup] = useState(true);
   const [busy, setBusy] = useState(false);
   const [mediaBusy, setMediaBusy] = useState(false);
   const [error, setError] = useState("");
+  const [discardOpen, setDiscardOpen] = useState(false);
+  const [nextPage, setNextPage] = useState<{ create: () => void }>();
+  const [previewVersion, setPreviewVersion] = useState<number>();
   const [saved, setSaved] = useState(false);
   const [actionsHost, setActionsHost] = useState<HTMLDivElement | null>(null);
   const [introId] = useState(() => crypto.randomUUID());
-  const importInput = useRef<HTMLInputElement>(null);
-  const readingFile = useRef(false);
-  const editorRef = useRef<MDXEditorMethods>(null);
-  const titleFormattingChanged = JSON.stringify(titleHighlights) !== JSON.stringify(baseline.titleHighlights ?? []);
-  const dirty = title !== baseline.title || titleFormattingChanged || JSON.stringify(sections) !== JSON.stringify(baseline.sections);
+  const editorRef = useRef<MDXEditorMethods>(null), savingRef = useRef(false);
   const withinLimits = sections.length <= 100 && sections.every((section) => section.title.length <= 200 && section.markdown.length <= 32_768)
     && sections.reduce((length, section) => length + section.markdown.length, 0) <= 262_144;
   const valid = Boolean(title.trim() && withinLimits && validMarkup);
   const canPublish = document.canPublish && valid && sections.some((section) => section.title.trim() || section.markdown.trim());
-
   const mounted = useRef(false);
   useLayoutEffect(() => {
     mounted.current = true;
     return () => { mounted.current = false; };
   }, []);
   useLayoutEffect(() => { setActionsHost(editorActionsRef?.current ?? null); }, [editorActionsRef]);
-  useLayoutEffect(() => {
-    if (!dirty) {
-      drafts.delete(bufferKey);
-      return;
-    }
-    const current = drafts.get(bufferKey);
-    if (current?.title !== title || current.titleHighlights !== titleHighlights || current.sections !== sections || current.baseline !== baseline) {
-      drafts.set(bufferKey, { title, titleHighlights, sections, baseline });
-    }
-  }, [baseline, bufferKey, dirty, drafts, sections, title, titleHighlights]);
+  const { importInput, readingFile, chooseFile, importText } = useProductDocMarkdownImport(editorRef, mounted, busy,
+    () => setError(""), () => setError(copy.importError));
 
   function changeMarkdown(markdown: string) {
     setSections(editorMarkdownToSections(markdown, introId));
     setSaved(false);
   }
-
-  const chooseFile = useCallback(() => importInput.current?.click(), []);
-
-  async function importText(file?: File) {
-    if (!file || busy || readingFile.current || !editorRef.current) return;
-    readingFile.current = true;
-    try {
-      const content = await readProductDocImport(file);
-      if (!mounted.current) return;
-      editorRef.current?.focus(() => editorRef.current?.insertMarkdown(content),
-        { defaultSelection: "rootEnd", preventScroll: true });
-      setError("");
-    } catch {
-      if (mounted.current) setError(copy.importError);
-    } finally {
-      readingFile.current = false;
-    }
-  }
-
-  async function save(publish: boolean) {
-    if (busy || mediaBusy || readingFile.current || !valid || (publish ? !canPublish : !dirty)) return;
+  async function save(publish: boolean, confirmedVersion?: number, useDefaultTitle = false) {
+    const titleToSave = title.trim() || (useDefaultTitle ? copy.untitledPage : "");
+    if (savingRef.current || mediaBusy || readingFile.current || !titleToSave || !withinLimits || !validMarkup
+      || (publish ? !canPublish : !dirty)) return false;
+    if (confirmedVersion !== undefined && (dirty || baseline.version !== confirmedVersion)) return false;
+    if (confirmedVersion !== undefined) setPreviewVersion(undefined);
+    savingRef.current = true;
     setBusy(true);
     setError("");
     setSaved(false);
     try {
       let expectedDraftVersion = baseline.version;
       if (dirty) {
-        const cleanTitle = title.trim();
+        const cleanTitle = titleToSave;
         const cleanTitleHighlights = trimTitleHighlights(title, titleHighlights);
         const cleanSections = sections.map((section) => ({ ...section, title: section.title.trim() }));
         const previouslyMarkedSections = new Set(baseline.sections.filter((section) => section.titleHighlights?.length)
@@ -121,80 +108,91 @@ export function ProductDocDraft({ api, scope, document, copy, locale, drafts, ed
           ? { ...section, titleHighlights: [] } : section);
         const saving = drafts.get(bufferKey);
         const result = await api.save(scope, document.id, { title: cleanTitle, sections: savedSections, expectedDraftVersion,
-          ...(titleFormattingChanged || titleHighlights.length ? { titleHighlights: cleanTitleHighlights } : {}) });
+          ...(titleFormattingChanged || titleHighlights.length ? { titleHighlights: cleanTitleHighlights } : {}),
+          ...(taxonomyChanged ? { taxonomy: draftTaxonomy } : {}),
+          ...(propertiesChanged ? { properties: draftProperties } : {}) });
         expectedDraftVersion = result.draftVersion;
         if (drafts.get(bufferKey) === saving) drafts.delete(bufferKey);
         if (mounted.current) {
           setTitle(cleanTitle);
           setTitleHighlights(cleanTitleHighlights);
           setSections(cleanSections);
-          setBaseline({ title: cleanTitle, titleHighlights: cleanTitleHighlights, sections: cleanSections, version: expectedDraftVersion });
-          if (!publish) onSaved();
+          setBaseline({ title: cleanTitle, titleHighlights: cleanTitleHighlights, sections: cleanSections, taxonomy, properties, version: expectedDraftVersion });
+          onSaved();
           setSaved(true);
           if (folder) onClose();
         }
       }
-      if (publish) {
-        await api.publish(scope, document.id, { expectedDraftVersion });
+      if (confirmedVersion !== undefined) {
+        await api.publish(scope, document.id, { expectedDraftVersion: confirmedVersion });
         if (mounted.current) onPublished();
-      }
+      } else if (publish && mounted.current) setPreviewVersion(expectedDraftVersion);
+      return true;
     } catch (failure) {
-      if (!mounted.current) return;
-      const code = productDocErrorCode(failure);
-      setError(code === "PRODUCT_DOC_STALE_DRAFT" ? copy.staleDraft
-        : code === "PRODUCT_DOC_PARENT_UNPUBLISHED" ? copy.unpublishedParent : copy.saveError);
+      if (!mounted.current) return false;
+      setError(productDocSaveError(failure, copy, locale));
+      return false;
     } finally {
+      savingRef.current = false;
       if (mounted.current) setBusy(false);
     }
+  }
+  useImperativeHandle(requestNewPageRef, () => (create) => {
+    if (savingRef.current || mediaBusy || readingFile.current || nextPage || previewVersion !== undefined) return;
+    if (dirty) {
+      setError("");
+      setNextPage({ create });
+    } else create();
+  });
+  function discardDraft() {
+    drafts.delete(bufferKey);
+    onClose();
   }
 
   const publishLabel = document.publishedVersion === null ? copy.publish : ru ? "Обновить" : "Update";
   const actions = <DraftActions copy={copy} locale={locale} scope={scope} folder={folder} busy={busy} mediaBusy={mediaBusy} saved={saved}
+    review={!folder && document.canEdit && <ProductDocReviewAction target={{ ...scope, docId: document.id }} locale={locale}
+      source={{ kind: "draft", draftVersion: baseline.version, dirty: dirty || !baseline.title.trim(),
+        canPublish: document.canPublish, sections: baseline.sections }} disabled={busy || mediaBusy} />}
     canPublish={!folder && document.canPublish} publishLabel={publishLabel}
     canSave={!busy && !mediaBusy && dirty && valid} canSubmit={!busy && !mediaBusy && canPublish}
     onSave={(publish) => { void save(publish); }}
-    onClose={() => {
-      if (dirty && !window.confirm(copy.unsaved)) return;
-      drafts.delete(bufferKey);
-      onClose();
-    }} />;
-  const heading = <div className={styles.pageHeading}>
-    <ProductDocTitleInput title={title} highlights={titleHighlights} locale={locale} label={folder ? copy.name : copy.untitled}
-      placeholder={folder ? copy.name : copy.untitledPage} disabled={busy} autoFocus={isFreshPage} folder={folder}
-      onTitle={(value) => {
-        setTitleHighlights((current) => changeTitleHighlights(title, value, current));
-        setTitle(value);
-        setSaved(false);
-      }}
-      onHighlight={(value) => { setTitleHighlights(value); setSaved(false); }}
-      onEnter={() => folder ? void save(false) : editorRef.current?.focus(undefined, { defaultSelection: "rootStart" })} />
-    {error && <p className={styles.error} role="alert">{error}</p>}
-    {!withinLimits && <p className={styles.error} role="alert">{copy.draftTooLong}</p>}
-  </div>;
+    onClose={() => { if (dirty) setDiscardOpen(true); else discardDraft(); }} />;
   return <div className={styles.draft} data-local-actions={!actionsHost || undefined}
     onKeyDown={(event) => {
       if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== "s") return;
       event.preventDefault();
-      void save(false);
+      if (!nextPage && !discardOpen && previewVersion === undefined) void save(false);
     }}>
     {actionsHost ? createPortal(actions, actionsHost) : <header className={styles.actionHeader}>{actions}</header>}
-    {folder ? heading : <>
-      <RichProductSection key={editorSeed.epoch} markdown={editorSeed.markdown} title={heading}
-        label={ru ? "Содержимое страницы" : "Page content"}
-        placeholder={ru ? "Начните писать или нажмите / для вставки" : "Start writing or press / to insert"}
-        locale={locale} disabled={busy} editorRef={editorRef}
-        onChange={changeMarkdown} onValidity={setValidMarkup} onImport={chooseFile} onMediaBusy={setMediaBusy} />
-      <input ref={importInput} type="file" hidden accept=".md,.markdown,.txt,text/markdown,text/plain"
-        onChange={(event) => { void importText(event.target.files?.[0]); event.target.value = ""; }} />
-      {!validMarkup && <div className={styles.recovery}>
-        <p className={styles.error} role="alert">{ru
-          ? "Редактор не смог прочитать часть форматирования. Предыдущий черновик остаётся доступен."
-          : "The editor couldn’t read some formatting. Your last complete draft is still available."}</p>
-        <button className={chrome.action} type="button" disabled={busy} onClick={() => {
-          setValidMarkup(true);
-          setEditorSeed((value) => ({ markdown: sectionsToEditorMarkdown(sections), epoch: value.epoch + 1 }));
-        }}>{copy.retry}</button>
-      </div>}
-    </>}
+    <ProductDocDraftNavigation copy={copy} ru={ru} busy={busy} error={error} discardOpen={discardOpen}
+      createPending={Boolean(nextPage)} canSave={withinLimits && validMarkup && !mediaBusy && (!folder || valid)}
+      validationError={!withinLimits ? copy.draftTooLong : !validMarkup ? copy.fixFormattingBeforeCreate : ""}
+      onKeep={() => setDiscardOpen(false)} onDiscard={discardDraft} onCancel={() => setNextPage(undefined)}
+      onSave={async () => {
+        if (!nextPage || !await save(false, undefined, !folder) || !mounted.current) return;
+        setNextPage(undefined);
+        nextPage.create();
+      }} />
+    {previewVersion !== undefined && <ProductDocPublishPreview api={api} scope={scope} docId={document.id} locale={locale}
+      version={previewVersion} isUpdate={document.publishedVersion !== null} onClose={() => setPreviewVersion(undefined)}
+      onPublish={(version) => { void save(true, version); }} />}
+    <ProductDocDraftSurface document={document} scope={scope} copy={copy} locale={locale} projectName={projectName}
+      subdocs={subdocs} busy={busy} isFreshPage={isFreshPage} title={title} titleHighlights={titleHighlights}
+      taxonomy={taxonomy} properties={properties} editorSeed={editorSeed} editorRef={editorRef} importInput={importInput}
+      withinLimits={withinLimits} validMarkup={validMarkup} error={error} onChange={changeMarkdown}
+      onValidity={setValidMarkup} onImport={chooseFile} onImportText={importText} onMediaBusy={setMediaBusy}
+      onTitle={(value) => {
+        setTitleHighlights((current) => changeTitleHighlights(title, value, current));
+        setTitle(value);
+        setSaved(false);
+      }} onHighlight={(value) => { setTitleHighlights(value); setSaved(false); }}
+      onFolderSave={() => { void save(false); }}
+      onTaxonomy={(value) => { setTaxonomy(value); setSaved(false); }}
+      onProperties={(value) => { setProperties(value); setSaved(false); }}
+      onRecover={() => {
+        setValidMarkup(true);
+        setEditorSeed((value) => ({ markdown: sectionsToEditorMarkdown(sections), epoch: value.epoch + 1 }));
+      }} />
   </div>;
 }

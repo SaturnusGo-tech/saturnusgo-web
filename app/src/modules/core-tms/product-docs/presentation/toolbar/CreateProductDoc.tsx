@@ -1,71 +1,70 @@
 "use client";
 
+import { addToast, Button, Input, Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
 import { Check, ListPlus, LoaderCircle, Plus, X } from "lucide-react";
-import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type FormEvent } from "react";
-import popup from "../../../presentation/common/popup/caseFieldPopup.module.css";
-import { useAnchoredPopup } from "../../../presentation/common/popup/useAnchoredPopup";
+import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import type { ProductDocNode, ProductDocsApi, ProductDocScope } from "../../domain/product-docs";
 import type { ProductDocsCopy } from "../../localization/copy";
 import styles from "../product-docs.module.css";
 import creation from "./folder-creation.module.css";
+import { ProductDocSubpageComposer, type ProductDocSubpageInput } from "./subdoc/ProductDocSubpageComposer";
 
-export function CreateProductDoc({ api, scope, parentId, kind, copy, onCreated, labelled = false }: {
+export function CreateProductDoc({ api, scope, parentId, kind, copy, onCreated, onCreatePage, disabled, labelled = false, pageLabel = copy.new, inline = false, iconOnly = false, projectName }: {
   api: ProductDocsApi;
   scope: ProductDocScope;
   parentId: string | null;
   kind: ProductDocNode["kind"];
   copy: ProductDocsCopy;
   onCreated(id: string, kind: ProductDocNode["kind"]): void;
+  onCreatePage?(create: () => void): void;
+  disabled?: boolean;
   labelled?: boolean;
+  pageLabel?: string;
+  inline?: boolean;
+  iconOnly?: boolean;
+  projectName?: string;
 }) {
   const [folderOpen, setFolderOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [saving, setSaving] = useState(false);
   const [failed, setFailed] = useState(false);
-  const operation = useRef<{ title: string; key: string } | null>(null);
+  const operation = useRef<{ payload: string; key: string } | null>(null);
   const currentRequest = useRef<AbortController | null>(null);
   const toggle = useRef<HTMLButtonElement>(null);
-  const control = useRef<HTMLDivElement>(null);
-  const panel = useRef<HTMLDivElement>(null);
-  const input = useRef<HTMLInputElement>(null);
   const formId = useId();
 
   useEffect(() => () => currentRequest.current?.abort(), []);
-
-  const closeFromOutside = useCallback(() => {
-    if (!currentRequest.current) setFolderOpen(false);
-  }, []);
-  useAnchoredPopup(folderOpen, false, control, toggle, panel, closeFromOutside, 250, 155);
-  useLayoutEffect(() => {
-    if (folderOpen) input.current?.focus({ preventScroll: true });
-  }, [folderOpen]);
 
   function dismiss() {
     setFolderOpen(false);
     setTitle("");
     setFailed(false);
     operation.current = null;
-    toggle.current?.focus({ preventScroll: true });
+    requestAnimationFrame(() => toggle.current?.focus({ preventScroll: true }));
   }
 
-  async function create(name: string) {
-    if (!name || currentRequest.current) return;
+  async function create(details: ProductDocSubpageInput) {
+    if (!details.title || currentRequest.current) return;
     const controller = new AbortController();
     currentRequest.current = controller;
-    if (operation.current?.title !== name) {
-      operation.current = { title: name, key: crypto.randomUUID() };
+    const input = { kind, parentId, ...details };
+    const payload = JSON.stringify(input);
+    if (operation.current?.payload !== payload) {
+      operation.current = { payload, key: crypto.randomUUID() };
     }
     setSaving(true);
     setFailed(false);
     try {
-      const result = await api.create(scope, { kind, parentId, title: name }, {
+      const result = await api.create(scope, input, {
         idempotencyKey: operation.current.key, signal: controller.signal,
       });
       if (controller.signal.aborted) return;
       dismiss();
       onCreated(result.id, kind);
     } catch {
-      if (!controller.signal.aborted) setFailed(true);
+      if (controller.signal.aborted) return;
+      if (kind === "page") addToast({ title: copy.createError, severity: "danger" });
+      else setFailed(true);
     } finally {
       currentRequest.current = null;
       if (!controller.signal.aborted) setSaving(false);
@@ -74,41 +73,55 @@ export function CreateProductDoc({ api, scope, parentId, kind, copy, onCreated, 
 
   function createFolder(event: FormEvent) {
     event.preventDefault();
-    void create(title.trim());
+    void create({ title: title.trim() });
   }
 
-  return <div ref={control} className={kind === "folder" ? styles.folderCreator : styles.toolbarControl} onKeyDown={(event) => {
-    if (event.key !== "Escape" || !folderOpen || saving) return;
-    event.preventDefault();
-    event.stopPropagation();
-    dismiss();
-  }}>
-    {kind === "page" ? <button type="button" className={`${styles.primary} ${styles.createPage} ${styles.hoverLine}`}
-      disabled={saving} onClick={() => void create(copy.untitledPage)}>
+  if (kind === "page") return <div className={styles.toolbarControl}>
+    <Button ref={toggle} size="sm" radius="full" isIconOnly={iconOnly} aria-label={pageLabel}
+      variant={inline ? "light" : undefined} disableRipple
+      className={iconOnly ? styles.iconButton : inline ? creation.subdocAction : styles.primary}
+      aria-expanded={inline ? folderOpen : undefined} aria-controls={inline && folderOpen ? formId : undefined}
+      isDisabled={saving || disabled} onPress={() => {
+        if (inline) { if (!folderOpen) setFolderOpen(true); return; }
+        const createPage = () => { void create({ title: copy.untitledPage }); };
+        if (onCreatePage) onCreatePage(createPage);
+        else createPage();
+      }}>
       {saving ? <LoaderCircle className={styles.loadingIcon} size={15} aria-hidden="true" /> : <Plus size={15} aria-hidden="true" />}
-      <span>{copy.new}</span>
-    </button> : <button ref={toggle} type="button" className={`${labelled ? styles.primary : styles.iconButton} ${styles.hoverLine}`}
-      aria-label={copy.newFolder} title={copy.newFolder} aria-haspopup="dialog"
-      aria-expanded={folderOpen} aria-controls={folderOpen ? formId : undefined} disabled={saving}
-      onClick={() => folderOpen ? dismiss() : setFolderOpen(true)}>
-      <ListPlus size={16} aria-hidden="true" />
-      {labelled && copy.newFolder}
-    </button>}
-    {kind === "page" && failed && <div className={styles.toolbarPopover} role="alert">{copy.createError}</div>}
-    {kind === "folder" && <div ref={panel} className={`${creation.panel} ${popup.panel}`} id={formId}
-      popover="manual" role="dialog" aria-label={copy.newFolder} data-open={folderOpen}
-      aria-hidden={!folderOpen} inert={!folderOpen}>
-      <form className={creation.form} onSubmit={createFolder}>
-        <input ref={input} className={`${styles.textInput} ${creation.input}`} type="text" aria-label={copy.name} value={title}
-          placeholder={copy.name} disabled={saving} maxLength={200} onChange={(event) => setTitle(event.target.value)} />
-        <button className={styles.iconButton} type="submit" aria-label={copy.createFolder} title={copy.createFolder}
-          disabled={saving || !title.trim()}>
-          {saving ? <LoaderCircle className={styles.loadingIcon} size={15} aria-hidden="true" /> : <Check size={16} aria-hidden="true" />}
-        </button>
-        <button className={styles.iconButton} type="button" aria-label={copy.cancel} title={copy.cancel} disabled={saving}
-          onClick={dismiss}><X size={16} aria-hidden="true" /></button>
-        {failed && <p className={styles.error} role="alert">{copy.createError}</p>}
-      </form>
-    </div>}
+      {!iconOnly && <span>{pageLabel}</span>}
+    </Button>
+    {inline && folderOpen && <ProductDocSubpageComposer id={formId} scope={scope} projectName={projectName} copy={copy}
+      disabled={saving} onCancel={dismiss} onCreate={(details) => {
+        const createPage = () => { void create(details); };
+        if (onCreatePage) onCreatePage(createPage);
+        else createPage();
+      }} />}
+  </div>;
+
+  return <div className={styles.folderCreator}>
+    <Popover isOpen={folderOpen} onOpenChange={(open) => {
+      if (currentRequest.current) return;
+      if (open) setFolderOpen(true); else dismiss();
+    }} placement="bottom-start" shouldBlockScroll={false} shouldCloseOnScroll={false}
+      classNames={{ base: creation.positioner, content: creation.panel }}>
+      <PopoverTrigger>
+        <Button ref={toggle} size="sm" isIconOnly={!labelled} variant="light"
+          className={`${labelled ? styles.primary : styles.iconButton} ${styles.hoverLine}`} aria-label={copy.newFolder} isDisabled={saving}>
+          <ListPlus size={16} aria-hidden="true" />{labelled && copy.newFolder}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent aria-label={copy.newFolder}>
+        <form className={creation.form} onSubmit={createFolder} data-input-shell>
+          <Input autoFocus type="text" aria-label={copy.name} value={title} placeholder={copy.name} isDisabled={saving} maxLength={200}
+            classNames={{ base: creation.input, inputWrapper: creation.inputWrapper, input: creation.inputElement }} onValueChange={setTitle} />
+          <Button size="sm" isIconOnly type="submit" className={styles.iconButton} aria-label={copy.createFolder} isDisabled={saving || !title.trim()}>
+            {saving ? <LoaderCircle className={styles.loadingIcon} size={15} aria-hidden="true" /> : <Check size={16} aria-hidden="true" />}
+          </Button>
+          <Button size="sm" isIconOnly type="button" className={styles.iconButton} aria-label={copy.cancel} isDisabled={saving}
+            onPress={dismiss}><X size={16} aria-hidden="true" /></Button>
+          {failed && <p className={styles.error} role="alert">{copy.createError}</p>}
+        </form>
+      </PopoverContent>
+    </Popover>
   </div>;
 }

@@ -1,18 +1,20 @@
 "use client";
 
+import { Button } from "@heroui/react";
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
 import { indentOnInput, syntaxHighlighting } from "@codemirror/language";
 import { Annotation, Compartment, EditorState, Transaction } from "@codemirror/state";
-import { EditorView, drawSelection, keymap, lineNumbers, placeholder } from "@codemirror/view";
+import { EditorView, drawSelection, keymap, lineNumbers } from "@codemirror/view";
 import { classHighlighter } from "@lezer/highlight";
 import { $isCodeBlockNode, readOnly$, useCellValue, useCodeBlockEditorContext, type CodeBlockEditorProps } from "@mdxeditor/editor";
 import { $createParagraphNode, $getNodeByKey, $setSelection } from "lexical";
-import { CodeXml, ListOrdered, Trash2, WrapText } from "lucide-react";
+import { ListOrdered, Trash2, WrapText } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef } from "react";
+import { ProductDocTooltip } from "../../overlay/ProductDocTooltip";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
-import { AnimatedSelect } from "../../../../presentation/common/select/AnimatedSelect";
-import { productDocCodeLanguage, productDocCodeLanguageValue, productDocLanguageOptions } from "./engine/codeLanguage";
+import { productDocCodeLanguage, productDocCodeLanguageValue } from "./engine/codeLanguage";
 import { productDocCodeSettings, updateProductDocCodeSetting } from "./engine/codeSettings";
+import { CodeLanguageMenu } from "./language/CodeLanguageMenu";
 import { CopySnippet } from "./snippet/CopySnippet";
 import styles from "./productDocBlocks.module.css";
 
@@ -105,7 +107,6 @@ export function ProductDocCodeEditor({ code, language, meta, nodeKey, focusEmitt
       attributesSlot.reconfigure([
         EditorState.readOnly.of(readOnly), EditorView.editable.of(!readOnly),
         EditorView.contentAttributes.of({ "aria-label": ru ? "Код" : "Code", spellcheck: "false" }),
-        placeholder(ru ? "Введите или вставьте код" : "Type or paste code"),
       ]),
     ] });
   }, [attributesSlot, readOnly, ru, settingsSlot, showNumbers, wrap]);
@@ -125,25 +126,28 @@ export function ProductDocCodeEditor({ code, language, meta, nodeKey, focusEmitt
 
   return <div className={styles.snippet} contentEditable={false} onKeyDown={(event) => event.stopPropagation()}>
     <div className={styles.snippetToolbar}>
-      <AnimatedSelect label={ru ? "Язык" : "Language"} value={currentLanguage}
-        options={productDocLanguageOptions(currentLanguage, ru ? "Обычный текст" : "Plain text")}
-        triggerIcon={<CodeXml size={13} aria-hidden="true" />}
-        onChange={(value) => setLanguage(value || (meta ? "text" : ""))}
-        className={styles.language} compact menuMinWidth={164} disabled={readOnly} />
+      <CodeLanguageMenu ru={ru} value={currentLanguage} disabled={readOnly}
+        onChange={(value) => setLanguage(value || (meta ? "text" : ""))} />
       <div className={styles.snippetActions}>
-        <button type="button" aria-label={ru ? "Номера строк" : "Line numbers"} title={ru ? "Номера строк" : "Line numbers"}
-          aria-pressed={showNumbers} disabled={readOnly} onClick={() => updateSetting("lineNumbers", !showNumbers)}><ListOrdered size={15} /></button>
-        <button type="button" aria-label={ru ? "Перенос строк" : "Wrap lines"} title={ru ? "Перенос строк" : "Wrap lines"}
-          aria-pressed={wrap} disabled={readOnly} onClick={() => updateSetting("wrap", !wrap)}><WrapText size={15} /></button>
+        <ProductDocTooltip label={ru ? "Номера строк" : "Line numbers"}>
+          <Button size="sm" isIconOnly aria-label={ru ? "Номера строк" : "Line numbers"} aria-pressed={showNumbers}
+            isDisabled={readOnly} onPress={() => updateSetting("lineNumbers", !showNumbers)}><ListOrdered size={15} aria-hidden="true" /></Button>
+        </ProductDocTooltip>
+        <ProductDocTooltip label={ru ? "Перенос строк" : "Wrap lines"}>
+          <Button size="sm" isIconOnly aria-label={ru ? "Перенос строк" : "Wrap lines"} aria-pressed={wrap}
+            isDisabled={readOnly} onPress={() => updateSetting("wrap", !wrap)}><WrapText size={15} aria-hidden="true" /></Button>
+        </ProductDocTooltip>
         <CopySnippet code={code} locale={locale} />
-        <button type="button" aria-label={ru ? "Удалить блок кода" : "Remove code block"} title={ru ? "Удалить блок кода" : "Remove code block"}
-          disabled={readOnly} onClick={() => parentEditor.update(() => {
-            const node = $getNodeByKey(nodeKey);
-            if (!node) return;
-            const next = node.getNextSibling() ?? node.insertAfter($createParagraphNode());
-            node.remove();
-            next.selectStart();
-          })}><Trash2 size={14} /></button>
+        <ProductDocTooltip label={ru ? "Удалить блок кода" : "Remove code block"}>
+          <Button size="sm" isIconOnly aria-label={ru ? "Удалить блок кода" : "Remove code block"}
+            isDisabled={readOnly} onPress={() => parentEditor.update(() => {
+              const node = $getNodeByKey(nodeKey);
+              if (!node) return;
+              const next = node.getNextSibling() ?? node.insertAfter($createParagraphNode());
+              node.remove();
+              next.selectStart();
+            })}><Trash2 size={14} aria-hidden="true" /></Button>
+        </ProductDocTooltip>
       </div>
     </div>
     <div className={styles.codeEditor} ref={container} />

@@ -1,28 +1,23 @@
 "use client";
 
-import { activeEditor$, closeImageDialog$, currentSelection$, openNewImageDialog$,
-  readOnly$, rootEditor$ } from "@mdxeditor/editor";
-import { Cell, useCellValues, useRealm } from "@mdxeditor/gurx";
-import { getNearestEditorFromDOMNode } from "lexical";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { useOptionalAttachmentClient } from "../../../../../attachments/presentation/context/AttachmentClientProvider";
+import { Button, Spinner } from "@heroui/react";
+import { activeEditor$, currentSelection$, readOnly$, rootEditor$ } from "@mdxeditor/editor";
+import { Cell, Signal, useCellValues, useRealm } from "@mdxeditor/gurx";
+import { getNearestEditorFromDOMNode, type RangeSelection } from "lexical";
+import { File as FileIcon, X } from "lucide-react";
+import { useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useTmsLocale } from "../../../../../localization/context/useTmsLocale";
-import { useProductDocsWorkspace } from "../../../../composition/context/ProductDocsContext";
-import { imageAttachmentReference } from "../codec/productDocImageReference";
-import { captureImageTarget, insertProductDocImages, type ProductDocImageTarget } from "../insertion/productDocImageInsertion";
+import { attachmentFileName, maxProductDocAttachmentBytes, productDocAttachmentAccept, productDocMediaAccept } from "../../../../domain/attachments/productDocAttachment";
+import { useUploadProductDocAttachment } from "../../../../state/attachments/useProductDocAttachment";
+import { formatAttachmentSize } from "../../../../domain/attachments/formatAttachmentSize";
+import attachmentStyles from "../../../attachments/product-doc-attachment.module.css";
+import { ProductDocEmbedContext } from "../../../embeds/context/productDocEmbedContext";
+import { captureImageTarget, insertProductDocAttachments, insertProductDocImages, type ProductDocImageTarget } from "../insertion/productDocImageInsertion";
 import { directImageLink } from "../productDocImageSource";
 import styles from "../image.module.css";
 
-const types = ["image/png", "image/jpeg", "image/webp", "image/gif"] as const;
-const maxBytes = 25 * 1024 * 1024;
-const byExtension = { png: types[0], jpg: types[1], jpeg: types[1], webp: types[2], gif: types[3] } as const;
 export const productDocMediaBusyCallback$ = Cell<((pending: boolean) => void) | undefined>(undefined);
-
-function fileMime(file: File) {
-  return file.type
-    ? types.find((type) => type === file.type)
-    : byExtension[file.name.split(".").pop()?.toLowerCase() as keyof typeof byExtension];
-}
+export const productDocOpenAttachmentPicker$ = Signal<RangeSelection | null | void | { mediaOnly: true; selection?: RangeSelection | null }>();
 
 function dropRange(event: DragEvent) {
   const point = document.caretPositionFromPoint?.(event.clientX, event.clientY);
@@ -41,69 +36,65 @@ export function ProductDocImageInput() {
   const input = useRef<HTMLInputElement>(null);
   const target = useRef<ProductDocImageTarget>(null);
   const request = useRef<AbortController>(null);
-  const [pending, setPending] = useState(false);
+  const [pending, setPending] = useState<{ name: string; size: number } | null>(null);
   const [error, setError] = useState<"format" | "size" | "count" | "upload" | null>(null);
-  const client = useOptionalAttachmentClient();
-  const scope = useProductDocsWorkspace()?.scope;
-  const projectId = scope?.projectId;
-  const workspaceId = scope?.workspaceId;
-  const ru = useTmsLocale().locale === "ru";
+  const scope = useContext(ProductDocEmbedContext);
+  const uploadAttachment = useUploadProductDocAttachment(scope);
+  const { locale, languageTag } = useTmsLocale();
+  const ru = locale === "ru";
 
   useEffect(() => {
-    setPending(false);
+    setPending(null);
     return () => {
       if (!request.current) return;
       request.current.abort();
       request.current = null;
       realm.getValue(productDocMediaBusyCallback$)?.(false);
     };
-  }, [realm, workspaceId, projectId]);
+  }, [realm, scope]);
   useEffect(() => { if (readOnly) request.current?.abort(); }, [readOnly]);
 
   const upload = useCallback(async (files: File[], position: ProductDocImageTarget) => {
     if (request.current || !files.length) return;
     setError(null);
+    const attachments = files.map((file) => ({ file, name: attachmentFileName(file) }));
     if (files.length > 20) { setError("count"); return; }
-    if (files.some((file) => !fileMime(file))) { setError("format"); return; }
-    if (files.some((file) => file.size < 1 || file.size > maxBytes)) { setError("size"); return; }
-    if (!client || !projectId) { setError("upload"); return; }
+    if (attachments.some(({ name }) => !name)) { setError("format"); return; }
+    if (files.some((file) => file.size < 1 || file.size > maxProductDocAttachmentBytes)) { setError("size"); return; }
+    if (!uploadAttachment) { setError("upload"); return; }
     const controller = new AbortController();
     request.current = controller;
-    setPending(true);
     realm.getValue(productDocMediaBusyCallback$)?.(true);
     const uploaded: string[] = [];
     try {
-      for (const file of files) {
-        controller.signal.throwIfAborted();
-        const result = await client.upload({
-          projectId, owner: { kind: "project", projectId }, kind: "screenshot", mimeType: fileMime(file)!,
-          file, operationKey: "doc-image:" + crypto.randomUUID(), signal: controller.signal,
-        });
-        if (result.status !== "ready") throw new Error("Image upload is incomplete");
-        uploaded.push(imageAttachmentReference(result.id));
+      for (const { file, name } of attachments) {
+        if (controller.signal.aborted || !name) break;
+        setPending({ name, size: file.size });
+        try { uploaded.push(await uploadAttachment(file, name, crypto.randomUUID(), controller.signal)); }
+        catch { if (!controller.signal.aborted) setError("upload"); }
       }
-    } catch {
-      if (!controller.signal.aborted) setError("upload");
     } finally {
-      try {
-        if (!controller.signal.aborted) insertProductDocImages(position, uploaded);
-      } finally {
+      try { if (!controller.signal.aborted) insertProductDocAttachments(position, uploaded); }
+      finally {
         if (request.current === controller) {
           request.current = null;
-          setPending(false);
+          setPending(null);
           realm.getValue(productDocMediaBusyCallback$)?.(false);
         }
       }
     }
-  }, [client, projectId, realm]);
+  }, [realm, uploadAttachment]);
 
-  useLayoutEffect(() => realm.sub(openNewImageDialog$, () => {
+  useLayoutEffect(() => realm.sub(productDocOpenAttachmentPicker$, (requestOptions) => {
     const editor = realm.getValue(activeEditor$) ?? root;
-    if (editor?.isEditable() && !request.current) {
-      target.current = captureImageTarget(editor, realm.getValue(currentSelection$));
-      input.current?.click();
+    if (editor && editor === root && editor.isEditable() && !request.current && input.current) {
+      const mediaOnly = requestOptions && "mediaOnly" in requestOptions;
+      const selection = mediaOnly ? requestOptions.selection : requestOptions;
+      target.current = selection ? { editor, selection: selection.clone() }
+        : captureImageTarget(editor, realm.getValue(currentSelection$));
+      input.current.accept = mediaOnly ? productDocMediaAccept : productDocAttachmentAccept;
+      input.current.click();
     }
-    realm.pub(closeImageDialog$, undefined);
   }), [realm, root]);
 
   useLayoutEffect(() => {
@@ -119,19 +110,18 @@ export function ProductDocImageInput() {
       if (!files.length && !link) return;
       event.preventDefault();
       event.stopPropagation();
-      const position = captureImageTarget(editor);
-      if (link) insertProductDocImages(position, [link]);
-      else void upload(files, position);
+      if (link) insertProductDocImages(captureImageTarget(editor), [link]);
+      else if (root) void upload(files, captureImageTarget(root));
     }
     function drop(event: DragEvent) {
       const files = Array.from(event.dataTransfer?.files ?? []);
-      const editor = getNearestEditorFromDOMNode(event.target as Node) ?? root;
-      if (!files.length || !editor?.isEditable()) return;
+      if (!files.length || !root?.isEditable()) return;
       event.preventDefault();
       event.stopPropagation();
       const range = dropRange(event);
-      const inEditor = range && editor.getRootElement()?.contains(range.startContainer);
-      void upload(files, captureImageTarget(editor, null, inEditor ? range : null));
+      const editor = getNearestEditorFromDOMNode(event.target as Node);
+      const inEditor = editor === root && range && root.getRootElement()?.contains(range.startContainer);
+      void upload(files, captureImageTarget(root, null, inEditor ? range : null));
     }
     return root?.registerRootListener((element, previous) => {
       previous?.removeEventListener("paste", paste, true);
@@ -144,21 +134,39 @@ export function ProductDocImageInput() {
   }, [readOnly, root, upload]);
 
   const failure = {
-    format: ru ? "Выберите изображение PNG, JPEG, WebP или GIF." : "Choose a PNG, JPEG, WebP or GIF image.",
-    size: ru ? "Размер изображения должен быть от 1 байта до 25 МБ." : "Choose an image up to 25 MB.",
-    count: ru ? "Можно вставить до 20 изображений за раз." : "Insert up to 20 images at a time.",
-    upload: ru ? "Не удалось загрузить изображение. Попробуйте снова." : "Couldn't upload the image. Try again.",
+    format: ru ? "Выберите XLS, XLSX, DOCX, PDF, PNG, JPEG, HEIC, HEIF, WebP, GIF, MOV, MP3 или MP4."
+      : "Choose an XLS, XLSX, DOCX, PDF, PNG, JPEG, HEIC, HEIF, WebP, GIF, MOV, MP3 or MP4 file.",
+    size: ru ? "Выберите непустой файл до 25 МБ." : "Choose a non-empty file up to 25 MB.",
+    count: ru ? "Можно прикрепить до 20 файлов за раз." : "Attach up to 20 files at a time.",
+    upload: ru ? "Не все файлы удалось загрузить. Прикрепите их ещё раз." : "Some files couldn’t be uploaded. Attach them again.",
   };
   return <>
-    <input hidden ref={input} type="file" multiple accept={types.join(",")} onChange={(event) => {
+    <input hidden ref={input} type="file" multiple aria-label={ru ? "Прикрепить файл" : "Attach file"} accept={productDocAttachmentAccept} onChange={(event) => {
       const files = Array.from(event.target.files ?? []);
       event.target.value = "";
       if (target.current) void upload(files, target.current);
       target.current = null;
     }} />
-    {(pending || error) && <div className={styles.feedback} role={error ? "alert" : "status"}>
-      {pending ? (ru ? "Загрузка изображений…" : "Uploading images…") : error && failure[error]}
-      {!pending && <button type="button" onClick={() => setError(null)} aria-label={ru ? "Закрыть" : "Dismiss"}>×</button>}
+    {pending && <div className={`${attachmentStyles.track} ${attachmentStyles.upload}`} role="status">
+      <div className={attachmentStyles.file}>
+        <div className={attachmentStyles.caption}>
+          <FileIcon size={14} className={attachmentStyles.icon} aria-hidden="true" />
+          <div className={attachmentStyles.identity}>
+            <strong title={pending.name}>{pending.name}</strong>
+            <span>{formatAttachmentSize(pending.size, languageTag, ru)}</span>
+          </div>
+          <div className={attachmentStyles.uploadStatus}>
+            <Spinner size="sm" variant="dots" color="current" aria-hidden="true"
+              classNames={{ wrapper: attachmentStyles.uploadSpinner, dots: attachmentStyles.uploadDot }} />
+            {ru ? "Загрузка…" : "Uploading…"}
+          </div>
+        </div>
+      </div>
+    </div>}
+    {!pending && error && <div className={styles.feedback} role="alert">
+      {failure[error]}
+      <Button size="sm" variant="light" isIconOnly onPress={() => setError(null)} aria-label={ru ? "Закрыть" : "Dismiss"}>
+        <X size={14} aria-hidden="true" /></Button>
     </div>}
   </>;
 }

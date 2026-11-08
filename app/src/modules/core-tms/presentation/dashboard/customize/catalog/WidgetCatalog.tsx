@@ -17,13 +17,14 @@ const categories = [
   { key: "runs", icon: ChartNoAxesCombined }, { key: "defects", icon: Bug }, { key: "library", icon: Layers3 },
 ] as const;
 
-export function WidgetCatalog({ dashboardName, projectName, selected, onAdd, onBack, renderPreview }: {
+export function WidgetCatalog({ dashboardName, projectName, selected, onAdd, onBack, renderPreview, documentInsert }: {
   dashboardName: string;
   projectName?: string;
   selected: Set<string>;
   onAdd: (widgets: WidgetDefinition[]) => void;
   onBack: () => void;
   renderPreview?: (key: string) => ReactNode;
+  documentInsert?: { label: string; busy: boolean };
 }) {
   const { locale, t } = useTmsLocale();
   const copy = catalogCopy(locale);
@@ -48,8 +49,8 @@ export function WidgetCatalog({ dashboardName, projectName, selected, onAdd, onB
       detailPanel.current?.scrollIntoView({ block: "start", behavior: "instant" });
     });
   };
-  return <section ref={catalog} className={styles.catalog} aria-labelledby={titleId}>
-    <div className={styles.topbar}>
+  return <section ref={catalog} className={styles.catalog} data-document-insert={Boolean(documentInsert)} aria-labelledby={titleId}>
+    {!documentInsert && <div className={styles.topbar}>
       <button type="button" className={styles.back} onClick={onBack} title={dashboardName}>
         <ArrowLeft size={17} aria-hidden="true" /><span>{copy.back}</span>
       </button>
@@ -57,13 +58,14 @@ export function WidgetCatalog({ dashboardName, projectName, selected, onAdd, onB
         <span aria-live="polite">{copy.added} <strong>{addedCount}</strong></span>
         <button type="button" className={styles.returnButton} onClick={onBack}>{copy.done}</button>
       </div>
-    </div>
+    </div>}
     <header className={styles.heading}>
-      <div><h1 id={titleId} ref={heading} tabIndex={-1}>{t("dashboardLayout.catalog")}</h1>
-        <p>{copy.count(widgetCatalog.length)}</p></div>
+      {documentInsert ? <p id={titleId}>{copy.count(widgetCatalog.length)}</p>
+        : <div><h1 id={titleId} ref={heading} tabIndex={-1}>{t("dashboardLayout.catalog")}</h1>
+          <p>{copy.count(widgetCatalog.length)}</p></div>}
       <label className={styles.search} data-input-shell>
         <Search size={17} aria-hidden="true" />
-        <input type="search" value={search} onChange={(event) => setSearch(event.target.value)}
+        <input type="search" data-autofocus={documentInsert ? "" : undefined} value={search} onChange={(event) => setSearch(event.target.value)}
           placeholder={t("dashboardLayout.search")} aria-label={t("dashboardLayout.search")} />
       </label>
     </header>
@@ -77,9 +79,9 @@ export function WidgetCatalog({ dashboardName, projectName, selected, onAdd, onB
             <small>{key === "all" ? widgetCatalog.length : widgetCatalog.filter((widget) => widgetSection(widget.key) === key).length}</small>
           </button>)}
         </nav>
-        <button type="button" className={styles.addAll} disabled={!missing.length} onClick={() => onAdd(missing)}>
+        {!documentInsert && <button type="button" className={styles.addAll} disabled={!missing.length} onClick={() => onAdd(missing)}>
           <Plus size={18} aria-hidden="true" /><span>{copy.addAll} {missing.length || ""}</span>
-        </button>
+        </button>}
       </aside>
       <section className={styles.results} aria-label={copy.all}>
         <div className={styles.resultsHeading}>
@@ -88,14 +90,14 @@ export function WidgetCatalog({ dashboardName, projectName, selected, onAdd, onB
         </div>
         <div className={styles.entries}>
           {rows.map((widget) => <WidgetEntry key={widget.key} widget={widget} active={active?.key === widget.key}
-            added={selected.has(widget.key)} onSelect={() => selectWidget(widget.key)}
+            added={selected.has(widget.key)} addLabel={documentInsert?.label} busy={documentInsert?.busy} onSelect={() => selectWidget(widget.key)}
             onAdd={() => onAdd([widget])} renderPreview={renderPreview} />)}
         </div>
         {!rows.length && <div className={styles.noResults}><Search size={26} aria-hidden="true" />
           <p>{t("dashboardLayout.noMatches")}</p>
           <button type="button" onClick={() => { setSearch(""); setGroup("all"); }}>{copy.clear}</button></div>}
       </section>
-      {active && <WidgetDetails key={active.key} panelRef={detailPanel} widget={active} added={selected.has(active.key)}
+      {active && <WidgetDetails key={active.key} panelRef={detailPanel} widget={active} added={selected.has(active.key)} addLabel={documentInsert?.label} busy={documentInsert?.busy}
         projectName={projectName ?? dashboardName} onAdd={() => onAdd([active])}
         onSelectRelated={selectRelated} renderPreview={renderPreview} />}
     </div>

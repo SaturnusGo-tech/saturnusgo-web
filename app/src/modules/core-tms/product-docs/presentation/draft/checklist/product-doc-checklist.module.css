@@ -1,0 +1,8 @@
+.position {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  inset-inline-start: 0;
+  inset-block-start: calc((1lh - 18px) / 2);
+  user-select: none;
+}

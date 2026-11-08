@@ -8,7 +8,7 @@ import { queueCopy, runProgress } from "./progress/model";
 import { compactRunTitle } from "./title/compact-run-title";
 import styles from "../workbench.module.css";
 
-type Props = { queue: WorkbenchQueue; onOpenRow: (row: DashboardDrillRow) => void; detail?: boolean };
+type Props = { queue: WorkbenchQueue; onOpenRow?: (row: DashboardDrillRow) => void; detail?: boolean };
 
 export function WorkbenchRows({ queue, onOpenRow, detail = false }: Props) {
   const { locale, languageTag, t } = useTmsLocale();
@@ -24,18 +24,18 @@ export function WorkbenchRows({ queue, onOpenRow, detail = false }: Props) {
       const canContinue = progress && progress.completed < progress.total;
       const progressLabel = progress ? copy.completed(format.format(progress.completed), format.format(progress.total)) : "";
       return <li key={`${record.projectId}:${record.entity}:${record.id}`}>
-        <button type="button" className={`${styles.row} ${row.progress && !detail ? styles.runRow : ""}`} onClick={() => onOpenRow(record)}
+        <button type="button" disabled={!onOpenRow} className={`${styles.row} ${row.progress && !detail ? styles.runRow : ""}`} onClick={() => onOpenRow?.(record)}
           aria-label={`${canContinue ? copy.continue : copy.open}: ${record.key}. ${title}. ${progressLabel}`}>
           <div className={styles.rowTitle}>
             <span className={styles.recordKey}>{record.key}</span><strong>{title}</strong>
-            <ArrowUpRight size={14} aria-hidden="true" />
+            {onOpenRow && <ArrowUpRight size={14} aria-hidden="true" />}
           </div>
           {detail && <div className={styles.rowContext}>
             <span>{record.project}</span><span>{row.environmentName ?? t("dashboardWorkbench.noEnvironment")}</span>
             <span className={styles.build}>{row.buildReference || t("dashboardWorkbench.noBuild")}</span>
           </div>}
           {row.progress && <div className={styles.runExecution}>
-            <RunProgress progress={row.progress} action={<span className={styles.continue}>
+            <RunProgress progress={row.progress} action={onOpenRow && <span className={styles.continue}>
               {canContinue ? copy.continue : copy.open}<ChevronRight size={14} aria-hidden="true" />
             </span>} />
           </div>}

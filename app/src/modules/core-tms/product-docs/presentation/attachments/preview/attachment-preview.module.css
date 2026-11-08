@@ -1,0 +1,33 @@
+.pdf, .spreadsheet { background: var(--attachment-viewport, var(--falcon-surface)); min-inline-size: 0; }
+.pdf { position: relative; }
+.pdfViewport { position: relative; overflow: auto; max-block-size: min(480px, 66vh); padding: 8px; min-block-size: 90px; }
+.pdf[data-expanded] .pdfViewport { max-block-size: min(74vh, 1100px); }
+.paper { width: 100%; max-width: 960px; margin-inline: auto; }
+.paper canvas { display: block; width: 100%; height: auto; border-radius: 2px; background: var(--falcon-doc-paper); }
+.pdfLoading { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+.pager, .sheets { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 4px 8px; color: var(--falcon-text-secondary); font-size: 12px; }
+.pager { position: absolute; inset-block-end: 11px; inset-inline-start: 50%; translate: -50% 0;
+  white-space: nowrap; gap: 4px; padding: 3px; border: 1px solid var(--attachment-stroke); border-radius: 7px;
+  background: var(--attachment-surface); color: var(--attachment-title); opacity: 0; transition: opacity 140ms ease; }
+.pdf:is(:hover, :focus-within, [data-expanded]) .pager { opacity: 1; }
+.pager button, .sheets button { background: transparent; color: var(--falcon-text); min-width: 28px; padding: 3px 8px; border: 0; border-radius: 5px; }
+.pager button:hover, .sheets button:is(:hover, [aria-pressed="true"]) { background: var(--falcon-hover); }
+.sheets { justify-content: start; flex-wrap: wrap; }
+.image, .video { display: block; max-inline-size: 100%; inline-size: 100%; max-block-size: min(520px, 64vh); object-fit: contain; background: var(--attachment-viewport, var(--falcon-surface)); }
+.image { background: transparent; }
+.image[data-expanded], .video[data-expanded] { max-block-size: 76vh; }
+.video { aspect-ratio: 16 / 9; }
+.audio { display: block; inline-size: 100%; max-inline-size: 100%; height: 42px; color-scheme: inherit; }
+.document { max-block-size: 320px; overflow: auto; padding: 18px 22px; background: var(--falcon-surface); color: var(--falcon-text); overflow-wrap: anywhere; }
+.document[data-expanded], .spreadsheet[data-expanded] .cells { max-block-size: 70vh; }
+.document p { margin: 0 0 8px; font-size: 13px; line-height: 1.6; white-space: pre-wrap; }
+.document p:last-child { margin-bottom: 0; }
+.cells { max-block-size: 280px; overflow: auto; }
+.cells table { border-collapse: collapse; width: 100%; font-size: 12px; font-variant-numeric: tabular-nums; }
+.cells td, .cells th { border: 1px solid var(--falcon-border); padding: 5px 9px; text-align: start; white-space: nowrap; }
+.cells th { color: var(--falcon-text-secondary); background: var(--falcon-control); }
+.unavailable { display: flex; gap: 6px; align-items: center; margin: 0; padding: 12px; color: var(--falcon-text-secondary); font-size: 13px; }
+
+.previewNote { margin: 0; padding: 7px 10px; color: var(--falcon-text-secondary); font-size: 11px; }
+@media (hover: none) { .pager { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .pager { transition: none; } }

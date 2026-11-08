@@ -1,5 +1,8 @@
 "use client";
 
+import { ProductDocTooltip } from "../../overlay/ProductDocTooltip";
+
+import { Input } from "@heroui/react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useLexicalNodeSelection } from "@lexical/react/useLexicalNodeSelection";
 import { $isImageNode, type ImageNode, type imagePlugin } from "@mdxeditor/editor";
@@ -7,8 +10,10 @@ import { $getNodeByKey, HISTORY_PUSH_TAG } from "lexical";
 import { ImageIcon, Pencil, Trash2 } from "lucide-react";
 import { useRef, useState } from "react";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
+import fields from "../../fields/product-doc-field.module.css";
+import { productDocFieldSlots } from "../../fields/productDocFieldSlots";
 import { useProductDocImage } from "./productDocImageSource";
-import { ProductDocImageResize } from "./resize/ProductDocImageResize";
+import { ProductDocMediaResize } from "./resize/ProductDocImageResize";
 import styles from "./image.module.css";
 
 function ImageControls({ nodeKey, alt, width }: { nodeKey: string; alt: string; width?: number | "inherit" }) {
@@ -45,7 +50,7 @@ function ImageControls({ nodeKey, alt, width }: { nodeKey: string; alt: string; 
           <img ref={image} src={media.src} alt={alt} referrerPolicy="no-referrer" width={displayedWidth}
             onError={() => setFailed(media.src ?? undefined)} />
         </button>
-        <ProductDocImageResize image={image} ru={ru} onResize={setDraftWidth}
+        <ProductDocMediaResize media={image} label={ru ? "Изменить размер изображения" : "Resize image"} onResize={setDraftWidth}
           onCommit={(value) => updateNode((node) => node.setWidthAndHeight(value, "inherit"))} />
       </> : <div className={styles.placeholder} role="status">
         <ImageIcon size={16} aria-hidden="true" />
@@ -53,12 +58,12 @@ function ImageControls({ nodeKey, alt, width }: { nodeKey: string; alt: string; 
           : (ru ? "Изображение недоступно" : "Image unavailable")}
       </div>}
       <div className={styles.tools}>
-        <button type="button" title={altLabel} aria-label={altLabel} onClick={() => setEditAlt(true)}>
+        <ProductDocTooltip label={altLabel}><button type="button" aria-label={altLabel} onClick={() => setEditAlt(true)}>
           <Pencil size={15} aria-hidden="true" />
-        </button>
-        <button type="button" title={removeLabel} aria-label={removeLabel} onClick={() => updateNode((node) => node.remove())}>
+        </button></ProductDocTooltip>
+        <ProductDocTooltip label={removeLabel}><button type="button" aria-label={removeLabel} onClick={() => updateNode((node) => node.remove())}>
           <Trash2 size={15} aria-hidden="true" />
-        </button>
+        </button></ProductDocTooltip>
       </div>
     </div>
     {editAlt && <form className={styles.alt} onSubmit={(event) => {
@@ -68,11 +73,13 @@ function ImageControls({ nodeKey, alt, width }: { nodeKey: string; alt: string; 
       updateNode((node) => node.setAltText(value));
       setEditAlt(false);
     }}>
-      <input autoFocus name="alt" defaultValue={alt} maxLength={500} aria-label={altLabel} placeholder={altLabel}
-        onKeyDown={(event) => {
-          event.stopPropagation();
-          if (event.key === "Escape") setEditAlt(false);
-        }} />
+      <div className={`${fields.host} ${styles.altField}`} data-input-shell>
+        <Input autoFocus name="alt" defaultValue={alt} maxLength={500} aria-label={altLabel} placeholder={altLabel}
+          classNames={productDocFieldSlots} onKeyDown={(event) => {
+            event.stopPropagation();
+            if (event.key === "Escape") setEditAlt(false);
+          }} />
+      </div>
       <button type="submit">{ru ? "Сохранить" : "Save"}</button>
       <button type="button" onClick={() => setEditAlt(false)}>{ru ? "Отмена" : "Cancel"}</button>
     </form>}

@@ -30,6 +30,7 @@ import { EstimateBadge, PriorityBadge, TypeBadge } from "../cases/list/CaseBadge
 import styles from "../../tms.module.css";
 import runStyles from "./runs.module.css";
 type RunsViewProps = {
+  embedded?: boolean;
   executionPending?: boolean; emptyFiltered?: boolean;
   verificationContext?: ReactNode;
   onCreate?: () => void;
@@ -53,12 +54,13 @@ type RunsViewProps = {
   onArchive: (run: TestRunSummary) => void;
   onDefectCreated: (defect: Defect) => void;
 };
-export function RunsView({ executionPending = false, emptyFiltered = false, navigation, verificationContext, onCreate, onDirtyChange, workspaceId, offline, cases, selectedRun, items, scopeLoading, selectedItem, onSelectItem, onStepStatus, onStepActual, onSaveStepActual, onItemStatus, onUnblock, canExecute, startPending, startError, onStart, archivePending, onDefectCreated }: RunsViewProps) {
+export function RunsView({ embedded = false, executionPending = false, emptyFiltered = false, navigation, verificationContext, onCreate, onDirtyChange, workspaceId, offline, cases, selectedRun, items, scopeLoading, selectedItem, onSelectItem, onStepStatus, onStepActual, onSaveStepActual, onItemStatus, onUnblock, canExecute, startPending, startError, onStart, archivePending, onDefectCreated }: RunsViewProps) {
   const { locale, t } = useTmsLocale();
   const [reporting, setReporting] = useState(false);
   const [layout, setLayout] = useScenarioLayout();
   const [propertiesOpen, setPropertiesOpen] = useState(false);
-  const focus = useRunFocus(workspaceId);
+  const focus = useRunFocus(embedded ? `${workspaceId}:docs` : workspaceId);
+  const shell = useRef<HTMLDivElement>(null);
   const focused = Boolean(selectedRun && focus.focused);
   const restoreProperties = useRef(false);
   const navigationId = useId();
@@ -80,10 +82,10 @@ export function RunsView({ executionPending = false, emptyFiltered = false, navi
   const attemptWritable = actionWritable && !selectedItem?.archivedAt && canEditRunAttempt(selectedRun, selectedItem);
   useRunKeyboardShortcuts({
     items, selectedItem, selectedRun, runWritable: attemptWritable && !executionPending && dirtySteps.length === 0, navigationBlocked: scopeLoading || executionPending || dirtySteps.length > 0, onItemStatus, onSelectItem,
-    setReporting,
+    setReporting, embeddedScope: embedded ? shell : undefined,
   });
   const runNavigator = <div id={navigationId} className={`${runStyles.navigator} ${focusStyles.navigator}`} aria-hidden={focused} ref={element => { if (element) element.inert = focused; }}><div className={focusStyles.navigationContent}>{navigation}</div></div>;
-  const shellProps = { className: `${runStyles.shell} ${focusStyles.shell}`, "data-testid": "runs-view", "data-run-focused": focused, "data-focus-ready": focus.ready };
+  const shellProps = { ref: shell, className: `${runStyles.shell} ${focusStyles.shell}`, "data-testid": "runs-view", "data-run-focused": focused, "data-focus-ready": focus.ready };
   const panelLabel = focused ? (locale === "ru" ? "Показать список кейсов" : "Show case list") : (locale === "ru" ? "Скрыть список кейсов" : "Hide case list");
   const panelHandle = selectedRun && <button type="button" className={focusStyles.panelHandle} onClick={toggleFocus}
     aria-expanded={!focused} aria-controls={navigationId} aria-label={panelLabel} title={panelLabel} data-run-panel-handle>

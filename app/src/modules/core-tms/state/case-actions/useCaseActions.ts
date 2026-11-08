@@ -23,13 +23,13 @@ import {
 import type { useWorkspaceDerived } from "../workspace-derived/useWorkspaceDerived";
 import type { useWorkspaceState } from "../workspace/useWorkspaceState";
 import { reconcileMaintenance } from "../../test-cases/maintenance/model/case-maintenance";
+import type { DraftProductDocRequirement } from "../../product-docs/domain/product-docs";
 import { useCaseDocumentation } from "./documentation/useCaseDocumentation";
 
 function summaryOf(testCase: TestCase, etag: string): TestCaseSummary {
   const { current: _current, linkIds: _linkIds, ...summary } = testCase;
   return { ...summary, etag };
 }
-
 export function useCaseActions(
   state: ReturnType<typeof useWorkspaceState>,
   derived: ReturnType<typeof useWorkspaceDerived>,
@@ -60,13 +60,13 @@ export function useCaseActions(
     state.setSelectedCaseEtag(etag);
   }
 
-  function openNewCase(folderPath = state.selectedFolder || "/Unsorted") {
+  function openNewCase(folderPath = state.selectedFolder || "/Unsorted", requirement?: DraftProductDocRequirement) {
     if (state.isCaseSubmitting()) return;
     caseOperation.current = null;
     saveCheckpoint.current = null;
     setCaseAttachmentRecovery(false);
     setCaseRequiredFields(false);
-    documentation.reset();
+    documentation.reset(requirement ? [requirement] : []);
     state.setCaseDraft(createEmptyRevision(locale));
     state.setCaseFolderPath(folderPath);
     state.setEditing(false);

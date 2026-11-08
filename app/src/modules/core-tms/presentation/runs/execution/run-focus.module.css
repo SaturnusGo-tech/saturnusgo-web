@@ -56,14 +56,14 @@
   .rail.rail { width: 100%; padding: 22px 0 0; grid-template-columns: repeat(2, minmax(0, 1fr)); transition: transform var(--run-panel-duration) var(--run-panel-ease), visibility 0s; }
   [data-properties-open="false"] .rail { transform: translateX(100%); transition-delay: 0s, var(--run-panel-duration); }
 }
-@media (max-width: 720px) {
+@container (max-width: 720px) {
   .shell.shell { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 38dvh) minmax(0, 1fr) auto; transition: grid-template-rows var(--run-panel-duration) var(--run-panel-ease); }
   .shell.shell[data-run-focused="true"] { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 0dvh) minmax(0, 1fr) auto; }
   .navigationContent { width: 100%; height: 38dvh; }
   .panelHandle { left: 50%; top: 38dvh; transform: translate(-50%, -50%) rotate(-90deg); }
   [data-run-focused="true"] > .panelHandle { left: 50%; top: 6px; }
 }
-@media (max-width: 480px) { .rail.rail { grid-template-columns: minmax(0, 1fr); } }
+@container (max-width: 480px) { .rail.rail { grid-template-columns: minmax(0, 1fr); } }
 @media (prefers-reduced-motion: reduce) {
   .shell.shell, .overview.overview, .navigationContent, .rail.rail, .panelHandle, .panelHandle > svg { transition: none; }
 }

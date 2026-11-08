@@ -98,7 +98,7 @@
   border-radius: 7px;
   background: var(--falcon-elevated);
   color: var(--falcon-text);
-  box-shadow: 0 5px 18px rgb(0 0 0 / 14%);
+  box-shadow: var(--falcon-shadow-popover);
   font-size: 12px;
   line-height: 1.35;
 }
@@ -126,19 +126,7 @@
 .layoutControls button:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: -1px; }
 
 .layoutControls .layoutCountButton { padding-inline: 8px; }
-.layoutCount { position: relative; }
-.layoutCountOptions {
-  position: absolute;
-  inset: calc(100% + 8px) auto auto -4px;
-  display: grid;
-  min-width: max-content;
-  padding: 5px;
-  border: 1px solid var(--falcon-border);
-  border-radius: 7px;
-  background: var(--falcon-elevated);
-  box-shadow: 0 5px 18px rgb(0 0 0 / 14%);
-}
-.layoutCountOptions button { justify-content: flex-start; padding: 4px 10px; }
+.layoutCountChoice { display: inline-flex; align-items: center; gap: 8px; }
 
 .layoutRatioOptions {
   display: flex;

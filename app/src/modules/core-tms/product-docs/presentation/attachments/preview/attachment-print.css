@@ -1,0 +1,8 @@
+[data-falcon-pdf-print] { display: none; }
+@media print {
+  body[data-falcon-pdf-printing] { overflow: visible !important; height: auto !important; margin: 0 !important; background: var(--falcon-doc-paper) !important; }
+  body[data-falcon-pdf-printing] > :not([data-falcon-pdf-print]) { display: none !important; }
+  body[data-falcon-pdf-printing] > [data-falcon-pdf-print] { display: block; }
+  [data-falcon-pdf-print] img { display: block; inline-size: 100%; max-block-size: 96vh; object-fit: contain; break-inside: avoid; break-after: page; }
+  [data-falcon-pdf-print] img:last-child { break-after: auto; }
+}

@@ -23,6 +23,7 @@ function harness(reduced: boolean | null = false) {
       } };
       if (name === "framer-motion") return { useReducedMotion: () => reduced };
       if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en", languageTag: "en-US", t: (key: string) => key }) };
+      if (name.endsWith("/DashboardSegments")) return { DashboardSegments: "DashboardSegments", dashboardTabId: (id: string, key: string) => `${id}-${key}` };
       if (name.endsWith("/labels")) return { localizedLabel: (_locale: string, value: string) => value };
       if (name.endsWith(".css")) return { __esModule: true, default: new Proxy({}, { get: (_target, key) => key }) };
       return new Proxy({}, { get: (_target, key) => key });
@@ -38,7 +39,7 @@ function nodes(value: any): Node[] {
 }
 const find = (tree: Node, type: string) => nodes(tree).find((node) => node.type === type)!;
 const button = (tree: Node, label: string) => nodes(tree).find((node) => node.type === "button" && node.props["aria-label"]?.startsWith(label))!;
-const results = (tree: Node) => nodes(tree).find((node) => node.type === "button" && node.props.children === "dashboard.outcomeTrend")!.props.onClick();
+const results = (tree: Node) => find(tree, "DashboardSegments").props.onSelect("outcomes");
 const data: DashboardSnapshot = {
   generatedAt: "2026-09-07T12:00:00Z", query: { workspaceId: "workspace", projectId: "project", period: "7d" },
   metrics: { passRate: 50, casePassRate: 75, currentCases: 0, casesCreated: 0, runsLaunched: 3, completedRuns: 2, passedRuns: 1,

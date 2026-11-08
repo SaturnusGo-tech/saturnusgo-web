@@ -16,6 +16,7 @@ export function CaseOverview({
   languageTag,
   collaboration,
   archived,
+  readOnly,
   sharedSteps,
   onResolveSharedStep,
 }: {
@@ -28,6 +29,7 @@ export function CaseOverview({
   languageTag: string;
   collaboration: CaseCollaborationViewModel;
   archived?: boolean;
+  readOnly?: boolean;
   sharedSteps: readonly SharedStepSummary[];
   onResolveSharedStep: (id: string) => Promise<SharedStep | null>;
 }) {
@@ -38,6 +40,7 @@ export function CaseOverview({
       locale={locale}
       revision={revision}
       archived={archived}
+      readOnly={readOnly}
       editor={editor}
       sharedSteps={sharedSteps}
       onResolveSharedStep={onResolveSharedStep}

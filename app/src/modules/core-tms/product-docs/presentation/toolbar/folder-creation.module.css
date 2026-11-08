@@ -1,43 +1,48 @@
+.positioner { z-index: 78; width: min(280px, calc(100vw - 24px)); }
 .panel {
-  position: fixed;
-  inset: auto;
-  z-index: 24;
   box-sizing: border-box;
-  margin: 0;
-  padding: 10px;
-  overflow: auto;
+  width: 100%;
+  padding: 8px;
   border: 1px solid var(--falcon-border);
-  border-radius: 12px;
+  border-radius: 13px;
   color: var(--falcon-text);
   background: var(--falcon-elevated);
   box-shadow: var(--falcon-shadow-popover);
 }
-
-.form {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 30px 30px;
+.form { display: grid; width: 100%; grid-template-columns: minmax(0, 1fr) 30px 30px; align-items: center; gap: 4px; }
+.input { min-inline-size: 0; }
+.form .inputWrapper {
+  display: flex;
   align-items: center;
-  gap: 4px;
-}
-
-.form .input {
-  --tms-focus-border: var(--falcon-text-muted);
-  --tms-focus-ring: transparent;
-  min-width: 0;
-  height: 32px;
-  padding: 4px 10px;
+  min-height: 32px;
+  padding: 0 9px;
   border: 1px solid var(--falcon-border);
   border-radius: 8px;
-  font-size: 13px;
+  background: var(--falcon-control);
 }
-
-.form .input:focus-visible {
-  border-color: var(--falcon-text-muted);
-  outline: none;
-}
-
+.form .inputWrapper:focus-within { border-color: var(--falcon-text-muted); }
+.form .inputElement { width: 100%; color: var(--falcon-text); font: inherit; font-size: 13px; border: 0; outline: 0; background: transparent; }
 .form p { grid-column: 1 / -1; margin: 2px 0 0; }
 
-@supports not selector(:popover-open) {
-  .panel[aria-hidden="true"] { display: none; }
+.subdocAction {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: 26px;
+  height: auto;
+  padding: 2px 0;
+  border: 0;
+  border-radius: 6px;
+  box-shadow: none;
+  background: transparent;
+  color: var(--falcon-text-secondary);
+  font-size: 13px;
+}
+.subdocAction.subdocAction:is([data-hover="true"],[data-pressed="true"],[aria-expanded="true"]) { background: transparent; color: var(--falcon-text); }
+.subdocAction.subdocAction:focus-visible {
+  outline: 0;
+  box-shadow: none;
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }

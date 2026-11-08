@@ -1,5 +1,6 @@
 "use client";
 
+import { addToast } from "@heroui/react";
 import { FileText, RotateCcw } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { productDocErrorCode } from "../../domain/errors/product-doc-response";
@@ -24,7 +25,6 @@ export function ProductDocsArchive({ api, scope, copy, refresh, onChanged }: {
   const title = useRef<HTMLHeadingElement>(null);
   const pending = useRef(false);
   const [busy, setBusy] = useState<string>();
-  const [notice, setNotice] = useState("");
   const [failure, setFailure] = useState("");
   useEffect(() => { title.current?.focus({ preventScroll: true }); }, []);
 
@@ -32,12 +32,11 @@ export function ProductDocsArchive({ api, scope, copy, refresh, onChanged }: {
     if (pending.current || list.loading || list.error) return;
     pending.current = true;
     setBusy(node.id);
-    setNotice("");
     setFailure("");
     try {
       await api.setArchived(scope, node.id, false, { expectedDraftVersion: node.draftVersion });
       onChanged();
-      setNotice(copy.restored);
+      addToast({ title: copy.restored, severity: "success" });
       title.current?.focus({ preventScroll: true });
     } catch (error) {
       const code = productDocErrorCode(error);
@@ -60,7 +59,6 @@ export function ProductDocsArchive({ api, scope, copy, refresh, onChanged }: {
         <h1 id={heading} ref={title} tabIndex={-1}>{copy.archive}</h1>
         <p>{copy.archiveDescription}</p>
       </header>
-      {notice && <p role="status">{notice}</p>}
       {failure && <p className={shared.error} role="alert">{failure}</p>}
       {nodes.length > 0 && <ul className={styles.list}>
         {nodes.map((node) => <li className={styles.row} key={node.id}>

@@ -3,6 +3,8 @@ import { protocolRoutePolicy } from "./protocol/route-policy.mjs";
 import {accountSpaceRequestCookieNames} from "./account-spaces/cookie-policy.mjs";
 
 const MAXIMUM_BODY_BYTES = 2 * 1024 * 1024;
+const MAXIMUM_PRODUCT_DOC_ATTACHMENT_BYTES = 25 * 1024 * 1024;
+const productDocAttachmentPath = /^\/api\/v1\/workspaces\/[A-Za-z0-9_-]{1,160}\/projects\/[A-Za-z0-9_-]{1,160}\/product-docs\/[A-Za-z0-9_-]{1,160}\/attachments$/;
 const HEX_KEY = /^[a-f0-9]{64}$/;
 const encoder = new TextEncoder();
 const hex = (buffer) => Array.from(new Uint8Array(buffer), (byte) => byte.toString(16).padStart(2, "0")).join("");
@@ -80,7 +82,11 @@ export async function signedApiRequest(request, env, audience) {
   if (cookie) headers.set("cookie", cookie);
   const timestamp = String(Date.now());
   const clientIp = request.headers.get("cf-connecting-ip") ?? "";
-  const body = await readBody(request, protocol?.maximumBodyBytes ?? (dictation ? 12_810_000 : MAXIMUM_BODY_BYTES));
+  const productDocAttachment = request.method === "POST" && productDocAttachmentPath.test(incoming.pathname)
+    && headers.get("content-type") === "application/octet-stream";
+  const maximumBodyBytes = productDocAttachment ? MAXIMUM_PRODUCT_DOC_ATTACHMENT_BYTES
+    : dictation ? 12_810_000 : MAXIMUM_BODY_BYTES;
+  const body = await readBody(request, protocol?.maximumBodyBytes ?? maximumBodyBytes);
   const fields = [protocol?.kind === "mcp" ? "falcon-gateway-v2" : "falcon-gateway-v1", request.method,
     incoming.pathname + incoming.search, incoming.hostname, timestamp, clientIp, origin, await digest(cookie), await digest(body)];
   if (protocol?.kind === "mcp") fields.push(await digest(headers.get("authorization") ?? ""));

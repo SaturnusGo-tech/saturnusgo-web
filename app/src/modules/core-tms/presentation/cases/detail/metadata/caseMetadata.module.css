@@ -48,16 +48,11 @@
 .trigger > svg { justify-self: end; color: currentColor; opacity: .72; transition: transform 120ms ease; }
 .trigger[aria-expanded="true"] > svg { transform: rotate(180deg); }
 
+.overlay { z-index: 90; outline: none; }
 .menu {
-  position: absolute;
-  z-index: 80;
-  top: calc(100% + 3px);
-  left: 0;
   width: max-content;
-  min-width: 100%;
-  max-width: 220px;
-  max-height: 226px;
-  overflow: auto;
+  min-width: 134px;
+  max-width: min(220px, calc(100vw - 24px));
   padding: 5px;
   color: var(--falcon-text);
   background: var(--falcon-elevated);
@@ -65,34 +60,31 @@
   border-radius: 12px;
   box-shadow: var(--falcon-shadow-popover);
 }
-.menu > button {
-  width: 100%;
+.listbox { min-width: 0; }
+.list { display: grid; gap: 2px; max-height: 224px; overflow: auto; margin: 0; padding: 0; list-style: none; }
+.list .option {
   min-height: 30px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 14px;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
   padding: 5px 7px;
   color: inherit;
   background: transparent;
   border: 0;
-  border-radius: 8px;
+  border-radius: 7px;
   cursor: pointer;
-  text-align: left;
 }
-.menu > button:hover { background: var(--falcon-hover); }
-.menu > button:focus-visible { outline: 1px solid var(--falcon-text-muted); outline-offset: -1px; box-shadow: none; }
-.menu > button[data-selected="true"] { background: var(--falcon-selected); }
-.menu > button > svg { justify-self: end; color: var(--falcon-action); }
-.menu .optionLabel {
-  min-height: 20px;
-  padding: 0;
-  color: inherit;
-  background: transparent;
-  border: 0;
-  border-radius: 0;
+.option[data-focus-visible="true"] { outline: 1px solid var(--falcon-text-muted); outline-offset: -1px; }
+.optionLabel > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: linear-gradient(currentColor, currentColor) left bottom / 0 1px no-repeat;
+  transition: background-size 160ms ease-out;
 }
-.menu .optionLabel > span { overflow: hidden; text-overflow: ellipsis; }
+.option:is([data-hover="true"], [data-focus="true"]) .optionLabel > span { background-size: 100% 1px; }
+.option[aria-checked="true"] .optionLabel { font-weight: 650; }
+.optionCheck { inline-size: 13px; flex: none; }
 
 .chip {
   flex: 0 0 auto;
@@ -158,13 +150,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .trigger > svg,
-  .menu { transition: none; }
+  .optionLabel > span { transition: none; }
 }
 
 @media (max-width: 520px) { .controls { width: 100%; } }
-
-.menu[data-popup-positioned] { position:fixed; inset:auto; margin:0; left:var(--menu-left); top:var(--menu-top); min-width:var(--menu-width); max-width:min(220px,calc(100vw - 24px)); }
-.menu::backdrop { background:transparent; pointer-events:none; }
 
 [data-case-property-rail] .labelledControl .select {
   min-width: 0;

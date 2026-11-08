@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@heroui/react";
+import { ProductDocTooltip } from "../../../overlay/ProductDocTooltip";
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 import { writeClipboardText } from "../../../../../../../shared/lib/clipboard";
@@ -23,9 +25,9 @@ export function CopySnippet({ code, locale }: { code: string; locale: TmsLocale 
   }
 
   return <>
-    <button type="button" aria-label={label} title={feedback || label} disabled={!code} onClick={copy}>
+    <ProductDocTooltip label={feedback || label}><Button type="button" size="sm" isIconOnly aria-label={label} isDisabled={!code} onPress={copy}>
       {copied ? <Check size={15} aria-hidden="true" /> : <Copy size={15} aria-hidden="true" />}
-    </button>
+    </Button></ProductDocTooltip>
     <span className={styles.feedback} role="status">{feedback}</span>
   </>;
 }

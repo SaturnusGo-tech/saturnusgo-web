@@ -39,9 +39,9 @@ export function SelectionControls({ state, ru, onSelectAll, action, extraSection
   useEffect(() => { if (ql) qlPanel.current?.querySelector("input")?.focus({ preventScroll: true }); }, [ql]);
   useEffect(() => { if (disabled) { setQl(false); setFilter(false); } }, [disabled]);
   const queryTools = <>
-      <button ref={qlButton} className={css.tool} type="button" disabled={disabled} aria-label={ru ? "QL-запрос" : "QL query"} data-active={Boolean(state.qlQuery) || undefined} aria-expanded={ql} onClick={() => setQl(!ql)}>QL</button>
+      <button ref={qlButton} className={css.tool} type="button" disabled={disabled} aria-label={ru ? "QL-запрос" : "QL query"} data-active={Boolean(state.qlQuery) || undefined} aria-expanded={ql} onClick={() => { setFilter(false); setQl(!ql); }}>QL</button>
       <div className={css.filter}><button className={css.tool} type="button" disabled={disabled} aria-expanded={filter} aria-haspopup="dialog" aria-controls="case-filter-panel"
-        data-active={extraSections?.some((item) => item.active) || Boolean(fieldFilterCount(state.facets) || state.facets.owners?.length || state.facets.folders.length || state.facets.components.length || state.filters.tag || state.filters.type !== "all" || state.filters.priority !== "all" || state.filters.lifecycle !== "all" || (state.filters.maintenanceStatus && state.filters.maintenanceStatus !== "all") || state.filters.includeArchived) || undefined} aria-label={ru ? "Фильтры" : "Filters"} onClick={() => setFilter(!filter)}><PiFunnelSimple size={16} /></button>
+        data-active={extraSections?.some((item) => item.active) || Boolean(fieldFilterCount(state.facets) || state.facets.owners?.length || state.facets.folders.length || state.facets.components.length || state.filters.tag || state.filters.type !== "all" || state.filters.priority !== "all" || state.filters.lifecycle !== "all" || (state.filters.maintenanceStatus && state.filters.maintenanceStatus !== "all") || state.filters.includeArchived) || undefined} aria-label={ru ? "Фильтры" : "Filters"} onClick={() => { setQl(false); setFilter(!filter); }}><PiFunnelSimple size={16} /></button>
         {filter && <CaseFilterMenu locale={ru ? "ru" : "en"} filters={state.filters} onFilters={state.setFilters}
           customSectionsOnly={inline} extraSections={extraSections} onResetExtra={onResetExtra} facets={state.facets} onFacets={state.setFacets} options={state.options} onClose={() => setFilter(false)} />}</div>
   </>;
@@ -62,6 +62,6 @@ export function SelectionControls({ state, ru, onSelectAll, action, extraSection
       {tools}
     </div>}
     <QlDisclosure open={ql}><div className={css.ql} ref={qlPanel} onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); setQl(false); qlButton.current?.focus(); } }}><CaseQlAutocomplete locale={ru ? "ru" : "en"} query={state.qlQuery} onQuery={state.setQlQuery}
-      folders={state.options.folders} components={state.options.components} members={state.directory.items} tags={state.options.tags} /></div></QlDisclosure>
+      folders={state.options.folders} components={state.options.components} members={state.directory.items} tags={state.options.tags} floatingSuggestions={inline && repository} /></div></QlDisclosure>
   </div>;
 }

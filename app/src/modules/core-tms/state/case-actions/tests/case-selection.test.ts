@@ -85,10 +85,12 @@ test("a lost document link response resumes against the existing case and also a
     if (path.endsWith("/doc-two") && loseResponse) { loseResponse = false; throw new Error("Connection lost"); }
     return {};
   }, async () => ({data: {canEdit: true, requirements: [], nextCursor: null}}));
-  f.render().actions.openNewCase();
+  const first = {docId: "doc-one", sectionId: "payment", title: "Bookings", sectionTitle: "Payment"};
+  f.render().actions.openNewCase(undefined, first);
+  assert.deepEqual(Array.from(f.render().actions.caseDocumentation), [first]);
+  assert.equal(f.writes(), 0);
   f.render().state.setCaseDraft({ ...createEmptyRevision(), title: "Coverage",
     description: "[Rule](https://tms.example/work/?workspaceId=workspace&projectId=project&view=product-docs&docId=pasted)" });
-  const first = {docId: "doc-one", sectionId: null, title: "Bookings", sectionTitle: null};
   f.render().actions.setCaseDocumentation([first, {docId: "doc-two", sectionId: "policy", title: "Payments", sectionTitle: "Policy"}]);
   const submit = () => f.render().actions.saveCase({preventDefault() {}} as never);
   await submit();
@@ -100,7 +102,7 @@ test("a lost document link response resumes against the existing case and also a
   assert.equal(f.selection().dialog, null);
   const path = "/workspaces/workspace/projects/project/product-docs/cases/case-created/requirements";
   assert.deepEqual(requests, [
-    [path + "/doc-one", "PUT", {sectionId: null}],
+    [path + "/doc-one", "PUT", {sectionId: "payment"}],
     [path + "/doc-two", "PUT", {sectionId: "policy"}],
     [path + "/doc-two", "DELETE", undefined],
     [path + "/pasted", "PUT", {sectionId: null, preserveExisting: true}],

@@ -122,3 +122,27 @@ for (const purpose of ["dictation", "documentation-dictation"]) test(`${purpose}
   }
   assert.equal(calls, 0);
 });
+
+test("the gateway permits bounded binary uploads only on the document attachment collection", async () => {
+  const path = "/api/v1/workspaces/workspace-a/projects/project-a/product-docs/doc_123/attachments";
+  const maxBytes = 25 * 1024 * 1024;
+  const request = ({ endpoint = path, method = "POST", contentType = "application/octet-stream", size, length = size }) =>
+    new Request(`https://${host}${endpoint}?filename=release.mp4`, {
+      method, body: new Uint8Array(size), headers: {
+        origin: `https://${host}`, cookie, "content-type": contentType, "content-length": String(length),
+      },
+    });
+  const forwarded = await signedApiRequest(request({ size: maxBytes }), env, "tenant");
+  assert.equal(forwarded.headers.get("content-type"), "application/octet-stream");
+  assert.equal((await forwarded.arrayBuffer()).byteLength, maxBytes);
+  const send = () => assert.fail("rejected upload must not contact the API");
+  for (const input of [
+    request({ size: 1, length: maxBytes + 1 }),
+    request({ size: maxBytes + 1, length: 1 }),
+    request({ endpoint: path + "/docfile_123", size: 2 * 1024 * 1024 + 1 }),
+    request({ method: "PUT", size: 2 * 1024 * 1024 + 1 }),
+    request({ contentType: "application/json", size: 2 * 1024 * 1024 + 1 }),
+  ]) {
+    assert.equal((await proxyCompanyApi(input, env, "tenant", send)).status, 413);
+  }
+});

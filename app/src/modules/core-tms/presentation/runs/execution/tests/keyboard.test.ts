@@ -22,3 +22,27 @@ test("a bug-report page suppresses covered run shortcuts from any focus target",
   press("[", true); press("]", true);
   assert.deepEqual(statuses, ["blocked", "failed", "passed"]); assert.deepEqual(selection, ["previous", "next"]); assert.equal(evidence, 1); assert.equal(reports, 1);
 });
+
+test("embedded run shortcuts only execute inside the run and outside nested menus and dialogs", () => {
+  let handler: (event: unknown) => void = () => undefined;
+  const statuses: string[] = [];
+  const h = componentHarness(undefined, { document: { querySelector: () => ({}) } });
+  Object.assign(h.window, { addEventListener: (_name: string, callback: typeof handler) => { handler = callback; }, removeEventListener() {} });
+  const { useRunKeyboardShortcuts: useKeys } = h.load<{ useRunKeyboardShortcuts: typeof useRunKeyboardShortcuts }>(new URL("../useRunKeyboardShortcuts.ts", import.meta.url), name => {
+    if (name.endsWith("caseRevision")) return { executableSteps: () => [] };
+  });
+  const dialog = {};
+  const panel = { contains: (node: { inside: boolean }) => node.inside, closest: () => dialog };
+  h.render(() => useKeys({ items: [{ id: "current" }], selectedItem: { id: "current", activeAttemptNo: 1, snapshot: {}, attempts: [{ attemptNo: 1, stepResults: [] }] },
+    selectedRun: { id: "run" }, runWritable: true, embeddedScope: { current: panel }, onItemStatus: (value: string) => statuses.push(value) } as never));
+  const press = (inside: boolean, parentDialog: unknown, menu = false) => handler({
+    key: "b", preventDefault() {}, target: { inside, closest: (selector: string) =>
+      selector === "[role=dialog]" ? parentDialog : selector.includes("[role=menu]") && menu },
+  });
+  press(false, null);
+  press(true, {});
+  press(true, dialog, true);
+  assert.deepEqual(statuses, []);
+  press(true, dialog);
+  assert.deepEqual(statuses, ["blocked"]);
+});

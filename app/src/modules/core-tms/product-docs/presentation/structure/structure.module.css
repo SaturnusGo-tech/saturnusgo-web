@@ -66,6 +66,10 @@
   font-size: 13px;
 }
 
+.renameInput { min-inline-size: 0; }
+.renameInputWrapper { padding: 4px 9px; border: 1px solid var(--falcon-border); border-radius: 8px; background: var(--falcon-control); }
+.renameInputWrapper:focus-within { border-color: var(--falcon-text-muted); }
+.renameField { width: 100%; border: 0; outline: 0; background: transparent; color: var(--falcon-text); font: inherit; }
 .rename p { grid-column: 1 / -1; margin: 0; }
 
 @media (max-width: 640px) {

@@ -9,7 +9,7 @@ import { freshnessPages, normalizeFreshnessPage, pageForKey } from "./freshness/
 import { freshnessCopy, freshnessIcons } from "./freshness/presentation";
 import styles from "./freshness/freshness.module.css";
 
-type Props = { model: DashboardWorkbenchModel; page?: number; onPageChange?: (page: number) => void };
+type Props = { model: Pick<DashboardWorkbenchModel, "snapshot" | "loading" | "error" | "enabled" | "refresh"> & Partial<Pick<DashboardWorkbenchModel, "openDrill">>; page?: number; onPageChange?: (page: number) => void };
 
 export function FreshnessPanel({ model, page, onPageChange }: Props) {
   const { locale, languageTag, t } = useTmsLocale();
@@ -53,12 +53,12 @@ export function FreshnessPanel({ model, page, onPageChange }: Props) {
               const count = check.count === undefined ? "—" : new Intl.NumberFormat(languageTag).format(check.count);
               const hint = check.hint ? t(`dashboardWorkbench.${check.hint}`) : copy.hints[check.kind];
               return <li key={check.kind}>
-                <button type="button" disabled={check.count === undefined} tabIndex={current === pageIndex ? 0 : -1}
+                <button type="button" disabled={check.count === undefined || !model.openDrill} data-measured={check.count !== undefined} tabIndex={current === pageIndex ? 0 : -1}
                   title={hint} aria-label={`${label}: ${count}. ${hint}`} data-kind={check.kind}
-                  onClick={() => model.openDrill(check.kind)}>
+                  onClick={() => model.openDrill?.(check.kind)}>
                   <span className={styles.icon}><Icon size={20} strokeWidth={1.7} aria-hidden="true" /></span>
                   <span className={styles.label}>{label}</span>
-                  <strong>{count}</strong><ArrowUpRight className={styles.drillArrow} size={13} aria-hidden="true" />
+                  <strong>{count}</strong>{model.openDrill && <ArrowUpRight className={styles.drillArrow} size={13} aria-hidden="true" />}
                 </button>
               </li>;
             })}

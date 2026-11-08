@@ -10,11 +10,11 @@ const labels = {
 };
 export function HighlightPalette({ locale, onChoose }: { locale: "ru" | "en"; onChoose: (color: HighlightColor | null) => void }) {
   const text = labels[locale];
-  return <>
+  return <div className={css.palette}>
     <div className={css.colors} role="group" aria-label={text.title}>
       {highlightColors.map((color) => <button key={color} type="button" data-color={color} className={css.swatch}
         title={text[color]} aria-label={text[color]} onClick={() => onChoose(color)} />)}
     </div>
     <button type="button" className={css.remove} onClick={() => onChoose(null)}><Eraser size={15} />{text.remove}</button>
-  </>;
+  </div>;
 }

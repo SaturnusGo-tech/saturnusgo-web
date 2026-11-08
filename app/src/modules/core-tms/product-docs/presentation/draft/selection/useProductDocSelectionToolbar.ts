@@ -3,7 +3,7 @@
 import { $getSelection, $isRangeSelection, type LexicalEditor, type RangeSelection } from "lexical";
 import { useLayoutEffect, useRef, useState, type RefObject } from "react";
 
-type Placement = { left: number; top: number; below: boolean; menuAbove: boolean; format: number; visible: boolean };
+type Placement = { left: number; top: number; below: boolean; format: number; visible: boolean };
 const gap = 8;
 
 function scrollContainer(root: HTMLElement) {
@@ -78,11 +78,9 @@ export function useProductDocSelectionToolbar(
         }
         saved.current = selection;
         const left = Math.max(gap, Math.min(view.innerWidth - width - gap, selected.left + (selected.width - width) / 2));
-        const menuAbove = view.innerHeight - top - height < Math.min(178, view.innerHeight * .45)
-          && top > view.innerHeight - top - height;
         setPlacement((previous) => previous?.visible && previous.left === left && previous.top === top
-          && previous.below === below && previous.menuAbove === menuAbove && previous.format === selection.format
-          ? previous : { left, top, below, menuAbove, format: selection.format, visible: true });
+          && previous.below === below && previous.format === selection.format
+          ? previous : { left, top, below, format: selection.format, visible: true });
       }
 
       function queue() {

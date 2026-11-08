@@ -3,7 +3,6 @@
 import { FolderAppearanceProvider } from "../../folders/presentation/appearance/context/FolderAppearanceProvider";
 import { WorkspaceConnectorProvider } from "../../connectors/application/context/WorkspaceConnectorContext";
 import { WorkspacePeopleProvider } from "../../workspace/members/context/WorkspacePeopleContext";
-import { CheckCircle2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { TmsAuthBoundary } from "../../auth/presentation/boundary/TmsAuthBoundary";
 import { TmsLocaleProvider } from "../../localization/context/TmsLocaleProvider";
@@ -28,6 +27,7 @@ import "./motion/motion.css";
 import { transitionContent } from "./motion/transition/content-transition";
 import { usePageAppearance } from "./motion/usePageAppearance";
 import appearance from "./appearance/glass.module.css";
+import { WorkspaceUiProvider } from "./ui/WorkspaceUiProvider";
 
 const glassEnabled = process.env.NEXT_PUBLIC_FALCON_GLASS_EXPERIMENT !== "false";
 
@@ -35,7 +35,7 @@ export function LocalizedWorkspace() {
   const model = useWorkspaceModel();
   const pageRef = usePageAppearance([model.view, model.project?.id, model.repositoryScope.key, model.connection].join(":"));
   useHistoryScroll(pageRef);
-  const { t } = useTmsLocale();
+  const { locale, languageTag, t } = useTmsLocale();
   const docs = useProductDocsAccess(model.data.workspace.id, model.project?.id ?? "", model.connection === "connected");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
 
@@ -69,6 +69,7 @@ export function LocalizedWorkspace() {
   }
 
   return (
+    <WorkspaceUiProvider locale={languageTag} notice={model.notice}>
     <FolderAppearanceProvider resource={model.folders} workspaceId={model.data.workspace.id} projectId={model.project?.id}><WorkspacePeopleProvider workspaceId={model.data.workspace.id} offline={model.connection !== "connected"}>
     <WorkspaceConnectorProvider workspaceId={model.data.workspace.id} projectId={model.project?.id ?? ""} active={model.connection === "connected" && !!model.project && model.data.meta.authorization.capabilities.includes("integration:read")}>
     <div
@@ -107,8 +108,18 @@ export function LocalizedWorkspace() {
           )}
           <div className={`${styles.stageContent} ${motion.content} ${guideStyles.workspaceContent}`} ref={pageRef} data-workspace-content>
             <GuidePanelProvider scope={JSON.stringify([model.data.workspace.id, model.project?.id, model.view])} contentRef={pageRef}>
-              <ProductDocsWorkspace api={docs.api} enabled={docs.enabled} scope={docs.scope}
-                visible={model.view === "product-docs"} projectName={model.project?.name} contentRef={pageRef}
+              <ProductDocsWorkspace workspace={model} api={docs.api} enabled={docs.enabled} scope={docs.scope}
+                visible={model.view === "product-docs"} projectName={model.project?.name} contentRef={pageRef} onOpenDefect={model.openDefect} activity={model.data.activity}
+                onCreateCase={model.data.meta.authorization.capabilities.includes("test_case:manage") ? (requirement) => {
+                  if (model.caseSubmitting) return;
+                  selectView("cases");
+                  if (model.dialog === "case") {
+                    model.notify(locale === "ru" ? "Сначала завершите редактирование открытого кейса."
+                      : "Finish editing the open case first.");
+                    return;
+                  }
+                  model.openNewCase("/", requirement);
+                } : undefined}
                 fallback={docs.pending || model.connection === "loading" ? <TessiqLoader pane label={t("common.loading")} />
                   : <CompanyFeatureUnavailable onReturn={() => changeView("cases")} />}>
                 <WorkspaceStage model={model} />
@@ -118,14 +129,9 @@ export function LocalizedWorkspace() {
         </main>
         <VerificationQueueControl state={model.verification} workspaceId={model.data.workspace.id} />
       </div>
-      {model.notice && (
-        <div className={styles.toast} role="status" aria-live="polite">
-          <CheckCircle2 size={17} />
-          {model.notice}
-        </div>
-      )}
       <WorkspaceDialogs model={model} />
     </div></WorkspaceConnectorProvider></WorkspacePeopleProvider></FolderAppearanceProvider>
+    </WorkspaceUiProvider>
   );
 }
 

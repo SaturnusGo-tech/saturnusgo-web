@@ -3,7 +3,7 @@ import { ArrowUpRight, Check, Copy, Mail, Settings2, X } from "lucide-react";
 import { workspaceDisplayName } from "../../../localization/format/workspace/display-name";
 import type { BillingPlanId } from "../../domain/billing";
 import { planNames, planRequestGmailUrl, planSupportEmail, type PlanRequest, type PlanRequestList } from "../domain/plan-request";
-import { planRequestStatus } from "./plan-request-offers";
+import { planRequestStatus } from "./offers/plan-request-offers";
 import css from "./plan-request.module.css";
 
 type Props = {

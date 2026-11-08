@@ -1,8 +1,10 @@
 import type { TmsLocale } from "../../localization/model/locale";
 import { archiveCopy } from "./archive-copy";
+import { draftCopy } from "./draft/draft-copy";
 
 const english = {
   ...archiveCopy.en,
+  ...draftCopy.en,
   title: "Docs",
   tree: "Pages",
   search: "Find a page…",
@@ -57,7 +59,6 @@ const english = {
   draft: "Draft",
   untitled: "Page title",
   untitledSection: "Untitled section",
-  draftTooLong: "The draft is too long. Shorten a section or split it into separate pages.",
   publish: "Publish",
   published: "Published",
   version: "Version",
@@ -69,10 +70,7 @@ const english = {
   save: "Save draft",
   saved: "Draft saved",
   saving: "Saving…",
-  saveError: "Couldn’t save the change. Your edits are still here.",
-  staleDraft: "This draft changed elsewhere. Copy your edits before reopening the latest draft.",
-  unpublishedParent: "Publish the parent pages first so readers can reach this page.",
-  unsaved: "Discard unsaved edits?",
+  pathAncestors: "Show parent pages",
   outline: "On this page",
   relatedCases: "Related test cases",
   noRelatedCases: "No test cases are linked yet.",
@@ -89,7 +87,7 @@ const english = {
   discussion: "Comments",
   noComments: "No comments yet.",
   commentPlaceholder: "Leave a comment…",
-  postComment: "Post",
+  postComment: "Post comment",
   postingComment: "Posting…",
   commentError: "Couldn’t post your comment. Try again.",
   importError: "Couldn’t import this Markdown file.",
@@ -100,6 +98,7 @@ const english = {
 
 const russian: typeof english = {
   ...archiveCopy.ru,
+  ...draftCopy.ru,
   title: "Документация",
   tree: "Страницы",
   search: "Найти страницу…",
@@ -154,7 +153,6 @@ const russian: typeof english = {
   draft: "Черновик",
   untitled: "Заголовок страницы",
   untitledSection: "Раздел без заголовка",
-  draftTooLong: "Черновик слишком длинный. Сократите раздел или разделите его на несколько страниц.",
   publish: "Опубликовать",
   published: "Опубликовано",
   version: "Версия",
@@ -166,10 +164,7 @@ const russian: typeof english = {
   save: "Сохранить черновик",
   saved: "Черновик сохранён",
   saving: "Сохраняем…",
-  saveError: "Не удалось сохранить изменения. Ваши правки остались в редакторе.",
-  staleDraft: "Этот черновик изменили в другом месте. Скопируйте правки, прежде чем открыть свежую версию.",
-  unpublishedParent: "Сначала опубликуйте родительские страницы, чтобы читатели могли открыть эту статью.",
-  unsaved: "Удалить несохранённые изменения?",
+  pathAncestors: "Показать родительские страницы",
   outline: "В этой статье",
   relatedCases: "Связанные тест-кейсы",
   noRelatedCases: "Связанных тест-кейсов пока нет.",
@@ -186,7 +181,7 @@ const russian: typeof english = {
   discussion: "Комментарии",
   noComments: "Комментариев пока нет.",
   commentPlaceholder: "Оставить комментарий…",
-  postComment: "Отправить",
+  postComment: "Отправить комментарий",
   postingComment: "Отправляем…",
   commentError: "Не удалось отправить комментарий. Попробуйте ещё раз.",
   importError: "Не удалось импортировать файл Markdown.",

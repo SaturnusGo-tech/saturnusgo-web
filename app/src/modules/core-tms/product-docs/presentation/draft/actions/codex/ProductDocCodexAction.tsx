@@ -1,9 +1,12 @@
 "use client";
 
+import { Button, Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
+import { useReducedMotion } from "framer-motion";
 import { ExternalLink, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { isFalconDesktop } from "../../../../../auth/sign-in/domain/desktop-mode";
 import { CodexMark } from "../../../../../codex-employee/presentation/branding/CodexMark";
+import { useIntegrationGuide } from "../../../../../documentation/panel/GuidePanelProvider";
 import type { TmsLocale } from "../../../../../localization/model/locale";
 import { IntegrationGuideLink } from "../../../../../presentation/hooks/shared/theme/IntegrationGuideLink";
 import { visitWorkspace } from "../../../../../state/navigation/browser/workspace-history";
@@ -12,15 +15,21 @@ import { codexBrowserAddress, codexDesktopCommandAddress, codexSetupAddress } fr
 import { useProductDocCodexConnection } from "../../../../state/draft/codex/useProductDocCodexConnection";
 import styles from "./codex-action.module.css";
 
-type Notice = "unknown" | "missing-app" | "desktop-version" | "launch-failed";
+type Notice = "missing-app" | "desktop-version" | "launch-failed";
 type Handoff = { requestId: string; timer: ReturnType<typeof setTimeout> };
+const promptGuide = "codex-prompts-product-docs";
 
 export function ProductDocCodexAction({ scope, locale, disabled }: { scope: ProductDocScope; locale: TmsLocale; disabled: boolean }) {
   const { status, refresh } = useProductDocCodexConnection(scope.workspaceId, scope.projectId);
+  const guide = useIntegrationGuide();
+  const reducedMotion = useReducedMotion();
   const ru = locale === "ru";
+  const [open, setOpen] = useState(false);
   const [notice, setNotice] = useState<Notice | null>(null);
   const [opening, setOpening] = useState(false);
   const pending = useRef<Handoff | null>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const guideRequested = useRef(false);
 
   useEffect(() => {
     function acknowledge(event: Event) {
@@ -30,6 +39,7 @@ export function ProductDocCodexAction({ scope, locale, disabled }: { scope: Prod
       clearTimeout(pending.current.timer);
       pending.current = null;
       setOpening(false);
+      if (detail.status === "opened") setOpen(false);
       setNotice(detail.status === "opened" ? null : detail.status === "unavailable" ? "missing-app" : "launch-failed");
     }
     window.addEventListener("falcon:codex-handoff", acknowledge);
@@ -40,15 +50,22 @@ export function ProductDocCodexAction({ scope, locale, disabled }: { scope: Prod
   }, []);
 
   function openSetup() {
+    setOpen(false);
     visitWorkspace(codexSetupAddress(window.location.href, scope, locale));
   }
 
+  function openGuide() {
+    if (!guideRequested.current || !trigger.current) return;
+    guideRequested.current = false;
+    guide?.open(promptGuide, trigger.current);
+  }
+
   function openCodex() {
-    if (disabled || pending.current || status === "checking") return;
+    if (disabled || pending.current || status === "checking" || status === "unknown") return;
     setNotice(null);
-    if (status === "unknown") { setNotice("unknown"); return; }
     if (status === "available") { openSetup(); return; }
     if (!isFalconDesktop()) {
+      setOpen(false);
       window.location.assign(codexBrowserAddress(locale));
       return;
     }
@@ -77,40 +94,53 @@ export function ProductDocCodexAction({ scope, locale, disabled }: { scope: Prod
     : "Draft a QA page from requirements, notes or a PDF. Review it before publishing.";
   const permission = ru ? "Для сохранения черновиков обновите разрешения Falcon в Codex."
     : "To save drafts, update the Falcon permissions in Codex.";
-  const title = status === "read-only" ? `${capability} ${permission}` : status === "connected" ? capability : label;
   const notices: Record<Notice, string> = {
-    unknown: ru ? "Не удалось проверить подключение Codex." : "Couldn’t check your Codex connection.",
     "missing-app": ru ? "Установите приложение ChatGPT, чтобы открыть Codex." : "Install the ChatGPT desktop app to open Codex.",
     "desktop-version": ru ? "Обновите Falcon Desktop, чтобы открывать Codex из редактора." : "Update Falcon Desktop to open Codex from the editor.",
     "launch-failed": ru ? "Не удалось открыть Codex. Попробуйте ещё раз." : "Couldn’t open Codex. Try again.",
   };
 
-  return <div className={styles.root} onKeyDown={(event) => {
-    if (event.key === "Escape" && notice) { event.stopPropagation(); setNotice(null); }
-  }}>
-    <button type="button" className={styles.action} title={title} aria-label={label}
-      aria-description={title !== label ? title : undefined}
-      aria-busy={opening || status === "checking" || undefined}
-      disabled={disabled || opening || status === "checking"} onClick={openCodex}>
-      <CodexMark className={styles.mark} />
-      <span>Codex</span>
-    </button>
-    {notice && <div className={styles.notice}>
-      <button className={styles.dismiss} type="button" aria-label={ru ? "Закрыть" : "Close"} onClick={() => setNotice(null)}>
-        <X size={15} aria-hidden="true" />
-      </button>
-      <p role="status">{notices[notice]}</p>
+  return <Popover isOpen={open} onOpenChange={setOpen} placement="bottom-end" offset={6} containerPadding={12}
+    shouldBlockScroll={false} shouldCloseOnScroll={false} classNames={{ content: styles.panel }} style={{ zIndex: 160 }}
+    disableAnimation={Boolean(reducedMotion)} motionProps={{ onAnimationComplete: (phase) => {
+      if (phase === "exit") openGuide();
+    } }}>
+    <PopoverTrigger>
+      <Button ref={trigger} className={styles.action} title="Codex" isDisabled={disabled}>
+        <CodexMark className={styles.mark} />
+        <span>Codex</span>
+      </Button>
+    </PopoverTrigger>
+    <PopoverContent aria-label="Codex">
+      <div className={styles.heading}>
+        <CodexMark />
+        <strong>Codex</strong>
+        <Button className={styles.dismiss} isIconOnly aria-label={ru ? "Закрыть" : "Close"} onPress={() => setOpen(false)}>
+          <X size={15} aria-hidden="true" />
+        </Button>
+      </div>
+      <p>{capability}</p>
+      {status === "read-only" && <p>{permission}</p>}
+      {status === "unknown" && <p role="status">{ru ? "Не удалось проверить подключение Codex." : "Couldn’t check your Codex connection."}</p>}
+      {notice && <p role="status">{notices[notice]}</p>}
       <div className={styles.links}>
-        {notice === "unknown" && <button type="button" onClick={() => { setNotice(null); refresh(); }}>
-          {ru ? "Проверить снова" : "Retry"}
-        </button>}
+        {guide ? <Button onPress={() => {
+          guideRequested.current = true;
+          setOpen(false);
+          if (reducedMotion) requestAnimationFrame(openGuide);
+        }}>{ru ? "Сценарии" : "Prompt examples"}</Button>
+          : <IntegrationGuideLink article={promptGuide}>{ru ? "Сценарии" : "Prompt examples"}</IntegrationGuideLink>}
         {notice === "missing-app" && <a href="https://chatgpt.com/download/" target="_blank" rel="noopener noreferrer">
           {ru ? "Скачать ChatGPT" : "Download ChatGPT"} <ExternalLink size={12} aria-hidden="true" />
         </a>}
-        {notice === "unknown"
-          ? <button type="button" onClick={openSetup}>{ru ? "Плагин Falcon" : "Falcon plugin"}</button>
-          : <IntegrationGuideLink article="codex-prompts-product-docs">{ru ? "Сценарии" : "Prompt examples"}</IntegrationGuideLink>}
+        {status === "unknown" && <Button onPress={() => { setNotice(null); refresh(); }}>
+          {ru ? "Проверить снова" : "Retry"}
+        </Button>}
       </div>
-    </div>}
-  </div>;
+      <Button className={styles.primary} isDisabled={disabled || status === "checking"} isLoading={opening}
+        onPress={status === "unknown" ? openSetup : openCodex}>
+        {status === "unknown" ? (ru ? "Плагин Falcon" : "Falcon plugin") : label}
+      </Button>
+    </PopoverContent>
+  </Popover>;
 }

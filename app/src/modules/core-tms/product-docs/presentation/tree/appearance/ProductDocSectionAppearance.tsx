@@ -1,13 +1,18 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { Button, Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
+import { useReducedMotion } from "framer-motion";
+import { lazy, Suspense, useCallback, useRef, useState } from "react";
 import type { FolderAppearance } from "../../../../folders/model/appearance/folder-appearance";
 import type { TmsLocale } from "../../../../localization/model/locale";
-import { FolderAppearancePopover } from "../../../../folders/presentation/appearance/control/FolderAppearanceControl";
 import type { ProductDocNode, ProductDocsApi, ProductDocScope } from "../../../domain/product-docs";
 import { SectionVisual } from "./ProductDocSectionIcon";
 import { useSectionAppearance } from "../../../state/appearance/useSectionAppearance";
 import { useSectionAppearanceEditor } from "../../../state/appearance/useSectionAppearanceEditor";
+import styles from "./section-appearance.module.css";
+
+const Picker = lazy(() => import("../../../../folders/presentation/appearance/picker/FolderAppearancePicker")
+  .then((module) => ({ default: module.FolderAppearancePicker })));
 
 export function ProductDocSectionAppearance({ api, scope, node, locale, onChanged }: {
   api: ProductDocsApi;
@@ -17,6 +22,8 @@ export function ProductDocSectionAppearance({ api, scope, node, locale, onChange
   onChanged(): void;
 }) {
   const { appearance, automatic } = useSectionAppearance(scope, node);
+  const [open, setOpen] = useState(false);
+  const reducedMotion = useReducedMotion();
   const { workspaceId, projectId } = scope;
   const { id, draftVersion } = node;
   const version = useRef(draftVersion);
@@ -29,8 +36,22 @@ export function ProductDocSectionAppearance({ api, scope, node, locale, onChange
   }, [api, workspaceId, projectId, id]);
   const ru = locale === "ru";
   const editor = useSectionAppearanceEditor(projectId, appearance, save, onChanged, ru);
-  return <FolderAppearancePopover key={node.id} name={node.title} ru={ru} appearance={appearance} editor={editor}
-    defaultIcon={automatic} defaultColor="var(--falcon-icon)"
-    resetLabel={ru ? "По названию раздела" : "Match section title"}
-    renderVisual={(value) => <SectionVisual appearance={value ?? null} automatic={automatic} size={17} />} />;
+  const label = ru ? "Оформление папки" : "Folder appearance";
+  const current = editor.busy || editor.failed || open ? editor.preview : appearance;
+  return <Popover isOpen={open} onOpenChange={setOpen} placement="bottom-start" offset={6} containerPadding={12}
+    shouldBlockScroll={false} shouldCloseOnScroll={false} disableAnimation={Boolean(reducedMotion)}
+    classNames={{ content: styles.picker }} style={{ zIndex: 160 }}>
+    <PopoverTrigger>
+      <Button isIconOnly size="sm" variant="light" className={styles.trigger}
+        aria-label={`${label}: ${node.title}`} title={label} data-failed={editor.failed || undefined}>
+        <SectionVisual appearance={current ?? null} automatic={automatic} size={17} />
+      </Button>
+    </PopoverTrigger>
+    <PopoverContent aria-label={label}>
+      <Suspense fallback={<p className={styles.loading} role="status">{ru ? "Загрузка…" : "Loading…"}</p>}>
+        <Picker folder={{ appearance }} ru={ru} editor={editor} defaultIcon={automatic} defaultColor="var(--falcon-icon)"
+          resetLabel={ru ? "По названию раздела" : "Match section title"} />
+      </Suspense>
+    </PopoverContent>
+  </Popover>;
 }

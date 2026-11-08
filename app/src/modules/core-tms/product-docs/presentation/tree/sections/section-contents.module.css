@@ -29,3 +29,7 @@
 }
 
 .section > button { margin-top: 12px; }
+
+.subdocs { margin-block: 16px 0; padding-block: 4px 16px; }
+.subdocs > h2 { margin: 0 0 6px; font-size: 14px; }
+.subdocs > div:last-of-type { margin-block-start: 3px; }

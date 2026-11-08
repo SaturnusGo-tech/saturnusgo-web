@@ -54,7 +54,7 @@
   cursor: pointer;
 }
 .tools button:hover, .alt button:hover { background: var(--falcon-hover); }
-.image button:focus-visible, .alt input:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 1px; }
+.image button:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 1px; }
 .resize {
   position: absolute;
   inset: auto -8px -8px auto;
@@ -82,17 +82,7 @@
 }
 .image:is(:hover, :focus-within, [data-selected]) .resize { opacity: 1; pointer-events: auto; }
 .alt { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; max-width: 100%; }
-.alt input {
-  min-height: 31px;
-  width: min(240px, 100%);
-  padding: 5px 8px;
-  border: 1px solid var(--falcon-border-strong);
-  border-radius: 6px;
-  background: var(--falcon-control);
-  color: var(--falcon-text);
-  font: inherit;
-  font-size: 13px;
-}
+.altField { width: min(240px, 100%); }
 .alt button { padding: 5px 9px; font: inherit; font-size: 13px; color: var(--falcon-text); }
 .feedback {
   position: fixed;

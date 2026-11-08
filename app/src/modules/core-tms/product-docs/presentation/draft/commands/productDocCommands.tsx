@@ -1,112 +1,136 @@
 "use client";
 
+import { Listbox, usePopover } from "@heroui/react";
 import { LexicalTypeaheadMenuPlugin, MenuOption, type MenuRenderFn } from "@lexical/react/LexicalTypeaheadMenuPlugin";
-import { $createHeadingNode, $createQuoteNode } from "@lexical/rich-text";
-import {
-  addComposerChild$, applyListType$, convertSelectionToNode$, insertCodeBlock$, insertDirective$,
-  insertTable$, insertThematicBreak$, openNewImageDialog$, realmPlugin, usePublisher,
-} from "@mdxeditor/editor";
-import { $getSelection, $isParagraphNode, $isRangeSelection, $isRootNode, COMMAND_PRIORITY_NORMAL } from "lexical";
-import { Braces, Heading2, Heading3, Image, Info, List, ListOrdered, Minus, Quote, SquareCheck, Table2, type LucideIcon } from "lucide-react";
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { addComposerChild$, editorInTable$, readOnly$, realmPlugin, rootEditor$, useCellValue } from "@mdxeditor/editor";
+import { $getSelection, $isParagraphNode, $isRangeSelection, $isRootNode, COMMAND_PRIORITY_HIGH, COMMAND_PRIORITY_NORMAL, KEY_DOWN_COMMAND } from "lexical";
+import { motion, useReducedMotion } from "framer-motion";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
+import { toolbarMenuMotion } from "../toolbar/menu/ProductDocToolbarMenu";
 import { productDocCommandQuery } from "./commandQuery";
-import styles from "./commands.module.css";
+import { productDocMacShortcuts, productDocShortcutCommand } from "./keyboard/commandShortcuts";
+import { productDocCommandRows } from "./menu/ProductDocCommandRows";
+import { productDocCommandMatches, useProductDocInsertCommands, type ProductDocInsertCommand } from "./registry/useProductDocInsertCommands";
+import styles from "./menu/commands.module.css";
 
 class InsertOption extends MenuOption {
-  constructor(
-    key: string,
-    readonly label: string,
-    readonly Icon: LucideIcon,
-    readonly insert: () => void,
-  ) { super(key); }
-
-  matches(query: string) {
-    return this.key.includes(query) || this.label.toLowerCase().includes(query);
-  }
+  constructor(readonly command: ProductDocInsertCommand) { super(command.id); }
 }
+type CommandMenu = Parameters<MenuRenderFn<InsertOption>>[1];
 
-function InsertMenu({ options, selectedIndex, selectOptionAndCleanUp, setHighlightedIndex }: Parameters<MenuRenderFn<InsertOption>>[1]) {
+function InsertMenu({ anchor, menu, closing }: { anchor: RefObject<HTMLElement>; menu: CommandMenu; closing: boolean }) {
   const { locale } = useTmsLocale();
-  const active = useRef<HTMLLIElement>(null);
+  const reduced = useReducedMotion();
+  const viewport = useRef<HTMLDivElement>(null);
+  const previous = useRef(menu);
+  if (!closing && menu.options.length) previous.current = menu;
+  const { options, selectedIndex, selectOptionAndCleanUp, setHighlightedIndex } = closing ? previous.current : menu;
+  const label = locale === "ru" ? "Вставить" : "Insert";
+  const mac = productDocMacShortcuts();
+  const { getPopoverProps } = usePopover({
+    isOpen: true, triggerRef: anchor, placement: "bottom-start", offset: 3, containerPadding: 12,
+    isDismissable: false, shouldCloseOnBlur: false, shouldCloseOnScroll: false, shouldBlockScroll: false,
+  });
+
   useLayoutEffect(() => {
-    const item = active.current;
-    const list = item?.parentElement;
-    if (!item || !list) return;
-    const itemBounds = item.getBoundingClientRect();
-    const listBounds = list.getBoundingClientRect();
-    const delta = itemBounds.top < listBounds.top
-      ? itemBounds.top - listBounds.top : Math.max(0, itemBounds.bottom - listBounds.bottom);
-    list.scrollTop += delta;
+    if (!viewport.current) return;
+    const elements = viewport.current.querySelectorAll<HTMLElement>("[role=option]");
+    options.forEach((option, index) => option.setRefElement(elements[index] ?? null));
+    const selected = selectedIndex === null ? null : elements[selectedIndex];
+    if (!selected) return;
+    const optionBounds = selected.getBoundingClientRect();
+    const menuBounds = viewport.current.getBoundingClientRect();
+    const delta = optionBounds.top < menuBounds.top ? optionBounds.top - menuBounds.top
+      : Math.max(0, optionBounds.bottom - menuBounds.bottom);
+    viewport.current.scrollTop += delta;
   }, [options, selectedIndex]);
 
-  return <div className={styles.menu}>
-    <span className={styles.label}>{locale === "ru" ? "Вставить" : "Insert"}</span>
-    <ul className={styles.options} role="presentation">
-      {options.map((option, index) => (
-        <li key={option.key} id={`typeahead-item-${index}`} role="option" aria-selected={selectedIndex === index}
-          ref={(element) => {
-            option.setRefElement(element);
-            if (selectedIndex === index) active.current = element;
-          }}
-          onPointerMove={() => { if (selectedIndex !== index) setHighlightedIndex(index); }}
-          onMouseDown={(event) => event.preventDefault()}
-          onClick={() => selectOptionAndCleanUp(option)}>
-          <option.Icon size={16} aria-hidden="true" />
-          {option.label}
-        </li>
-      ))}
-    </ul>
-  </div>;
+  return createPortal(<div {...getPopoverProps({ style: { zIndex: 160 } })} data-doc-slash-menu>
+    <motion.div className={styles.menu} initial={reduced ? false : "initial"} animate={closing ? "exit" : "enter"}
+      variants={toolbarMenuMotion} aria-hidden={closing || undefined} inert={closing || undefined}>
+      <div ref={viewport} className={styles.viewport} onPointerMoveCapture={(event) => {
+        if (!(event.target instanceof Element)) return;
+        const item = event.target.closest<HTMLElement>("[data-doc-command-index]");
+        const index = Number(item?.dataset.docCommandIndex ?? -1);
+        if (index >= 0 && index !== selectedIndex) setHighlightedIndex(index);
+      }}>
+        <Listbox aria-label={label} hideEmptyContent selectionMode="none" shouldUseVirtualFocus
+          classNames={{ base: styles.listbox, list: styles.options }} itemClasses={{ base: styles.option, title: styles.label }}
+          onMouseDown={(event) => event.preventDefault()} onAction={(key) => {
+            const option = options.find((entry) => entry.key === key);
+            if (option) selectOptionAndCleanUp(option);
+          }}>
+          {productDocCommandRows(options.map(({ command }) => command), locale, mac, { selected: selectedIndex })}
+        </Listbox>
+      </div>
+    </motion.div>
+  </div>, document.body);
 }
-
-const renderMenu: MenuRenderFn<InsertOption> = (anchor, props) => (
-  anchor.current && props.options.length ? createPortal(<InsertMenu {...props} />, anchor.current) : null
-);
 
 function ProductDocCommands() {
   const { locale } = useTmsLocale();
-  const ru = locale === "ru";
   const [query, setQuery] = useState<string | null>(null);
-  const changeBlock = usePublisher(convertSelectionToNode$);
-  const list = usePublisher(applyListType$);
-  const image = usePublisher(openNewImageDialog$);
-  const table = usePublisher(insertTable$);
-  const code = usePublisher(insertCodeBlock$);
-  const directive = usePublisher(insertDirective$);
-  const divider = usePublisher(insertThematicBreak$);
-  const commands = useMemo(() => [
-    new InsertOption("heading", ru ? "Заголовок" : "Heading", Heading2, () => changeBlock(() => $createHeadingNode("h2"))),
-    new InsertOption("subheading", ru ? "Подзаголовок" : "Subheading", Heading3, () => changeBlock(() => $createHeadingNode("h3"))),
-    new InsertOption("bulleted list", ru ? "Маркированный список" : "Bulleted list", List, () => list("bullet")),
-    new InsertOption("numbered list", ru ? "Нумерованный список" : "Numbered list", ListOrdered, () => list("number")),
-    new InsertOption("task list", ru ? "Чек-лист" : "Task list", SquareCheck, () => list("check")),
-    new InsertOption("table", ru ? "Таблица" : "Table", Table2, () => table({ rows: 3, columns: 3 })),
-    new InsertOption("image", ru ? "Изображение" : "Image", Image, () => image()),
-    new InsertOption("quote", ru ? "Цитата" : "Quote", Quote, () => changeBlock($createQuoteNode)),
-    new InsertOption("note", ru ? "Примечание" : "Note", Info, () => directive({ type: "containerDirective", name: "note" })),
-    new InsertOption("code block", ru ? "Блок кода" : "Code block", Braces, () => code({})),
-    new InsertOption("divider", ru ? "Разделитель" : "Divider", Minus, () => divider()),
-  ], [changeBlock, code, directive, divider, image, list, ru, table]);
+  const [closing, setClosing] = useState(false);
+  const reduced = useReducedMotion();
+  const pendingClose = useRef<Promise<void> | null>(null);
+  const closeWithMotion = useCallback(() => {
+    if (reduced) return;
+    if (pendingClose.current) return pendingClose.current;
+    setClosing(true);
+    pendingClose.current = new Promise<void>((resolve) => window.setTimeout(resolve, 130)).finally(() => {
+      pendingClose.current = null;
+      setClosing(false);
+    });
+    return pendingClose.current;
+  }, [reduced]);
+  const renderMenu = useCallback<MenuRenderFn<InsertOption>>((anchor, menu) => (
+    anchor.current && (menu.options.length || closing)
+      ? <InsertMenu anchor={anchor as RefObject<HTMLElement>} menu={menu} closing={closing} /> : null
+  ), [closing]);
+  const editor = useCellValue(rootEditor$);
+  const readOnly = useCellValue(readOnly$);
+  const inTable = useCellValue(editorInTable$);
+  const mac = productDocMacShortcuts();
+  const commands = useProductDocInsertCommands(locale);
+  const options = useMemo(() => commands
+    .filter((option) => productDocCommandMatches(option, query ?? ""))
+    .map((option) => new InsertOption(option)), [commands, query]);
+
+  useLayoutEffect(() => {
+    if (!editor || readOnly || inTable) return;
+    return editor.registerCommand(KEY_DOWN_COMMAND, (event) => {
+      if (event.defaultPrevented || !editor.isEditable() || !editor.getRootElement()?.contains(event.target as Node)) return false;
+      if (event.target instanceof Element && event.target.closest('input, textarea, [contenteditable="false"]')) return false;
+      const id = productDocShortcutCommand(event, mac);
+      const command = id && commands.find((option) => option.id === id);
+      const selection = $getSelection();
+      if (!command || !$isRangeSelection(selection)) return false;
+      event.preventDefault();
+      command.run(selection);
+      return true;
+    }, COMMAND_PRIORITY_HIGH);
+  }, [editor, commands, inTable, mac, readOnly]);
 
   return <LexicalTypeaheadMenuPlugin<InsertOption> anchorClassName={styles.anchor}
-    commandPriority={COMMAND_PRIORITY_NORMAL} menuRenderFn={renderMenu} onQueryChange={setQuery}
-    options={commands.filter((option) => option.matches(query ?? ""))}
+    commandPriority={COMMAND_PRIORITY_NORMAL} menuRenderFn={renderMenu} onQueryChange={setQuery} onClose={closeWithMotion}
+    options={options}
     triggerFn={(text) => {
       const matchingString = productDocCommandQuery(text);
       const selection = $getSelection();
-      if (matchingString === null || !$isRangeSelection(selection)) return null;
+      if (readOnly || inTable || matchingString === null || !$isRangeSelection(selection)) return null;
       const anchor = selection.anchor.getNode();
       const paragraph = anchor.getParent();
       if (anchor.getPreviousSibling() || !$isParagraphNode(paragraph) || !$isRootNode(paragraph.getParent())
-        || !commands.some((option) => option.matches(matchingString))) return null;
+        || !commands.some((option) => productDocCommandMatches(option, matchingString))) return null;
       return { leadOffset: 0, matchingString, replaceableString: text };
     }}
     onSelectOption={(option, token, close) => {
       if (token) {
         token.remove();
-        option.insert();
+        const selection = $getSelection();
+        option.command.run($isRangeSelection(selection) ? selection : null);
       }
       close();
     }} />;

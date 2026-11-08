@@ -1,6 +1,8 @@
-.toggle { display: inline-flex; align-items: center; flex: 0 0 auto; gap: 2px; padding: 2px; border-radius: 10px; background: var(--falcon-hover); }
-.toggle > button { display: grid; place-items: center; width: 28px; height: 26px; min-height: 0; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--falcon-text-muted); cursor: pointer; transition: color 140ms ease, background-color 140ms ease; }
-.toggle > button:hover { color: var(--falcon-text); }
-.toggle > button[aria-pressed="true"] { color: var(--falcon-text); background: var(--falcon-surface); box-shadow: var(--falcon-shadow); }
-.toggle > button:focus-visible { outline: 2px solid var(--falcon-action); outline-offset: 2px; }
-@media (prefers-reduced-motion: reduce) { .toggle > button { transition: none; } }
+.base { display: inline-flex; flex: 0 0 auto; }
+.toggle { display: inline-flex; align-items: center; gap: 2px; padding: 2px; border-radius: 12px; background: var(--falcon-hover); }
+.toggle .tab { position: relative; isolation: isolate; display: grid; place-items: center; width: 28px; height: 26px; min-height: 0; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--falcon-text-muted); cursor: pointer; }
+.toggle .tab:is(:hover, [data-selected="true"]) { color: var(--falcon-text); }
+.toggle .tab[data-selected="true"]:not(:has(.cursor)), .cursor { background: var(--falcon-surface); box-shadow: var(--falcon-shadow); }
+.cursor { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; }
+.content { position: relative; display: grid; place-items: center; color: inherit; }
+.tab:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 2px; }

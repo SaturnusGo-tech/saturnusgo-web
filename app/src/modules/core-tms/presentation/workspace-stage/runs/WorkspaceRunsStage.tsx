@@ -6,7 +6,7 @@ import { buildCaseDeepLink } from "../../../test-cases/navigation/case-deep-link
 import { visitWorkspace } from "../../../state/navigation/browser/workspace-history";
 import { useRunRepository } from "../../runs/repository/state/useRunRepository";
 import { useRunExecutionNavigation } from "../../runs/navigation/state/useRunExecutionNavigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RunRepositoryBrowser } from "../../runs/repository/RunRepositoryBrowser";
 import type { WorkspaceModel } from "../../../state/model/useWorkspaceModel";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -14,17 +14,25 @@ import { RunsView } from "../../runs/RunsView";
 import { useRunImpact } from "../../../impact/application/run/useRunImpact";
 import { RunImpactSummary } from "../../../impact/presentation/run/RunImpactSummary";
 import { TessiqLoader } from "../../common/loading/TessiqLoader";
-export function WorkspaceRunsStage({ model }: { model: WorkspaceModel }) {
+import runLayout from "./workspace-runs-stage.module.css";
+
+export function WorkspaceRunsStage({ model, fixedRun = false, onCloseLockedChange }: {
+  model: WorkspaceModel;
+  fixedRun?: boolean;
+  onCloseLockedChange?(locked: boolean): void;
+}) {
   const [editingRun, setEditingRun] = useState<TestRunSummary | null>(null);
   const [executionDirty, setExecutionDirty] = useState(false);
   const { t, locale } = useTmsLocale();
-  const repository = useRunRepository(model, locale === "ru");
+  const repository = useRunRepository(model, locale === "ru", fixedRun);
   const execution = useRunExecutionNavigation(model, repository, executionDirty);
-  const impactScope = { workspaceId: model.data.workspace.id, projectId: model.project?.id ?? "" };
+  const impactScope = { workspaceId: model.data.workspace.id, projectId: model.projectId };
   const impactEligible = model.connection === "connected" && Boolean(model.selectedRun)
     && model.data.meta.authorization.capabilities.includes("integration:read");
-  const { enabled: impactEnabled, impact, startBlocked } = useRunImpact(impactScope, impactEligible, locale === "ru", model.selectedRun?.id);
-  if (model.runResourceError) return <div role="alert">
+  const { enabled: impactEnabled, impact, startBlocked } = useRunImpact(impactScope, impactEligible, locale === "ru", model.selectedRun);
+  const closeLocked = executionDirty || execution.pending || repository.browser.busy || repository.assignments.busy || Boolean(editingRun);
+  useEffect(() => { onCloseLockedChange?.(closeLocked); }, [closeLocked, onCloseLockedChange]);
+  if (model.runResourceError) return <div className={runLayout.error} role="alert">
     <p>{locale === "ru" ? "Не удалось открыть выбранный прогон. Проверьте доступ и повторите загрузку." : "The selected run could not be opened. Check access and retry."}</p>
     <button type="button" onClick={model.retryRunResource}>{locale === "ru" ? "Повторить" : "Retry"}</button>
   </div>;
@@ -37,15 +45,16 @@ export function WorkspaceRunsStage({ model }: { model: WorkspaceModel }) {
   return (
     <div style={{ height: "100%", minHeight: 0, display: "flex", flexDirection: "column", gap: 10 }}>
       {impactEnabled && <RunImpactSummary state={impact} scope={impactScope} ru={locale === "ru"} />}
-      <div style={{ flex: 1, minHeight: 0 }}>
+      <div className={runLayout.pane}>
       <RunsView
-        onCreate={model.connection === "connected" && model.data.meta.authorization.capabilities.includes("run:manage") ? () => model.openRunDialog() : undefined}
+        embedded={fixedRun}
+        onCreate={!fixedRun && model.connection === "connected" && model.data.meta.authorization.capabilities.includes("run:manage") ? () => model.openRunDialog() : undefined}
         verificationContext={<VerificationRunContext run={model.selectedRun} item={execution.selectedItem}
           connected={model.connection === "connected"} onOpenDefect={model.openDefect}
           onOpenCaseActivity={(caseId) => visitWorkspace(buildCaseDeepLink(window.location.href, {
-            workspaceId: model.data.workspace.id, projectId: model.project!.id, caseId,
+            workspaceId: model.data.workspace.id, projectId: model.projectId, caseId,
           }, { activity: true }))} />}
-        navigation={<RunRepositoryBrowser model={model} repository={repository} onEditRun={onEditRun} draftDirty={executionDirty} lifecycleBlocked={executionDirty || execution.pending} startBlocked={startBlocked} />}
+        navigation={<RunRepositoryBrowser model={model} repository={repository} onEditRun={onEditRun} draftDirty={executionDirty} lifecycleBlocked={executionDirty || execution.pending} startBlocked={startBlocked} fixedRun={fixedRun} />}
         onDirtyChange={setExecutionDirty}
         workspaceId={model.data.workspace.id}
         offline={model.connection === "demo"}
@@ -77,7 +86,7 @@ export function WorkspaceRunsStage({ model }: { model: WorkspaceModel }) {
         }}
       />
       </div>
-      {editingRun && <RunEditDialog key={editingRun.id} run={editingRun} workspaceId={model.data.workspace.id}
+      {editingRun && <RunEditDialog key={editingRun.id} run={editingRun} workspaceId={model.data.workspace.id} inline={fixedRun}
         onClose={() => setEditingRun(null)} onSaved={run => {
           model.setData(current => ({ ...current, runs: current.runs.map(item => item.id === run.id ? run : item) }));
           setEditingRun(null); repository.browser.refresh(); model.retryRunResource();

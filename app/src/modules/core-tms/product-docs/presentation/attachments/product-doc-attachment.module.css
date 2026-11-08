@@ -1,0 +1,83 @@
+.track { position: relative; min-inline-size: 0; margin-block: 15px; }
+.track, .modal {
+  --attachment-surface: var(--falcon-elevated);
+  --attachment-stroke: var(--falcon-border);
+  --attachment-viewport: var(--falcon-surface);
+  --attachment-title: var(--falcon-text);
+  --attachment-meta: var(--falcon-text-secondary);
+  --attachment-glyph: var(--falcon-text-secondary);
+  --attachment-selection: var(--falcon-focus);
+  --attachment-shadow: none;
+}
+:global(html.dark) :is(.track, .modal) {
+  --attachment-surface: var(--falcon-doc-panel);
+  --attachment-stroke: var(--falcon-doc-attachment-border);
+  --attachment-viewport: var(--falcon-doc-attachment-viewport);
+  --attachment-title: var(--falcon-doc-paper);
+  --attachment-meta: var(--falcon-doc-attachment-meta);
+  --attachment-glyph: var(--falcon-doc-attachment-icon);
+  --attachment-selection: var(--falcon-doc-attachment-focus);
+  --attachment-shadow: 0 .5px 2px var(--falcon-doc-attachment-shadow);
+}
+.file { position: relative; container-type: inline-size; box-sizing: border-box; width: min(100%, 44rem); max-inline-size: 100%;
+  margin-inline: auto; margin-block: 0; border: .5px solid var(--attachment-stroke); border-radius: 6px;
+  background: var(--attachment-surface); color: var(--attachment-title); box-shadow: var(--attachment-shadow); scroll-margin-block-start: 100px; }
+.caption { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 9px; padding: 8px 12px 7px 18px; }
+.icon { color: var(--attachment-glyph); }
+.identity { min-inline-size: 0; display: grid; gap: 1px; }
+.identity strong { font-size: 15px; line-height: 20px; font-weight: 500; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.identity span { color: var(--attachment-meta); font-size: 12px; line-height: 15px; }
+.message { color: var(--falcon-text-secondary); font-size: 12px; }
+.actions { display: flex; align-items: center; }
+.actions .action { display: inline-grid; place-items: center; inline-size: 26px; min-inline-size: 26px; block-size: 26px; min-block-size: 0; padding: 0;
+  border: 0; border-radius: 5px; background: transparent; color: var(--attachment-meta); }
+.actions .action > svg { inline-size: 13px; block-size: 13px; stroke-width: 2; }
+.actions .action:not(:disabled):is(:hover, [data-hover="true"]) { background: var(--falcon-hover); color: var(--attachment-title); }
+.actions .action:disabled { opacity: .45; }
+.preview { min-inline-size: 0; overflow: hidden; margin: 0 6px 6px; border-radius: 4px; }
+.file[data-file-kind="image"] { border: 0; background: transparent; box-shadow: none; }
+.file[data-file-kind="image"] .preview { margin: 0; border-radius: 7px; }
+.file[data-file-kind="image"] .caption { display: contents; }
+.file[data-file-kind="image"] :is(.caption > .icon, .identity) {
+  position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%);
+}
+.file[data-file-kind="image"] .actions {
+  position: absolute; z-index: 1; inset: 5px 5px auto auto; border: 1px solid var(--attachment-stroke);
+  border-radius: 6px; background: var(--attachment-surface); opacity: 0; transition: opacity 140ms ease;
+}
+.file[data-file-kind="image"]:is(:hover, :focus-within):not([data-resizing]) .actions { opacity: 1; }
+.file:has(.resize:is(:hover, :focus-visible)), .file[data-resizing] {
+  outline: 2px solid var(--attachment-selection); outline-offset: 1px;
+}
+.upload { position: sticky; inset-block-end: 12px; z-index: 1; width: min(100%, 44rem); margin-inline: auto; }
+.uploadStatus { display: flex; align-items: center; gap: 7px; padding-inline-start: 10px;
+  border-inline-start: 1px solid var(--attachment-stroke); color: var(--attachment-meta); font-size: 13px; }
+.uploadStatus .uploadSpinner { display: flex; align-items: center; gap: 2px; inline-size: 15px; block-size: 14px; transform: none; }
+.uploadStatus .uploadDot { display: block; flex: 0 0 3px; inline-size: 3px; block-size: 3px; background: currentColor; }
+.message { display: flex; align-items: center; gap: 8px; padding: 0 12px 8px; }
+.resize { position: absolute; z-index: 2; inset-block-start: 50%; inset-inline-end: -8px; translate: 0 -50%;
+  display: grid; place-items: center; inline-size: 16px; block-size: 40px; padding: 0; border: 0;
+  border-radius: 8px; background: transparent; cursor: ew-resize; touch-action: none; }
+.resize::after { content: ""; inline-size: 3px; block-size: 19px; border-radius: 4px;
+  background: var(--attachment-selection); opacity: 0; transition: opacity 120ms ease; }
+.file:is(:hover, :focus-within, [data-resizing]) .resize::after { opacity: 1; }
+.file button:focus-visible, .modal button:focus-visible { outline: 1px solid var(--falcon-focus); outline-offset: 1px; }
+.modalWrapper { position: fixed; inset: 0; z-index: 180; display: grid; place-items: center; padding: 16px; }
+.modalBackdrop { position: fixed; inset: 0; z-index: 179; background: var(--falcon-scrim); }
+.modal { display: flex; flex-direction: column; inline-size: min(100%, 65rem); max-block-size: calc(100dvh - 32px); overflow: hidden;
+  border: 1px solid var(--attachment-stroke); border-radius: 12px; background: var(--attachment-surface); color: var(--attachment-title); }
+.modalHeader { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 11px 14px; min-inline-size: 0; }
+.modalHeader > span { font-size: 14px; font-weight: 600; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.modalBody { min-block-size: 0; padding: 0 8px 8px; overflow: auto; }
+@container (max-width: 280px) {
+  .caption { grid-template-columns: auto minmax(0, 1fr); gap: 5px; }
+  .caption .actions { grid-column: 1 / -1; justify-content: end; }
+  .uploadStatus { grid-column: 2; border: 0; padding-inline-start: 0; }
+}
+@media (hover: none) {
+  .resize { inline-size: 32px; inset-inline-end: -12px; }
+  .resize::after, .file[data-file-kind="image"]:not([data-resizing]) .actions { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .resize::after, .file[data-file-kind="image"] .actions { transition: none; }
+}

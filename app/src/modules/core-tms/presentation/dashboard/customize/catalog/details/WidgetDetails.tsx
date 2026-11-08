@@ -1,3 +1,4 @@
+import { Button } from "@heroui/react";
 import { ArrowRight, Check, ChevronDown, Info, Plus } from "lucide-react";
 import { useId, useState, type ReactNode, type Ref } from "react";
 import type { WidgetDefinition } from "../../../../../dashboards/layout/model/widget-catalog";
@@ -8,9 +9,9 @@ import { widgetDetails } from "../model/widget-details";
 import { WidgetPreview } from "../preview/WidgetPreview";
 import styles from "./details.module.css";
 
-export function WidgetDetails({ panelRef, widget, projectName, added, onAdd, onSelectRelated, renderPreview }: {
+export function WidgetDetails({ panelRef, widget, projectName, added, onAdd, onSelectRelated, renderPreview, addLabel, busy = false }: {
   panelRef: Ref<HTMLElement>; widget: WidgetDefinition; projectName: string; added: boolean; onAdd: () => void;
-  onSelectRelated: (key: string) => void; renderPreview?: (key: string) => ReactNode;
+  onSelectRelated: (key: string) => void; renderPreview?: (key: string) => ReactNode; addLabel?: string; busy?: boolean;
 }) {
   const { locale } = useTmsLocale();
   const copy = catalogCopy(locale);
@@ -20,7 +21,7 @@ export function WidgetDetails({ panelRef, widget, projectName, added, onAdd, onS
   const contentsId = useId();
   return <aside ref={panelRef} className={styles.details} aria-labelledby={titleId}>
     <header><h2 id={titleId}>{locale === "ru" ? widget.ru : widget.en}</h2>
-      <p>{copy.preview}<span aria-hidden="true"> · </span>{projectName}</p></header>
+      <p>{copy.preview}{projectName && <><span aria-hidden="true"> · </span>{projectName}</>}</p></header>
     <div className={styles.preview}><WidgetPreview widget={widget} renderPreview={renderPreview} /></div>
     <p className={styles.purpose}>{detail.purpose}</p>
     <div className={styles.section}><span>{copy.section}</span><strong>{sectionLabel(widgetSection(widget.key), locale)}</strong></div>
@@ -31,10 +32,11 @@ export function WidgetDetails({ panelRef, widget, projectName, added, onAdd, onS
       </button>
       {expanded && <ul id={contentsId}>{detail.included.map((item) => <li key={item}>{item}</li>)}</ul>}
     </div>}
-    <button type="button" className={styles.add} disabled={added} onClick={onAdd}>
+    <Button type="button" size="sm" variant="solid" disableRipple className={styles.add} data-added={added}
+      isDisabled={added || busy} onPress={onAdd}>
       {added ? <Check size={19} aria-hidden="true" /> : <Plus size={20} aria-hidden="true" />}
-      {added ? copy.alreadyAdded : copy.add}
-    </button>
+      {added ? copy.alreadyAdded : addLabel ?? copy.add}
+    </Button>
     <div className={styles.explanation}><h3>{copy.context}</h3><p>{detail.context}</p>
       <h3>{copy.overlap}</h3><p>{detail.overlap}</p></div>
     {detail.related.length > 0 && <div className={styles.related}><h3>{copy.related}</h3>

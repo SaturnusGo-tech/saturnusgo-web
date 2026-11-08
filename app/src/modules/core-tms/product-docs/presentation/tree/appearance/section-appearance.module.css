@@ -21,3 +21,49 @@
   width: var(--section-icon-size);
   height: var(--section-icon-size);
 }
+
+.trigger {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.trigger:hover, .trigger[aria-expanded="true"] { background: var(--falcon-hover); }
+.trigger:focus-visible { outline: 1px solid var(--falcon-focus); outline-offset: 2px; }
+.trigger[data-failed]::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--falcon-danger);
+}
+
+.picker {
+  display: block;
+  box-sizing: border-box;
+  width: min(420px, calc(100vw - 24px));
+  max-height: min(420px, calc(100dvh - 28px));
+  padding: 12px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--falcon-border);
+  border-radius: 14px;
+  background: var(--falcon-elevated);
+  color: var(--falcon-text);
+  box-shadow: var(--falcon-shadow-popover);
+  font-size: 12px;
+  scrollbar-width: thin;
+}
+
+.loading { margin: 0; color: var(--falcon-text-secondary); }

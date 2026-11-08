@@ -9,6 +9,7 @@ import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedLabel } from "../../../localization/format/labels";
 import { AnimatedSelect } from "../../common/select/AnimatedSelect";
 import { DashboardChartTooltip } from "../common/DashboardChartTooltip";
+import { DashboardSegments, dashboardTabId } from "../common/segments/DashboardSegments";
 import styles from "./trend.module.css";
 
 const SERIES = ["launched", "passed", "failed", "blocked", "incomplete", "not_started", "aborted"] as const;
@@ -17,12 +18,13 @@ type SeriesKey = typeof SERIES[number];
 
 export function DashboardTrendChart({ snapshot, onOpenDrill, onPeriodChange }: {
   snapshot: DashboardSnapshot;
-  onOpenDrill: (drill: DashboardDrill) => void;
+  onOpenDrill?: (drill: DashboardDrill) => void;
   onPeriodChange?: (period: DashboardPeriod) => void;
 }) {
   const { locale, languageTag, t } = useTmsLocale();
   const reduceMotion = useReducedMotion();
   const titleId = useId();
+  const panelId = `${titleId}-chart`;
   const [mode, setMode] = useState<"launched" | "outcomes">("launched");
   const [bucket, setBucket] = useState("all");
   const [hidden, setHidden] = useState<SeriesKey[]>([]);
@@ -74,62 +76,63 @@ export function DashboardTrendChart({ snapshot, onOpenDrill, onPeriodChange }: {
             { value: "90d", label: t("dashboard.period90") },
           ]} />}
       </header>
-      <div className={styles.modes} role="group" aria-label={t("dashboard.runFlow")}>
-        <button type="button" aria-pressed={mode === "launched"} onClick={() => { setMode("launched"); setHidden([]); }}>{t("dashboard.launchTrend")}</button>
-        <button type="button" aria-pressed={mode === "outcomes"} onClick={() => { setMode("outcomes"); setHidden([]); }}>{t("dashboard.outcomeTrend")}</button>
-      </div>
-      {hasFlow ? <>
-        <div className={styles.axisLabel}>{t("dashboard.runCount")}</div>
-        <div className={styles.chart}>
-          <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={snapshot.trend} margin={{ top: 8, right: 20, bottom: 4, left: 0 }}
-              accessibilityLayer aria-label={t("dashboard.runFlowAria")}>
-              <CartesianGrid stroke="var(--trend-grid)" vertical={false} />
-              <XAxis dataKey="day" axisLine={false} tickLine={false} minTickGap={36} tickMargin={12}
-                tickFormatter={dateLabel} tick={{ fill: "var(--muted)", fontSize: 11 }} />
-              <YAxis width={42} allowDecimals={false} domain={[0, "auto"]} includeHidden axisLine={false}
-                tickLine={false} tickMargin={10} tick={{ fill: "var(--muted)", fontSize: 11 }} />
-              <Tooltip cursor={{ stroke: "var(--line-strong)", strokeWidth: 1 }}
-                content={<DashboardChartTooltip formatLabel={(value) => { const point = snapshot.trend.find((item) => item.day === value); return point ? bucketLabel(point.start, point.end) : dateLabel(String(value)); }}
-                  formatValue={(value) => numberFormat.format(Number(value))} />} />
-              {mode === "launched" && <Area dataKey="launched" name={t("dashboard.launchedRuns")} type="monotone" hide={hidden.includes("launched")}
-                stroke="var(--trend-launched)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" fill="var(--trend-launched)" fillOpacity={0.055}
-                dot={snapshot.trend.length === 1 ? { r: 3 } : false} connectNulls={false}
-                activeDot={(point) => <Dot {...point} r={4} cursor="pointer" onClick={() => onOpenDrill(inBucket(launched, point.index))} />}
-                isAnimationActive={reduceMotion === false} animationDuration={300} />}
-              {shownControls.filter((item) => item.key !== "launched").map((item) => (
-                <Line key={item.key} dataKey={item.key} name={item.label} type="monotone" hide={hidden.includes(item.key)}
-                  stroke={item.color} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" connectNulls={false}
-                  dot={snapshot.trend.length === 1 ? { r: 3 } : false}
-                  activeDot={(point) => <Dot {...point} r={4} cursor="pointer" onClick={() => onOpenDrill(inBucket(item.drill, point.index))} />}
-                  isAnimationActive={reduceMotion === false} animationDuration={300} />
-              ))}
-            </ComposedChart>
-          </ResponsiveContainer>
+      <DashboardSegments label={t("dashboard.runFlow")} panelId={panelId} selectedKey={mode} listClassName={styles.modes}
+        items={[{ key: "launched", label: t("dashboard.launchTrend") }, { key: "outcomes", label: t("dashboard.outcomeTrend") }]}
+        onSelect={(next) => { setMode(next); setHidden([]); }} />
+      <div id={panelId} role="tabpanel" aria-labelledby={dashboardTabId(panelId, mode)}>
+        {hasFlow ? <>
+          <div className={styles.axisLabel}>{t("dashboard.runCount")}</div>
+          <div className={styles.chart}>
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={snapshot.trend} margin={{ top: 8, right: 20, bottom: 4, left: 0 }}
+                accessibilityLayer aria-label={t("dashboard.runFlowAria")}>
+                <CartesianGrid stroke="var(--trend-grid)" vertical={false} />
+                <XAxis dataKey="day" axisLine={false} tickLine={false} minTickGap={36} tickMargin={12}
+                  tickFormatter={dateLabel} tick={{ fill: "var(--muted)", fontSize: 11 }} />
+                <YAxis width={42} allowDecimals={false} domain={[0, "auto"]} includeHidden axisLine={false}
+                  tickLine={false} tickMargin={10} tick={{ fill: "var(--muted)", fontSize: 11 }} />
+                <Tooltip cursor={{ stroke: "var(--line-strong)", strokeWidth: 1 }}
+                  content={<DashboardChartTooltip formatLabel={(value) => { const point = snapshot.trend.find((item) => item.day === value); return point ? bucketLabel(point.start, point.end) : dateLabel(String(value)); }}
+                    formatValue={(value) => numberFormat.format(Number(value))} />} />
+                {mode === "launched" && <Area dataKey="launched" name={t("dashboard.launchedRuns")} type="monotone" hide={hidden.includes("launched")}
+                  stroke="var(--trend-launched)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" fill="var(--trend-launched)" fillOpacity={0.055}
+                  dot={snapshot.trend.length === 1 ? { r: 3 } : false} connectNulls={false}
+                  activeDot={(point) => <Dot {...point} r={4} cursor={onOpenDrill ? "pointer" : undefined} onClick={onOpenDrill && (() => onOpenDrill(inBucket(launched, point.index)))} />}
+                  isAnimationActive={reduceMotion === false} animationDuration={300} />}
+                {shownControls.filter((item) => item.key !== "launched").map((item) => (
+                  <Line key={item.key} dataKey={item.key} name={item.label} type="monotone" hide={hidden.includes(item.key)}
+                    stroke={item.color} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" connectNulls={false}
+                    dot={snapshot.trend.length === 1 ? { r: 3 } : false}
+                    activeDot={(point) => <Dot {...point} r={4} cursor={onOpenDrill ? "pointer" : undefined} onClick={onOpenDrill && (() => onOpenDrill(inBucket(item.drill, point.index)))} />}
+                    isAnimationActive={reduceMotion === false} animationDuration={300} />
+                ))}
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+        </> : <p className={styles.empty}>{t("dashboard.noRunFlow")}</p>}
+        <div className={styles.legend} role="group" aria-label={t("dashboard.runFlowAria")}>
+          {shownControls.map((item) => {
+            const visible = !hidden.includes(item.key);
+            return <div className={styles.series} key={item.key} data-visible={visible}>
+              <button className={styles.toggle} type="button" aria-pressed={visible} onClick={() => toggle(item.key)}
+                disabled={visible && shownControls.filter((item) => !hidden.includes(item.key)).length === 1}
+                aria-label={`${t(visible ? "dashboard.hideSeries" : "dashboard.showSeries")}: ${item.label}`}>
+                <span className={styles.dot} aria-hidden="true" style={{ background: item.color }} />
+                <span>{item.label}</span>
+              </button>
+              {onOpenDrill ? <button className={styles.drill} type="button" onClick={() => onOpenDrill(selected(item.drill))}
+                aria-label={`${t("dashboard.open.run")}: ${item.label}, ${numberFormat.format(item.value)}`}>
+                <strong>{numberFormat.format(item.value)}</strong><ArrowUpRight size={12} aria-hidden="true" />
+              </button> : <span className={styles.drill}><strong>{numberFormat.format(item.value)}</strong></span>}
+            </div>;
+          })}
         </div>
-      </> : <p className={styles.empty}>{t("dashboard.noRunFlow")}</p>}
-      <div className={styles.legend} role="group" aria-label={t("dashboard.runFlowAria")}>
-        {shownControls.map((item) => {
-          const visible = !hidden.includes(item.key);
-          return <div className={styles.series} key={item.key} data-visible={visible}>
-            <button className={styles.toggle} type="button" aria-pressed={visible} onClick={() => toggle(item.key)}
-              disabled={visible && shownControls.filter((item) => !hidden.includes(item.key)).length === 1}
-              aria-label={`${t(visible ? "dashboard.hideSeries" : "dashboard.showSeries")}: ${item.label}`}>
-              <span className={styles.dot} aria-hidden="true" style={{ background: item.color }} />
-              <span>{item.label}</span>
-            </button>
-            <button className={styles.drill} type="button" onClick={() => onOpenDrill(selected(item.drill))}
-              aria-label={`${t("dashboard.open.run")}: ${item.label}, ${numberFormat.format(item.value)}`}>
-              <strong>{numberFormat.format(item.value)}</strong><ArrowUpRight size={12} aria-hidden="true" />
-            </button>
-          </div>;
-        })}
+        <footer className={styles.footer}>
+          <AnimatedSelect compact className={styles.bucketSelect} label={t("dashboard.bucket")}
+            value={selectedPoint ? bucket : "all"} onChange={setBucket} options={bucketOptions} />
+          {onOpenDrill && <span>{t("dashboard.trendDrillHint")}</span>}
+        </footer>
       </div>
-      <footer className={styles.footer}>
-        <AnimatedSelect compact className={styles.bucketSelect} label={t("dashboard.bucket")}
-          value={selectedPoint ? bucket : "all"} onChange={setBucket} options={bucketOptions} />
-        <span>{t("dashboard.trendDrillHint")}</span>
-      </footer>
     </section>
   );
 }

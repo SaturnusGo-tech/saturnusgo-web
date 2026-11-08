@@ -8,6 +8,7 @@ import { RepositoryDragContext } from "../../folders/presentation/dnd/Repository
 import { useEffect, useRef, useState } from "react";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { TessiqLoader } from "../common/loading/TessiqLoader";
+import { CaseLocationBreadcrumbs } from "./detail/location/CaseLocationBreadcrumbs";
 import { CaseDetailPanel } from "./detail/CaseDetailPanel";
 import {
   CASE_INSPECTOR_MAX,
@@ -134,6 +135,9 @@ export function CasesView(props: CasesViewProps) {
             sharedSteps={props.sharedSteps}
             onResolveSharedStep={props.onResolveSharedStep}
             selectedFolder={props.selectedFolder}
+            location={props.testCase && props.revision && props.editor?.mode !== "create" &&
+              <CaseLocationBreadcrumbs ru={locale === "ru"} projectName={props.projectName} path={props.testCase.folderPath}
+                title={props.revision.title} onFolder={props.editor || props.repository ? undefined : props.onSelectFolder} />}
             onNew={view.createCase}
             onEdit={props.onEdit}
             onClone={props.onClone}

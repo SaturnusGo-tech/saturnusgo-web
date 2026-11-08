@@ -15,7 +15,7 @@
 .hotspotRow > div { min-width: 0; padding: 5px 12px; }
 .hotspotRow > div + div { border-left: 1px solid var(--line); }
 .portfolioPanel button { padding: 4px 0; color: var(--ink); border: 0; background: transparent; font-size: 12px; line-height: 1.5; cursor: pointer; font-variant-numeric: tabular-nums; }
-.portfolioPanel button:hover { color: var(--action); }
+.portfolioPanel button:not(:disabled):hover { color: var(--action); }
 .portfolioPanel button:focus-visible { outline: 2px solid var(--action); outline-offset: 3px; border-radius: 4px; }
 .portfolioPanel .hotspotName { width: 100%; display: flex; align-items: center; gap: 9px; text-align: left; }
 .riskDot { width: 9px; height: 9px; flex: 0 0 auto; border-radius: 50%; background: var(--risk-color); }
@@ -45,3 +45,13 @@
 :global([data-appearance="glass"]) .hotspotHeader { background: var(--control); }
 :global([data-appearance="glass"]) .hotspotRow > div + div { border-left: 0; }
 :global([data-appearance="glass"]) .hotspotRow:hover { background: var(--control-hover); }
+
+:global([data-doc-dashboard]) .portfolioPanel {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  max-block-size: min(var(--embed-height, 640px), 68dvh);
+}
+:global([data-doc-dashboard]) .portfolioPanel > :not(.hotspotTable) { flex: none; }
+:global([data-doc-dashboard]) .hotspotTable { min-block-size: 0; overflow: auto; scrollbar-width: thin; }
+:global([data-doc-dashboard]) .hotspotHeader { position: sticky; inset-block-start: 0; z-index: 1; }

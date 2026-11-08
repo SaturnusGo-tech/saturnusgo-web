@@ -9,7 +9,7 @@
 .outcomes i { width: 10px; height: 10px; border-radius: 50%; background: var(--outcome-color); }
 .outcomes strong { font-size: 12px; font-weight: 550; font-variant-numeric: tabular-nums; }
 .outcomes button > span { min-width: 0; overflow-wrap: anywhere; }
-.panel .outcomes button:hover { color: var(--action); }
+.panel .outcomes button:not(:disabled):hover { color: var(--action); }
 .outcomes button:focus-visible { outline: 2px solid var(--action); outline-offset: 3px; border-radius: 4px; }
 @container dashboard-widget (max-width: 300px) { .heading, .composition, .outcomes { padding-inline: 14px; } }
 

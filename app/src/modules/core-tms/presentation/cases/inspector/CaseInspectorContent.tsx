@@ -21,13 +21,13 @@ import { Requirements } from "../../../product-docs/requirements/Requirements";
 type Props = {
   testCaseId?: string;
   projectId?: string;
-  locale: TmsLocale; revision: TestCaseRevision; archived?: boolean; editor?: CaseInspectorEditor;
+  locale: TmsLocale; revision: TestCaseRevision; archived?: boolean; readOnly?: boolean; editor?: CaseInspectorEditor;
   sharedSteps: readonly SharedStepSummary[];
   onResolveSharedStep: (id: string) => Promise<SharedStep | null>;
   onRequestEdit: () => void;
 };
 export function CaseInspectorContent({
-  locale, revision, archived, editor, sharedSteps, onResolveSharedStep, onRequestEdit, testCaseId, projectId,
+  locale, revision, archived, readOnly: previewOnly, editor, sharedSteps, onResolveSharedStep, onRequestEdit, testCaseId, projectId,
 }: Props) {
   const ru = locale === "ru";
   const [layout, setLayout] = useScenarioLayout();
@@ -39,7 +39,7 @@ export function CaseInspectorContent({
   const folderSnapshots = useRef<Partial<Record<InspectorSection, string>>>({});
   const editorMode = editor?.mode;
   const creating = editorMode === "create";
-  const readOnly = Boolean(archived) && !creating;
+  const readOnly = Boolean(archived || previewOnly) && !creating;
   const linksPending = Boolean(editor?.documentationRetry);
   const value = readOnly ? visible : editor?.value ?? visible;
   useEffect(() => { setVisible(copyInspectorRevision(revision)); }, [revision]);
@@ -94,6 +94,7 @@ export function CaseInspectorContent({
     onEdit: begin,
     onCancel: cancel,
     onSave: saveSection,
+    hideEdit: previewOnly,
     disabled: readOnly || linksPending || editor?.submitting || editor?.attachmentsPending,
   });
   const requestField = (section: InspectorSection) => !readOnly && !linksPending && !editor?.submitting && !editor?.attachmentsPending ? () => {

@@ -1,0 +1,26 @@
+.positioner { z-index: 160; }
+.palette {
+  box-sizing: border-box;
+  inline-size: min(216px, calc(100vw - 24px));
+  padding: 9px;
+  border: 1px solid var(--falcon-border);
+  border-radius: 12px;
+  background: var(--falcon-elevated);
+  color: var(--falcon-text);
+  box-shadow: var(--falcon-shadow-popover);
+}
+.trigger {
+  display: inline-grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--falcon-icon);
+  cursor: pointer;
+}
+.trigger:is(:hover, [aria-expanded="true"]) { background: var(--falcon-hover); color: var(--falcon-text); }
+.trigger:disabled { opacity: .45; cursor: default; }

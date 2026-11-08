@@ -27471,6 +27471,735 @@
         }
       ]
     },
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/link-preview": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Product Docs"
+        ],
+        "operationId": "resolveProductDocLink",
+        "summary": "Resolve authorized Falcon link metadata or compact metadata for a public URL.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Product Docs result.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProductDocLinkPreview"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductDocLinkTarget"
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "not-applicable"
+      }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/run-embeds": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "docId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "Product Docs"
+        ],
+        "operationId": "captureProductDocRun",
+        "summary": "Capture immutable evidence from a test run. Use the same command ID for retries.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Product Docs result.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProductDocRunEmbedCapture"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductDocRunEmbedCaptureInput"
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "body-key"
+      }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/run-embeds/candidates": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "docId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Product Docs"
+        ],
+        "operationId": "listProductDocRunCandidates",
+        "summary": "Find accessible test runs to capture as article evidence.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Search for runs by name, key, or environment.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ql",
+            "in": "query",
+            "description": "Falcon Query expression for case filters.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Opaque cursor from the previous page.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            }
+          },
+          {
+            "name": "projectIds",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Identifier"
+              }
+            }
+          },
+          {
+            "name": "results",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/ExecutionStatus"
+              }
+            }
+          },
+          {
+            "name": "folders",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "productGroups",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "products",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "regression",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "true",
+                  "false"
+                ]
+              }
+            }
+          },
+          {
+            "name": "types",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/AnalyticsTestCaseType"
+              }
+            }
+          },
+          {
+            "name": "priorities",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "critical",
+                  "high",
+                  "medium",
+                  "low"
+                ]
+              }
+            }
+          },
+          {
+            "name": "statuses",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "ready",
+                  "draft",
+                  "deprecated"
+                ]
+              }
+            }
+          },
+          {
+            "name": "tags",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "owners",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "components",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matching test runs in accessible projects.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductDocRunCandidatesEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "x-tms-idempotency": "not-applicable"
+      }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/run-embeds/{embedId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "docId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        },
+        {
+          "name": "embedId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^runembed_[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Product Docs"
+        ],
+        "operationId": "getProductDocRun",
+        "summary": "Read a saved run capture from the selected article revision.",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2147483647
+            }
+          },
+          {
+            "name": "draft",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product Docs result.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProductDocRunEmbed"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/dashboard-embeds": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "docId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "Product Docs"
+        ],
+        "operationId": "captureProductDocDashboard",
+        "summary": "Capture an immutable dashboard widget snapshot. Retry the same operation with the same command ID.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Product Docs result.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProductDocDashboardEmbed"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductDocDashboardCaptureInput"
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "not-applicable"
+      }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/dashboard-embeds/{embedId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "docId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        },
+        {
+          "name": "embedId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^dsh_[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Product Docs"
+        ],
+        "operationId": "getProductDocDashboard",
+        "summary": "Read the saved snapshot or evaluate the same widget with current data.",
+        "parameters": [
+          {
+            "name": "mode",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "snapshot",
+                "current"
+              ],
+              "default": "snapshot"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2147483647
+            }
+          },
+          {
+            "name": "draft",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product Docs result.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProductDocDashboardEmbed"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
     "/workspaces/{workspaceId}/projects/{projectId}/product-docs": {
       "parameters": [
         {
@@ -27537,6 +28266,22 @@
             "description": "List roots of archived branches. Requires publish permission. Cannot be combined with draft=true or parentId.",
             "schema": {
               "type": "boolean"
+            }
+          },
+          {
+            "name": "productGroupId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
             }
           }
         ],
@@ -27640,6 +28385,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
           }
         },
         "requestBody": {
@@ -27653,6 +28401,92 @@
           }
         },
         "x-tms-idempotency": "required"
+      }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/diagram": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Product Docs"
+        ],
+        "operationId": "generateProductDocDiagram",
+        "description": "Generate a Mermaid flowchart proposal for a project. Requires documentation edit access and consumes the workspace's writing budget. The proposal leaves all saved documents unchanged.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductDocDiagramInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The generated flowchart source.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProductDocDiagram"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        }
       }
     },
     "/workspaces/{workspaceId}/projects/{projectId}/product-docs/availability": {
@@ -27863,6 +28697,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
           }
         },
         "requestBody": {
@@ -28397,6 +29234,379 @@
         }
       }
     },
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/impact": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "docId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Product Docs"
+        ],
+        "operationId": "getProductDocImpact",
+        "summary": "Read article coverage or compare an exact saved draft with the latest publication.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+            }
+          },
+          {
+            "name": "draft",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "expectedDraftVersion",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2147483647
+            }
+          },
+          {
+            "name": "sectionId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product Docs result.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProductDocImpact"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/reviews": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "docId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Product Docs"
+        ],
+        "operationId": "listProductDocReviews",
+        "summary": "List review requests for saved article drafts.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product Docs result.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProductDocReviewPage"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Product Docs"
+        ],
+        "operationId": "requestProductDocReview",
+        "x-tms-idempotency": "body-key",
+        "summary": "Request a review of a saved draft or one of its sections.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductDocReviewRequestInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Product Docs result.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProductDocReview"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "422": {
+            "description": "The selected reviewer cannot review this draft.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/reviews/{reviewId}/decision": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "docId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        },
+        {
+          "name": "reviewId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "Product Docs"
+        ],
+        "operationId": "decideProductDocReview",
+        "x-tms-idempotency": "body-key",
+        "summary": "Record a review decision as the assigned reviewer.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductDocReviewDecisionInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product Docs result.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProductDocReview"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
     "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/comments": {
       "parameters": [
         {
@@ -28869,6 +30079,238 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/attachments": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "docId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "Product Docs"
+        ],
+        "operationId": "uploadProductDocAttachment",
+        "summary": "Upload a private document attachment of at most 25 MiB.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "in": "query",
+            "name": "filename",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string",
+                "format": "binary",
+                "maxLength": 26214400
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Private product documentation attachment and expiring content URLs.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProductDocAttachment"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "408": {
+            "description": "Preview processing exceeded its time limit.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        },
+        "x-tms-idempotency": "required"
+      }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/attachments/{attachmentId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "docId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        },
+        {
+          "in": "path",
+          "name": "attachmentId",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^docfile_[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Product Docs"
+        ],
+        "operationId": "getProductDocAttachment",
+        "summary": "Read an attachment authorized by the selected article revision.",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2147483647
+            }
+          },
+          {
+            "name": "draft",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Private product documentation attachment and expiring content URLs.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProductDocAttachment"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
@@ -34939,7 +36381,8 @@
           "BILLING_READ_ONLY",
           "BILLING_CONTACT_SALES",
           "BILLING_TEAM_UNAVAILABLE",
-          "PERSONAL_OWNERSHIP_TRANSFER_UNAVAILABLE"
+          "PERSONAL_OWNERSHIP_TRANSFER_UNAVAILABLE",
+          "PRODUCT_DOC_INVALID_TAXONOMY"
         ]
       },
       "ValidationIssue": {
@@ -57497,6 +58940,697 @@
           }
         }
       },
+      "ProductDocTaxonomyInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "productGroupId",
+          "productId"
+        ],
+        "properties": {
+          "productGroupId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "productId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "ProductDocTaxonomyValue": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "label"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "label": {
+            "type": "string"
+          }
+        }
+      },
+      "ProductDocTaxonomy": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "productGroup",
+          "product"
+        ],
+        "properties": {
+          "productGroup": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProductDocTaxonomyValue"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "product": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProductDocTaxonomyValue"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "ProductDocSearchMatch": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "sectionId",
+          "sectionTitle",
+          "snippet"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "title",
+              "section",
+              "body"
+            ]
+          },
+          "sectionId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,128}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sectionTitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "snippet": {
+            "type": "string"
+          }
+        }
+      },
+      "ProductDocLinkTarget": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind",
+              "id"
+            ],
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "case"
+                ]
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind",
+              "id"
+            ],
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "document"
+                ]
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,128}$"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 2147483647
+              },
+              "sectionId": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,128}$"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind",
+              "url"
+            ],
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "external"
+                ]
+              },
+              "url": {
+                "type": "string",
+                "format": "uri",
+                "maxLength": 2048
+              }
+            }
+          }
+        ]
+      },
+      "ProductDocLinkPreview": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "title",
+          "description",
+          "host",
+          "path"
+        ],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "ready",
+              "deprecated",
+              "published",
+              "archived"
+            ]
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ]
+          },
+          "ownerIdentityId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "case",
+              "document",
+              "external"
+            ]
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "host": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "path": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ProductDocRunEmbed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "runId",
+          "runKey",
+          "title",
+          "status",
+          "environmentName",
+          "runCreatedAt",
+          "capturedAt",
+          "requirementVersions",
+          "counts"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^runembed_[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$"
+          },
+          "runId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "runProjectId": {
+            "$ref": "#/components/schemas/Identifier",
+            "description": "Project that owns the source run. Older snapshots may omit this property."
+          },
+          "runKey": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RunStatus"
+          },
+          "environmentName": {
+            "type": "string"
+          },
+          "runCreatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "capturedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "requirementVersions": {
+            "type": "array",
+            "description": "Sorted, distinct published versions of this article pinned by items in the source run.",
+            "items": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2147483647
+            }
+          },
+          "counts": {
+            "$ref": "#/components/schemas/ExecutionCounts"
+          }
+        }
+      },
+      "ProductDocRunEmbedCapture": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "runId",
+          "runKey",
+          "title",
+          "status",
+          "environmentName",
+          "runCreatedAt",
+          "capturedAt",
+          "requirementVersions",
+          "counts",
+          "directive"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^runembed_[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$"
+          },
+          "runId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "runProjectId": {
+            "$ref": "#/components/schemas/Identifier",
+            "description": "Project that owns the source run. Older snapshots may omit this property."
+          },
+          "runKey": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RunStatus"
+          },
+          "environmentName": {
+            "type": "string"
+          },
+          "runCreatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "capturedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "requirementVersions": {
+            "type": "array",
+            "description": "Sorted, distinct published versions of this article pinned by items in the source run.",
+            "items": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2147483647
+            }
+          },
+          "counts": {
+            "$ref": "#/components/schemas/ExecutionCounts"
+          },
+          "directive": {
+            "type": "string",
+            "description": "Standalone Markdown directive for this article."
+          }
+        }
+      },
+      "ProductDocRunCandidate": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "projectId",
+          "projectName",
+          "key",
+          "name",
+          "environmentName",
+          "createdAt",
+          "status",
+          "components",
+          "tags"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "projectId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "environmentName": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RunStatus"
+          },
+          "components": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ProductDocRunCandidatesEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductDocRunCandidate"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "nextCursor",
+              "hasMore"
+            ],
+            "properties": {
+              "nextCursor": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "hasMore": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "ProductDocRunEmbedCaptureInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "runId",
+          "commandId"
+        ],
+        "properties": {
+          "runId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "runProjectId": {
+            "$ref": "#/components/schemas/Identifier",
+            "description": "Source project when the run belongs to a different project. Defaults to the article project."
+          },
+          "commandId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[!-~]+$"
+          }
+        }
+      },
+      "ProductDocDashboardCaptureInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "widgetKey",
+          "periodDays",
+          "commandId"
+        ],
+        "properties": {
+          "widgetKey": {
+            "type": "string",
+            "enum": [
+              "readyForRetest",
+              "trend",
+              "queue",
+              "portfolio",
+              "freshness",
+              "types",
+              "tags",
+              "coverage",
+              "defects",
+              "outcomes",
+              "currentCases",
+              "casesCreated",
+              "runsLaunched",
+              "completedRuns",
+              "passedRuns",
+              "passRate",
+              "currentDefects",
+              "reportedDefects",
+              "linkedDefects",
+              "defect:open",
+              "defect:triaged",
+              "defect:in_progress",
+              "defect:ready_for_retest",
+              "defect:verified",
+              "defect:closed",
+              "defect:reopened",
+              "type:manual",
+              "type:automated",
+              "type:checklist"
+            ]
+          },
+          "periodDays": {
+            "type": "integer",
+            "enum": [
+              7,
+              30,
+              90
+            ]
+          },
+          "productGroupId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "productId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "regression": {
+            "type": "boolean"
+          },
+          "commandId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        }
+      },
+      "ProductDocDashboardEmbed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "widgetKey",
+          "periodDays",
+          "modelVersion",
+          "capturedAt",
+          "generatedAt",
+          "summary",
+          "workbench"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^dsh_[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$"
+          },
+          "widgetKey": {
+            "type": "string",
+            "enum": [
+              "readyForRetest",
+              "trend",
+              "queue",
+              "portfolio",
+              "freshness",
+              "types",
+              "tags",
+              "coverage",
+              "defects",
+              "outcomes",
+              "currentCases",
+              "casesCreated",
+              "runsLaunched",
+              "completedRuns",
+              "passedRuns",
+              "passRate",
+              "currentDefects",
+              "reportedDefects",
+              "linkedDefects",
+              "defect:open",
+              "defect:triaged",
+              "defect:in_progress",
+              "defect:ready_for_retest",
+              "defect:verified",
+              "defect:closed",
+              "defect:reopened",
+              "type:manual",
+              "type:automated",
+              "type:checklist"
+            ]
+          },
+          "periodDays": {
+            "type": "integer",
+            "enum": [
+              7,
+              30,
+              90
+            ]
+          },
+          "productGroupId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "productId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "regression": {
+            "type": "boolean"
+          },
+          "modelVersion": {
+            "type": "integer",
+            "enum": [
+              1
+            ]
+          },
+          "capturedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "generatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/DashboardAnalyticsSummary"
+          },
+          "workbench": {
+            "$ref": "#/components/schemas/DashboardWorkbench"
+          }
+        }
+      },
       "ProductDocNode": {
         "type": "object",
         "additionalProperties": false,
@@ -57558,6 +59692,31 @@
           },
           "appearance": {
             "$ref": "#/components/schemas/RepositoryFolderAppearance"
+          },
+          "taxonomy": {
+            "$ref": "#/components/schemas/ProductDocTaxonomy"
+          },
+          "match": {
+            "$ref": "#/components/schemas/ProductDocSearchMatch"
+          },
+          "searchPath": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "title"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       },
@@ -57691,6 +59850,46 @@
           },
           "appearance": {
             "$ref": "#/components/schemas/RepositoryFolderAppearance"
+          },
+          "taxonomy": {
+            "$ref": "#/components/schemas/ProductDocTaxonomy"
+          },
+          "properties": {
+            "$ref": "#/components/schemas/ProductDocProperties"
+          },
+          "activity": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Recorded creation and publication events visible with this document.",
+            "properties": {
+              "created": {
+                "$ref": "#/components/schemas/ProductDocActivityEvent"
+              },
+              "published": {
+                "$ref": "#/components/schemas/ProductDocActivityEvent"
+              }
+            }
+          }
+        }
+      },
+      "ProductDocActivityEvent": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "identityId",
+          "displayName",
+          "at"
+        ],
+        "properties": {
+          "identityId": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
@@ -57731,6 +59930,36 @@
           }
         }
       },
+      "ProductDocDiagramInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "prompt"
+        ],
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000,
+            "description": "The process to diagram, without leading or trailing whitespace."
+          }
+        }
+      },
+      "ProductDocDiagram": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source"
+        ],
+        "properties": {
+          "source": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 5000,
+            "description": "Canonical Mermaid flowchart source with plain-text node and edge labels."
+          }
+        }
+      },
       "ProductDocCreateInput": {
         "type": "object",
         "additionalProperties": false,
@@ -57762,6 +59991,18 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 200
+          },
+          "taxonomy": {
+            "$ref": "#/components/schemas/ProductDocTaxonomyInput"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 32768,
+            "description": "Initial Markdown body for a page. Blank text leaves the draft empty."
+          },
+          "properties": {
+            "$ref": "#/components/schemas/ProductDocPropertiesInput",
+            "description": "Optional initial priority, assignee and labels for a page."
           }
         }
       },
@@ -57797,6 +60038,13 @@
               "$ref": "#/components/schemas/ProductDocTitleHighlight"
             },
             "description": "Ordered, non-overlapping UTF-16 ranges in the plain title. An empty array removes all title highlights."
+          },
+          "taxonomy": {
+            "$ref": "#/components/schemas/ProductDocTaxonomyInput"
+          },
+          "properties": {
+            "$ref": "#/components/schemas/ProductDocPropertiesInput",
+            "description": "Omit to preserve the current properties. Clear by passing null priority, null assigneeIdentityId and an empty labels array."
           }
         },
         "description": "Total Markdown length across sections must not exceed 262144."
@@ -58065,6 +60313,392 @@
           }
         }
       },
+      "ProductDocImpactCase": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "caseId",
+          "title",
+          "sectionId",
+          "needsUpdate",
+          "affected",
+          "missingSection"
+        ],
+        "properties": {
+          "caseId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "title": {
+            "type": "string"
+          },
+          "sectionId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,128}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "needsUpdate": {
+            "type": "boolean"
+          },
+          "affected": {
+            "type": "boolean"
+          },
+          "missingSection": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ProductDocImpactSection": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sectionId",
+          "title",
+          "kind"
+        ],
+        "properties": {
+          "sectionId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "title": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "added",
+              "edited",
+              "removed"
+            ]
+          },
+          "excerpt": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "field",
+              "before",
+              "after"
+            ],
+            "properties": {
+              "field": {
+                "type": "string",
+                "enum": [
+                  "heading",
+                  "body"
+                ]
+              },
+              "before": {
+                "type": "string"
+              },
+              "after": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "ProductDocImpact": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "cases",
+          "totalLinkedCases",
+          "affectedCases",
+          "casesNeedingUpdate",
+          "nextCursor",
+          "publishedVersion",
+          "draftVersion",
+          "changes"
+        ],
+        "properties": {
+          "cases": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductDocImpactCase"
+            },
+            "maxItems": 100
+          },
+          "totalLinkedCases": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "affectedCases": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "casesNeedingUpdate": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "publishedVersion": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 2147483647
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "draftVersion": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 2147483647
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "changes": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "pageChanged",
+                  "orderChanged",
+                  "sections"
+                ],
+                "properties": {
+                  "pageChanged": {
+                    "type": "boolean"
+                  },
+                  "orderChanged": {
+                    "type": "boolean"
+                  },
+                  "sections": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ProductDocImpactSection"
+                    },
+                    "maxItems": 200
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "ProductDocReview": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "sectionId",
+          "reviewerIdentityId",
+          "reviewerDisplayName",
+          "requestedByIdentityId",
+          "draftVersion",
+          "status",
+          "note",
+          "requestedAt",
+          "decidedAt",
+          "stale",
+          "canDecide"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "sectionId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,128}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reviewerIdentityId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "reviewerDisplayName": {
+            "type": "string"
+          },
+          "requestedByIdentityId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "draftVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "approved",
+              "changes_requested"
+            ]
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "requestedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "decidedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "stale": {
+            "type": "boolean"
+          },
+          "canDecide": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ProductDocReviewPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reviews",
+          "nextCursor",
+          "currentDraftVersion",
+          "canRequest"
+        ],
+        "properties": {
+          "reviews": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductDocReview"
+            },
+            "maxItems": 100
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,128}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "currentDraftVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "canRequest": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ProductDocReviewRequestInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sectionId",
+          "reviewerIdentityId",
+          "expectedDraftVersion",
+          "commandId"
+        ],
+        "properties": {
+          "sectionId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,128}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reviewerIdentityId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "expectedDraftVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "commandId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[!-~]+$"
+          }
+        }
+      },
+      "ProductDocReviewDecisionInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "decision",
+          "commandId"
+        ],
+        "properties": {
+          "decision": {
+            "type": "string",
+            "enum": [
+              "approved",
+              "changes_requested"
+            ]
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          },
+          "commandId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[!-~]+$"
+          }
+        }
+      },
       "ProductDocLinkInput": {
         "type": "object",
         "additionalProperties": false,
@@ -58149,6 +60783,230 @@
             "$ref": "#/components/schemas/RepositoryFolderAppearance"
           }
         }
+      },
+      "ProductDocPriority": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "enum": [
+          "critical",
+          "high",
+          "medium",
+          "low",
+          null
+        ]
+      },
+      "ProductDocPropertiesInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "priority",
+          "assigneeIdentityId",
+          "labels"
+        ],
+        "properties": {
+          "priority": {
+            "$ref": "#/components/schemas/ProductDocPriority"
+          },
+          "assigneeIdentityId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 128
+          },
+          "labels": {
+            "type": "array",
+            "maxItems": 12,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 48
+            }
+          }
+        }
+      },
+      "ProductDocProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "priority",
+          "assignee",
+          "labels"
+        ],
+        "properties": {
+          "priority": {
+            "$ref": "#/components/schemas/ProductDocPriority"
+          },
+          "assignee": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "identityId",
+                  "displayName"
+                ],
+                "properties": {
+                  "identityId": {
+                    "type": "string"
+                  },
+                  "displayName": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "labels": {
+            "type": "array",
+            "maxItems": 12,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 48
+            }
+          }
+        }
+      },
+      "ProductDocAttachment": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "filename",
+          "byteSize",
+          "mimeType",
+          "kind",
+          "url",
+          "downloadUrl",
+          "expiresAt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "byteSize": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 26214400
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "image",
+              "audio",
+              "video",
+              "pdf",
+              "document",
+              "spreadsheet"
+            ]
+          },
+          "preview": {
+            "$ref": "#/components/schemas/ProductDocAttachmentPreview"
+          },
+          "previewMimeType": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "downloadUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ProductDocAttachmentPreview": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "paragraphs"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "text"
+              },
+              "truncated": {
+                "type": "boolean"
+              },
+              "paragraphs": {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "sheets"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "table"
+              },
+              "truncated": {
+                "type": "boolean"
+              },
+              "sheets": {
+                "type": "array",
+                "maxItems": 10,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "name",
+                    "rows"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "rows": {
+                      "type": "array",
+                      "maxItems": 40,
+                      "items": {
+                        "type": "array",
+                        "maxItems": 16,
+                        "items": {
+                          "type": "string",
+                          "maxLength": 256
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
       }
     }
   }

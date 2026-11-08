@@ -1,15 +1,12 @@
+import { Tab, Tabs } from "@heroui/react";
 import type { ReactNode } from "react";
 import layout from "./case-detail-tabs.module.css";
 import { transitionContent } from "../../../workspace/motion/transition/content-transition";
 import type { TmsLocale } from "../../../../localization/model/locale";
 import {
-  inspectorTabAfterKey,
   inspectorTabsForMode,
   type InspectorTabId,
-  type InspectorTabKey,
 } from "../../inspector/model";
-import inspector from "../../inspector/caseInspector.module.css";
-import styles from "../../cases.module.css";
 
 type Props = {
   locale: TmsLocale;
@@ -30,31 +27,20 @@ export function CaseDetailTabs({ locale, active, tabsId, creating, fileCount = 0
     activity: ru ? "История" : "Change history",
   };
   const tabs = inspectorTabsForMode(creating);
-  return <div className={layout.row}><div
-    className={`${styles.detailTabs} ${inspector.tabs} ${layout.tabs}`}
-    role="tablist"
-    aria-label={ru ? "Разделы кейса" : "Case sections"}
-    onKeyDown={(event) => {
-      if (creating || !["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
-      event.preventDefault();
-      event.stopPropagation();
-      const next = inspectorTabAfterKey(active, event.key as InspectorTabKey);
-      transitionContent(() => onActive(next));
-      requestAnimationFrame(() => document.getElementById(`${tabsId}-${next}`)?.focus());
-    }}
-  >
-    {tabs.map((tab) => <button
-      id={`${tabsId}-${tab}`}
-      key={tab}
-      type="button"
-      role="tab"
-      tabIndex={active === tab ? 0 : -1}
-      aria-selected={active === tab}
-      aria-controls={`${tabsId}-panel`}
-      className={active === tab ? styles.detailTabActive : ""}
-      onClick={() => transitionContent(() => onActive(tab))}
-    >{labels[tab]}{tab === "files" && fileCount > 0 && <span>{fileCount}</span>}
-      {tab === "activity" && activityCount > 0 && <span>{activityCount}</span>}
-    </button>)}
-  </div>{actions && <div className={layout.actions}>{actions}</div>}</div>;
+  return <div className={layout.row}>
+    <Tabs aria-label={ru ? "Разделы кейса" : "Case sections"} selectedKey={active}
+      classNames={{ base: layout.base, tabList: layout.tabs, tab: layout.tab, tabContent: layout.content, cursor: layout.cursor }}
+      motionProps={{ transition: { type: "spring", duration: .3, bounce: 0 } }}
+      onSelectionChange={(key) => {
+        const tab = tabs.find((item) => item === key);
+        if (tab) transitionContent(() => onActive(tab));
+      }}>
+      {tabs.map((tab) => {
+        const count = tab === "files" ? fileCount : tab === "activity" ? activityCount : 0;
+        return <Tab key={tab} id={`${tabsId}-${tab}`} aria-controls={`${tabsId}-panel`}
+          title={<>{labels[tab]}{count > 0 && <span className={layout.badge}>{count}</span>}</>} />;
+      })}
+    </Tabs>
+    {actions && <div className={layout.actions}>{actions}</div>}
+  </div>;
 }

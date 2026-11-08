@@ -43,7 +43,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
   const editorOpen = Boolean(props.editor);
   const documentationRetry = Boolean(props.editor?.documentationRetry && !creating);
   const uploadLocked = Boolean(props.editor?.submitting || props.editor?.attachmentsPending || documentationRetry);
-  const canAttach = !archived && props.canAttach !== false;
+  const canAttach = !props.readOnly && !archived && props.canAttach !== false;
   const uploadProgress: CaseAttachmentProgress = (id, phase) => setFiles((current) =>
     current.map((entry) => entry.id === id ? { ...entry, phase } : entry));
   const editorWasOpen = useRef(editorOpen);
@@ -137,6 +137,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
         testCase={props.testCase}
         creating={creating}
         editorOpen={editorOpen}
+        readOnly={props.readOnly}
         fullscreen={props.fullscreen}
         onRunCase={runCase}
         onToggleFullscreen={props.onToggleFullscreen}
@@ -145,6 +146,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
         onArchive={props.onArchive}
         onClose={props.onClose ? () => { if (!props.editor?.submitting) closeWithMotion(() => props.onClose?.()); } : undefined}
       >{!creating && editorActions}</CaseDetailHeaderActions>
+      {props.location && <div className={inspector.caseLocation}>{props.location}</div>}
       {readyDefects > 0 && <div className={inspector.metaRow}>
         <span className={inspector.retestBadge} role="status">{localizedLabel(props.locale, "ready_for_retest")} · {readyDefects}</span>
       </div>}
@@ -157,13 +159,13 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
             <span>{ru ? "Обновлён" : "Updated"} {formatDate(props.testCase.updatedAt)}</span>
           </p>}
         </div>}
-        {!creating && headerEditing !== "title" && <button ref={titleEditButton} type="button" disabled={archived || uploadLocked} className={inspector.iconButton} onClick={() => beginHeaderEdit("title")} aria-label={ru ? "Изменить название" : "Edit title"}><Pencil size={14} /></button>}
+        {!props.readOnly && !creating && headerEditing !== "title" && <button ref={titleEditButton} type="button" disabled={archived || uploadLocked} className={inspector.iconButton} onClick={() => beginHeaderEdit("title")} aria-label={ru ? "Изменить название" : "Edit title"}><Pencil size={14} /></button>}
       </div>
       {!creating && props.editor && ((attempted && problemMessage) || ((props.editor.attachmentsPending || documentationRetry) && !props.editor.submitting)) &&
         <div className={inspector.headerFeedback}>{editorFeedback}</div>}
       {!creating && <CaseDetailTabs locale={props.locale} active={activeTab} tabsId={tabsId} creating={creating}
         fileCount={attachmentIds.length + externalImages.length} activityCount={caseActivity.length} onActive={setTab}
-        actions={props.testCase && <CaseMaintenanceFeature caseId={props.testCase.id} initial={props.testCase.maintenance} blocked={archived || editorOpen} />} />}
+        actions={props.testCase && <CaseMaintenanceFeature caseId={props.testCase.id} initial={props.testCase.maintenance} blocked={archived || editorOpen || Boolean(props.readOnly)} />} />}
     </header>
     <CaseAttachmentDraftProvider locale={props.locale} enabled={canAttach && editorOpen} locked={uploadLocked} entries={files} onEntries={setFiles}
       validStepIds={new Set(revision.steps.map(({ id }) => id))} validChecklistIds={new Set(revision.checklist.map(({ id }) => id))}>
@@ -176,7 +178,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
     }}>
       <fieldset disabled={uploadLocked} className={inspector.uploadFieldset}>
       <div className={`${styles.detailScroll} ${inspector.scroll}`} id={`${tabsId}-panel`} role={creating ? undefined : "tabpanel"} aria-labelledby={creating ? undefined : `${tabsId}-${activeTab}`} tabIndex={0}>
-        {activeTab === "overview" ? <><CaseOverview locale={props.locale} languageTag={props.languageTag} testCaseId={creating ? undefined : props.testCase?.id} projectId={props.testCase?.projectId} revision={revision} archived={archived} editor={archived ? undefined : props.editor} collaboration={props.collaboration} sharedSteps={props.sharedSteps} onResolveSharedStep={props.onResolveSharedStep} onRequestEdit={requestEdit} />{creating && <InspectorPendingAttachments locale={props.locale} showPicker={false} />}</> : <CaseContextTab tab={activeTab} locale={props.locale} languageTag={props.languageTag} testCase={props.testCase} revision={revision}
+        {activeTab === "overview" ? <><CaseOverview locale={props.locale} languageTag={props.languageTag} testCaseId={creating ? undefined : props.testCase?.id} projectId={props.testCase?.projectId} revision={revision} archived={archived} readOnly={props.readOnly} editor={archived ? undefined : props.editor} collaboration={props.collaboration} sharedSteps={props.sharedSteps} onResolveSharedStep={props.onResolveSharedStep} onRequestEdit={requestEdit} />{creating && <InspectorPendingAttachments locale={props.locale} showPicker={false} />}</> : <CaseContextTab tab={activeTab} locale={props.locale} languageTag={props.languageTag} testCase={props.testCase} revision={revision}
           attachmentIds={attachmentIds} linkIds={props.linkIds} externalImages={externalImages}
           removableAttachmentIds={canAttach ? new Set(caseRevisionAttachmentIds(revision)) : undefined}
           requestAttachmentEdit={canAttach && !uploadLocked ? requestEdit : undefined}

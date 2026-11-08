@@ -13,7 +13,8 @@
 .checks li { display: flex; min-width: 0; }
 .checks li + li { border-top: 1px solid var(--line); }
 .checks button { width: 100%; display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 9px 0; color: var(--ink); background: transparent; border: 0; text-align: left; font: inherit; cursor: pointer; }
-.checks button:disabled { opacity: .5; cursor: default; }
+.checks button:disabled { cursor: default; }
+.checks button:disabled:not([data-measured="true"]) { opacity: .5; }
 .icon { flex: 0 0 24px; display: grid; place-items: center; color: var(--muted); }
 .checks [data-kind="inProgressItems"] .icon { color: var(--dash-success, var(--falcon-icon)); }
 .checks [data-kind="activeRuns"] .icon { color: var(--dash-blue, var(--falcon-icon)); }

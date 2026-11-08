@@ -1,5 +1,7 @@
 "use client";
 
+import { Button, Input } from "@heroui/react";
+import { ProductDocTooltip } from "../overlay/ProductDocTooltip";
 import { Check, LoaderCircle, X } from "lucide-react";
 import { useRef, useState, type FormEvent } from "react";
 import repository from "../../../folders/presentation/structure/structure.module.css";
@@ -50,15 +52,16 @@ export function RenameFolder({ api, scope, copy, node, onSaved, onClose }: {
   return <form className={styles.rename} aria-label={copy.renameFolder} onSubmit={(event) => void save(event)} onKeyDown={(event) => {
     if (event.key === "Escape" && !pending.current) { event.stopPropagation(); onClose(); }
   }}>
-    <input className={shared.textInput} aria-label={copy.name} value={title} maxLength={200} disabled={saving}
-      autoFocus onFocus={(event) => event.currentTarget.select()} onChange={(event) => setTitle(event.target.value)} />
-    <button type="submit" className={repository.add} title={copy.saveName} aria-label={copy.saveName}
-      disabled={saving || !title.trim() || title.trim() === node.title}>
+    <Input classNames={{ base: styles.renameInput, inputWrapper: styles.renameInputWrapper, input: styles.renameField }}
+      aria-label={copy.name} value={title} maxLength={200} isDisabled={saving} data-input-shell
+      autoFocus onFocus={(event) => event.currentTarget.select()} onValueChange={setTitle} />
+    <ProductDocTooltip label={copy.saveName}><Button size="sm" isIconOnly type="submit" className={repository.add} aria-label={copy.saveName}
+      isDisabled={saving || !title.trim() || title.trim() === node.title}>
       {saving ? <LoaderCircle size={15} className={shared.loadingIcon} aria-hidden="true" /> : <Check size={15} aria-hidden="true" />}
-    </button>
-    <button type="button" className={repository.add} title={copy.cancel} aria-label={copy.cancel} disabled={saving} onClick={onClose}>
+    </Button></ProductDocTooltip>
+    <ProductDocTooltip label={copy.cancel}><Button size="sm" isIconOnly type="button" className={repository.add} aria-label={copy.cancel} isDisabled={saving} onPress={onClose}>
       <X size={15} aria-hidden="true" />
-    </button>
+    </Button></ProductDocTooltip>
     {error && <p className={repository.error} role="alert">{error}</p>}
   </form>;
 }

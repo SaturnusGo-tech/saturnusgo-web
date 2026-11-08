@@ -2,6 +2,7 @@ import type { components } from "../../../../core/tms/generated/tms-api";
 import type { RunItem } from "../../../../core/tms/contracts/legacy-contract";
 import { TmsApiError, type TmsHttpClient } from "../../../../core/tms/transport/http";
 import { collectCursorPages } from "./pagination/collect-cursor-pages";
+import { listRunPage } from "./pagination/list-run-page";
 import { mapRun, mapRunAttempt, mapRunAttemptSummary, mapRunItem, mapRunItemSummary } from "./run-mapper";
 
 type Api = components["schemas"];
@@ -12,13 +13,8 @@ export type RunHistoryPageRequest = { readonly cursor?: string; readonly limit?:
   readonly signal?: AbortSignal };
 
 export async function listRuns(http: TmsHttpClient, projectId: string, signal?: AbortSignal) {
-  const page = await collectCursorPages<Api["Run"], Api["PageMeta"]>(async (cursor) => {
-    const query = new URLSearchParams({
-      projectId, limit: String(LIST_PAGE_SIZE), includeArchived: "true",
-    });
-    if (cursor) query.set("cursor", cursor);
-    return http.get<Api["RunListEnvelope"]>(`/runs?${query}`, signal);
-  }, {
+  const page = await collectCursorPages<Api["Run"], Api["PageMeta"]>((cursor) =>
+    listRunPage(http, projectId, { cursor, limit: LIST_PAGE_SIZE, includeArchived: true, signal }), {
     maxItems: LIST_ITEM_LIMIT, maxPages: LIST_PAGE_LIMIT,
     resourceLabel: "Workspace run list", signal,
   });

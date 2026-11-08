@@ -1,3 +1,4 @@
+import { Button } from "@heroui/react";
 import { Check, Plus } from "lucide-react";
 import type { ReactNode } from "react";
 import type { WidgetDefinition } from "../../../../dashboards/layout/model/widget-catalog";
@@ -7,9 +8,10 @@ import { catalogCopy, sectionLabel } from "./model/catalog-copy";
 import { WidgetPreview } from "./preview/WidgetPreview";
 import styles from "./catalog.module.css";
 
-export function WidgetEntry({ widget, added, active, onAdd, onSelect, renderPreview }: {
+export function WidgetEntry({ widget, added, active, onAdd, onSelect, renderPreview, addLabel, busy = false }: {
   widget: WidgetDefinition; added: boolean; active: boolean; onAdd: () => void; onSelect: () => void;
   renderPreview?: (key: string) => ReactNode;
+  addLabel?: string; busy?: boolean;
 }) {
   const { locale, t } = useTmsLocale();
   const copy = catalogCopy(locale);
@@ -24,10 +26,11 @@ export function WidgetEntry({ widget, added, active, onAdd, onSelect, renderPrev
     </div>
     <button type="button" className={styles.selectEntry} onClick={onSelect} aria-pressed={active}
       aria-label={`${copy.preview}: ${title}`} />
-    <button className={styles.install} type="button" disabled={added} onClick={onAdd}
-      aria-label={`${added ? t("dashboardLayout.added") : t("dashboardLayout.add")}: ${title}`}>
+    <Button className={styles.install} type="button" size="sm" variant="light" disableRipple
+      isDisabled={added || busy} data-added={added} onPress={onAdd}
+      aria-label={`${added ? t("dashboardLayout.added") : addLabel ?? t("dashboardLayout.add")}: ${title}`}>
       {added ? <Check size={17} aria-hidden="true" /> : <Plus size={18} aria-hidden="true" />}
-      <span>{t(added ? "dashboardLayout.added" : "dashboardLayout.install")}</span>
-    </button>
+      <span>{added ? t("dashboardLayout.added") : addLabel ?? t("dashboardLayout.install")}</span>
+    </Button>
   </article>;
 }

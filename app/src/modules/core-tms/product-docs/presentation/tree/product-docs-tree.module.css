@@ -148,10 +148,11 @@
 
 .nested {
   margin-block: 2px 3px;
-  margin-inline-start: 15px;
-  padding-inline-start: 8px;
+  margin-inline-start: 9px;
+  padding-inline-start: 6px;
   border-inline-start: 1px solid var(--falcon-border-strong);
 }
+.nested[data-flat] { margin-inline-start: 0; padding-inline-start: 0; border-inline-start: 0; }
 
 .sidebar :is(.view, .node, .disclosure):focus-visible {
   outline: 1px solid var(--falcon-text-muted);

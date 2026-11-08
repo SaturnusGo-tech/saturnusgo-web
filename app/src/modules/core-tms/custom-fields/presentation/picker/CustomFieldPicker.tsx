@@ -13,8 +13,8 @@ import css from "./customFieldPicker.module.css";
 
 export type CustomFieldPickerProps = CustomFieldScope & { field: CustomFieldDefinition;
   selected: readonly CustomFieldSelection[]; onChange(values: readonly CustomFieldSelection[]): void;
-  parentValueId?: string | null; canCreate?: boolean; disabled?: boolean; placeholder?: string; invalid?: boolean; errorId?: string; autoOpen?: boolean };
-export function CustomFieldPicker({ field, selected, onChange, parentValueId, canCreate = false,
+  parentValueId?: string | null; allowProductsWithoutGroup?: boolean; canCreate?: boolean; disabled?: boolean; placeholder?: string; invalid?: boolean; errorId?: string; autoOpen?: boolean };
+export function CustomFieldPicker({ field, selected, onChange, parentValueId, allowProductsWithoutGroup = false, canCreate = false,
   disabled = false, placeholder, invalid, errorId, autoOpen = false, workspaceId, projectId }: CustomFieldPickerProps) {
   const { locale } = useTmsLocale(); const ru = locale === "ru"; const id = useId();
   const [open, setOpen] = useState(false); const [opened, setOpened] = useState(false); const root = useRef<HTMLDivElement>(null);
@@ -38,7 +38,7 @@ export function CustomFieldPicker({ field, selected, onChange, parentValueId, ca
   }, [autoOpen, disabled]);
   const label = customFieldLabel(field, ru); const candidate = parseFieldValue(page.search, field.type);
   const exact = page.items.find(value => normalizedFieldLabel(value.label) === normalizedFieldLabel(page.search));
-  const parentNeeded = field.systemKey === "product" && !parentValueId;
+  const parentNeeded = field.systemKey === "product" && !parentValueId && !allowProductsWithoutGroup;
   function choose(value: CustomFieldSelection) {
     if (parentNeeded && value.parentValueId) return;
     const next = field.multiple ? (selected.some(item => item.id === value.id)

@@ -1,0 +1,23 @@
+.list { min-inline-size: 0; }
+.list .tab { position: relative; isolation: isolate; block-size: auto; }
+.tab:focus-visible { z-index: 1; }
+.tab[data-disabled="true"] { cursor: default; }
+.tab[data-selected="true"]:not(:has(.cursor)) { background: var(--dashboard-tab-cursor, var(--falcon-elevated)); }
+.content {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: inherit;
+  white-space: nowrap;
+}
+.cursor {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: var(--dashboard-tab-cursor, var(--falcon-elevated));
+}
+.badge { font-variant-numeric: tabular-nums; }

@@ -17,7 +17,7 @@
 .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--row-color); }
 .track { height: 8px; display: block; width: 100%; overflow: hidden; border-radius: 3px; background: var(--control-hover); }
 .track i { display: block; height: 100%; border-radius: inherit; background: var(--row-color); }
-.panel button:hover .rowLabel, .panel .inventory:hover, .panel .coverageDetails button:hover { color: var(--action); }
+.panel button:not(:disabled):hover .rowLabel, .panel .inventory:not(:disabled):hover, .panel .coverageDetails button:not(:disabled):hover { color: var(--action); }
 .panel button:focus-visible { outline: 2px solid var(--action); outline-offset: 3px; border-radius: 4px; }
 .coverage { padding: 0 18px 16px; }
 .coverageRow { padding-bottom: 11px; }.coverageRow:last-child { padding-bottom: 0; }

@@ -1,23 +1,13 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { nextMetadataOption } from "../navigation/nextMetadataOption";
 
 const source = readFileSync(new URL("../MetadataSelect.tsx", import.meta.url), "utf8");
 
-test("metadata listbox wraps arrow navigation and supports boundaries", () => {
-  assert.equal(nextMetadataOption(4, 3, "ArrowDown"), 0);
-  assert.equal(nextMetadataOption(4, 0, "ArrowUp"), 3);
-  assert.equal(nextMetadataOption(4, 2, "Home"), 0);
-  assert.equal(nextMetadataOption(4, 1, "End"), 3);
-  assert.equal(nextMetadataOption(0, 0, "ArrowDown"), -1);
-});
-
-test("metadata trigger is one control with its chevron inside", () => {
-  assert.match(source, /className=\{\x60\$\{styles\.trigger\} /);
-  assert.match(source, /aria-haspopup="listbox"/);
-  assert.match(source, /aria-expanded=\{open\}/);
-  assert.match(source, /className=\{styles\.triggerLabel\}/);
-  assert.doesNotMatch(source, /className=\{`\$\{styles\.chip\} \$\{selected/);
+test("metadata choices use a single HeroUI trigger with managed focus and selection", () => {
+  assert.match(source, /<Dropdown placement="bottom-start" isOpen=\{open\} onOpenChange=\{setOpen\}/);
+  assert.match(source, /<DropdownTrigger>\s*<Button/);
   assert.match(source, /<ChevronDown[^>]+aria-hidden="true"/);
+  assert.match(source, /selectionMode="single" disallowEmptySelection selectedKeys=\{\[value\]\}/);
+  assert.doesNotMatch(source, /showPopover|onKeyDown=/);
 });

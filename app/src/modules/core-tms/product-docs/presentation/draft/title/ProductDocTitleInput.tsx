@@ -1,9 +1,10 @@
 "use client";
 
+import { Input } from "@heroui/react";
 import { useLayoutEffect, useRef, useState } from "react";
 import type { ProductDocTitleHighlight } from "../../../domain/product-docs";
 import type { TmsLocale } from "../../../../localization/model/locale";
-import { RawHighlightToolbar } from "../../../../presentation/cases/inspector/markdown/highlight/raw/RawHighlightToolbar";
+import { ProductDocHighlightPicker } from "../highlight/ProductDocHighlightPicker";
 import { ProductDocTitleText } from "./ProductDocTitleText";
 import { markTitleRange } from "./model/productDocTitleHighlights";
 import styles from "../editor.module.css";
@@ -29,9 +30,9 @@ export function ProductDocTitleInput({ title, highlights, locale, label, placeho
     if (folder) input.current?.select();
   }, [autoFocus, folder]);
   useLayoutEffect(() => { setScroll(input.current?.scrollLeft ?? 0); }, [title, highlights]);
-  const field = <input className={styles.titleInput} data-inline-title ref={input} type="text" aria-label={label} placeholder={placeholder}
-    maxLength={200} value={title} disabled={disabled}
-    onChange={(event) => onTitle(event.currentTarget.value)}
+  const field = <Input classNames={{ base: styles.titleControl, inputWrapper: styles.titleControlSlot, input: styles.titleInput }}
+    data-inline-title ref={input} type="text" aria-label={label} placeholder={placeholder}
+    maxLength={200} value={title} isDisabled={disabled} onValueChange={onTitle}
     onScroll={(event) => setScroll(event.currentTarget.scrollLeft)}
     onSelect={(event) => setScroll(event.currentTarget.scrollLeft)}
     onKeyDown={(event) => {
@@ -47,7 +48,7 @@ export function ProductDocTitleInput({ title, highlights, locale, label, placeho
       </div>}
       {field}
     </div>
-    {!folder && <RawHighlightToolbar locale={locale} disabled={disabled || !title.trim()}
+    {!folder && <ProductDocHighlightPicker locale={locale} disabled={disabled || !title.trim()}
       label={locale === "ru" ? "Маркер заголовка" : "Title highlight"}
       onOpen={() => {
         const field = input.current;

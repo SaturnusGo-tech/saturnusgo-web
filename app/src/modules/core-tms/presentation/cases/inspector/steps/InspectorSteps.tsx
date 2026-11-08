@@ -1,3 +1,4 @@
+import { FalconCheckbox } from "../../../common/checkbox/FalconCheckbox";
 "use client";
 
 import { Plus, Trash2 } from "lucide-react";
@@ -159,11 +160,10 @@ function ChecklistRow(props: {
         renderFooter={(emoji) => <ScenarioAttachmentControls prefix={emoji} fieldKey={`checklist:${props.id}`} />}
         onChange={(text) => props.onChange({ text })} {...attachments.transfer} />
     </div>
-    <label className={css.checklistRequired}>
-      <input type="checkbox" checked={props.required}
-        onChange={(event) => props.onChange({ required: event.target.checked })} />
+    <FalconCheckbox className={css.checklistRequired} isSelected={props.required}
+      onValueChange={(required) => props.onChange({ required })}>
       {props.ru ? "Обязательный" : "Required"}
-    </label>
+    </FalconCheckbox>
     <button type="button" className={css.removeButton} disabled={!props.canRemove}
       onClick={props.onRemove} aria-label={props.ru ? "Удалить пункт" : "Remove item"}>
       <Trash2 size={14} />

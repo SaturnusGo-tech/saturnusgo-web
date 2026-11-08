@@ -4,7 +4,7 @@ import { TmsApiError, type TmsHttpClient } from "../../../../core/tms/transport/
 import {
   mapDefectDrill, mapRunDrill, mapRunItemDrill, mapTestCaseDrill,
 } from "../http/dashboard-drill-mapper";
-import { mapDashboardAnalyticsSummary } from "../http/dashboard-summary-mapper";
+import { readDashboardSummary } from "./summary/readDashboardSummary";
 import type {
   DashboardAnalyticsQuery, DashboardAnalyticsSource, DashboardDrillRequest,
 } from "../model/dashboard-analytics";
@@ -45,17 +45,10 @@ export function createHttpDashboardAnalyticsSource(http: TmsHttpClient,
 
   return Object.freeze({
     async summary(query: DashboardAnalyticsQuery, signal?: AbortSignal) {
-      const params = new URLSearchParams({ workspaceId: query.workspaceId,
-        period: query.period, dimensionLimit: "20" });
-      if (query.projectId) params.set("projectId", query.projectId);
-      for (const key of ["productGroupId", "productId", "regression"] as const) {
-        if (query[key] !== undefined) params.set(key, String(query[key]));
-      }
       try {
-        const envelope = await http.get<Api["DashboardAnalyticsSummaryEnvelope"]>(
-          `/dashboard-analytics/summary?${params}`, signal);
+        const snapshot = await readDashboardSummary(http, query, signal);
         fallbackQueries.delete(queryKey(query));
-        return mapDashboardAnalyticsSummary(envelope.data, query);
+        return snapshot;
       } catch (error) {
         if (!unavailableRoute(error)) throw error;
         fallbackQueries.add(queryKey(query));

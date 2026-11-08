@@ -11,7 +11,7 @@ import styles from "./breakdowns.module.css";
 export function DashboardBreakdowns({ snapshot, onOpenDrill, kind }: {
   kind?: "types" | "tags" | "coverage";
   snapshot: DashboardSnapshot;
-  onOpenDrill: (drill: DashboardDrill) => void;
+  onOpenDrill?: (drill: DashboardDrill) => void;
 }) {
   const { locale, languageTag, t } = useTmsLocale();
   const format = new Intl.NumberFormat(languageTag);
@@ -24,7 +24,7 @@ export function DashboardBreakdowns({ snapshot, onOpenDrill, kind }: {
     filter: { entity: "test_case", basis: "current" } };
   const distribution = (items: typeof tags, total: number) => <div className={styles.distribution}>
     {items.map(item => <button type="button" key={item.key} className={styles.distributionRow}
-      title={item.label} onClick={() => onOpenDrill({ ...item.drill, label: item.label })}
+      title={item.label} disabled={!onOpenDrill} onClick={onOpenDrill && (() => onOpenDrill({ ...item.drill, label: item.label }))}
       style={{ "--row-color": "var(--dash-blue)" } as CSSProperties}
       aria-label={`${item.label}: ${format.format(item.value)}`}>
       <span className={styles.rowLabel}>{item.label}</span>
@@ -35,13 +35,13 @@ export function DashboardBreakdowns({ snapshot, onOpenDrill, kind }: {
   return <div className={kind ? styles.single : styles.grid}>
     {(!kind || kind === "types") && <section className={styles.panel}>
       <header className={styles.heading}><h2>{t("dashboard.byType")}</h2></header>
-      <button type="button" className={styles.inventory} onClick={() => onOpenDrill(allCases)}
+      <button type="button" className={styles.inventory} disabled={!onOpenDrill} onClick={onOpenDrill && (() => onOpenDrill(allCases))}
         aria-label={`${t("dashboard.currentCases")}: ${format.format(snapshot.metrics.currentCases)}`}>
         <strong>{format.format(snapshot.metrics.currentCases)}</strong><Files size={36} strokeWidth={1.4} aria-hidden="true" />
       </button>
       <div className={styles.composition}><CompositionBar items={types} colors={TYPE_COLORS} /></div>
       <div className={styles.distribution}>{types.map(item => <button type="button" key={item.key}
-        className={styles.typeRow} onClick={() => onOpenDrill({ ...item.drill, label: item.label })}
+        className={styles.typeRow} disabled={!onOpenDrill} onClick={onOpenDrill && (() => onOpenDrill({ ...item.drill, label: item.label }))}
         style={{ "--row-color": TYPE_COLORS[item.key] ?? "var(--dash-slate)" } as CSSProperties}
         aria-label={`${item.label}: ${format.format(item.value)}`}>
         <i className={styles.dot} aria-hidden="true" /><span className={styles.rowLabel}>{item.label}</span>
@@ -57,14 +57,14 @@ export function DashboardBreakdowns({ snapshot, onOpenDrill, kind }: {
       {coverage.length ? <div className={styles.coverage}>
         {coverage.map(item => <div className={styles.coverageRow} key={item.id} data-gap={item.uncoveredCases > 0}
           style={{ "--row-color": "var(--dash-success)" } as CSSProperties}>
-          <button type="button" className={styles.covered} onClick={() => onOpenDrill(item.drills.covered!)}
+          <button type="button" className={styles.covered} disabled={!onOpenDrill} onClick={onOpenDrill && (() => onOpenDrill(item.drills.covered!))}
             aria-label={`${item.label}: ${t("dashboard.coveredOfTotal", { covered: item.coveredCases!, total: item.caseCount })}`}>
             <span className={styles.rowLabel} title={item.label}>{item.label}</span><strong>{percent.format(item.coverageRate)}%</strong>
             <span className={styles.track} aria-hidden="true"><i style={{ width: `${Math.min(100, Math.max(0, item.coverageRate!))}%` }} /></span>
           </button>
           <div className={styles.coverageDetails}>
             <span>{t("dashboard.coveredOfTotal", { covered: format.format(item.coveredCases!), total: format.format(item.caseCount) })}</span>
-            <button type="button" onClick={() => onOpenDrill(item.drills.uncovered!)}
+            <button type="button" disabled={!onOpenDrill} onClick={onOpenDrill && (() => onOpenDrill(item.drills.uncovered!))}
               aria-label={`${item.label}: ${t("dashboard.uncovered")} — ${format.format(item.caseCount - item.coveredCases!)}`}>
               {t("dashboard.uncoveredShort")} <strong>{format.format(item.caseCount - item.coveredCases!)}</strong>
             </button>

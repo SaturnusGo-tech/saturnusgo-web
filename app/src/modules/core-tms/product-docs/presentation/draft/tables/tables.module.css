@@ -8,6 +8,7 @@
 .tableAppearance .tableInsert button.sizeTrigger {
   min-width: 20px;
   padding-inline: 3px;
+  border: 0;
 }
 
 .tableInsert .sizeTrigger[aria-expanded="true"] {
@@ -16,16 +17,12 @@
 }
 
 .sizePicker {
-  position: absolute;
-  z-index: 5;
-  inset-block-start: calc(100% + 6px);
-  inset-inline-end: 0;
-  width: max-content;
+  inline-size: max-content;
   padding: 10px;
   border: 1px solid var(--falcon-border);
-  border-radius: 7px;
+  border-radius: 12px;
   background: var(--falcon-elevated);
-  box-shadow: 0 6px 18px rgb(0 0 0 / 15%);
+  box-shadow: var(--falcon-shadow-popover);
 }
 
 .sizeGrid {
@@ -120,9 +117,35 @@
   border: 1px solid var(--falcon-border);
   border-radius: 7px;
   background: var(--falcon-elevated);
-  box-shadow: 0 5px 18px rgb(0 0 0 / 14%);
+  box-shadow: var(--falcon-shadow-popover);
 }
 
 .tableAppearance :global([class*="_tableColumnEditorPopoverContent_"]) button { border-radius: 4px; cursor: pointer; }
 .tableAppearance :global([class*="_tableColumnEditorPopoverContent_"]) button svg { width: 16px; height: 16px; }
 .tableAppearance :global([class*="_tableColumnEditorPopoverContent_"]) :global([class*="_popoverArrow_"]) { display: none; }
+
+.tableAppearance :global(.mdxeditor-root-contenteditable) table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.tableAppearance :global(.mdxeditor-root-contenteditable) table > tbody > tr > :is(td, th)[data-active] {
+  border-color: var(--falcon-border);
+}
+.tableAppearance :global(.mdxeditor-root-contenteditable) table > tbody > tr > :is(td, th)[data-active] + :is(td, th)[data-active] {
+  border-inline-start: 0;
+}
+.tableAppearance :global(.mdxeditor-root-contenteditable) table > tbody > tr + tr > :is(td, th)[data-active] {
+  border-block-start: 0;
+}
+.tableAppearance :global(.mdxeditor-root-contenteditable) table > tbody > tr:first-child > :is(td, th)[data-active]:nth-child(2) {
+  border-start-start-radius: 10px;
+}
+.tableAppearance :global(.mdxeditor-root-contenteditable) table > tbody > tr:first-child > :is(td, th)[data-active]:nth-last-child(2) {
+  border-start-end-radius: 10px;
+}
+.tableAppearance :global(.mdxeditor-root-contenteditable) table > tbody > tr:last-child > :is(td, th)[data-active]:nth-child(2) {
+  border-end-start-radius: 10px;
+}
+.tableAppearance :global(.mdxeditor-root-contenteditable) table > tbody > tr:last-child > :is(td, th)[data-active]:nth-last-child(2) {
+  border-end-end-radius: 10px;
+}

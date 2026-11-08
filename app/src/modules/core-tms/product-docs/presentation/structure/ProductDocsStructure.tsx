@@ -1,5 +1,7 @@
 "use client";
 
+import { ProductDocTooltip } from "../overlay/ProductDocTooltip";
+
 import { motion, useIsPresent, useReducedMotion } from "framer-motion";
 import { Archive, ArrowLeft, ChevronRight, FolderInput } from "lucide-react";
 import { useId, useRef, useState } from "react";
@@ -151,14 +153,14 @@ function StructureRow({ node, canEdit, canMove, ...props }: BranchProps & { node
           aria-label={folder && canMutate ? `${copy.renameItem} ${node.title}` : undefined} title={node.title}
           onClick={() => folder && canMutate ? onRename(node.id) : onOpen(node)}>{node.title}</button>}
       {!folder && node.publishedVersion === null && <span className={styles.draft}>{copy.draft}</span>}
-      {canMutate && canMove && <button type="button" className={repository.add} title={copy.move} disabled={Boolean(renaming)}
+      {canMutate && canMove && <ProductDocTooltip label={copy.move}><button type="button" className={repository.add} disabled={Boolean(renaming)}
         aria-label={`${copy.move} ${node.title}`} onClick={(event) => onMove(node, path, event.currentTarget)}>
         <FolderInput size={16} aria-hidden="true" />
-      </button>}
-      {canMutate && canMove && <button type="button" className={repository.add} title={copy.archiveItem} disabled={Boolean(renaming)}
+      </button></ProductDocTooltip>}
+      {canMutate && canMove && <ProductDocTooltip label={copy.archiveItem}><button type="button" className={repository.add} disabled={Boolean(renaming)}
         aria-label={`${copy.archiveItem} ${node.title}`} onClick={(event) => onArchive(node, event.currentTarget)}>
         <Archive size={16} aria-hidden="true" />
-      </button>}
+      </button></ProductDocTooltip>}
       {canMutate && !renaming && <CreateProductDoc api={api} scope={scope} copy={copy}
         kind="folder" parentId={node.id} onCreated={() => {
           onToggle(node.id, true);

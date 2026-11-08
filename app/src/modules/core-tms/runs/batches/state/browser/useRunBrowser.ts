@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { nextRunAfterFinish } from "../../../model/history/run-history";
-import type { TestRunSummary } from "../../../../../../core/tms/contracts/legacy-contract";
+import type { RunItemSummary, TestRunSummary } from "../../../../../../core/tms/contracts/legacy-contract";
 import { formatTmsMutationFailure, toTmsMutationFailure } from "../../../../../../core/tms/errors/mutation-failure";
 import { resolvePendingOperation, type PendingOperation } from "../../../../../../core/tms/idempotency/pending-operation";
 import { useTmsHttpClient } from "../../../../auth/http/TmsHttpClientContext";
@@ -12,7 +12,7 @@ import { runRepositoryEntries, type RunRepositoryEntry } from "../../model/repos
 
 type Action = "start" | "pause" | "resume" | "complete" | "archive" | "restore";
 export function useRunBrowser(input: { workspaceId: string; selected: TestRunSummary | null; selectedId?: string | null;
-  knownRuns: TestRunSummary[]; connected: boolean; ru: boolean;
+  knownRuns: TestRunSummary[]; connected: boolean; ru: boolean; fixedRun?: { items: RunItemSummary[]; ready: boolean };
   onUpdate: (runs: TestRunSummary[]) => void; onRefreshSelected: () => void;
   onFinished?: (next: TestRunSummary | null) => void }) {
   const http = useTmsHttpClient(); const [batches, setBatches] = useState<RunBatch[]>([]);
@@ -22,6 +22,7 @@ export function useRunBrowser(input: { workspaceId: string; selected: TestRunSum
   const [loading, setLoading] = useState(false); const [busy, setBusy] = useState(false);
   const [incomplete, setIncomplete] = useState(false);
   const [error, setError] = useState(""); const [revision, setRevision] = useState(0);
+  const fixed = Boolean(input.fixedRun);
   const latest = useRef(input); latest.current = input;
   const pending = useRef(false); const operation = useRef<PendingOperation | null>(null);
   const command = useRef<{ signature: string; key: string; body?: RunBatchTransition; etag?: string } | null>(null);
@@ -33,18 +34,19 @@ export function useRunBrowser(input: { workspaceId: string; selected: TestRunSum
   }, [input.workspaceId]);
   useEffect(() => {
     const controller = new AbortController();
-    if (!input.connected) return;
+    if (!input.connected || fixed) return;
     listRunBatches(http, input.workspaceId, controller.signal).then((next) => {
       if (!controller.signal.aborted) { setBatches(next); setBatchesWorkspace(input.workspaceId); }
     }).catch((err: unknown) => { if (!controller.signal.aborted) setError(formatTmsMutationFailure(toTmsMutationFailure(err), input.ru ? "Не удалось загрузить прогоны." : "Could not load runs.")); });
     return () => controller.abort();
-  }, [http, input.workspaceId, input.connected, revision, input.knownRuns.length]);
+  }, [http, input.workspaceId, input.connected, fixed, revision, input.knownRuns.length]);
   const selectedId = input.selectedId ?? input.selected?.id;
   const batch = batches.find((b) => b.runs.some((r) => r.id === selectedId));
   const memberIds = batch?.runs.map((r) => r.id).join("|") ?? selectedId ?? "";
   const selectedRuns = batch?.runs ?? (input.selected ? [input.selected] : []);
   const resolvedIds = selectedRuns.map(run => run.id).join("|");
   useEffect(() => {
+    if (fixed) return;
     const controller = new AbortController(); generation.current += 1; setError(""); setIncomplete(false);
     const scope = `${input.workspaceId}:${memberIds}`;
     if (entriesScope.current !== scope) { setEntries([]); entriesScope.current = scope; }
@@ -62,10 +64,10 @@ export function useRunBrowser(input: { workspaceId: string; selected: TestRunSum
       } catch (err) { if (!controller.signal.aborted) { setLoading(false); setError(formatTmsMutationFailure(toTmsMutationFailure(err), input.ru ? "Не удалось загрузить кейсы прогона." : "Could not load run cases.")); } }
     }
     void load(); return () => { controller.abort(); generation.current += 1; };
-  }, [http, memberIds, resolvedIds, batchesWorkspace, input.workspaceId, input.connected, revision]);
+  }, [http, memberIds, resolvedIds, batchesWorkspace, input.workspaceId, input.connected, fixed, revision]);
   const batchId = batch?.id ?? input.selected?.batchId;
   useEffect(() => {
-    if (!batchId || !input.connected) return;
+    if (!batchId || !input.connected || fixed) return;
     const controller = new AbortController();
     const refresh = () => {
       if (document.visibilityState === "hidden" || pending.current) return;
@@ -75,9 +77,9 @@ export function useRunBrowser(input: { workspaceId: string; selected: TestRunSum
     };
     refresh(); window.addEventListener("focus", refresh); document.addEventListener("visibilitychange", refresh);
     return () => { controller.abort(); window.removeEventListener("focus", refresh); document.removeEventListener("visibilitychange", refresh); };
-  }, [http, input.workspaceId, input.connected, batchId]);
+  }, [http, input.workspaceId, input.connected, fixed, batchId]);
   async function act(action: Action) {
-    if (pending.current || !input.selected || !input.connected) return;
+    if (pending.current || !input.selected || !input.connected || (fixed && batchId)) return;
     pending.current = true; setBusy(true); setError(""); const token = generation.current;
     const id = batchId ?? input.selected.id;
     const signature = JSON.stringify({ workspaceId: input.workspaceId, id, action });
@@ -100,7 +102,7 @@ export function useRunBrowser(input: { workspaceId: string; selected: TestRunSum
       if (batchId && prepared.body) {
         const next = await transitionRunBatch(http, input.workspaceId, batchId, prepared.body, prepared.key);
         updated = next.runs;
-        if (token === generation.current) setBatches((values) => [...values.filter((b) => b.id !== next.id), next]);
+        if (token === generation.current && !fixed) setBatches((values) => [...values.filter((b) => b.id !== next.id), next]);
       } else {
         updated = [(await (action === "archive" ? archiveRun(http, input.selected.id, prepared.etag!, prepared.key)
           : action === "restore" ? restoreRun(http, input.selected.id, prepared.etag!, prepared.key)
@@ -145,7 +147,7 @@ export function useRunBrowser(input: { workspaceId: string; selected: TestRunSum
     async function reconcileCompletion() {
       try {
         let updated = [completed];
-        if (batchId) {
+        if (batchId && !fixed) {
           const next = await getRunBatch(http, input.workspaceId, batchId, controller.signal);
           if (controller.signal.aborted) return;
           updated = next.runs;
@@ -162,8 +164,13 @@ export function useRunBrowser(input: { workspaceId: string; selected: TestRunSum
     }
     void reconcileCompletion();
     return () => controller.abort();
-  }, [http, input.workspaceId, selectedId, input.selected?.status, batchId]);
+  }, [http, input.workspaceId, input.fixedRun, selectedId, input.selected?.status, batchId]);
+  const fixedItems = input.fixedRun?.items;
+  const fixedProject = input.selected?.projectId;
+  const fixedEntries = useMemo(() => selectedId && fixedProject && fixedItems
+    ? runRepositoryEntries(selectedId, fixedProject, fixedItems) : [], [selectedId, fixedProject, fixedItems]);
+  const fixedReady = Boolean(input.fixedRun?.ready && input.selected);
   const scopedEntries = input.connected && entriesScope.current === `${input.workspaceId}:${memberIds}` ? entries : [];
-  return { ready: !memberIds || loadedScope === `${input.workspaceId}:${memberIds}:${revision}`, incomplete, dismissIncomplete: () => setIncomplete(false), batch, choices, entries: scopedEntries, loading, busy, error, act, selectedRuns,
+  return { ready: fixed ? fixedReady : !memberIds || loadedScope === `${input.workspaceId}:${memberIds}:${revision}`, incomplete, dismissIncomplete: () => setIncomplete(false), batch, choices, entries: fixed ? fixedEntries : scopedEntries, loading: fixed ? !fixedReady : loading, busy, error, act, selectedRuns,
     refresh: () => setRevision((n) => n + 1) };
 }

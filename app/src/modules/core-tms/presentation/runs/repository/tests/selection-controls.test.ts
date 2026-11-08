@@ -126,3 +126,18 @@ test("header lifecycle lock does not block recovery navigation or New run", () =
   assert.equal(all.find(node => node.props["aria-label"] === "Pause run")?.props.disabled, true);
   assert.equal(all.find(node => node.props["aria-label"] === "Complete run")?.props.disabled, true);
 });
+
+test("impact approval blocks starting a draft but permits resuming a paused run", () => {
+  const h = componentHarness();
+  const { RunRepositoryHeader: View } = h.load<{ RunRepositoryHeader: typeof RunRepositoryHeader }>(new URL("../header/RunRepositoryHeader.tsx", import.meta.url), name => {
+    if (name === "framer-motion") return { useReducedMotion: () => true, AnimatePresence: "AnimatePresence", motion: { button: "button" } };
+  });
+  const props = { ru: false, choices: [], value: "r", disabled: false, startBlocked: true, canManage: true,
+    onChoose() {}, onCreate() {}, onAction() {} } as Parameters<typeof View>[0];
+  const lifecycleButton = (status: "draft" | "paused", label: string) => {
+    const run = { status, archivedAt: null } as Parameters<typeof View>[0]["run"];
+    return nodes(h.render(() => View({ ...props, run }))).find(node => node.props["aria-label"] === label)?.props.disabled;
+  };
+  assert.equal(lifecycleButton("draft", "Start run"), true);
+  assert.equal(lifecycleButton("paused", "Resume run"), false);
+});

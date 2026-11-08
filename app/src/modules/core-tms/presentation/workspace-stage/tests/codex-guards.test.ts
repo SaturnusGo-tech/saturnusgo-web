@@ -56,6 +56,7 @@ test("workspace permits shared connector catalog for readers only with a project
       if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ t: (key: string) => key }) };
       if (name.endsWith("usePageAppearance")) return { usePageAppearance: () => ({ current: null }) };
       if (name.endsWith("useHistoryScroll")) return { useHistoryScroll: () => {} };
+      if (name.endsWith("useProductDocsAccess")) return { useProductDocsAccess: () => ({ enabled: false }) };
     });
     const shell = nodes(h.render(() => Workspace())).find(node => typeof node.type === "function")!;
     const content = nodes(h.render(() => (shell.type as unknown as () => unknown)()));

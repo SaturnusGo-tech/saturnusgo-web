@@ -3,22 +3,23 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { TestRunSummary } from "../../../../../../core/tms/contracts/legacy-contract";
 import { RunSelector } from "./RunSelector";
 import css from "./run-header.module.css";
-export function RunRepositoryHeader({ru,run,onEdit,choices,value,disabled,actionsDisabled=false,startBlocked,onChoose,onCreate,onAction,canManage}:{
+export function RunRepositoryHeader({ru,run,onEdit,choices,value,disabled,actionsDisabled=false,startBlocked,onChoose,onCreate,onAction,canManage,fixedRun=false}:{
   ru:boolean;run?:TestRunSummary;onEdit?:()=>void;choices:{id:string;name:string;tags:string[];runs:TestRunSummary[]}[];value:string;
-  disabled:boolean;actionsDisabled?:boolean;startBlocked:boolean;canManage:boolean;onChoose:(id:string)=>void;onCreate:()=>void;
+  disabled:boolean;actionsDisabled?:boolean;startBlocked:boolean;canManage:boolean;fixedRun?:boolean;onChoose:(id:string)=>void;onCreate:()=>void;
   onAction:(action:"start"|"pause"|"resume"|"complete")=>void;
 }) {
   const reduced=useReducedMotion();
-  const executable=run && !run.archivedAt && ["draft","active","paused"].includes(run.status);
-  const running=run && !run.archivedAt && ["active","paused"].includes(run.status);
+  const canChangeLifecycle = !fixedRun || !run?.batchId;
+  const executable=canChangeLifecycle && run && !run.archivedAt && ["draft","active","paused"].includes(run.status);
+  const running=canChangeLifecycle && run && !run.archivedAt && ["active","paused"].includes(run.status);
   const label=run?.status==="active" ? (ru?"Приостановить прогон":"Pause run") :
     run?.status==="paused" ? (ru?"Продолжить прогон":"Resume run") : (ru?"Запустить прогон":"Start run");
   return <div className={css.header}>
-    <RunSelector onEdit={onEdit} ru={ru} choices={choices} value={value} onChoose={onChoose} disabled={disabled}/>
+    <RunSelector onEdit={onEdit} ru={ru} choices={choices} value={value} onChoose={onChoose} disabled={disabled} fixedRun={fixedRun}/>
     {canManage && <div className={css.actions}>
-      <button type="button" className={css.newRun} onClick={onCreate} disabled={disabled}><Plus size={14}/>{ru?"Новый прогон":"New run"}</button>
+      {!fixedRun && <button type="button" className={css.newRun} onClick={onCreate} disabled={disabled}><Plus size={14}/>{ru?"Новый прогон":"New run"}</button>}
       {executable && <button type="button" className={css.play} aria-label={label} title={label}
-        disabled={disabled || actionsDisabled || (run.status!=="active" && startBlocked)}
+        disabled={disabled || actionsDisabled || (run.status==="draft" && startBlocked)}
         onClick={()=>onAction(run.status==="active"?"pause":run.status==="paused"?"resume":"start")}>
         {run.status==="active"?<Pause size={15}/>:<Play size={15} fill="currentColor"/>}</button>}
       <AnimatePresence initial={false}>{running && <motion.button key="complete" type="button" className={css.finish}

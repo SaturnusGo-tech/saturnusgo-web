@@ -36,7 +36,8 @@
 .catalog .selectEntry { position: absolute; inset: 0 100px 0 0; z-index: 1; border: 0; border-radius: 12px; background: transparent; cursor: pointer; }
 .catalog .install { position: relative; z-index: 2; display: inline-flex; align-items: center; justify-content: flex-end; gap: 6px; min-width: 82px; min-height: 40px; padding: 5px 0 5px 4px; border: 0; border-radius: 6px; color: var(--store-link); background: transparent; font-size: 11px; cursor: pointer; white-space: nowrap; }
 .install svg { flex-shrink: 0; }.install:not(:disabled):hover { color: var(--ink); }
-.catalog .install:disabled { color: var(--store-green); opacity: 1; cursor: default; }
+.catalog .install:disabled { color: var(--muted); opacity: 1; cursor: default; }
+.catalog .install[data-added="true"] { color: var(--store-green); }
 .noResults { min-height: 250px; display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 30px; color: var(--muted); font-size: 13px; text-align: center; }.noResults p { line-height: 1.6; }.catalog .noResults button { color: var(--store-link); background: transparent; border: 0; cursor: pointer; font-size: 12px; }
 .catalog button:focus-visible { outline: 2px solid var(--store-blue); outline-offset: 3px; }
 @container widget-store (max-width: 1220px) {
@@ -66,3 +67,14 @@
 :global([data-appearance="glass"]) .entry { border-radius: 20px; background: var(--paper); }
 :global([data-appearance="glass"]) .entry[data-selected="true"] { border-color: var(--line-strong); background: var(--glass-selected, var(--control-hover)); box-shadow: none; }
 :global([data-appearance="glass"]) :is(.thumbnail, .catalog .selectEntry) { border-radius: 14px; }
+
+.catalog[data-document-insert="true"] { padding-bottom: 12px; }
+.catalog[data-document-insert="true"] .heading { margin: 0 0 20px; align-items: center; }
+.catalog[data-document-insert="true"] .search {
+  --tms-focus-border: var(--falcon-border-strong);
+  border-radius: 999px;
+}
+.catalog[data-document-insert="true"] .search:focus-within { outline: none; }
+@container widget-store (max-width: 710px) {
+  .catalog[data-document-insert="true"] .heading { align-items: stretch; gap: 9px; }
+}

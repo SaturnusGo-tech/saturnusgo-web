@@ -58,10 +58,15 @@
 .filters button:disabled { opacity: .45; cursor: default; }
 .filters .quietButton { color: var(--muted); background: transparent; border-color: transparent; }
 .choiceNote { flex-basis: 100%; margin: 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
-.tabs { display: flex; gap: 20px; padding: 0 18px; border-bottom: 1px solid var(--line); }
+.tabs { --dashboard-tab-cursor: transparent; display: flex; gap: 20px; padding: 0 18px; border-bottom: 1px solid var(--line); }
 .tabs button { display: flex; align-items: center; gap: 7px; min-height: 39px; padding: 6px 0 10px; color: var(--muted); background: transparent; border: 0; border-bottom: 2px solid transparent; font: inherit; font-size: 11px; cursor: pointer; }
-.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--action, var(--falcon-border)); }
-.tabs button > span { min-width: 19px; padding: 2px 4px; background: var(--control); border-radius: 4px; font-size: 10px; text-align: center; font-variant-numeric: tabular-nums; }
+.tabs button[data-selected="true"] { color: var(--ink); }
+.tabs button[data-selected="true"]:not(:has([data-slot="cursor"])) { border-bottom-color: var(--action, var(--falcon-border)); }
+.tabs button > [data-slot="cursor"] {
+  inset-block-start: auto; inset-block-end: -2px; block-size: 2px; border-radius: 0;
+  background: var(--action, var(--falcon-border));
+}
+.tabs [data-slot="tabContent"] > span { min-width: 19px; padding: 2px 4px; background: var(--control); border-radius: 4px; font-size: 10px; text-align: center; font-variant-numeric: tabular-nums; }
 .preview { max-height: 340px; overflow: auto; scrollbar-width: thin; }
 .queuePanel { display: flex; flex-direction: column; height: 100%; }
 .queuePanel .heading { padding: 19px 20px 9px; min-height: 51px; }
@@ -143,10 +148,13 @@
 @media (prefers-reduced-motion: reduce) { .continue svg { transition: none; } }
 
 :global([data-appearance="glass"]) .panel { border-radius: 22px; box-shadow: var(--falcon-shadow-popover); }
-:global([data-appearance="glass"]) .tabs { gap: 5px; padding-block: 2px 9px; }
+:global([data-appearance="glass"]) .tabs { --dashboard-tab-cursor: var(--dashboard-selection); gap: 5px; padding-block: 2px 9px; }
 :global([data-appearance="glass"]) .tabs button { min-height: 32px; padding: 6px 10px; border: 0; border-radius: 999px; }
-:global([data-appearance="glass"]) .tabs button[aria-selected="true"] { color: var(--dashboard-selection-ink); background: var(--dashboard-selection); }
-:global([data-appearance="glass"]) .tabs button > span { border-radius: 999px; background: color-mix(in srgb, currentColor 12%, transparent); }
+:global([data-appearance="glass"]) .tabs button[data-selected="true"] { color: var(--dashboard-selection-ink); }
+:global([data-appearance="glass"]) .tabs button > [data-slot="cursor"] {
+  inset-block: 0; block-size: auto; border-radius: inherit; background: var(--dashboard-tab-cursor);
+}
+:global([data-appearance="glass"]) .tabs [data-slot="tabContent"] > span { border-radius: 999px; background: color-mix(in srgb, currentColor 12%, transparent); }
 :global([data-appearance="glass"]) .queuePanel .tabs { gap: 5px; }
 :global([data-appearance="glass"]) .queuePanel .tabs button { min-height: 32px; padding-bottom: 6px; }
 :global([data-appearance="glass"]) :is(.filters input, .filters select, .filters button, .state button, .filterSelect > button, .loadMore) { border-radius: 999px; }

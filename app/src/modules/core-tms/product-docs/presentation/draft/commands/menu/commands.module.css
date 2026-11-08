@@ -1,0 +1,87 @@
+.anchor { z-index: 20; }
+
+.menu {
+  --doc-command-outline: var(--falcon-border);
+  --doc-command-divider: var(--falcon-border);
+  box-sizing: border-box;
+  display: block;
+  inline-size: min(227px, calc(100vw - 24px));
+  padding: 5px 4.5px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 10px;
+  background: var(--falcon-elevated);
+  color: var(--falcon-text);
+  box-shadow: inset 0 0 0 .5px var(--doc-command-outline), var(--falcon-shadow-popover);
+  font-family: inherit;
+  font-size: 13.5px;
+}
+
+:global(html.dark) .menu {
+  --doc-command-outline: var(--falcon-doc-tooltip-border);
+  --doc-command-divider: var(--falcon-doc-tooltip-border);
+  --falcon-elevated: var(--falcon-doc-popover);
+  --falcon-text: var(--falcon-doc-command-text);
+  --falcon-text-secondary: var(--falcon-doc-command-shortcut);
+  --falcon-icon: var(--falcon-doc-command-icon);
+  --falcon-selected: var(--falcon-doc-selected);
+}
+
+.viewport {
+  max-block-size: min(472px, calc(100dvh - 34px));
+  margin-inline: -4.5px;
+  padding-inline: 4.5px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+.listbox { min-inline-size: 0; padding: 0; }
+.options, .group { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.section { position: relative; margin: 0; padding: 0; }
+.section + .section { margin-block-start: 5px; padding-block-start: 5px; }
+.section + .section::before {
+  position: absolute;
+  inset: 0 -4.5px auto;
+  block-size: .5px;
+  background: var(--doc-command-divider);
+  content: "";
+}
+
+.menu .option {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-block-size: 34px;
+  padding: 4px 10px 4px 13px;
+  gap: 9px;
+  border: 0;
+  border-radius: 6px;
+  outline: 0;
+  background: transparent;
+  color: var(--falcon-text);
+  font-size: 13.5px;
+  font-weight: 400;
+  line-height: 1.2;
+  text-align: start;
+  cursor: pointer;
+}
+.menu .option[data-highlighted],
+.toolbarMenu .option[data-hover="true"],
+.toolbarMenu:not(:has(.option[data-hover="true"])) .option[data-focus-visible="true"] {
+  background: var(--falcon-selected);
+}
+.menu .option > svg { flex: none; color: var(--falcon-icon); }
+.label { min-inline-size: 0; flex: 1; }
+
+.menu .shortcut {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  min-inline-size: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--falcon-text-secondary);
+  box-shadow: none;
+}
+.shortcut .keys { padding: 0; font: inherit; font-size: 11.5px; letter-spacing: 0; white-space: nowrap; }

@@ -13,8 +13,9 @@ export type TmsMutationOptions = {
   readonly ifMatch?: string;
   readonly idempotencyKey?: string;
 };
+export type TmsBinaryOptions = { readonly contentType?: string; readonly accept?: string; readonly idempotencyKey?: string };
 export interface TmsHttpClient {
-  binary?(path: string, body: Blob, signal?: AbortSignal): Promise<Response>;
+  binary?(path: string, body: Blob, signal?: AbortSignal, options?: TmsBinaryOptions): Promise<Response>;
   stream?(path: string, body: unknown, signal?: AbortSignal): Promise<Response>;
   get<T>(path: string, signal?: AbortSignal): Promise<T>;
   getResource<T>(path: string, signal?: AbortSignal): Promise<TmsResource<T>>;
@@ -134,8 +135,13 @@ export function createTmsHttpClient(
   }
 
   return Object.freeze({
-    async binary(path: string, body: Blob, signal?: AbortSignal): Promise<Response> {
-      return request(path, { method: "POST", headers: { "Content-Type": body.type || "application/octet-stream", Accept: "image/png, image/gif" }, body }, signal);
+    async binary(path: string, body: Blob, signal?: AbortSignal, options: TmsBinaryOptions = {}): Promise<Response> {
+      const headers = new Headers({
+        "Content-Type": options.contentType ?? (body.type || "application/octet-stream"),
+        Accept: options.accept ?? "image/png, image/gif",
+      });
+      if (options.idempotencyKey) headers.set("Idempotency-Key", options.idempotencyKey);
+      return request(path, { method: "POST", headers, body }, signal);
     },
     async stream(path: string, body: unknown, signal?: AbortSignal): Promise<Response> {
       return request(path, {

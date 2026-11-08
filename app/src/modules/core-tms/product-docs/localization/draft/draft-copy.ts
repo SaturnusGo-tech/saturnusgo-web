@@ -1,0 +1,26 @@
+export const draftCopy = {
+  en: {
+    draftTooLong: "The draft is too long. Shorten a section or split it into separate pages.",
+    saveError: "Couldn’t save the change. Your edits are still here.",
+    staleDraft: "This draft changed elsewhere. Copy your edits before reopening the latest draft.",
+    unpublishedParent: "Publish the parent pages first so readers can reach this page.",
+    unsaved: "Discard unsaved edits?",
+    saveBeforeCreate: "Save this draft?",
+    saveBeforeCreateDetail: "Save your changes before opening a new page.",
+    keepEditing: "Keep editing",
+    saveAndCreate: "Save and create",
+    fixFormattingBeforeCreate: "Fix the formatting before saving this draft.",
+  },
+  ru: {
+    draftTooLong: "Черновик слишком длинный. Сократите раздел или разделите его на несколько страниц.",
+    saveError: "Не удалось сохранить изменения. Ваши правки остались в редакторе.",
+    staleDraft: "Этот черновик изменили в другом месте. Скопируйте правки, прежде чем открыть свежую версию.",
+    unpublishedParent: "Сначала опубликуйте родительские страницы, чтобы читатели могли открыть эту статью.",
+    unsaved: "Удалить несохранённые изменения?",
+    saveBeforeCreate: "Сохранить черновик?",
+    saveBeforeCreateDetail: "Сохраните изменения, прежде чем открыть новую страницу.",
+    keepEditing: "Продолжить редактирование",
+    saveAndCreate: "Сохранить и создать",
+    fixFormattingBeforeCreate: "Исправьте форматирование перед сохранением черновика.",
+  },
+};

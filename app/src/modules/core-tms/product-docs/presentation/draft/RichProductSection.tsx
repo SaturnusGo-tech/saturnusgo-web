@@ -9,14 +9,23 @@ import {
 import "@mdxeditor/editor/style.css";
 import { ChevronDown, Ellipsis, ImageIcon, Plus, Trash2 } from "lucide-react";
 import { createContext, useContext, useMemo, useRef, type ReactNode, type RefObject } from "react";
+import { productDocAttachmentDescriptor } from "../attachments/productDocAttachmentEditor";
+import { DashboardPickerProvider, productDocDashboardDescriptor } from "../dashboard/editor/dashboardEditor";
+import { RunEvidencePickerProvider, productDocRunDescriptor } from "../run/editor/runEditor";
+import { productDocRadio } from "./blocks/radio/ProductDocRadio";
 import { ProductDocCodeEditor } from "./blocks/ProductDocCodeEditor";
+import { ProductDocStructuredBlock } from "./blocks/structured/ProductDocStructuredBlock";
+import { productDocCollapseDescriptor, productDocCollapsePlugin } from "./blocks/collapse/ProductDocCollapse";
+import { structuredBlockKind } from "../../domain/structured/structuredMarkdown";
 import blockStyles from "./blocks/productDocBlocks.module.css";
+import { productDocGifPlugin } from "./media/gif/ProductDocGif";
 import { productDocImageOptions } from "./media/ProductDocImage";
 import { productDocImageInputPlugin } from "./media/input/productDocImageInputPlugin";
 import tableStyles from "./tables/tables.module.css";
 import { productDocTableGuardPlugin } from "./tables/productDocTableGuard";
 import { markdownEditorTranslation } from "../../../presentation/cases/inspector/markdown/translations/markdownEditorTranslation";
 import type { TmsLocale } from "../../../localization/model/locale";
+import { productDocChecklistPlugin } from "./checklist/productDocChecklist";
 import { productDocCommandsPlugin } from "./commands/productDocCommands";
 import { productDocFormattingPlugin } from "./formatting/productDocFormatting";
 import { productDocLayoutsPlugin } from "./layouts/productDocLayouts";
@@ -24,8 +33,10 @@ import layoutStyles from "./layouts/layouts.module.css";
 import { productDocSectionsPlugin } from "./sections/productDocSections";
 import { productDocSelectionToolbarPlugin } from "./selection/ProductDocSelectionToolbar";
 import { ProductDocToolbar } from "./toolbar/ProductDocToolbar";
+import { productDocSmartPaste } from "./links/smart/productDocSmartPaste";
 import { ProductDocLinkDialog, isProductDocLink } from "./links/ProductDocLinkDialog";
 import { productDocCallout } from "./blocks/callout/productDocCallout";
+import calloutStyles from "./blocks/callout/product-doc-callout.module.css";
 import markerStyles from "../../../presentation/cases/inspector/markdown/highlight/highlight.module.css";
 import styles from "./editor.module.css";
 
@@ -72,19 +83,29 @@ export default function RichProductSection({
   }), []);
   const plugins = useMemo(() => [
     observeImport(),
-    headingsPlugin({ allowedHeadingLevels: [2, 3, 4] }),
+    headingsPlugin({ allowedHeadingLevels: [1, 2, 3, 4] }),
     listsPlugin(),
+    productDocChecklistPlugin(),
     quotePlugin(),
     tablePlugin(),
     productDocTableGuardPlugin(),
     imagePlugin(productDocImageOptions),
+    productDocGifPlugin(),
     productDocImageInputPlugin({ onMediaBusy }),
     thematicBreakPlugin(),
-    codeBlockPlugin({ codeBlockEditorDescriptors: [{ priority: 0, match: () => true, Editor: ProductDocCodeEditor }] }),
+    codeBlockPlugin({ codeBlockEditorDescriptors: [
+      { priority: 10, match: (language) => Boolean(structuredBlockKind(language)), Editor: ProductDocStructuredBlock },
+      { priority: 0, match: () => true, Editor: ProductDocCodeEditor },
+    ] }),
     linkPlugin({ validateUrl: isProductDocLink }),
+    productDocSmartPaste(),
     linkDialogPlugin({ LinkDialog: ProductDocLinkDialog }),
     markdownShortcutPlugin(),
-    directivesPlugin({ directiveDescriptors: [productDocCallout] }),
+    directivesPlugin({ directiveDescriptors: [
+      productDocCallout, productDocDashboardDescriptor, productDocRunDescriptor, productDocRadio,
+      productDocAttachmentDescriptor, productDocCollapseDescriptor,
+    ] }),
+    productDocCollapsePlugin(),
     productDocSectionsPlugin(),
     productDocFormattingPlugin(),
     productDocSelectionToolbarPlugin(),
@@ -97,10 +118,10 @@ export default function RichProductSection({
     pageTitlePlugin(),
   ], [locale, observeImport, onImport, onMediaBusy]);
 
-  return <Title.Provider value={title}>
+  return <DashboardPickerProvider><RunEvidencePickerProvider><Title.Provider value={title}>
     <MDXEditor ref={editorRef} markdown={markdown} plugins={plugins}
       readOnly={disabled} className={`${styles.editor} ${tableStyles.tableAppearance}`}
-      contentEditableClassName={`${styles.editorBody} ${layoutStyles.editorLayouts} ${blockStyles.editor} ${markerStyles.surface}`}
+      contentEditableClassName={`${styles.editorBody} ${layoutStyles.editorLayouts} ${blockStyles.editor} ${markerStyles.surface} ${calloutStyles.prose}`}
       placeholder={placeholder} suppressHtmlProcessing spellCheck
       iconComponentFor={(name) => {
         if (name === "arrow_drop_down") return <ChevronDown size={13} />;
@@ -127,5 +148,5 @@ export default function RichProductSection({
           onChange(value);
         });
       }} />
-  </Title.Provider>;
+  </Title.Provider></RunEvidencePickerProvider></DashboardPickerProvider>;
 }

@@ -1,0 +1,129 @@
+.track {
+  min-inline-size: 0;
+  margin-block: 14px;
+}
+
+:global([data-doc-column]) > .track:only-child { margin-block: 0; }
+
+.frame {
+  position: relative;
+  box-sizing: border-box;
+  inline-size: var(--run-embed-width, min(100%, 34rem));
+  min-inline-size: min(100%, 13rem);
+  max-inline-size: 100%;
+  container-type: inline-size;
+  color: var(--falcon-text);
+}
+
+.frame[data-align="center"] { margin-inline: auto; }
+.frame[data-align="right"] { margin-inline-start: auto; }
+
+.summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(5.25rem, 24%) auto;
+  grid-template-areas: "identity progress details";
+  align-items: center;
+  gap: 12px;
+  min-block-size: 44px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: var(--falcon-panel);
+  box-shadow: inset 0 0 0 .5px var(--falcon-border);
+}
+
+.identity {
+  grid-area: identity;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-inline-size: 0;
+  font-size: 13px;
+  font-weight: 560;
+  line-height: 1.45;
+}
+
+.identity .glyph { flex: none; color: var(--falcon-text-secondary); }
+.identity > strong { overflow-wrap: anywhere; }
+
+.summary .identity a.runLink {
+  --yt-link: var(--falcon-text);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-inline-size: 0;
+  color: var(--falcon-text);
+  text-decoration: none;
+}
+
+.summary .identity a.runLink:is(:hover, :focus-visible) { text-decoration: underline; text-underline-offset: 3px; }
+.runLink span { min-inline-size: 0; overflow-wrap: anywhere; }
+.runLink svg { flex: none; color: var(--falcon-text-secondary); }
+.progress { grid-area: progress; min-inline-size: 0; color: var(--falcon-text-secondary); font-size: 11px; }
+
+.summary .detailsTrigger {
+  grid-area: details;
+  display: grid;
+  place-items: center;
+  min-inline-size: 28px;
+  inline-size: 28px;
+  block-size: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--falcon-text-secondary);
+}
+
+.summary .detailsTrigger:is(:hover, [aria-expanded="true"]) { background: var(--falcon-hover); color: var(--falcon-text); }
+.summary :is(a, button):focus-visible { outline: 1px solid var(--falcon-text-secondary); outline-offset: 2px; }
+
+.details {
+  --run-details-outline: var(--falcon-border);
+  --run-details-secondary: var(--falcon-text-secondary);
+  box-sizing: border-box;
+  display: grid;
+  gap: 8px;
+  inline-size: min(18rem, calc(100vw - 24px));
+  padding: 11px 13px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--falcon-elevated);
+  color: var(--falcon-text);
+  box-shadow: inset 0 0 0 .5px var(--run-details-outline), 0 4px 12px var(--falcon-doc-tooltip-shadow);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+:global(html.dark) .details {
+  --run-details-outline: var(--falcon-doc-tooltip-border);
+  --run-details-secondary: var(--falcon-doc-muted);
+  background: var(--falcon-doc-popover);
+  color: var(--falcon-doc-text);
+}
+
+.facts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 5px 12px; margin: 0; }
+.facts dt { color: var(--run-details-secondary); }
+.facts dd { margin: 0; overflow-wrap: anywhere; }
+.fact { display: contents; }
+
+.message {
+  grid-column: 2 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  color: var(--falcon-text-secondary);
+  font-size: 11px;
+}
+
+.skeleton { inline-size: 100%; block-size: 4px; border-radius: 99px; background: var(--falcon-control); }
+
+@container (max-width: 360px) {
+  .summary {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "identity details" "progress progress";
+    gap: 5px 8px;
+  }
+  .progress { padding-inline-start: 25px; }
+  .message { grid-column: 1 / -1; padding-inline-start: 25px; }
+}

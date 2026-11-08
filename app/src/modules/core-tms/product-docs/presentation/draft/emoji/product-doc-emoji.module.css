@@ -1,0 +1,13 @@
+.positioner { z-index: 160; }
+.panel {
+  width: min(352px, calc(100vw - 20px));
+  max-height: min(430px, 75dvh);
+  padding: 4px;
+  border: 1px solid var(--falcon-border);
+  border-radius: 14px;
+  background: var(--falcon-elevated);
+  color: var(--falcon-text);
+  box-shadow: var(--falcon-shadow-popover);
+  overflow: auto;
+}
+.panel > div { width: 100%; }

@@ -1,4 +1,4 @@
-import { useEffect, type Dispatch, type SetStateAction } from "react";
+import { useEffect, type Dispatch, type RefObject, type SetStateAction } from "react";
 import type { ExecutionStatus, RunItem, RunItemSummary, TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import { executableSteps } from "../../../helpers/cases/caseRevision";
 
@@ -9,17 +9,23 @@ type RunKeyboardShortcutOptions = {
   runWritable: boolean; navigationBlocked?: boolean;
   onItemStatus: (status: ExecutionStatus) => void;
   onSelectItem: (id: string) => void;
+  embeddedScope?: RefObject<HTMLElement | null>;
   setReporting: Dispatch<SetStateAction<boolean>>;
 };
 
 export function useRunKeyboardShortcuts(options: RunKeyboardShortcutOptions) {
-  const { navigationBlocked, items, onItemStatus, onSelectItem, runWritable, selectedItem, selectedRun, setReporting } = options;
+  const { navigationBlocked, items, onItemStatus, onSelectItem, runWritable, selectedItem, selectedRun, setReporting, embeddedScope } = options;
   useEffect(() => {
     if (!selectedRun || !selectedItem || !items.some(entry => entry.id === selectedItem.id)) return;
     const item = selectedItem;
     function handleShortcut(event: KeyboardEvent) {
       const target = event.target as HTMLElement | null;
-      if (event.defaultPrevented || document.querySelector("[data-defect-page]") || target?.closest("[role=dialog], [role=menu], [role=listbox]")) return;
+      if (event.defaultPrevented || target?.closest("[role=menu], [role=listbox]")) return;
+      const dialog = target?.closest("[role=dialog]");
+      if (embeddedScope) {
+        const panel = embeddedScope.current;
+        if (!panel?.contains(target) || dialog !== panel.closest("[role=dialog]")) return;
+      } else if (dialog || document.querySelector("[data-defect-page]")) return;
       if (target?.closest("input, textarea, select, [contenteditable='true']")) return;
       const index = items.findIndex((entry) => entry.id === item.id);
       const activeAttempt = item.attempts.find((entry) => entry.attemptNo === item.activeAttemptNo)
@@ -54,5 +60,5 @@ export function useRunKeyboardShortcuts(options: RunKeyboardShortcutOptions) {
     }
     window.addEventListener("keydown", handleShortcut);
     return () => window.removeEventListener("keydown", handleShortcut);
-  }, [navigationBlocked, items, onItemStatus, onSelectItem, runWritable, selectedItem, selectedRun, setReporting]);
+  }, [navigationBlocked, items, onItemStatus, onSelectItem, runWritable, selectedItem, selectedRun, setReporting, embeddedScope]);
 }

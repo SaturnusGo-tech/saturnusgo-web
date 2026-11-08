@@ -14,6 +14,7 @@ type Props = {
   testCase?: TestCaseSummary;
   creating: boolean;
   editorOpen: boolean;
+  readOnly?: boolean;
   children?: ReactNode;
   fullscreen: boolean;
   onRunCase: () => void;
@@ -71,7 +72,7 @@ export function CaseDetailHeaderActions(props: Props) {
         : (ru ? "Карточка тест-кейса" : "Test case")}</span>
     </div>
     <div className={inspector.headerActions}>
-      {props.children ?? (!props.creating && !props.editorOpen && <>
+      {props.children ?? (!props.creating && !props.editorOpen && !props.readOnly && <>
       <button type="button" disabled={archived} title={archived ? restoreTitle : undefined}
         className={`${inspector.headerTextButton} ${inspector.headerRunButton}`} onClick={() => { if (!archived) props.onRunCase(); }}>
         <Play size={14} />{ru ? "Запустить" : "Run"}</button>
@@ -100,11 +101,11 @@ export function CaseDetailHeaderActions(props: Props) {
             setMenuOpen(false);
             void copy(buildCaseDeepLink(window.location.href, { caseId: item.id, projectId: item.projectId }), "link");
           }}>{copied === "link" ? <Check size={14} /> : <Link2 size={14} />}{ru ? "Копировать ссылку" : "Copy link"}</button>}
-          <button type="button" role="menuitem" disabled={archived} title={archived ? restoreTitle : undefined} onClick={() => {
+          {!props.readOnly && <button type="button" role="menuitem" disabled={archived} title={archived ? restoreTitle : undefined} onClick={() => {
             if (archived) return;
             setMenuOpen(false);
             props.onClone();
-          }}><Files size={14} />{ru ? "Создать копию" : "Create a copy"}</button>
+          }}><Files size={14} />{ru ? "Создать копию" : "Create a copy"}</button>}
           {item && props.onCreateDefect && <button type="button" role="menuitem"
             disabled={archived || props.editorOpen} title={archived ? restoreTitle : undefined}
             onClick={() => {

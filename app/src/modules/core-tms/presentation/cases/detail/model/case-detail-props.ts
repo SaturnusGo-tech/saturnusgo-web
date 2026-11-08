@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { Activity, TestCaseRevision, TestCaseSummary } from "../../../../../../core/tms/contracts/legacy-contract";
 import type { TmsLocale } from "../../../../localization/model/locale";
 import type { SharedStep, SharedStepSummary } from "../../../../shared-steps/model/shared-step";
@@ -16,8 +17,10 @@ export type CaseDetailPanelProps = {
   sharedSteps: readonly SharedStepSummary[];
   onResolveSharedStep: (id: string) => Promise<SharedStep | null>;
   selectedFolder: string;
+  location?: ReactNode;
   editor?: CaseInspectorEditor;
   canAttach?: boolean;
+  readOnly?: boolean;
   onNew: (folder?: string) => void;
   onEdit: () => void;
   onClone: () => void;

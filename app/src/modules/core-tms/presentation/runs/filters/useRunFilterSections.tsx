@@ -6,7 +6,7 @@ import { localizedLabel, localizedComponentLabel } from "../../../localization/f
 import type { ExtraFilterSection } from "../../cases/toolbar/CasesToolbarPopovers";
 import { RunFilterOptions } from "./options/RunFilterOptions";
 import { RunAssigneeFilter } from "./assignee/RunAssigneeFilter";
-import { emptyRunFilters, matchesRunFilters, toggleRunFilter, type RunFilterState } from "./run-filter-model";
+import { emptyRunFilters, matchesRunFilters, runFilterValues, toggleRunFilter, type RunFilterState } from "./run-filter-model";
 export function useRunFilterSections({workspaceId,scope,projects,rows,ru}:{workspaceId:string;scope:string;
   projects:readonly {id:string;name:string}[];rows:RunRepositoryEntry[];ru:boolean}) {
   const [filters,setFilters]=useState(emptyRunFilters);
@@ -18,16 +18,16 @@ export function useRunFilterSections({workspaceId,scope,projects,rows,ru}:{works
   const custom=caseFieldOptions(rows.map(row=>row.testCase));
   const definitions:{id:keyof RunFilterState;label:string;icon:React.ReactNode;options:{value:string;label:string}[]}[]=[
     {id:"projects",label:ru?"Проекты":"Projects",icon:<FolderKanban size={13}/>,options:projects.map(p=>({value:p.id,label:p.name}))},
-    {id:"results",label:ru?"Результаты":"Results",icon:<CircleCheck size={13}/>,options:enumOptions(["not_run","in_progress","passed","failed","blocked","skipped"])},
+    {id:"results",label:ru?"Результаты":"Results",icon:<CircleCheck size={13}/>,options:enumOptions(runFilterValues.results)},
     {id:"groups",label:ru?"Группировка":"Group by",icon:<ListTree size={13}/>,options:[{value:"project",label:ru?"По проектам":"By project"},{value:"component",label:ru?"По продуктам":"By product"},{value:"tag",label:ru?"По тегам":"By tag"}]},
     {id:"folders",label:ru?"Папки":"Folders",icon:<Folder size={13}/>,options:unique(rows.flatMap(r=>{
       const parts=r.testCase.folderPath.split("/").filter(Boolean);return ["/",...parts.map((_,i)=>"/"+parts.slice(0,i+1).join("/"))];}))},
     {id:"productGroups",label:ru?"Группы продуктов":"Product groups",icon:<Box size={13}/>,options:(custom.productGroups??[]).map(o=>({value:o.id,label:o.label}))},
     {id:"products",label:ru?"Продукты":"Products",icon:<Box size={13}/>,options:(custom.products??[]).map(o=>({value:o.id,label:o.label}))},
-    {id:"regression",label:ru?"Регресс":"Regression",icon:<CircleCheck size={13}/>,options:[{value:"true",label:"true"},{value:"false",label:"false"}]},
-    {id:"types",label:ru?"Тип":"Type",icon:<Bot size={13}/>,options:enumOptions(["manual","checklist","automated"])},
-    {id:"priorities",label:ru?"Приоритет":"Priority",icon:<Flag size={13}/>,options:enumOptions(["critical","high","medium","low"])},
-    {id:"statuses",label:ru?"Статус":"Status",icon:<CircleDot size={13}/>,options:enumOptions(["ready","draft","deprecated"])},
+    {id:"regression",label:ru?"Регресс":"Regression",icon:<CircleCheck size={13}/>,options:enumOptions(runFilterValues.regression)},
+    {id:"types",label:ru?"Тип":"Type",icon:<Bot size={13}/>,options:enumOptions(runFilterValues.types)},
+    {id:"priorities",label:ru?"Приоритет":"Priority",icon:<Flag size={13}/>,options:enumOptions(runFilterValues.priorities)},
+    {id:"statuses",label:ru?"Статус":"Status",icon:<CircleDot size={13}/>,options:enumOptions(runFilterValues.statuses)},
     {id:"tags",label:ru?"Теги":"Tags",icon:<Tags size={13}/>,options:unique(rows.flatMap(r=>r.testCase.tags))},
   ];
   const sections:ExtraFilterSection[]=[{id:"assignee",label:ru?"Ответственные":"Assignees",icon:<Users size={13}/>,

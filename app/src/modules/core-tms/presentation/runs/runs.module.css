@@ -164,7 +164,7 @@
   .shell { grid-template-columns: minmax(320px, 41%) minmax(0, 1fr); }
   .titleBlock, .utilityRow { padding-inline: 16px; }
 }
-@media (max-width: 720px) {
+@container (max-width: 720px) {
   .shell { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(240px, 38vh) minmax(0, 1fr) auto; }
   .navigator { grid-column: 1; grid-row: 1; }
   .emptyPane { grid-column: 1; grid-row: 2 / 4; }
@@ -177,7 +177,7 @@
   .sideRail { grid-template-columns: 1fr 1fr; }
   .titleBlock h1 { font-size: 21px; }
 }
-@media (max-width: 480px) {
+@container (max-width: 480px) {
   .sideRail { grid-template-columns: 1fr; }
   .stepTop { grid-template-columns: 24px minmax(0, 1fr); }
   .stepTop > .executionBadge { grid-column: 2; }

@@ -30,7 +30,8 @@ test("archiving a published page confirms against the current draft version", as
   );
   const { ArchiveProductDoc: View } = h.load<{ ArchiveProductDoc: typeof ArchiveProductDoc }>(
     new URL("../ArchiveProductDoc.tsx", import.meta.url),
-    (name) => name.endsWith("product-doc-response") ? { productDocErrorCode }
+    (name) => name === "@heroui/react" ? { Button: "Button" }
+      : name.endsWith("product-doc-response") ? { productDocErrorCode }
       : name.endsWith("useProductDocSelection") ? selection : undefined,
   );
   const published: ProductDocNode = { ...node, kind: "page", publishedVersion: 1 };
@@ -56,13 +57,13 @@ test("archiving a published page confirms against the current draft version", as
     api, scope, node: published, copy, onArchived: () => { archived++; }, onClose: () => { closed = true; },
   })));
   const findConfirm = (items: ReturnType<typeof render>) => items.find(
-    (item) => item.type === "button" && item.props.children === copy.archiveItem,
+    (item) => item.type === "Button" && item.props.children === copy.archiveItem,
   );
   const initial = findConfirm(render());
   assert.ok(initial);
-  assert.equal(initial.props.disabled, true);
+  assert.equal(initial.props.isDisabled, true);
   assert.equal(reads[0][2]?.draft, true);
-  invoke(initial, "onClick");
+  invoke(initial, "onPress");
   assert.equal(calls.length, 0);
   loadDraft(draft);
   await flush();
@@ -70,12 +71,12 @@ test("archiving a published page confirms against the current draft version", as
   assert.ok(ready.some((item) => item.props.subtitle === draft.title));
   const confirm = findConfirm(ready);
   assert.ok(confirm);
-  assert.ok(!confirm.props.disabled);
-  invoke(confirm, "onClick");
-  invoke(confirm, "onClick");
-  const cancel = render().find((item) => item.type === "button" && item.props.children === copy.cancel);
+  assert.ok(!confirm.props.isDisabled);
+  invoke(confirm, "onPress");
+  invoke(confirm, "onPress");
+  const cancel = render().find((item) => item.type === "Button" && item.props.children === copy.cancel);
   assert.ok(cancel);
-  invoke(cancel, "onClick");
+  invoke(cancel, "onPress");
   assert.equal(closed, false);
   assert.equal(archived, 0);
   assert.equal(calls.length, 1);
@@ -92,9 +93,12 @@ test("the archive shelf restores a scoped archived node and refreshes the tree",
   const list = h.load<{ useProductDocList: typeof useProductDocList }>(
     new URL("../../../state/tree/useProductDocList.ts", import.meta.url),
   );
+  const toasts: { title: string; severity: string }[] = [];
   const { ProductDocsArchive: View } = h.load<{ ProductDocsArchive: typeof ProductDocsArchive }>(
     new URL("../ProductDocsArchive.tsx", import.meta.url),
-    (name) => name.endsWith("useProductDocList") ? list : undefined,
+    (name) => name === "@heroui/react" ? { addToast: ({ title, severity }: (typeof toasts)[number]) => toasts.push({ title, severity }) }
+      : name.endsWith("product-doc-response") ? { productDocErrorCode }
+      : name.endsWith("useProductDocList") ? list : undefined,
   );
   const calls: Parameters<ProductDocsApi["setArchived"]>[] = [];
   const listing: Parameters<ProductDocsApi["list"]>[] = [];
@@ -121,4 +125,5 @@ test("the archive shelf restores a scoped archived node and refreshes the tree",
   assert.deepEqual(calls[0].slice(0, 3), [scope, node.id, false]);
   assert.equal(calls[0][3].expectedDraftVersion, 3);
   assert.equal(changed, true);
+  assert.deepEqual(toasts, [{ title: copy.restored, severity: "success" }]);
 });

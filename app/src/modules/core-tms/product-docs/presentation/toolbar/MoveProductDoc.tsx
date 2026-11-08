@@ -2,8 +2,8 @@
 
 import { LayoutGrid } from "lucide-react";
 import { useRef, useState, type FormEvent, type KeyboardEvent } from "react";
-import { Modal } from "../../../presentation/common/modal/Modal";
-import { AppOverlay } from "../../../presentation/common/overlay/AppOverlay";
+import { Button } from "@heroui/react";
+import { ProductDocModal } from "../overlay/ProductDocModal";
 import { FolderChoiceRow } from "../../../presentation/dialogs/folder/parent/choice/FolderChoiceRow";
 import folderStyles from "../../../presentation/dialogs/folder/parent/parent-folder-picker.module.css";
 import { productDocErrorCode } from "../../domain/errors/product-doc-response";
@@ -66,7 +66,7 @@ export function MoveProductDoc({ api, scope, document: page, path, copy, onMoved
     }
   }
 
-  return <AppOverlay><Modal title={copy.move} subtitle={page.title} panelClassName={styles.modal}
+  return <ProductDocModal title={copy.move} subtitle={page.title} closeLabel={copy.close} busy={saving} className={styles.modal}
     onClose={() => { if (!pending.current) onClose(); }}>
     <form className={styles.form} onSubmit={(event) => void move(event)} aria-busy={saving}>
       <h3>{copy.chooseDestination}</h3>
@@ -83,14 +83,14 @@ export function MoveProductDoc({ api, scope, document: page, path, copy, onMoved
       {draft.status === "error" && <ReadState copy={copy} status="error" retry={draft.retry} />}
       {error && <p role="alert" className={styles.error}>{error}</p>}
       <footer className={styles.footer}>
-        <button type="button" className={shared.action} disabled={saving} onClick={onClose}>{copy.cancel}</button>
-        <button type="submit" className={shared.primary}
-          disabled={saving || !current?.canEdit || destination === current.parentId}>
+        <Button autoFocus type="button" className={shared.action} isDisabled={saving} onPress={onClose}>{copy.cancel}</Button>
+        <Button type="submit" className={shared.primary}
+          isDisabled={saving || !current?.canEdit || destination === current.parentId}>
           {saving ? copy.saving : copy.moveHere}
-        </button>
+        </Button>
       </footer>
     </form>
-  </Modal></AppOverlay>;
+  </ProductDocModal>;
 }
 
 type BranchProps = {

@@ -6648,6 +6648,151 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/link-preview": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resolve authorized Falcon link metadata or compact metadata for a public URL. */
+        post: operations["resolveProductDocLink"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/run-embeds": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Capture immutable evidence from a test run. Use the same command ID for retries. */
+        post: operations["captureProductDocRun"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/run-embeds/candidates": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+            };
+            cookie?: never;
+        };
+        /** Find accessible test runs to capture as article evidence. */
+        get: operations["listProductDocRunCandidates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/run-embeds/{embedId}": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+                embedId: string;
+            };
+            cookie?: never;
+        };
+        /** Read a saved run capture from the selected article revision. */
+        get: operations["getProductDocRun"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/dashboard-embeds": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Capture an immutable dashboard widget snapshot. Retry the same operation with the same command ID. */
+        post: operations["captureProductDocDashboard"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/dashboard-embeds/{embedId}": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+                embedId: string;
+            };
+            cookie?: never;
+        };
+        /** Read the saved snapshot or evaluate the same widget with current data. */
+        get: operations["getProductDocDashboard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/workspaces/{workspaceId}/projects/{projectId}/product-docs": {
         parameters: {
             query?: never;
@@ -6664,6 +6809,29 @@ export interface paths {
         get: operations["listProductDocs"];
         put?: never;
         post: operations["createProductDocNode"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/diagram": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Generate a Mermaid flowchart proposal for a project. Requires documentation edit access and consumes the workspace's writing budget. The proposal leaves all saved documents unchanged. */
+        post: operations["generateProductDocDiagram"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6854,6 +7022,80 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/impact": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+            };
+            cookie?: never;
+        };
+        /** Read article coverage or compare an exact saved draft with the latest publication. */
+        get: operations["getProductDocImpact"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/reviews": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+            };
+            cookie?: never;
+        };
+        /** List review requests for saved article drafts. */
+        get: operations["listProductDocReviews"];
+        put?: never;
+        /** Request a review of a saved draft or one of its sections. */
+        post: operations["requestProductDocReview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/reviews/{reviewId}/decision": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+                reviewId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record a review decision as the assigned reviewer. */
+        post: operations["decideProductDocReview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/comments": {
         parameters: {
             query?: never;
@@ -6942,6 +7184,55 @@ export interface paths {
             cookie?: never;
         };
         get: operations["listRunItemProductDocRequirements"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/attachments": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload a private document attachment of at most 25 MiB. */
+        post: operations["uploadProductDocAttachment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/attachments/{attachmentId}": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+                attachmentId: string;
+            };
+            cookie?: never;
+        };
+        /** Read an attachment authorized by the selected article revision. */
+        get: operations["getProductDocAttachment"];
         put?: never;
         post?: never;
         delete?: never;
@@ -7661,7 +7952,7 @@ export interface components {
             meta: components["schemas"]["AnalyticsPageMeta"];
         };
         /** @enum {string} */
-        ErrorCode: "PRODUCT_DOC_ACCESS_DENIED" | "PRODUCT_DOC_NOT_FOUND" | "PRODUCT_DOC_STALE_DRAFT" | "PRODUCT_DOC_TREE_CYCLE" | "PRODUCT_DOC_PARENT_UNPUBLISHED" | "PRODUCT_DOC_EMPTY" | "ACTOR_UNAVAILABLE" | "AI_ANALYSIS_RETRY" | "AI_AUTHENTICATION_FAILED" | "AI_CONTEXT_BUDGET_EXCEEDED" | "AI_DISABLED" | "AI_DUPLICATE_CASE_ID" | "AI_GUIDE_ACCESS_CHANGED" | "AI_GUIDE_CHAT_CONFLICT" | "AI_GUIDE_CHAT_NOT_FOUND" | "AI_GUIDE_HISTORY_LIMIT" | "AI_GUIDE_IDEMPOTENCY_CONFLICT" | "AI_GUIDE_SHARED_ANSWER_NOT_FOUND" | "AI_GUIDE_TURN_CANCELLED" | "AI_GUIDE_TURN_FAILED" | "AI_GUIDE_TURN_PENDING" | "AI_INVALID_JSON" | "AI_NOT_CONFIGURED" | "AI_OUTPUT_TRUNCATED" | "AI_PAID_MODEL_DISABLED" | "AI_PROVIDER_QUOTA_EXHAUSTED" | "AI_PROVIDER_REQUEST_REJECTED" | "AI_PROVIDER_RESPONSE_INVALID" | "AI_PROVIDER_RESPONSE_TOO_LARGE" | "AI_PROVIDER_UNAVAILABLE" | "AI_RATE_LIMITED" | "AI_REQUEST_BUDGET_EXCEEDED" | "AI_SCHEMA_INVALID" | "AI_UNKNOWN_CASE_ID" | "AI_UNKNOWN_CHANGED_FILE" | "AI_WRITING_OUTPUT_INVALID" | "AI_WRITING_RATE_LIMITED" | "AI_WRITING_REFUSED" | "AI_WRITING_UNAVAILABLE" | "AMBIGUOUS_WORKFLOW_NAME" | "ANALYSIS_BUSY" | "ANALYSIS_NOT_FOUND" | "ANALYSIS_RUN_CONFLICT" | "ANALYTICS_SCOPE_TOO_LARGE" | "ANALYTICS_TEMPORARILY_UNAVAILABLE" | "ANALYTICS_WINDOW_TOO_LARGE" | "API_SOURCE_ACCESS_DENIED" | "API_SOURCE_CONTEXT_REQUIRED" | "API_SOURCE_MIGRATED" | "API_SOURCE_NAME_REQUIRED" | "API_SOURCE_NOT_FOUND" | "API_SOURCE_SCOPE_INVALID" | "ATTACHMENT_DIGEST_MISMATCH" | "AUTHENTICATION_REQUIRED" | "BAD_REQUEST" | "BOT_CHANNEL_MEMBERSHIP_REQUIRED" | "BUILD_CONTEXT_MISMATCH" | "BUILD_NOT_SUCCESSFUL" | "CATALOG_LIMIT_EXCEEDED" | "CHANGED_PATHS_LIMIT_EXCEEDED" | "CHANGE_CONTEXT_MISMATCH" | "CLOUD_AUTH_ACCOUNT_CONFLICT" | "CLOUD_AUTH_AUTHENTICATION_FAILED" | "CLOUD_AUTH_IDEMPOTENCY_CONFLICT" | "CLOUD_AUTH_ORIGIN_DENIED" | "CLOUD_AUTH_PERSISTENCE_FAILED" | "CLOUD_AUTH_RATE_LIMITED" | "CLOUD_AUTH_SESSION_INVALID" | "COMMAND_IN_PROGRESS" | "CONFLICT" | "CONNECTION_BINDING_IMMUTABLE" | "CONNECTION_BUSY" | "CONNECTION_DISABLED" | "CONNECTION_LIMIT_EXCEEDED" | "CONNECTION_NOT_FOUND" | "CREDENTIALS_REQUIRED" | "CREDENTIALS_UNAVAILABLE" | "DEFECT_ALREADY_ROUTED" | "DEFECT_NOT_FOUND" | "DELIVERY_NOT_RECONCILABLE" | "DELIVERY_NOT_RETRYABLE" | "DELIVERY_OUTCOME_UNKNOWN" | "DESKTOP_AUTH_INVALID" | "DESTINATION_NOT_ACCESSIBLE" | "DICTATION_EMPTY" | "DICTATION_INVALID_AUDIO" | "DICTATION_RATE_LIMITED" | "DICTATION_UNAVAILABLE" | "DISCOVERY_LIMIT_EXCEEDED" | "DUPLICATE_RULE" | "EMPTY_SCOPE" | "ENCRYPTION_KEY_REQUIRED" | "ENVIRONMENT_NOT_FOUND" | "EVENT_DISABLED" | "FEDERATION_INVALID" | "FEDERATION_LINK_REQUIRED" | "FEDERATION_SUBJECT_UNAVAILABLE" | "FEDERATION_UNAVAILABLE" | "FORBIDDEN" | "GAP_GENERATING" | "GAP_NOT_FOUND" | "GENERATION_FAILED" | "GITHUB_CONNECTION_REQUIRED" | "IDEMPOTENCY_KEY_REUSED" | "IMAGE_NORMALIZATION_BUSY" | "IMAGE_NORMALIZATION_CANCELLED" | "IMAGE_NORMALIZATION_TIMEOUT" | "IMPACT_PROCESSING_FAILED" | "IMPORT_AI_UNAVAILABLE" | "IMPORT_LIMIT_EXCEEDED" | "IMPORT_MAPPING_INVALID" | "IMPORT_SOURCE_INVALID" | "INTEGRATION_ACTOR_UNAVAILABLE" | "INTEGRATION_DISABLED" | "INTERNAL_ERROR" | "INVALID_CHANGED_FILE" | "INVALID_CHANNEL" | "INVALID_COMMIT" | "INVALID_EVENT" | "INVALID_GITHUB_EVENT" | "INVALID_MESSAGE_ID" | "INVALID_PATH_PREFIX" | "INVALID_PULL_REQUEST" | "INVALID_REPOSITORY" | "INVALID_SERVICE_URL" | "INVALID_TRANSITION" | "INVALID_WEBHOOK_PAYLOAD" | "INVALID_WORKFLOW_ID" | "LEASE_LOST" | "LINK_CONFLICT" | "NOTIFICATION_CONFLICT" | "NOTIFICATION_LIMIT_REACHED" | "NOTIFICATION_LINK_EXPIRED" | "NOTIFICATION_LINK_PENDING" | "NOTIFICATION_SUBSCRIPTION_INVALID" | "NOTIFICATION_UNAVAILABLE" | "NOT_FOUND" | "NO_MATCHING_TESTS" | "PATH_FILTER_REQUIRES_PR_OR_PUSH" | "PAYLOAD_TOO_LARGE" | "PERSONAL_ACCESS_DENIED" | "PERSONAL_TRIAL_EXPIRED" | "PRECONDITION_FAILED" | "PRECONDITION_REQUIRED" | "PROCESSING_FAILED" | "PROJECT_NOT_FOUND" | "PROOF_INVALID" | "QUOTA_EXCEEDED" | "RATE_LIMITED" | "REAUTHENTICATION_REQUIRED" | "REMOTE_ARCHIVED" | "REMOTE_NOT_FOUND" | "REMOTE_SCOPE_MISMATCH" | "REMOTE_TRANSITION_UNAVAILABLE" | "REPOSITORY_BINDING_IMMUTABLE" | "REPOSITORY_LIMIT_EXCEEDED" | "RETEST_CASE_MISMATCH" | "RETEST_EVIDENCE_REQUIRED" | "RETEST_STEP_MISMATCH" | "RULE_EVENT_DISABLED" | "RUN_ITEM_NOT_FOUND" | "RUN_NOT_COMPLETED" | "RUN_NOT_FOUND" | "RUN_RULE_REQUIRED" | "SCOPE_NOT_REVIEWABLE" | "SERVICE_UNAVAILABLE" | "SIGNING_SECRET_REQUIRED" | "SIGNUP_REQUIRED" | "SPACE_PROOF_INVALID" | "SPACE_SELECTION_INVALID" | "SSO_CONFLICT" | "SSO_FORBIDDEN" | "SSO_REQUIRED" | "SSO_TEST_REQUIRED" | "STALE_COMMENT" | "STATUS_NOT_ACCESSIBLE" | "SUITE_NOT_FOUND" | "UNLINKED_REMOTE_ISSUE" | "UNSUPPORTED_MEDIA_TYPE" | "UNSUPPORTED_OPERATION" | "UPLOAD_INTENT_EXPIRED" | "UPSTREAM_ACCESS_DENIED" | "UPSTREAM_INVALID_RESPONSE" | "UPSTREAM_RATE_LIMITED" | "UPSTREAM_REJECTED" | "UPSTREAM_UNAVAILABLE" | "VALIDATION_ERROR" | "VALIDATION_FAILED" | "WEBHOOK_UNAUTHORIZED" | "WORKFLOW_ID_MISMATCH" | "WORKFLOW_LIMIT_EXCEEDED" | "WORKFLOW_NOT_FOUND" | "YOUTRACK_CONFIGURATION_CHANGED" | "YOUTRACK_LINK_REQUIRED" | "YOUTRACK_NOT_READY_FOR_TEST" | "YOUTRACK_SYNC_CONFLICT" | "YOUTRACK_WEBHOOK_SETUP_UNAVAILABLE" | "YOUTRACK_WEBHOOK_UNAUTHORIZED" | "YOUTRACK_WORKFLOW_GUARD_REQUIRED" | "BILLING_FORBIDDEN" | "BILLING_DISABLED" | "BILLING_NOT_FOUND" | "BILLING_CONFLICT" | "BILLING_VERSION_CONFLICT" | "BILLING_PLAN_INCOMPATIBLE" | "BILLING_SEATS_OCCUPIED" | "BILLING_CHECKOUT_EXPIRED" | "BILLING_STARTUP_SETUP_REQUIRED" | "BILLING_INVALID_STATE" | "BILLING_INVALID_EVENT" | "BILLING_SIGNATURE_INVALID" | "BILLING_READ_ONLY" | "BILLING_CONTACT_SALES" | "BILLING_TEAM_UNAVAILABLE" | "PERSONAL_OWNERSHIP_TRANSFER_UNAVAILABLE";
+        ErrorCode: "PRODUCT_DOC_ACCESS_DENIED" | "PRODUCT_DOC_NOT_FOUND" | "PRODUCT_DOC_STALE_DRAFT" | "PRODUCT_DOC_TREE_CYCLE" | "PRODUCT_DOC_PARENT_UNPUBLISHED" | "PRODUCT_DOC_EMPTY" | "ACTOR_UNAVAILABLE" | "AI_ANALYSIS_RETRY" | "AI_AUTHENTICATION_FAILED" | "AI_CONTEXT_BUDGET_EXCEEDED" | "AI_DISABLED" | "AI_DUPLICATE_CASE_ID" | "AI_GUIDE_ACCESS_CHANGED" | "AI_GUIDE_CHAT_CONFLICT" | "AI_GUIDE_CHAT_NOT_FOUND" | "AI_GUIDE_HISTORY_LIMIT" | "AI_GUIDE_IDEMPOTENCY_CONFLICT" | "AI_GUIDE_SHARED_ANSWER_NOT_FOUND" | "AI_GUIDE_TURN_CANCELLED" | "AI_GUIDE_TURN_FAILED" | "AI_GUIDE_TURN_PENDING" | "AI_INVALID_JSON" | "AI_NOT_CONFIGURED" | "AI_OUTPUT_TRUNCATED" | "AI_PAID_MODEL_DISABLED" | "AI_PROVIDER_QUOTA_EXHAUSTED" | "AI_PROVIDER_REQUEST_REJECTED" | "AI_PROVIDER_RESPONSE_INVALID" | "AI_PROVIDER_RESPONSE_TOO_LARGE" | "AI_PROVIDER_UNAVAILABLE" | "AI_RATE_LIMITED" | "AI_REQUEST_BUDGET_EXCEEDED" | "AI_SCHEMA_INVALID" | "AI_UNKNOWN_CASE_ID" | "AI_UNKNOWN_CHANGED_FILE" | "AI_WRITING_OUTPUT_INVALID" | "AI_WRITING_RATE_LIMITED" | "AI_WRITING_REFUSED" | "AI_WRITING_UNAVAILABLE" | "AMBIGUOUS_WORKFLOW_NAME" | "ANALYSIS_BUSY" | "ANALYSIS_NOT_FOUND" | "ANALYSIS_RUN_CONFLICT" | "ANALYTICS_SCOPE_TOO_LARGE" | "ANALYTICS_TEMPORARILY_UNAVAILABLE" | "ANALYTICS_WINDOW_TOO_LARGE" | "API_SOURCE_ACCESS_DENIED" | "API_SOURCE_CONTEXT_REQUIRED" | "API_SOURCE_MIGRATED" | "API_SOURCE_NAME_REQUIRED" | "API_SOURCE_NOT_FOUND" | "API_SOURCE_SCOPE_INVALID" | "ATTACHMENT_DIGEST_MISMATCH" | "AUTHENTICATION_REQUIRED" | "BAD_REQUEST" | "BOT_CHANNEL_MEMBERSHIP_REQUIRED" | "BUILD_CONTEXT_MISMATCH" | "BUILD_NOT_SUCCESSFUL" | "CATALOG_LIMIT_EXCEEDED" | "CHANGED_PATHS_LIMIT_EXCEEDED" | "CHANGE_CONTEXT_MISMATCH" | "CLOUD_AUTH_ACCOUNT_CONFLICT" | "CLOUD_AUTH_AUTHENTICATION_FAILED" | "CLOUD_AUTH_IDEMPOTENCY_CONFLICT" | "CLOUD_AUTH_ORIGIN_DENIED" | "CLOUD_AUTH_PERSISTENCE_FAILED" | "CLOUD_AUTH_RATE_LIMITED" | "CLOUD_AUTH_SESSION_INVALID" | "COMMAND_IN_PROGRESS" | "CONFLICT" | "CONNECTION_BINDING_IMMUTABLE" | "CONNECTION_BUSY" | "CONNECTION_DISABLED" | "CONNECTION_LIMIT_EXCEEDED" | "CONNECTION_NOT_FOUND" | "CREDENTIALS_REQUIRED" | "CREDENTIALS_UNAVAILABLE" | "DEFECT_ALREADY_ROUTED" | "DEFECT_NOT_FOUND" | "DELIVERY_NOT_RECONCILABLE" | "DELIVERY_NOT_RETRYABLE" | "DELIVERY_OUTCOME_UNKNOWN" | "DESKTOP_AUTH_INVALID" | "DESTINATION_NOT_ACCESSIBLE" | "DICTATION_EMPTY" | "DICTATION_INVALID_AUDIO" | "DICTATION_RATE_LIMITED" | "DICTATION_UNAVAILABLE" | "DISCOVERY_LIMIT_EXCEEDED" | "DUPLICATE_RULE" | "EMPTY_SCOPE" | "ENCRYPTION_KEY_REQUIRED" | "ENVIRONMENT_NOT_FOUND" | "EVENT_DISABLED" | "FEDERATION_INVALID" | "FEDERATION_LINK_REQUIRED" | "FEDERATION_SUBJECT_UNAVAILABLE" | "FEDERATION_UNAVAILABLE" | "FORBIDDEN" | "GAP_GENERATING" | "GAP_NOT_FOUND" | "GENERATION_FAILED" | "GITHUB_CONNECTION_REQUIRED" | "IDEMPOTENCY_KEY_REUSED" | "IMAGE_NORMALIZATION_BUSY" | "IMAGE_NORMALIZATION_CANCELLED" | "IMAGE_NORMALIZATION_TIMEOUT" | "IMPACT_PROCESSING_FAILED" | "IMPORT_AI_UNAVAILABLE" | "IMPORT_LIMIT_EXCEEDED" | "IMPORT_MAPPING_INVALID" | "IMPORT_SOURCE_INVALID" | "INTEGRATION_ACTOR_UNAVAILABLE" | "INTEGRATION_DISABLED" | "INTERNAL_ERROR" | "INVALID_CHANGED_FILE" | "INVALID_CHANNEL" | "INVALID_COMMIT" | "INVALID_EVENT" | "INVALID_GITHUB_EVENT" | "INVALID_MESSAGE_ID" | "INVALID_PATH_PREFIX" | "INVALID_PULL_REQUEST" | "INVALID_REPOSITORY" | "INVALID_SERVICE_URL" | "INVALID_TRANSITION" | "INVALID_WEBHOOK_PAYLOAD" | "INVALID_WORKFLOW_ID" | "LEASE_LOST" | "LINK_CONFLICT" | "NOTIFICATION_CONFLICT" | "NOTIFICATION_LIMIT_REACHED" | "NOTIFICATION_LINK_EXPIRED" | "NOTIFICATION_LINK_PENDING" | "NOTIFICATION_SUBSCRIPTION_INVALID" | "NOTIFICATION_UNAVAILABLE" | "NOT_FOUND" | "NO_MATCHING_TESTS" | "PATH_FILTER_REQUIRES_PR_OR_PUSH" | "PAYLOAD_TOO_LARGE" | "PERSONAL_ACCESS_DENIED" | "PERSONAL_TRIAL_EXPIRED" | "PRECONDITION_FAILED" | "PRECONDITION_REQUIRED" | "PROCESSING_FAILED" | "PROJECT_NOT_FOUND" | "PROOF_INVALID" | "QUOTA_EXCEEDED" | "RATE_LIMITED" | "REAUTHENTICATION_REQUIRED" | "REMOTE_ARCHIVED" | "REMOTE_NOT_FOUND" | "REMOTE_SCOPE_MISMATCH" | "REMOTE_TRANSITION_UNAVAILABLE" | "REPOSITORY_BINDING_IMMUTABLE" | "REPOSITORY_LIMIT_EXCEEDED" | "RETEST_CASE_MISMATCH" | "RETEST_EVIDENCE_REQUIRED" | "RETEST_STEP_MISMATCH" | "RULE_EVENT_DISABLED" | "RUN_ITEM_NOT_FOUND" | "RUN_NOT_COMPLETED" | "RUN_NOT_FOUND" | "RUN_RULE_REQUIRED" | "SCOPE_NOT_REVIEWABLE" | "SERVICE_UNAVAILABLE" | "SIGNING_SECRET_REQUIRED" | "SIGNUP_REQUIRED" | "SPACE_PROOF_INVALID" | "SPACE_SELECTION_INVALID" | "SSO_CONFLICT" | "SSO_FORBIDDEN" | "SSO_REQUIRED" | "SSO_TEST_REQUIRED" | "STALE_COMMENT" | "STATUS_NOT_ACCESSIBLE" | "SUITE_NOT_FOUND" | "UNLINKED_REMOTE_ISSUE" | "UNSUPPORTED_MEDIA_TYPE" | "UNSUPPORTED_OPERATION" | "UPLOAD_INTENT_EXPIRED" | "UPSTREAM_ACCESS_DENIED" | "UPSTREAM_INVALID_RESPONSE" | "UPSTREAM_RATE_LIMITED" | "UPSTREAM_REJECTED" | "UPSTREAM_UNAVAILABLE" | "VALIDATION_ERROR" | "VALIDATION_FAILED" | "WEBHOOK_UNAUTHORIZED" | "WORKFLOW_ID_MISMATCH" | "WORKFLOW_LIMIT_EXCEEDED" | "WORKFLOW_NOT_FOUND" | "YOUTRACK_CONFIGURATION_CHANGED" | "YOUTRACK_LINK_REQUIRED" | "YOUTRACK_NOT_READY_FOR_TEST" | "YOUTRACK_SYNC_CONFLICT" | "YOUTRACK_WEBHOOK_SETUP_UNAVAILABLE" | "YOUTRACK_WEBHOOK_UNAUTHORIZED" | "YOUTRACK_WORKFLOW_GUARD_REQUIRED" | "BILLING_FORBIDDEN" | "BILLING_DISABLED" | "BILLING_NOT_FOUND" | "BILLING_CONFLICT" | "BILLING_VERSION_CONFLICT" | "BILLING_PLAN_INCOMPATIBLE" | "BILLING_SEATS_OCCUPIED" | "BILLING_CHECKOUT_EXPIRED" | "BILLING_STARTUP_SETUP_REQUIRED" | "BILLING_INVALID_STATE" | "BILLING_INVALID_EVENT" | "BILLING_SIGNATURE_INVALID" | "BILLING_READ_ONLY" | "BILLING_CONTACT_SALES" | "BILLING_TEAM_UNAVAILABLE" | "PERSONAL_OWNERSHIP_TRANSFER_UNAVAILABLE" | "PRODUCT_DOC_INVALID_TAXONOMY";
         ValidationIssue: {
             field: string;
             code: string;
@@ -12546,6 +12837,145 @@ export interface components {
         ProductDocAvailability: {
             enabled: boolean;
         };
+        ProductDocTaxonomyInput: {
+            productGroupId: string | null;
+            productId: string | null;
+        };
+        ProductDocTaxonomyValue: {
+            id: string;
+            label: string;
+        };
+        ProductDocTaxonomy: {
+            productGroup: components["schemas"]["ProductDocTaxonomyValue"] | null;
+            product: components["schemas"]["ProductDocTaxonomyValue"] | null;
+        };
+        ProductDocSearchMatch: {
+            /** @enum {string} */
+            kind: "title" | "section" | "body";
+            sectionId: string | null;
+            sectionTitle: string | null;
+            snippet: string;
+        };
+        ProductDocLinkTarget: {
+            /** @enum {string} */
+            kind: "case";
+            id: string;
+        } | {
+            /** @enum {string} */
+            kind: "document";
+            id: string;
+            version?: number;
+            sectionId?: string;
+        } | {
+            /** @enum {string} */
+            kind: "external";
+            /** Format: uri */
+            url: string;
+        };
+        ProductDocLinkPreview: {
+            key?: string;
+            /** @enum {string} */
+            status?: "draft" | "ready" | "deprecated" | "published" | "archived";
+            /** @enum {string} */
+            priority?: "low" | "medium" | "high" | "critical";
+            ownerIdentityId?: string | null;
+            /** @enum {string} */
+            kind: "case" | "document" | "external";
+            title: string | null;
+            description: string | null;
+            host: string | null;
+            path: string[];
+        };
+        ProductDocRunEmbed: {
+            id: string;
+            runId: string;
+            /** @description Project that owns the source run. Older snapshots may omit this property. */
+            runProjectId?: components["schemas"]["Identifier"];
+            runKey: string;
+            title: string;
+            status: components["schemas"]["RunStatus"];
+            environmentName: string;
+            /** Format: date-time */
+            runCreatedAt: string;
+            /** Format: date-time */
+            capturedAt: string;
+            /** @description Sorted, distinct published versions of this article pinned by items in the source run. */
+            requirementVersions: number[];
+            counts: components["schemas"]["ExecutionCounts"];
+        };
+        ProductDocRunEmbedCapture: {
+            id: string;
+            runId: string;
+            /** @description Project that owns the source run. Older snapshots may omit this property. */
+            runProjectId?: components["schemas"]["Identifier"];
+            runKey: string;
+            title: string;
+            status: components["schemas"]["RunStatus"];
+            environmentName: string;
+            /** Format: date-time */
+            runCreatedAt: string;
+            /** Format: date-time */
+            capturedAt: string;
+            /** @description Sorted, distinct published versions of this article pinned by items in the source run. */
+            requirementVersions: number[];
+            counts: components["schemas"]["ExecutionCounts"];
+            /** @description Standalone Markdown directive for this article. */
+            directive: string;
+        };
+        ProductDocRunCandidate: {
+            id: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            projectName: string;
+            key: string;
+            name: string;
+            environmentName: string;
+            /** Format: date-time */
+            createdAt: string;
+            status: components["schemas"]["RunStatus"];
+            components: string[];
+            tags: string[];
+        };
+        ProductDocRunCandidatesEnvelope: {
+            data: components["schemas"]["ProductDocRunCandidate"][];
+            meta: {
+                nextCursor: string | null;
+                hasMore: boolean;
+            };
+        };
+        ProductDocRunEmbedCaptureInput: {
+            runId: string;
+            /** @description Source project when the run belongs to a different project. Defaults to the article project. */
+            runProjectId?: components["schemas"]["Identifier"];
+            commandId: string;
+        };
+        ProductDocDashboardCaptureInput: {
+            /** @enum {string} */
+            widgetKey: "readyForRetest" | "trend" | "queue" | "portfolio" | "freshness" | "types" | "tags" | "coverage" | "defects" | "outcomes" | "currentCases" | "casesCreated" | "runsLaunched" | "completedRuns" | "passedRuns" | "passRate" | "currentDefects" | "reportedDefects" | "linkedDefects" | "defect:open" | "defect:triaged" | "defect:in_progress" | "defect:ready_for_retest" | "defect:verified" | "defect:closed" | "defect:reopened" | "type:manual" | "type:automated" | "type:checklist";
+            /** @enum {integer} */
+            periodDays: 7 | 30 | 90;
+            productGroupId?: string;
+            productId?: string;
+            regression?: boolean;
+            commandId: string;
+        };
+        ProductDocDashboardEmbed: {
+            id: string;
+            /** @enum {string} */
+            widgetKey: "readyForRetest" | "trend" | "queue" | "portfolio" | "freshness" | "types" | "tags" | "coverage" | "defects" | "outcomes" | "currentCases" | "casesCreated" | "runsLaunched" | "completedRuns" | "passedRuns" | "passRate" | "currentDefects" | "reportedDefects" | "linkedDefects" | "defect:open" | "defect:triaged" | "defect:in_progress" | "defect:ready_for_retest" | "defect:verified" | "defect:closed" | "defect:reopened" | "type:manual" | "type:automated" | "type:checklist";
+            /** @enum {integer} */
+            periodDays: 7 | 30 | 90;
+            productGroupId?: string;
+            productId?: string;
+            regression?: boolean;
+            /** @enum {integer} */
+            modelVersion: 1;
+            /** Format: date-time */
+            capturedAt: string;
+            /** Format: date-time */
+            generatedAt: string;
+            summary: components["schemas"]["DashboardAnalyticsSummary"];
+            workbench: components["schemas"]["DashboardWorkbench"];
+        };
         ProductDocNode: {
             id: string;
             parentId: string | null;
@@ -12560,6 +12990,12 @@ export interface components {
              */
             archivedAt?: string;
             appearance?: components["schemas"]["RepositoryFolderAppearance"];
+            taxonomy?: components["schemas"]["ProductDocTaxonomy"];
+            match?: components["schemas"]["ProductDocSearchMatch"];
+            searchPath?: {
+                id: string;
+                title: string;
+            }[];
         };
         ProductDocSection: {
             id: string;
@@ -12588,6 +13024,19 @@ export interface components {
              */
             archivedAt?: string;
             appearance?: components["schemas"]["RepositoryFolderAppearance"];
+            taxonomy?: components["schemas"]["ProductDocTaxonomy"];
+            properties?: components["schemas"]["ProductDocProperties"];
+            /** @description Recorded creation and publication events visible with this document. */
+            activity?: {
+                created?: components["schemas"]["ProductDocActivityEvent"];
+                published?: components["schemas"]["ProductDocActivityEvent"];
+            };
+        };
+        ProductDocActivityEvent: {
+            identityId: string;
+            displayName: string;
+            /** Format: date-time */
+            at: string;
         };
         ProductDocList: {
             nodes: components["schemas"]["ProductDocNode"][];
@@ -12595,11 +13044,24 @@ export interface components {
             canEdit: boolean;
             canPublish: boolean;
         };
+        ProductDocDiagramInput: {
+            /** @description The process to diagram, without leading or trailing whitespace. */
+            prompt: string;
+        };
+        ProductDocDiagram: {
+            /** @description Canonical Mermaid flowchart source with plain-text node and edge labels. */
+            source: string;
+        };
         ProductDocCreateInput: {
             /** @enum {string} */
             kind: "folder" | "page";
             parentId: string | null;
             title: string;
+            taxonomy?: components["schemas"]["ProductDocTaxonomyInput"];
+            /** @description Initial Markdown body for a page. Blank text leaves the draft empty. */
+            description?: string;
+            /** @description Optional initial priority, assignee and labels for a page. */
+            properties?: components["schemas"]["ProductDocPropertiesInput"];
         };
         /** @description Total Markdown length across sections must not exceed 262144. */
         ProductDocSaveInput: {
@@ -12608,6 +13070,9 @@ export interface components {
             expectedDraftVersion: number;
             /** @description Ordered, non-overlapping UTF-16 ranges in the plain title. An empty array removes all title highlights. */
             titleHighlights?: components["schemas"]["ProductDocTitleHighlight"][];
+            taxonomy?: components["schemas"]["ProductDocTaxonomyInput"];
+            /** @description Omit to preserve the current properties. Clear by passing null priority, null assigneeIdentityId and an empty labels array. */
+            properties?: components["schemas"]["ProductDocPropertiesInput"];
         };
         ProductDocPublishInput: {
             expectedDraftVersion: number;
@@ -12655,6 +13120,74 @@ export interface components {
             cases: components["schemas"]["ProductDocArticleCase"][];
             nextCursor: string | null;
         };
+        ProductDocImpactCase: {
+            caseId: string;
+            title: string;
+            sectionId: string | null;
+            needsUpdate: boolean;
+            affected: boolean;
+            missingSection: boolean;
+        };
+        ProductDocImpactSection: {
+            sectionId: string;
+            title: string;
+            /** @enum {string} */
+            kind: "added" | "edited" | "removed";
+            excerpt?: {
+                /** @enum {string} */
+                field: "heading" | "body";
+                before: string;
+                after: string;
+            };
+        };
+        ProductDocImpact: {
+            cases: components["schemas"]["ProductDocImpactCase"][];
+            totalLinkedCases: number;
+            affectedCases: number;
+            casesNeedingUpdate: number;
+            nextCursor: string | null;
+            publishedVersion: number | null;
+            draftVersion: number | null;
+            changes: {
+                pageChanged: boolean;
+                orderChanged: boolean;
+                sections: components["schemas"]["ProductDocImpactSection"][];
+            } | null;
+        };
+        ProductDocReview: {
+            id: string;
+            sectionId: string | null;
+            reviewerIdentityId: string;
+            reviewerDisplayName: string;
+            requestedByIdentityId: string;
+            draftVersion: number;
+            /** @enum {string} */
+            status: "pending" | "approved" | "changes_requested";
+            note: string | null;
+            /** Format: date-time */
+            requestedAt: string;
+            decidedAt: string | null;
+            stale: boolean;
+            canDecide: boolean;
+        };
+        ProductDocReviewPage: {
+            reviews: components["schemas"]["ProductDocReview"][];
+            nextCursor: string | null;
+            currentDraftVersion: number;
+            canRequest: boolean;
+        };
+        ProductDocReviewRequestInput: {
+            sectionId: string | null;
+            reviewerIdentityId: string;
+            expectedDraftVersion: number;
+            commandId: string;
+        };
+        ProductDocReviewDecisionInput: {
+            /** @enum {string} */
+            decision: "approved" | "changes_requested";
+            note?: string;
+            commandId: string;
+        };
         ProductDocLinkInput: {
             /** @description Create the association only if the article is not already linked to the test case. */
             preserveExisting?: boolean;
@@ -12672,6 +13205,51 @@ export interface components {
         ProductDocAppearanceInput: {
             expectedDraftVersion: number;
             appearance: components["schemas"]["RepositoryFolderAppearance"];
+        };
+        /** @enum {string|null} */
+        ProductDocPriority: "critical" | "high" | "medium" | "low" | null;
+        ProductDocPropertiesInput: {
+            priority: components["schemas"]["ProductDocPriority"];
+            assigneeIdentityId: string | null;
+            labels: string[];
+        };
+        ProductDocProperties: {
+            priority: components["schemas"]["ProductDocPriority"];
+            assignee: {
+                identityId: string;
+                displayName: string;
+            } | null;
+            labels: string[];
+        };
+        ProductDocAttachment: {
+            id: string;
+            filename: string;
+            byteSize: number;
+            mimeType: string;
+            /** @enum {string} */
+            kind: "image" | "audio" | "video" | "pdf" | "document" | "spreadsheet";
+            preview?: components["schemas"]["ProductDocAttachmentPreview"];
+            previewMimeType?: string;
+            /** Format: uri */
+            url: string;
+            /** Format: uri */
+            downloadUrl: string;
+            /** Format: date-time */
+            expiresAt: string;
+        };
+        ProductDocAttachmentPreview: {
+            /** @constant */
+            type: "text";
+            truncated?: boolean;
+            paragraphs: string[];
+        } | {
+            /** @constant */
+            type: "table";
+            truncated?: boolean;
+            sheets: {
+                name: string;
+                rows: string[][];
+            }[];
         };
     };
     responses: {
@@ -27220,6 +27798,261 @@ export interface operations {
             500: components["responses"]["InternalError"];
         };
     };
+    resolveProductDocLink: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductDocLinkTarget"];
+            };
+        };
+        responses: {
+            /** @description Product Docs result. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProductDocLinkPreview"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    captureProductDocRun: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductDocRunEmbedCaptureInput"];
+            };
+        };
+        responses: {
+            /** @description Product Docs result. */
+            201: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProductDocRunEmbedCapture"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listProductDocRunCandidates: {
+        parameters: {
+            query?: {
+                /** @description Search for runs by name, key, or environment. */
+                q?: string;
+                /** @description Falcon Query expression for case filters. */
+                ql?: string;
+                /** @description Opaque cursor from the previous page. */
+                cursor?: string;
+                limit?: number;
+                projectIds?: components["schemas"]["Identifier"][];
+                results?: components["schemas"]["ExecutionStatus"][];
+                folders?: string[];
+                productGroups?: string[];
+                products?: string[];
+                regression?: ("true" | "false")[];
+                types?: components["schemas"]["AnalyticsTestCaseType"][];
+                priorities?: ("critical" | "high" | "medium" | "low")[];
+                statuses?: ("ready" | "draft" | "deprecated")[];
+                tags?: string[];
+                owners?: string[];
+                components?: string[];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Matching test runs in accessible projects. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductDocRunCandidatesEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getProductDocRun: {
+        parameters: {
+            query?: {
+                version?: number;
+                draft?: boolean;
+                archived?: boolean;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+                embedId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Product Docs result. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProductDocRunEmbed"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    captureProductDocDashboard: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductDocDashboardCaptureInput"];
+            };
+        };
+        responses: {
+            /** @description Product Docs result. */
+            201: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProductDocDashboardEmbed"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getProductDocDashboard: {
+        parameters: {
+            query?: {
+                mode?: "snapshot" | "current";
+                version?: number;
+                draft?: boolean;
+                archived?: boolean;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+                embedId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Product Docs result. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProductDocDashboardEmbed"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
     listProductDocs: {
         parameters: {
             query?: {
@@ -27230,6 +28063,8 @@ export interface operations {
                 draft?: boolean;
                 /** @description List roots of archived branches. Requires publish permission. Cannot be combined with draft=true or parentId. */
                 archived?: boolean;
+                productGroupId?: string;
+                productId?: string;
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -27302,7 +28137,51 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            422: components["responses"]["UnprocessableEntity"];
             500: components["responses"]["InternalError"];
+        };
+    };
+    generateProductDocDiagram: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductDocDiagramInput"];
+            };
+        };
+        responses: {
+            /** @description The generated flowchart source. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProductDocDiagram"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            413: components["responses"]["PayloadTooLarge"];
+            422: components["responses"]["UnprocessableEntity"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
         };
     };
     getProductDocsAvailability: {
@@ -27418,6 +28297,7 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            422: components["responses"]["UnprocessableEntity"];
             500: components["responses"]["InternalError"];
         };
     };
@@ -27650,6 +28530,176 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["ProductDocArticleCases"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getProductDocImpact: {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string;
+                draft?: boolean;
+                expectedDraftVersion?: number;
+                sectionId?: string;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Product Docs result. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProductDocImpact"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listProductDocReviews: {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Product Docs result. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProductDocReviewPage"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    requestProductDocReview: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductDocReviewRequestInput"];
+            };
+        };
+        responses: {
+            /** @description Product Docs result. */
+            201: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProductDocReview"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            /** @description The selected reviewer cannot review this draft. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    decideProductDocReview: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+                reviewId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductDocReviewDecisionInput"];
+            };
+        };
+        responses: {
+            /** @description Product Docs result. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProductDocReview"];
                     };
                 };
             };
@@ -27897,6 +28947,104 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    uploadProductDocAttachment: {
+        parameters: {
+            query: {
+                filename: string;
+            };
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/octet-stream": string;
+            };
+        };
+        responses: {
+            /** @description Private product documentation attachment and expiring content URLs. */
+            201: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProductDocAttachment"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description Preview processing exceeded its time limit. */
+            408: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            409: components["responses"]["Conflict"];
+            413: components["responses"]["PayloadTooLarge"];
+            415: components["responses"]["UnsupportedMediaType"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getProductDocAttachment: {
+        parameters: {
+            query?: {
+                version?: number;
+                draft?: boolean;
+                archived?: boolean;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+                attachmentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Private product documentation attachment and expiring content URLs. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProductDocAttachment"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
             500: components["responses"]["InternalError"];
         };
     };

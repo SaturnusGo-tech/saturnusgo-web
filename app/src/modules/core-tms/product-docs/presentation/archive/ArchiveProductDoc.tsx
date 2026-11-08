@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Modal } from "../../../presentation/common/modal/Modal";
-import { AppOverlay } from "../../../presentation/common/overlay/AppOverlay";
+import { Button } from "@heroui/react";
+import { ProductDocModal } from "../overlay/ProductDocModal";
 import { productDocErrorCode } from "../../domain/errors/product-doc-response";
 import type { ProductDocNode, ProductDocsApi, ProductDocScope } from "../../domain/product-docs";
 import type { ProductDocsCopy } from "../../localization/copy";
@@ -50,7 +50,7 @@ export function ArchiveProductDoc({ api, scope, node, copy, onArchived, onClose 
     if (!pending.current) onClose(failure?.stale ?? false);
   }
 
-  return <AppOverlay><Modal title={copy.archiveItem} subtitle={current?.title ?? node.title} onClose={dismiss}>
+  return <ProductDocModal title={copy.archiveItem} subtitle={current?.title ?? node.title} closeLabel={copy.close} busy={busy} onClose={dismiss}>
     <div className={styles.confirmation} aria-busy={busy || draft.status === "loading"}>
       {draft.status !== "ready" ? <ReadState copy={copy} status={draft.status} retry={draft.retry} />
         : current ? <p>{copy.archiveHint}</p> : <p role="alert">{copy.unavailable}</p>}
@@ -58,13 +58,13 @@ export function ArchiveProductDoc({ api, scope, node, copy, onArchived, onClose 
         {failure.stale ? copy.lifecycleStale : copy.archiveError}
       </p>}
       <div className={styles.actions}>
-        <button type="button" className={shared.action} disabled={busy} onClick={dismiss} data-autofocus>
+        <Button autoFocus type="button" className={shared.action} isDisabled={busy} onPress={dismiss}>
           {copy.cancel}
-        </button>
-        <button type="button" className={shared.primary} disabled={!current || busy || failure?.stale} onClick={() => void archive()}>
+        </Button>
+        <Button type="button" className={shared.primary} isDisabled={!current || busy || failure?.stale} onPress={() => void archive()}>
           {busy ? copy.saving : copy.archiveItem}
-        </button>
+        </Button>
       </div>
     </div>
-  </Modal></AppOverlay>;
+  </ProductDocModal>;
 }

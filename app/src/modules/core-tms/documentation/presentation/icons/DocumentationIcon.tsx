@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import {
-  ArchiveRestore, ArrowRightLeft, Bell, Blocks, BookA, BookOpen, BookOpenText, Braces,
-  Bug, CirclePlay, CirclePlus, Copy, FilePenLine, FilePlus2, FileText,
+  ArchiveRestore, ArrowRightLeft, Bell, Blocks, BookA, BookMarked, BookOpen, BookOpenText, Braces,
+  Bug, CirclePlay, CirclePlus, Copy, FileCheck2, FilePenLine, FilePlus2, FileText,
   Folders, Highlighter, Layers3, LayoutDashboard, LifeBuoy, Link2,
   ListChecks, ListFilter, MessagesSquare, MonitorCheck, PanelLeft,
   PanelsTopLeft, Rocket, RotateCcw, ScrollText, Settings2, ShieldCheck,
@@ -31,7 +31,7 @@ const articleIcons = {
   "falcon-ai-writing": Sparkles,
   "colored-marker": Highlighter,
   "case-comments": MessagesSquare,
-  "product-docs-authoring": BookOpenText,
+  "product-docs-authoring": BookMarked,
   "shared-steps": Copy,
   "organize-cases": Folders,
   "import-export": ArrowRightLeft,
@@ -47,7 +47,7 @@ const articleIcons = {
   "integration-overview": Blocks,
   "codex-prompts": BookOpenText,
   "codex-prompts-repository": FolderSearch,
-  "codex-prompts-product-docs": FilePenLine,
+  "codex-prompts-product-docs": FileCheck2,
   "codex-prompts-runs": ClipboardCheck,
   "codex-prompts-web-qa": Globe,
   "codex-prompts-defects": ListTodo,

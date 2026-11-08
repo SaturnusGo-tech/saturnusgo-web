@@ -2,8 +2,8 @@ import { useLayoutEffect, type RefObject } from "react";
 
 type PopupAnchor = Pick<HTMLElement, "getBoundingClientRect" | "contains">;
 
-export function useAnchoredPopup(open: boolean, inline: boolean, root: RefObject<HTMLDivElement | null>,
-  trigger: RefObject<PopupAnchor | null>, menu: RefObject<HTMLDivElement | null>, onClose: () => void, preferredWidth = 0, maximumHeight = 320) {
+export function useAnchoredPopup(open: boolean, inline: boolean, root: RefObject<HTMLElement | null>,
+  trigger: RefObject<PopupAnchor | null>, menu: RefObject<HTMLElement | null>, onClose: () => void, preferredWidth = 0, maximumHeight = 320, maximumWidth = Infinity) {
   useLayoutEffect(() => {
     const element = menu.current;
     if (!open || inline || !element) return;
@@ -12,7 +12,7 @@ export function useAnchoredPopup(open: boolean, inline: boolean, root: RefObject
       const bounds = trigger.current?.getBoundingClientRect();
       if (!bounds) return;
       const gap = 6; const edge = 12;
-      const width = Math.min(Math.max(bounds.width, preferredWidth), innerWidth - edge * 2);
+      const width = Math.min(Math.max(bounds.width, preferredWidth), maximumWidth, innerWidth - edge * 2);
       const below = innerHeight - bounds.bottom - gap - edge;
       const above = bounds.top - gap - edge;
       const upwards = below < Math.min(element.scrollHeight, 220) && above > below;
@@ -28,8 +28,9 @@ export function useAnchoredPopup(open: boolean, inline: boolean, root: RefObject
       if (!root.current?.contains(target) && !trigger.current?.contains(target)) onClose();
     };
     const content = element.firstElementChild;
-    const observer = content && typeof ResizeObserver !== "undefined" ? new ResizeObserver(position) : null;
+    const observer = typeof ResizeObserver !== "undefined" ? new ResizeObserver(position) : null;
     if (content) observer?.observe(content);
+    if (trigger.current instanceof Element) observer?.observe(trigger.current);
     position(); window.addEventListener("resize", position); window.addEventListener("scroll", position, true);
     document.addEventListener("pointerdown", outside, true);
     return () => {
@@ -38,7 +39,7 @@ export function useAnchoredPopup(open: boolean, inline: boolean, root: RefObject
       document.removeEventListener("pointerdown", outside, true);
       hideNativePopover(element);
     };
-  }, [open, inline, root, trigger, menu, onClose, preferredWidth, maximumHeight]);
+  }, [open, inline, root, trigger, menu, onClose, preferredWidth, maximumHeight, maximumWidth]);
 }
 
 /** Older engines treat the popover attribute as an ordinary fixed-position panel. */

@@ -1,0 +1,49 @@
+.collapse { margin-block: 14px; min-inline-size: 0; }
+.collapseHeader { display: flex; align-items: center; gap: 5px; min-inline-size: 0; min-block-size: 28px; }
+.collapseToggle { flex: none; transition: color 140ms ease, background-color 140ms ease; }
+.collapseToggle svg { transition: transform 170ms ease; }
+.collapse[data-open] .collapseToggle svg { transform: rotate(90deg); }
+.collapseHeading { font-weight: 500; overflow-wrap: anywhere; }
+.collapseTitleHost { --tms-focus-border: transparent; --tms-focus-ring: transparent; min-inline-size: 0; flex: 1; }
+.collapseTitle .titleWrapper, .collapseTitle .titleWrapper:focus-within { min-block-size: 28px; height: 28px; padding: 0; border: 0; background: transparent; box-shadow: none; }
+.collapseTitle .titleInput {
+  min-inline-size: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  box-shadow: none;
+  color: var(--falcon-text);
+  font: inherit;
+}
+.collapseTitle .titleInput::placeholder { color: var(--falcon-text-secondary); }
+.collapsePanel { display: grid; padding-inline-start: 27px; }
+.collapseInner { min-block-size: 0; min-inline-size: 0; overflow: hidden; }
+.collapseInner > :first-child { margin-block-start: 5px; }
+.collapseInner > :last-child { margin-block-end: 0; }
+.collapseInner .collapseContent {
+  min-block-size: 25px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  outline: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.collapseToggle {
+  display: grid;
+  place-items: center;
+  min-inline-size: 0;
+  inline-size: 22px;
+  block-size: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--falcon-icon);
+  cursor: pointer;
+}
+.collapseToggle:hover { background: var(--falcon-hover); color: var(--falcon-text); }
+.collapseToggle:focus-visible { outline: 1px solid var(--falcon-focus); outline-offset: 1px; }
+@media (prefers-reduced-motion: reduce) { .collapseToggle, .collapseToggle svg { transition: none; } }

@@ -1,11 +1,15 @@
 "use client";
 
+import { Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
+import { useReducedMotion } from "framer-motion";
 import {
-  Button, ButtonWithTooltip, editorInTable$, insertTable$, readOnly$, useCellValue, usePublisher,
+  editorInTable$, insertTable$, readOnly$, useCellValue, usePublisher,
 } from "@mdxeditor/editor";
 import { ChevronDown, Table2 } from "lucide-react";
-import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useRef, useState, type KeyboardEvent } from "react";
 import type { TmsLocale } from "../../../../localization/model/locale";
+import { ProductDocToolbarButton, toolbarMenuMotion } from "../toolbar/menu/ProductDocToolbarMenu";
+import { useProductDocToolbarSelection } from "../toolbar/menu/useProductDocToolbarSelection";
 import styles from "./tables.module.css";
 
 const defaultSize = { rows: 3, columns: 3 };
@@ -19,36 +23,21 @@ export function ProductDocTableTools({ locale }: { locale: TmsLocale }) {
   const readOnly = useCellValue(readOnly$);
   const [open, setOpen] = useState(false);
   const [size, setSize] = useState(defaultSize);
-  const group = useRef<HTMLDivElement>(null);
-  const sizeTrigger = useRef<HTMLButtonElement>(null);
-  const pickerId = useId();
+  const grid = useRef<HTMLDivElement>(null);
+  const reduced = useReducedMotion();
+  const selection = useProductDocToolbarSelection();
   const ru = locale === "ru";
   const disabled = readOnly || insideTable;
 
-  useEffect(() => {
-    if (!open) return;
-    const dismiss = (event: Event) => {
-      if (event.target instanceof Node && !group.current?.contains(event.target)) setOpen(false);
-    };
-    document.addEventListener("pointerdown", dismiss);
-    document.addEventListener("focusin", dismiss);
-    return () => {
-      document.removeEventListener("pointerdown", dismiss);
-      document.removeEventListener("focusin", dismiss);
-    };
-  }, [open]);
-
   function focusSize({ rows, columns }: TableSize) {
-    group.current?.querySelector<HTMLButtonElement>(`[data-size="${columns}x${rows}"]`)?.focus({ preventScroll: true });
+    grid.current?.querySelector<HTMLButtonElement>(`[data-size="${columns}x${rows}"]`)?.focus({ preventScroll: true });
   }
-
-  useLayoutEffect(() => {
-    if (open) focusSize(defaultSize);
-  }, [open]);
 
   function insert(size: TableSize) {
     setOpen(false);
+    selection.restore();
     insertTable(size);
+    selection.focusEditor();
   }
 
   function navigate(event: KeyboardEvent, rows: number, columns: number) {
@@ -56,10 +45,10 @@ export function ProductDocTableTools({ locale }: { locale: TmsLocale }) {
     else if (event.key === "ArrowDown") rows += 1;
     else if (event.key === "ArrowLeft") columns -= 1;
     else if (event.key === "ArrowRight") columns += 1;
-    else if (event.key === "Escape") {
+    else if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      setOpen(false);
-      sizeTrigger.current?.focus();
+      event.stopPropagation();
+      insert({ rows, columns });
       return;
     } else return;
 
@@ -67,35 +56,40 @@ export function ProductDocTableTools({ locale }: { locale: TmsLocale }) {
     focusSize({ rows: Math.max(1, Math.min(maxRows, rows)), columns: Math.max(1, Math.min(maxColumns, columns)) });
   }
 
-  return <div ref={group} className={styles.tableInsert} data-toolbar-item>
-    <ButtonWithTooltip title={ru ? "Вставить таблицу" : "Insert table"} disabled={disabled}
-      onMouseDown={(event) => event.preventDefault()} onClick={() => insert(defaultSize)}>
+  const title = ru ? "Размер таблицы" : "Table size";
+  return <div className={styles.tableInsert} data-toolbar-item>
+    <ProductDocToolbarButton label={ru ? "Вставить таблицу" : "Insert table"} isIconOnly isDisabled={disabled}
+      onMouseDown={(event) => event.preventDefault()} onPress={() => insert(defaultSize)}>
       <Table2 size={16} />
-    </ButtonWithTooltip>
-    <Button className={styles.sizeTrigger} ref={sizeTrigger} title={ru ? "Размер таблицы" : "Table size"}
-      aria-label={ru ? "Размер таблицы" : "Table size"} aria-expanded={open} aria-controls={open ? pickerId : undefined}
-      aria-haspopup="dialog" disabled={disabled}
-      onMouseDown={(event) => event.preventDefault()}
-      onClick={() => { setSize(defaultSize); setOpen(!open); }}>
-      <ChevronDown size={12} />
-    </Button>
-    {open && !disabled ? <div className={styles.sizePicker} role="dialog" id={pickerId}
-      data-editor-dialog aria-label={ru ? "Выберите размер таблицы" : "Choose table size"}>
-      <div className={styles.sizeGrid}>
-        {Array.from({ length: maxRows * maxColumns }, (_, index) => {
-          const rows = Math.floor(index / maxColumns) + 1;
-          const columns = index % maxColumns + 1;
-          const current = size.rows === rows && size.columns === columns;
-          return <button key={index} type="button" className={styles.sizeCell} data-size={`${columns}x${rows}`}
-            data-highlighted={rows <= size.rows && columns <= size.columns} tabIndex={current ? 0 : -1}
-            aria-label={ru ? `${columns} × ${rows}, колонки × строки` : `${columns} × ${rows}, columns × rows`}
-            onFocus={() => setSize({ rows, columns })}
-            onPointerEnter={() => setSize({ rows, columns })}
-            onMouseDown={(event) => event.preventDefault()} onKeyDown={(event) => navigate(event, rows, columns)}
-            onClick={() => insert({ rows, columns })} />;
-        })}
-      </div>
-      <div className={styles.sizeValue}>{size.columns} × {size.rows}</div>
-    </div> : null}
+    </ProductDocToolbarButton>
+    <Popover isOpen={open && !disabled} onOpenChange={(next) => {
+      if (next) setSize(defaultSize);
+      setOpen(next);
+    }} placement="bottom-end" offset={6} containerPadding={10} shouldBlockScroll={false} shouldCloseOnScroll={false}
+      disableAnimation={Boolean(reduced)} motionProps={{ variants: toolbarMenuMotion }} style={{ zIndex: 160 }}
+      classNames={{ content: styles.sizePicker }}>
+      <PopoverTrigger>
+        <ProductDocToolbarButton label={title} isIconOnly className={styles.sizeTrigger} isDisabled={disabled} onPointerDownCapture={selection.remember} onKeyDownCapture={selection.rememberOnKey}>
+          <ChevronDown size={12} aria-hidden="true" />
+        </ProductDocToolbarButton>
+      </PopoverTrigger>
+      <PopoverContent data-editor-dialog aria-label={ru ? "Выберите размер таблицы" : "Choose table size"}>
+        <div className={styles.sizeGrid} ref={grid}>
+          {Array.from({ length: maxRows * maxColumns }, (_, index) => {
+            const rows = Math.floor(index / maxColumns) + 1;
+            const columns = index % maxColumns + 1;
+            const current = size.rows === rows && size.columns === columns;
+            return <button key={index} type="button" className={styles.sizeCell} data-size={`${columns}x${rows}`}
+              data-highlighted={rows <= size.rows && columns <= size.columns} tabIndex={current ? 0 : -1} autoFocus={current}
+              aria-label={ru ? `${columns} × ${rows}, колонки × строки` : `${columns} × ${rows}, columns × rows`}
+              onFocus={() => setSize({ rows, columns })}
+              onPointerEnter={() => setSize({ rows, columns })}
+              onMouseDown={(event) => event.preventDefault()} onKeyDown={(event) => navigate(event, rows, columns)}
+              onClick={() => insert({ rows, columns })} />;
+          })}
+        </div>
+        <div className={styles.sizeValue}>{size.columns} × {size.rows}</div>
+      </PopoverContent>
+    </Popover>
   </div>;
 }

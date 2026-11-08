@@ -7,9 +7,9 @@
 }
 .metric[data-tone="success"] { --metric-accent: var(--falcon-success); }
 .metric[data-tone="danger"] { --metric-accent: var(--falcon-danger); }
-.metric:disabled { cursor: default; }
+.metric:disabled, .metric[data-readonly="true"] { cursor: default; }
 .metric:disabled .value, .metric:disabled .glyph, .metric:disabled .ring { opacity: .45; }
-.metric:hover:not(:disabled) { border-color: color-mix(in srgb, var(--metric-accent) 50%, var(--line)); box-shadow: var(--falcon-shadow); }
+.metric:hover:not(:disabled, [data-readonly="true"]) { border-color: color-mix(in srgb, var(--metric-accent) 50%, var(--line)); box-shadow: var(--falcon-shadow); }
 .metric:focus-visible { outline: 2px solid var(--dash-blue, var(--falcon-focus)); outline-offset: 3px; }
 .metricText { display: block; min-width: 0; }
 .metricText > span { display: block; max-width: 100%; font-size: 12px; font-weight: 600; line-height: 1.5; letter-spacing: -.015em; overflow-wrap: anywhere; }
@@ -20,7 +20,7 @@
 .footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--muted); }
 .footer small { font-size: 10px; line-height: 1.5; }
 .footer > svg { flex-shrink: 0; opacity: .5; }
-.metric:hover:not(:disabled) .footer > svg { opacity: 1; color: var(--metric-accent); }
+.metric:hover:not(:disabled, [data-readonly="true"]) .footer > svg { opacity: 1; color: var(--metric-accent); }
 .ring { width: 64px; flex: 0 0 64px; color: var(--metric-accent); }
 .ring circle { fill: none; stroke-width: 6; }
 .ringTrack { stroke: var(--line-strong, var(--line)); }
@@ -40,7 +40,7 @@
 @media (prefers-reduced-motion: reduce) { .metric { transition: none; } }
 
 :global([data-appearance="glass"]) .metric { border-radius: 22px; box-shadow: var(--falcon-shadow); }
-:global([data-appearance="glass"]) .metric:hover:not(:disabled) { background: var(--glass-panel-strong, var(--falcon-hover)); }
+:global([data-appearance="glass"]) .metric:hover:not(:disabled, [data-readonly="true"]) { background: var(--glass-panel-strong, var(--falcon-hover)); }
 :global([data-appearance="glass"]) .metric[data-hero="true"] {
   color: var(--falcon-text); background: linear-gradient(135deg, var(--falcon-elevated), var(--falcon-panel));
   border-color: var(--falcon-border); box-shadow: var(--falcon-shadow);

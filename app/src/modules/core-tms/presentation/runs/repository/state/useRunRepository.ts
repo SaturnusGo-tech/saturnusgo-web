@@ -9,13 +9,15 @@ import { useSelectionFilters } from "../../../cases/selection/controls/Selection
 import { useRunFilterSections } from "../../filters/useRunFilterSections";
 import { orderedRunEntries } from "../../navigation/order/ordered-run-entries";
 
-export function useRunRepository(model: WorkspaceModel, ru: boolean) {
+export function useRunRepository(model: WorkspaceModel, ru: boolean, fixedRun = false) {
   const browser = useRunBrowser({ workspaceId: model.data.workspace.id, selected: model.selectedRun, selectedId: model.selectedRunId,
-    knownRuns: model.data.runs, connected: model.connection === "connected", ru,
+    knownRuns: fixedRun ? (model.selectedRun ? [model.selectedRun] : []) : model.data.runs,
+    connected: model.connection === "connected", ru,
+    fixedRun: fixedRun ? { items: model.runItems, ready: model.runResourceReady } : undefined,
     onUpdate: (runs) => model.setData((current) => ({ ...current,
       runs: [...current.runs.filter((r) => !runs.some((next) => r.id === next.id)), ...runs] })),
     onRefreshSelected: model.retryRunResource,
-    onFinished: (next) => {
+    onFinished: fixedRun ? undefined : (next) => {
       if (next) model.setProjectId(next.projectId);
       model.setSelectedRunId(next?.id ?? null); model.setSelectedRunItemId(null);
     } });

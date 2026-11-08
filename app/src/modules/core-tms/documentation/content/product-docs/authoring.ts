@@ -17,7 +17,7 @@ export const productDocAuthoring: DocArticle = {
       table(["Your role in the workflow", "What to do"],
         ["Reader", "Open the published rule or the version saved in a run. Project access still applies when someone shares a link."],
         ["Author with edit access", "Create and revise pages. Save drafts while someone checks the wording and the expected behavior."],
-        ["Reviewer with publish access", "Verify the rule against the agreed specification and publish the reviewed draft."],
+        ["Assigned reviewer", "Check the saved draft and approve it or request changes. A publisher decides when to publish."],
         ["Tester with case edit access", "Link the applicable rule and update test inputs and expectations when the product behavior changes."],
       ),
       steps(
@@ -47,6 +47,7 @@ export const productDocAuthoring: DocArticle = {
           "The selected phrase stands out while the rule remains readable with the surrounding text.",
           "English Falcon page editor with a highlighted booking rule, a boundary-case table, and the open marker palette."),
       ]),
+      paragraph("Use Tab and Shift+Tab to move between table cells. You can paste a spreadsheet range starting at a cell and undo the entire paste in one step."),
       paragraph("Press `/` while writing to find a block to insert. To bring in a Markdown draft, choose **Insert → Text from file…**. Check the imported headings, lists and links before you publish."),
       paragraph("Choose **Save draft** while you work. With the editor focused, you can also save with `⌘S` on Mac or `Ctrl+S` on Windows. The published page stays available to readers while you revise it.")),
     section("rule-example", "Example of a testable rule",
@@ -77,7 +78,8 @@ export const productDocAuthoring: DocArticle = {
     section("publication-review", "Review and publish a change",
       paragraph("Before publishing, ask someone familiar with the feature to walk through the boundary table using only the page. Check that the inputs are reproducible, each outcome is observable, and every linked heading still describes the rule its cases expect."),
       steps(
-        ["Publish the reviewed draft", "Choose **Publish** for a new page or **Update** for a page that already has a publication. If the page is nested under an unpublished page, publish the parent first. Open the result and check that the headings, table, links and images render correctly."],
+        ["Request a review", "Save the draft, open **Review** and choose a colleague. Ask for a review of the whole page or a specific section. The decision applies to the saved draft the reviewer saw."],
+        ["Preview the impact of publishing", "Choose **Publish** or **Update** to see changed sections and potentially affected test cases. Expand an edited section to compare excerpts. Confirm when the change is ready. If the parent page is unpublished, publish it first."],
         ["Compare the old and new rules", "In **Version history**, open the previous publication and compare its wording with the current page. For the booking example, version 1 used 24 hours and version 2 uses 48 hours. The change affects tests on both sides of the new cutoff."],
         ["Review the impacted cases", "Use **Related test cases** in the article to find coverage. Revise the affected cases and check the new expectations before creating a run for the changed rule. Keep the existing heading when it continues to describe the same requirement."],
       )),
@@ -88,6 +90,7 @@ export const productDocAuthoring: DocArticle = {
         ["Open the rule from the case", "The linked title opens the latest publication. If you linked a heading, Falcon opens the article at that section."],
         ["Read the version from a run", "Open the case within a run and find its requirements snapshot. The link opens the version captured when the run was created, even after the rule changes."],
       ),
+      paragraph("To write a new case for a specific rule, select the heading in the published article and choose **Create test case** in **Section coverage**. The case form opens with the selected section attached."),
       paragraph("For a section link, select its heading in **On this page** in the full article, then use **Copy link**. The case stores one link per article. If a case already links to a different section in that article, use the **Documentation** field to change the selection explicitly."),
       paragraph("Use the repository case to confirm what a test should check today. Use **Requirements in this run** to explain a historical result. In the example, the case opens the 48-hour rule and the older run shows **Viewing version 1**, where the threshold is 24 hours."),
       walkthrough("Open a linked rule from Falcon", [
@@ -100,6 +103,13 @@ export const productDocAuthoring: DocArticle = {
           "This sample run still refers to the earlier 24-hour rule. The current case opens the published 48-hour rule.",
           "English test run showing the pinned earlier publication of the booking rescheduling rule."),
       ])),
+    section("run-evidence", "Attach results from a test run",
+      steps(
+        ["Find the run", "While editing, choose **Insert → Run evidence**. In the editor’s run panel, find the run by name or key and select it."],
+        ["Insert the snapshot", "Choose **Insert snapshot**, then save the draft. The card records the run date, environment, results and capture time."],
+        ["Check which rule was tested", "Look for the published article version pinned by the run. If the run has no pin for this article, the card says so. Select the run title to see the current results and individual checks."],
+      ),
+      paragraph("A saved card keeps its original results. To report a later set of results, insert a new snapshot and publish a new article version. With Codex, ask it to insert a snapshot of the named run into the release summary, include the pinned version when available, and save the draft for review.")),
     section("troubleshoot", "Resolve access, links and versions",
       table(["What you see", "What to check"],
         ["A page is missing from Add page", "Confirm that the case and page are in the same project and the page is published. Search for a distinctive word from its title. If you still cannot open it from Docs, ask someone with project access to confirm its location and your access."],

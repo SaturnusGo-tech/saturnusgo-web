@@ -79,6 +79,48 @@
 .qlLine { position: relative; z-index: 20; }
 .qlRoot { position: relative; width: 100%; }
 .qlRoot .inputShell { width: 100%; }
+.qlInput[data-input-shell] { --tms-focus-border: transparent; --tms-focus-ring: transparent; min-width: 0; }
+.qlInput .qlControl {
+  display: flex;
+  align-items: center;
+  height: 34px;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--falcon-border);
+  border-radius: 10px;
+  background: var(--falcon-control);
+  box-shadow: none;
+}
+.qlInput .qlControl:focus-within { border-color: var(--falcon-icon-muted); }
+.qlInput:has(input[aria-invalid="true"]) .qlControl { border-color: var(--falcon-danger); }
+.qlInner { display: flex; width: 100%; min-width: 0; align-items: center; gap: 8px; }
+.qlInner > svg { flex: none; color: var(--falcon-icon); }
+.qlInput .qlText {
+  min-width: 0;
+  flex: 1;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--falcon-text);
+  font-size: 13px;
+  outline: 0;
+}
+.qlInput .qlControl input.qlText:is(:hover, :focus, :focus-visible) { outline: 0; border: 0; box-shadow: none; }
+.qlText::placeholder { color: var(--falcon-text-secondary); }
+.qlInner .qlClear {
+  display: grid;
+  place-items: center;
+  flex: none;
+  min-width: 22px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: 6px;
+  color: var(--falcon-text-secondary);
+}
+.qlClear:hover { background: var(--falcon-hover); color: var(--falcon-text); }
+@media (forced-colors: active) { .qlInput .qlControl:focus-within { outline: 1px solid Highlight; } }
 .groupLine { position: relative; display: flex; align-items: center; gap: 7px; }
 .groupLine > strong { color: var(--falcon-text-secondary); font-size: 11px; font-weight: 600; }
 .groupButton { height: 28px; justify-content: space-between; min-width: 150px; padding-inline: 8px; }
@@ -139,6 +181,28 @@
   transition: opacity 180ms ease, transform 220ms cubic-bezier(.22,.68,.25,1), visibility 0s 220ms;
 }
 .qlSuggestions[data-open] { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0); transition-delay: 0s; }
+.qlSuggestions[popover] {
+  position: fixed;
+  inset: auto;
+  z-index: 190;
+  margin: 0;
+  min-width: 0;
+  padding: 5px;
+  border-color: var(--falcon-border);
+  border-radius: 12px;
+  overscroll-behavior: contain;
+}
+:global(.dark) .qlSuggestions[popover] {
+  --falcon-elevated: var(--falcon-doc-popover);
+  --falcon-text: var(--falcon-doc-text);
+  --falcon-text-secondary: var(--falcon-doc-muted);
+  --falcon-border: var(--falcon-doc-popover-border);
+  --falcon-selected: var(--falcon-doc-selected);
+}
+.qlSuggestions[popover] button { min-height: 30px; padding-inline: 8px; border-radius: 7px; }
+.qlSuggestions[popover] button code { color: var(--falcon-text-secondary); font-size: 11px; }
+.qlSuggestions[popover] button:is(:hover, [aria-selected="true"]) code { color: color-mix(in srgb, var(--falcon-text-secondary) 86%, var(--falcon-text)); }
+.qlSuggestions[popover][data-popup-side="top"] { transform-origin: bottom left; }
 .qlSyntax { display: flex; gap: 12px; padding: 4px 7px 6px; color: var(--falcon-text-disabled); border-bottom: 1px solid var(--falcon-border-subtle); font-size: 9px; }
 .qlSyntax span { display: inline-flex; align-items: center; gap: 4px; }
 .qlSyntax kbd { min-width: 16px; padding: 1px 3px; color: var(--falcon-text-secondary); background: var(--falcon-control); border: 1px solid var(--falcon-border-strong); border-radius: 3px; font-family: inherit; text-align: center; }

@@ -15,13 +15,13 @@ import { billingPaymentsAvailable } from "../domain/catalog/billing-availability
 import { billingCheckoutMode } from "../domain/capabilities/checkout-capability";
 import { useStartupWorkspaceTransition } from "../startup/composition/useStartupWorkspaceTransition";
 import { StartupHandoffStatus } from "../startup/presentation/StartupHandoffStatus";
-import type { BillingPlanId } from "../domain/billing";
 import { usePlanRequests } from "../requests/application/usePlanRequests";
 import { createPlanRequestApi } from "../requests/data/plan-request-api";
-import { readPlanRequestIntent, withoutPlanRequestIntent, type PlanRequest } from "../requests/domain/plan-request";
+import { usePlanRequestIntent } from "../requests/application/intent/usePlanRequestIntent";
+import type { PlanRequest } from "../requests/domain/plan-request";
 import { PlanRequestDialog } from "../requests/presentation/PlanRequestDialog";
 import { ManualPlanCatalog } from "../requests/presentation/ManualPlanCatalog";
-import { planRequestOffers } from "../requests/presentation/plan-request-offers";
+import { planRequestOffers } from "../requests/presentation/offers/plan-request-offers";
 import { BillingScreen } from "../presentation/screen/BillingScreen";
 import { createAdministrationClient } from "../../company-administration/data/administration-client";
 import { BillingIdentityConfirmation } from "../startup/presentation/confirmation/BillingIdentityConfirmation";
@@ -61,15 +61,10 @@ export function ConnectedBillingFeature({ workspaceId, preview = false, onClose 
   const manualAvailable = Boolean(http && (session?.kind === "cloud" || session?.kind === "managed")
     && session.workspaceRole === "workspace_admin" && !isolatedPreview && !paymentsAvailable && !checkoutResolving);
   const manualApi = useMemo(() => manualAvailable && http ? createPlanRequestApi(http, workspaceId) : null, [manualAvailable, http, workspaceId]);
-  const [intent, setIntent] = useState<ReturnType<typeof readPlanRequestIntent>>(null);
-  const [offer, setOffer] = useState<BillingPlanId | null>(null);
+  const { openOffer, setOffer, clearIntent, deepRequestId } = usePlanRequestIntent(workspaceId);
   const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
   const [manualSetupId, setManualSetupId] = useState<string | null>(null);
   const [manualTransitionId, setManualTransitionId] = useState<string | null>(null);
-  useEffect(() => {
-    if (typeof window !== "undefined") setIntent(readPlanRequestIntent(window.location?.search ?? ""));
-  }, [workspaceId]);
-  const deepRequestId = intent?.kind === "request" && intent.workspaceId === workspaceId ? intent.id : null;
   const manual = usePlanRequests(manualApi, deepRequestId, locale);
   const selectedRequest = manual.data?.requests.find(item => item.id === selectedRequestId)
     ?? (deepRequestId ? manual.request : null);
@@ -96,11 +91,6 @@ export function ConnectedBillingFeature({ workspaceId, preview = false, onClose 
   const setup = useStartupSetup(setupApi, workspaceId, manualStartupSetup || setupOpen && billing.canManage && billing.summary?.workspaceKind === "personal");
   const ru = locale === "ru";
 
-  function clearIntent() {
-    if (!intent) return;
-    setIntent(null);
-    window.history.replaceState(window.history.state, "", withoutPlanRequestIntent(window.location.href));
-  }
   function dismissRequest() { clearIntent(); setOffer(null); setSelectedRequestId(null); }
   async function activateRequest(request: PlanRequest) {
     if (request.planId === "startup" && request.workspaceKind === "personal") {
@@ -182,7 +172,6 @@ export function ConnectedBillingFeature({ workspaceId, preview = false, onClose 
     onBack={() => { setSetupOpen(false); setRecoveryWorkspace(null); }} onCheckout={async () => {
       if (paymentsAvailable && setup.setup?.status === "ready") await billing.startCheckout("startup", { startupSetupId: setup.setup.id, startupSetupVersion: setup.setup.version, confirmWorkspaceConversion: true });
     }} />;
-  const openOffer = offer ?? (intent?.kind === "offer" ? intent.planId : null);
   const dialogRequest = selectedRequest ?? (openOffer ? pendingRequest ?? manual.data?.requests.find(item => item.planId === openOffer && item.status === "active") ?? null : null);
   const contactOnly = manual.accessDenied && workspaceKind === "company" && openOffer === "enterprise" && !deepRequestId;
   const offerUnavailable = manual.accessDenied || Boolean(openOffer && manual.data && !manual.data.eligiblePlanIds.includes(openOffer));
