@@ -112,9 +112,9 @@ export const productDocAuthoring: DocArticle = {
       paragraph("Choose **Codex** in the editor. If the project is connected, Falcon opens a chat in the Codex desktop app. If it is disconnected, Falcon opens the integration so you can grant access to the project."),
       code("prompt", "Draft a rule from reviewed source material",
         "In the Booking QA project, find the page on rescheduling confirmed bookings. Use the supplied product specification to draft a revision. Preserve existing headings where test cases already link to them. Add a boundary table for exactly 48 hours and one minute less. Mark the parts of the source that are ambiguous as open questions. Save a draft and report the headings you changed."),
-      paragraph("The **manage-product-docs** skill can read pages and save drafts with the corresponding project permission. Save your own editor changes before handing over the draft. Open the draft again after Codex finishes, check the rules against the source and publish it in Falcon."),
+      paragraph("The **manage-product-docs** skill uses Falcon MCP to edit pages and organize folders. Ask Codex to archive a page or folder to hide it from the active tree, or to restore it from Archive. With publish permission, Codex can publish the draft when you ask."),
       paragraph("Give Codex the specific release, role matrix and source document it should use. Ask it to keep linked headings, list conflicting requirements, and identify decisions that need a human review. Before publishing, compare its draft with the source and confirm the expected results in the case matrix."),
-      paragraph("For a read-only connection, update the Falcon permissions in Codex and grant **falcon:product-docs:write** for the project if you want Codex to save drafts."),
+      paragraph("Grant **falcon:product-docs:write** for the project to let Codex make changes allowed by your Falcon role."),
       articles("codex-prompts-product-docs", "codex-web-qa")),
   ],
 };

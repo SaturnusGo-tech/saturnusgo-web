@@ -1,0 +1,28 @@
+export const archiveCopy = {
+  en: {
+    archive: "Archive",
+    archiveItem: "Archive item",
+    archiveHint: "This item and its active contents will move to the archive. You can restore them from there.",
+    archiveEmpty: "Nothing has been archived in this project.",
+    archiveDescription: "Restore pages and folders to the documentation tree.",
+    archiveError: "Couldn’t archive this item. Try again.",
+    restore: "Restore",
+    restored: "Restored to the documentation tree.",
+    restoreError: "Couldn’t restore this item. Try again.",
+    restoreParent: "Restore the parent folder or page first.",
+    lifecycleStale: "This item changed. Refresh the documentation and try again.",
+  },
+  ru: {
+    archive: "Архив",
+    archiveItem: "Архивировать",
+    archiveHint: "Этот элемент и его активное содержимое переместятся в архив. Оттуда их можно восстановить.",
+    archiveEmpty: "В архиве проекта пока ничего нет.",
+    archiveDescription: "Восстанавливайте страницы и папки в структуре документации.",
+    archiveError: "Не удалось архивировать этот элемент. Попробуйте ещё раз.",
+    restore: "Восстановить",
+    restored: "Элемент восстановлен в структуре документации.",
+    restoreError: "Не удалось восстановить этот элемент. Попробуйте ещё раз.",
+    restoreParent: "Сначала восстановите родительскую папку или страницу.",
+    lifecycleStale: "Этот элемент изменился. Обновите документацию и попробуйте ещё раз.",
+  },
+};

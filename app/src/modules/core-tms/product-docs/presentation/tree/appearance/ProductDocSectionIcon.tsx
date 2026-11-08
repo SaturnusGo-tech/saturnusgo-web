@@ -4,8 +4,8 @@ import type { CSSProperties } from "react";
 import type { FolderAppearance } from "../../../../folders/model/appearance/folder-appearance";
 import { FolderVisual } from "../../../../folders/presentation/appearance/visual/FolderVisual";
 import type { ProductDocNode, ProductDocScope } from "../../../domain/product-docs";
-import { sectionIcons, type SectionIconId } from "./section-icons";
-import { useSectionAppearance } from "./state/useSectionAppearance";
+import { sectionIcons, type SectionIconId } from "../../../domain/appearance/section-icons";
+import { useSectionAppearance } from "../../../state/appearance/useSectionAppearance";
 import styles from "./section-appearance.module.css";
 
 export function SectionVisual({ appearance, automatic, size = 18 }: {

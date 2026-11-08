@@ -4,8 +4,8 @@ import { buildWorkspaceDeepLink } from "../../../../state/navigation/workspace-d
 import type { ProductDocScope } from "../../../domain/product-docs";
 
 const prompts: Record<TmsLocale, string> = {
-  en: "Use the manage-product-docs skill to draft or revise a QA page in Falcon Docs. Ask me for the project and source material. If the connection cannot save drafts, explain how to grant that permission. Show me the draft for review so I can publish it in Falcon.",
-  ru: "Используй скилл manage-product-docs, чтобы подготовить или обновить QA-страницу в Falcon Docs. Уточни проект и исходные материалы. Если у подключения нет права сохранять черновики, объясни, как его предоставить. Покажи черновик для проверки. Я опубликую его в Falcon.",
+  en: "Use the manage-product-docs skill and Falcon MCP to work on project documentation. I’ll tell you which project, pages, folders, or source materials to use. If an operation is unavailable, explain why. Publish a draft when I ask you to.",
+  ru: "Используй скилл manage-product-docs и Falcon MCP для работы с документацией проекта. Я укажу проект, страницы, папки или исходные материалы. Если операция недоступна, объясни причину. Опубликуй черновик, когда я попрошу.",
 };
 
 export function projectCodexStatus(connections: readonly PersonalCodexConnection[], projectId: string, now = Date.now()) {

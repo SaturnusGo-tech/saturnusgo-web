@@ -1,12 +1,13 @@
 "use client";
 
 import { motion, useIsPresent, useReducedMotion } from "framer-motion";
-import { ArrowLeft, ChevronRight, FolderInput } from "lucide-react";
+import { Archive, ArrowLeft, ChevronRight, FolderInput } from "lucide-react";
 import { useId, useRef, useState } from "react";
 import repository from "../../../folders/presentation/structure/structure.module.css";
 import type { ProductDocNode, ProductDocsApi, ProductDocScope } from "../../domain/product-docs";
 import type { ProductDocsCopy } from "../../localization/copy";
 import { useProductDocList } from "../../state/tree/useProductDocList";
+import { ArchiveProductDoc } from "../archive/ArchiveProductDoc";
 import { ProductDocsDisclosure } from "../motion/ProductDocsDisclosure";
 import { ReadState } from "../status/ReadState";
 import { CreateProductDoc } from "../toolbar/CreateProductDoc";
@@ -26,14 +27,17 @@ type StructureProps = {
   onBack(): void;
   onOpen(node: ProductDocNode): void;
   onChanged(): void;
+  onArchived(): void;
 };
 
-export function ProductDocsStructure({ api, scope, copy, refresh, lockedId, initialPath, onBack, onOpen, onChanged }: StructureProps) {
+export function ProductDocsStructure({ api, scope, copy, refresh, lockedId, initialPath, onBack, onOpen, onChanged, onArchived }: StructureProps) {
   const [expanded, setExpanded] = useState<ReadonlySet<string>>(() => new Set(initialPath?.map((node) => node.id)));
   const [renaming, setRenaming] = useState<string>();
   const [move, setMove] = useState<{ node: ProductDocNode; path: readonly ProductDocNode[] }>();
+  const [archive, setArchive] = useState<ProductDocNode>();
   const [notice, setNotice] = useState("");
   const moveTrigger = useRef<HTMLButtonElement>(null);
+  const archiveTrigger = useRef<HTMLButtonElement>(null);
   const heading = useId();
   const present = useIsPresent();
   const reduced = useReducedMotion();
@@ -70,6 +74,7 @@ export function ProductDocsStructure({ api, scope, copy, refresh, lockedId, init
       <StructureBranch api={api} scope={scope} copy={copy} refresh={refresh} lockedId={lockedId}
         path={[]} expanded={expanded} renaming={renaming} onToggle={toggle} onRename={setRenaming} onOpen={onOpen}
         onMove={(node, path, trigger) => { moveTrigger.current = trigger; setMove({ node, path }); }}
+        onArchive={(node, trigger) => { archiveTrigger.current = trigger; setArchive(node); }}
         onChanged={changed} />
       {notice && <p className={repository.notice} role="status">{notice}</p>}
     </div>
@@ -77,6 +82,13 @@ export function ProductDocsStructure({ api, scope, copy, refresh, lockedId, init
       onMoved={() => changed(copy.structureSaved)} onClose={() => {
         setMove(undefined);
         moveTrigger.current?.focus({ preventScroll: true });
+      }} />}
+    {archive && <ArchiveProductDoc api={api} scope={scope} node={archive} copy={copy}
+      onArchived={() => { setArchive(undefined); onArchived(); }}
+      onClose={(stale) => {
+        setArchive(undefined);
+        if (stale) onChanged();
+        archiveTrigger.current?.focus({ preventScroll: true });
       }} />}
   </motion.section>;
 }
@@ -88,6 +100,7 @@ type BranchProps = Pick<StructureProps, "api" | "scope" | "copy" | "refresh" | "
   onToggle(id: string, forceOpen?: boolean): void;
   onRename(id?: string): void;
   onMove(node: ProductDocNode, path: readonly ProductDocNode[], trigger: HTMLButtonElement): void;
+  onArchive(node: ProductDocNode, trigger: HTMLButtonElement): void;
   onChanged(message: string): void;
 };
 
@@ -109,7 +122,7 @@ function StructureBranch(props: BranchProps) {
 }
 
 function StructureRow({ node, canEdit, canMove, ...props }: BranchProps & { node: ProductDocNode; canEdit: boolean; canMove: boolean }) {
-  const { api, scope, copy, path, expanded, lockedId, renaming, onToggle, onRename, onOpen, onMove, onChanged } = props;
+  const { api, scope, copy, path, expanded, lockedId, renaming, onToggle, onRename, onOpen, onMove, onArchive, onChanged } = props;
   const childrenId = useId();
   const title = useRef<HTMLButtonElement>(null);
   const folder = node.kind === "folder";
@@ -141,6 +154,10 @@ function StructureRow({ node, canEdit, canMove, ...props }: BranchProps & { node
       {canMutate && canMove && <button type="button" className={repository.add} title={copy.move} disabled={Boolean(renaming)}
         aria-label={`${copy.move} ${node.title}`} onClick={(event) => onMove(node, path, event.currentTarget)}>
         <FolderInput size={16} aria-hidden="true" />
+      </button>}
+      {canMutate && canMove && <button type="button" className={repository.add} title={copy.archiveItem} disabled={Boolean(renaming)}
+        aria-label={`${copy.archiveItem} ${node.title}`} onClick={(event) => onArchive(node, event.currentTarget)}>
+        <Archive size={16} aria-hidden="true" />
       </button>}
       {canMutate && !renaming && <CreateProductDoc api={api} scope={scope} copy={copy}
         kind="folder" parentId={node.id} onCreated={() => {

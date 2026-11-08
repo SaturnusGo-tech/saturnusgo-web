@@ -1,4 +1,5 @@
 import type { components } from "../../../../core/tms/generated/tms-api";
+import type { FolderAppearance } from "../../folders/model/appearance/folder-appearance";
 
 export interface ProductDocScope { workspaceId: string; projectId: string }
 export interface ProductDocSelection { docId: string; version?: number; sectionId?: string }
@@ -9,6 +10,8 @@ export interface ProductDocNode {
   title: string;
   draftVersion: number;
   publishedVersion: number | null;
+  archivedAt?: string | null;
+  appearance?: FolderAppearance;
 }
 export type ProductDocTitleHighlight = components["schemas"]["ProductDocTitleHighlight"];
 export interface ProductDocSection {
@@ -50,14 +53,20 @@ export interface ProductDocCommentPage { comments: ProductDocComment[]; nextCurs
 export interface ProductDocPagination { limit?: number; cursor?: string; signal?: AbortSignal }
 export interface ProductDocsApi {
   availability(scope: ProductDocScope, signal?: AbortSignal): Promise<boolean>;
-  list(scope: ProductDocScope, options?: { q?: string; parentId?: string | null; draft?: boolean } & ProductDocPagination): Promise<ProductDocList>;
-  get(scope: ProductDocScope, docId: string, options?: { version?: number; draft?: boolean; signal?: AbortSignal }): Promise<ProductDocDetail>;
+  list(scope: ProductDocScope, options?: { q?: string; parentId?: string | null; draft?: boolean; archived?: boolean } & ProductDocPagination): Promise<ProductDocList>;
+  get(scope: ProductDocScope, docId: string, options?: { version?: number; draft?: boolean; archived?: boolean; signal?: AbortSignal }): Promise<ProductDocDetail>;
   create(scope: ProductDocScope, input: {kind: ProductDocNode["kind"]; parentId: string | null; title: string}, options: {idempotencyKey: string; signal?: AbortSignal}): Promise<{id: string}>;
   save(scope: ProductDocScope, docId: string, input: {
     title: string; sections: ProductDocSection[]; expectedDraftVersion: number; titleHighlights?: ProductDocTitleHighlight[];
   }): Promise<{draftVersion: number}>;
   publish(scope: ProductDocScope, docId: string, input: {expectedDraftVersion: number}): Promise<{version: number}>;
   move(scope: ProductDocScope, docId: string, input: {parentId: string | null; expectedDraftVersion: number}): Promise<{draftVersion: number}>;
+  setArchived(scope: ProductDocScope, docId: string, archived: boolean, input: {
+    expectedDraftVersion: number;
+  }): Promise<{ draftVersion: number; archivedAt: string | null; affectedCount: number }>;
+  setAppearance(scope: ProductDocScope, docId: string, input: {
+    appearance: FolderAppearance; expectedDraftVersion: number;
+  }): Promise<{ draftVersion: number }>;
   listComments(scope: ProductDocScope, docId: string, options?: ProductDocPagination): Promise<ProductDocCommentPage>;
   postComment(scope: ProductDocScope, docId: string, body: string, options: { idempotencyKey: string }): Promise<ProductDocComment>;
   listArticleCases(scope: ProductDocScope, docId: string, options?: ProductDocPagination): Promise<{cases: ProductDocCase[]; nextCursor: string | null}>;

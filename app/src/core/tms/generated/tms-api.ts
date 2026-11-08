@@ -6738,6 +6738,52 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/archive": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["archiveProductDoc"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/restore": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["restoreProductDoc"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/location": {
         parameters: {
             query?: never;
@@ -6759,6 +6805,30 @@ export interface paths {
         options?: never;
         head?: never;
         patch: operations["moveProductDoc"];
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/appearance": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Change the shared appearance of a documentation folder. */
+        patch: operations["setProductDocFolderAppearance"];
         trace?: never;
     };
     "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/cases": {
@@ -12484,6 +12554,12 @@ export interface components {
             title: string;
             draftVersion: number;
             publishedVersion: number | null;
+            /**
+             * Format: date-time
+             * @description Present when the product document is archived.
+             */
+            archivedAt?: string;
+            appearance?: components["schemas"]["RepositoryFolderAppearance"];
         };
         ProductDocSection: {
             id: string;
@@ -12506,6 +12582,12 @@ export interface components {
             version: number | null;
             /** @description Ordered, non-overlapping UTF-16 ranges in the plain title. An empty array removes all title highlights. */
             titleHighlights?: components["schemas"]["ProductDocTitleHighlight"][];
+            /**
+             * Format: date-time
+             * @description Present when the product document is archived.
+             */
+            archivedAt?: string;
+            appearance?: components["schemas"]["RepositoryFolderAppearance"];
         };
         ProductDocList: {
             nodes: components["schemas"]["ProductDocNode"][];
@@ -12529,6 +12611,15 @@ export interface components {
         };
         ProductDocPublishInput: {
             expectedDraftVersion: number;
+        };
+        ProductDocLifecycleInput: {
+            expectedDraftVersion: number;
+        };
+        ProductDocArchiveResult: {
+            draftVersion: number;
+            archivedAt: string | null;
+            /** @description Number of documents whose archive state changed. */
+            affectedCount: number;
         };
         ProductDocMoveInput: {
             parentId: string | null;
@@ -12577,6 +12668,10 @@ export interface components {
             end: number;
             /** @enum {string} */
             color: "yellow" | "blue" | "green" | "pink" | "purple";
+        };
+        ProductDocAppearanceInput: {
+            expectedDraftVersion: number;
+            appearance: components["schemas"]["RepositoryFolderAppearance"];
         };
     };
     responses: {
@@ -27133,6 +27228,8 @@ export interface operations {
                 limit?: number;
                 cursor?: string;
                 draft?: boolean;
+                /** @description List roots of archived branches. Requires publish permission. Cannot be combined with draft=true or parentId. */
+                archived?: boolean;
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -27248,6 +27345,8 @@ export interface operations {
             query?: {
                 version?: number;
                 draft?: boolean;
+                /** @description Read the archived draft. Requires publish permission. Cannot be combined with draft=true or version. */
+                archived?: boolean;
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -27363,6 +27462,86 @@ export interface operations {
             500: components["responses"]["InternalError"];
         };
     };
+    archiveProductDoc: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductDocLifecycleInput"];
+            };
+        };
+        responses: {
+            /** @description Archives the selected document and its active descendants. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProductDocArchiveResult"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    restoreProductDoc: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductDocLifecycleInput"];
+            };
+        };
+        responses: {
+            /** @description Restores the selected archive branch. Descendants archived separately remain archived. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProductDocArchiveResult"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
     moveProductDoc: {
         parameters: {
             query?: never;
@@ -27380,6 +27559,46 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["ProductDocMoveInput"];
+            };
+        };
+        responses: {
+            /** @description Product Docs result. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProductDocDraftVersion"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    setProductDocFolderAppearance: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductDocAppearanceInput"];
             };
         };
         responses: {

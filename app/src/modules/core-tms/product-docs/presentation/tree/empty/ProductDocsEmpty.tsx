@@ -2,7 +2,7 @@ import type { ProductDocsCopy } from "../../../localization/copy";
 import type { ProductDocsShelf } from "../../../state/library/useProductDocsLibrary";
 import styles from "../../product-docs.module.css";
 
-export function ProductDocsEmpty({ copy, shelf }: { copy: ProductDocsCopy; shelf: ProductDocsShelf }) {
+export function ProductDocsEmpty({ copy, shelf }: { copy: ProductDocsCopy; shelf: Exclude<ProductDocsShelf, "archive"> }) {
   const message = {
     overview: [copy.emptyOverviewTitle, copy.emptyOverviewDescription],
     recent: [copy.emptyRecentTitle, copy.noRecent],

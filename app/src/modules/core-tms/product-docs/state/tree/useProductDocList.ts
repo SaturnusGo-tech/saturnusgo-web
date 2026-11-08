@@ -10,10 +10,11 @@ export function useProductDocList(api: ProductDocsApi, scope: ProductDocScope, o
   q?: string;
   refresh: number;
   draft?: boolean;
+  archived?: boolean;
 }) {
   const { workspaceId, projectId } = scope;
-  const { parentId, q, refresh, draft } = options;
-  const key = JSON.stringify([workspaceId, projectId, parentId, q, draft]);
+  const { parentId, q, refresh, draft, archived } = options;
+  const key = JSON.stringify([workspaceId, projectId, parentId, q, draft, archived]);
   const pageKey = JSON.stringify([key, refresh]);
   const [loaded, setLoaded] = useState<Loaded>();
   const [page, setPage] = useState<{ key: string; cursor?: string; attempt: number }>();
@@ -23,7 +24,7 @@ export function useProductDocList(api: ProductDocsApi, scope: ProductDocScope, o
   useEffect(() => {
     const abort = new AbortController();
     setLoaded((previous) => previous?.key === key ? { ...previous, error: false, loading: true } : undefined);
-    api.list({ workspaceId, projectId }, { parentId, q, draft, cursor, limit: 40, signal: abort.signal }).then((data) => {
+    api.list({ workspaceId, projectId }, { parentId, q, draft, archived, cursor, limit: 40, signal: abort.signal }).then((data) => {
       if (abort.signal.aborted) return;
       setLoaded((previous) => {
         const previousNodes = cursor && previous?.key === key ? previous.data.nodes : [];
@@ -39,7 +40,7 @@ export function useProductDocList(api: ProductDocsApi, scope: ProductDocScope, o
       }));
     });
     return () => abort.abort();
-  }, [api, workspaceId, projectId, parentId, q, draft, key, refresh, cursor, attempt]);
+  }, [api, workspaceId, projectId, parentId, q, draft, archived, key, refresh, cursor, attempt]);
 
   return {
     data: active?.data,

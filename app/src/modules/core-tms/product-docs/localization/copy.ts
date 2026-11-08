@@ -1,6 +1,8 @@
 import type { TmsLocale } from "../../localization/model/locale";
+import { archiveCopy } from "./archive-copy";
 
 const english = {
+  ...archiveCopy.en,
   title: "Docs",
   tree: "Pages",
   search: "Find a page…",
@@ -97,6 +99,7 @@ const english = {
 };
 
 const russian: typeof english = {
+  ...archiveCopy.ru,
   title: "Документация",
   tree: "Страницы",
   search: "Найти страницу…",

@@ -1,4 +1,4 @@
-import type { FolderIconId } from "../../../../folders/model/appearance/folder-appearance";
+import type { FolderIconId } from "../../../folders/model/appearance/folder-appearance";
 
 type Tone = "info" | "discovery" | "success" | "neutral";
 

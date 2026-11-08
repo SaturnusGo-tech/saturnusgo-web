@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useOptionalAttachmentClient } from "../../../../../attachments/presentation/context/AttachmentClientProvider";
-import type { FolderAppearance } from "../../../../../folders/model/appearance/folder-appearance";
-import type { FolderPickerEditor } from "../../../../../folders/presentation/appearance/picker/FolderAppearancePicker";
+import { useOptionalAttachmentClient } from "../../../attachments/presentation/context/AttachmentClientProvider";
+import type { FolderAppearance } from "../../../folders/model/appearance/folder-appearance";
+import type { FolderPickerEditor } from "../../../folders/presentation/appearance/picker/FolderAppearancePicker";
+import { productDocErrorCode } from "../../domain/errors/product-doc-response";
 
 const imageTypes = ["image/png", "image/jpeg", "image/webp", "image/gif"] as const;
 const imageFormats = { accept: imageTypes.join(","), label: "PNG, JPG, WebP, GIF" };
@@ -12,13 +13,17 @@ const mimeByExtension = new Map<string, (typeof imageTypes)[number]>([
 ] as const);
 
 export function useSectionAppearanceEditor(projectId: string, appearance: FolderAppearance,
-  save: (value: FolderAppearance) => void, ru: boolean): FolderPickerEditor {
+  save: (value: FolderAppearance, recheckVersion: boolean) => Promise<void>,
+  onSaved: () => void, ru: boolean): FolderPickerEditor {
   const client = useOptionalAttachmentClient();
   const [preview, setPreview] = useState<FolderAppearance>();
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [busy, setBusy] = useState(false);
   const request = useRef<AbortController>(null);
-  const failed = useRef<{ value: FolderAppearance } | null>(null);
+  const failed = useRef<{ value: FolderAppearance; stale: boolean } | null>(null);
+  const queued = useRef<{ value: FolderAppearance; recheckVersion: boolean } | null>(null);
+  const saving = useRef(false);
   const lastUpload = useRef<{ file: File; key: string } | null>(null);
 
   useEffect(() => () => request.current?.abort(), [projectId, save]);
@@ -36,16 +41,39 @@ export function useSectionAppearanceEditor(projectId: string, appearance: Folder
     setError("");
   }
 
+  function takeQueuedChange() {
+    const change = queued.current;
+    queued.current = null;
+    return change;
+  }
+
+  async function flush() {
+    saving.current = true;
+    setBusy(true);
+    for (let change = takeQueuedChange(); change; change = takeQueuedChange()) {
+      try {
+        await save(change.value, change.recheckVersion);
+      } catch (failure) {
+        const stale = productDocErrorCode(failure) === "PRODUCT_DOC_STALE_DRAFT";
+        failed.current = { value: takeQueuedChange()?.value ?? change.value, stale };
+        setPreview(undefined);
+        setError(stale
+          ? (ru ? "Папка изменилась. Повторите сохранение." : "This folder changed. Try saving again.")
+          : (ru ? "Не удалось сохранить оформление." : "Could not save folder appearance."));
+        break;
+      }
+    }
+    saving.current = false;
+    setBusy(false);
+    if (!failed.current) onSaved();
+  }
+
   function choose(value: FolderAppearance) {
     cancelUpload();
-    setPreview(undefined);
-    try {
-      save(value);
-      failed.current = null;
-    } catch {
-      failed.current = { value };
-      setError(ru ? "Не удалось сохранить оформление в браузере." : "Could not save the appearance in this browser.");
-    }
+    setPreview(value);
+    queued.current = { value, recheckVersion: failed.current?.stale ?? false };
+    failed.current = null;
+    if (!saving.current) void flush();
   }
 
   async function image(file: File, retrying = false) {
@@ -82,7 +110,7 @@ export function useSectionAppearanceEditor(projectId: string, appearance: Folder
   }
 
   return {
-    preview: preview === undefined ? appearance : preview, error, uploading, busy: false,
+    preview: preview === undefined ? appearance : preview, error, uploading, busy,
     failed: Boolean(failed.current), uploadFailed: Boolean(error && lastUpload.current), canUpload: Boolean(client),
     imageFormats, image, choose, cancelUpload,
     previewColor(value) { setPreview(value); },

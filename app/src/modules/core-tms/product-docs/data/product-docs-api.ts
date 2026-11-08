@@ -46,6 +46,12 @@ export function createProductDocsApi(http: TmsHttpClient): ProductDocsApi {
     move: (scope, id, input) => http.mutate<Contract["ProductDocDraftVersion"]>(
       docPath(scope, id) + "/location", "PATCH", input satisfies Contract["ProductDocMoveInput"],
     ),
+    setArchived: (scope, id, archived, input) => http.mutate<Contract["ProductDocArchiveResult"]>(
+      docPath(scope, id) + (archived ? "/archive" : "/restore"), "POST", input satisfies Contract["ProductDocLifecycleInput"],
+    ),
+    setAppearance: (scope, id, input) => http.mutate<Contract["ProductDocDraftVersion"]>(
+      docPath(scope, id) + "/appearance", "PATCH", input satisfies Contract["ProductDocAppearanceInput"],
+    ),
     listComments: (scope, id, options) => read<Contract["ProductDocCommentPage"]>(
       docPath(scope, id) + "/comments" + query(options), options?.signal,
     ),

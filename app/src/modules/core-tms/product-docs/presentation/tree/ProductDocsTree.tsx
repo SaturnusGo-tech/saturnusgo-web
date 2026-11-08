@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, Clock3, LayoutGrid, Star } from "lucide-react";
+import { Archive, ChevronRight, Clock3, LayoutGrid, Star } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import type { ProductDocNode, ProductDocsApi, ProductDocScope } from "../../domain/product-docs";
 import type { ProductDocsCopy } from "../../localization/copy";
@@ -10,7 +10,7 @@ import type { ProductDocsShelf } from "../../state/library/useProductDocsLibrary
 import { ProductDocsDisclosure } from "../motion/ProductDocsDisclosure";
 import { ReadState } from "../status/ReadState";
 import styles from "../product-docs.module.css";
-import { ProductDocSectionAppearance } from "./appearance/control/ProductDocSectionAppearance";
+import { ProductDocSectionAppearance } from "./appearance/ProductDocSectionAppearance";
 import { ProductDocSectionIcon } from "./appearance/ProductDocSectionIcon";
 import treeStyles from "./product-docs-tree.module.css";
 
@@ -24,11 +24,13 @@ type TreeProps = {
   path?: readonly ProductDocNode[];
   refresh: number;
   draft: boolean;
+  canArchive: boolean;
   query: string;
   shelf: ProductDocsShelf;
   treeControls?: ReactNode;
   onHome(shelf?: ProductDocsShelf): void;
   onSelect(node: ProductDocNode): void;
+  onAppearanceSaved(): void;
   onEscape(): void;
 };
 
@@ -71,7 +73,9 @@ export function ProductDocsTree(props: TreeProps) {
         ["overview", props.copy.libraryHome, LayoutGrid],
         ["recent", props.copy.recent, Clock3],
         ["starred", props.copy.starred, Star],
-      ] as const).map(([shelf, title, Icon]) => <button key={shelf} type="button" className={treeStyles.view}
+        ["archive", props.copy.archive, Archive],
+      ] as const).filter(([shelf]) => shelf !== "archive" || props.canArchive)
+        .map(([shelf, title, Icon]) => <button key={shelf} type="button" className={treeStyles.view}
         aria-current={!props.selectedId && props.shelf === shelf ? "page" : undefined} onClick={() => props.onHome(shelf)}>
         <Icon className={shelf === "starred" ? treeStyles.star : undefined} size={15} aria-hidden="true" /> {title}
       </button>)}
@@ -116,7 +120,8 @@ function Branch(props: TreeProps & {
           <div className={treeStyles.row} data-current={selected || undefined}>
             {section && <div className={treeStyles.sectionMark}>
               {props.draft && data.canEdit
-                ? <ProductDocSectionAppearance scope={props.scope} node={node} locale={props.locale} />
+                ? <ProductDocSectionAppearance api={props.api} scope={props.scope} node={node} locale={props.locale}
+                  onChanged={props.onAppearanceSaved} />
                 : <ProductDocSectionIcon scope={props.scope} node={node} size={17} />}
             </div>}
             <button type="button" className={treeStyles.node} aria-current={selected ? "page" : undefined}

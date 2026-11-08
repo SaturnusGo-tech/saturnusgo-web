@@ -75,7 +75,7 @@ export function ProductDocsOverview({
   scope: ProductDocScope;
   copy: ProductDocsCopy;
   locale: TmsLocale;
-  shelf: ProductDocsShelf;
+  shelf: Exclude<ProductDocsShelf, "archive">;
   projectName?: string;
   rootNodes?: readonly ProductDocNode[];
   recent: readonly string[];

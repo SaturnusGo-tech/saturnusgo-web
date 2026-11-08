@@ -1,13 +1,14 @@
 "use client";
 
-import { Check, Clock3, Download, Ellipsis, FolderInput, Link2, MessageSquare, Pencil, Star } from "lucide-react";
+import { Archive, Check, Clock3, Download, Ellipsis, FolderInput, Link2, MessageSquare, Pencil, Star } from "lucide-react";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { writeClipboardText } from "../../../../../../shared/lib/clipboard";
 import type { TmsLocale } from "../../../../localization/model/locale";
 import type { ProductDocDetail, ProductDocNode, ProductDocsApi, ProductDocScope } from "../../../domain/product-docs";
 import type { ProductDocsCopy } from "../../../localization/copy";
 import { MoveProductDoc } from "../MoveProductDoc";
-import { ProductDocSectionAppearance } from "../../tree/appearance/control/ProductDocSectionAppearance";
+import { ArchiveProductDoc } from "../../archive/ArchiveProductDoc";
+import { ProductDocSectionAppearance } from "../../tree/appearance/ProductDocSectionAppearance";
 import { exportProductDocHeading } from "../../draft/sections/productDocMarkdown";
 import shared from "../../product-docs.module.css";
 import styles from "./reader-actions.module.css";
@@ -27,15 +28,17 @@ type Props = {
   onEdit(): void;
   onStar(): void;
   onVersion(version?: number): void;
-  onMoved(): void;
+  onChanged(): void;
+  onArchived(): void;
 };
 
 export function ProductDocActions({
   api, scope, document: page, path, copy, locale, starred, discussionButton, discussionOpen, showDiscussion,
-  onDiscussion, onEdit, onStar, onVersion, onMoved,
+  onDiscussion, onEdit, onStar, onVersion, onChanged, onArchived,
 }: Props) {
   const [open, setOpen] = useState<"history" | "link" | "more">();
   const [moving, setMoving] = useState(false);
+  const [archiving, setArchiving] = useState(false);
   const [copied, setCopied] = useState(false);
   const [link, setLink] = useState("");
   const [limit, setLimit] = useState(20);
@@ -45,7 +48,7 @@ export function ProductDocActions({
   const opener = useRef<HTMLButtonElement | null>(null);
   const latest = page.publishedVersion;
   const hasPublication = page.version !== null;
-  const canChange = page.canEdit && page.version === latest;
+  const canChange = page.canEdit && !page.archivedAt && page.version === latest;
 
   useEffect(() => {
     if (!open) return;
@@ -97,7 +100,8 @@ export function ProductDocActions({
     event.stopPropagation();
     closeMenu();
   }}>
-    {canChange && page.kind === "folder" && <ProductDocSectionAppearance key={page.id} scope={scope} node={page} locale={locale} />}
+    {canChange && page.kind === "folder" && <ProductDocSectionAppearance key={page.id} api={api}
+      scope={scope} node={page} locale={locale} onChanged={onChanged} />}
     {canChange && <button type="button" className={styles.icon}
       aria-label={page.kind === "folder" ? copy.renameFolder : copy.edit}
       title={page.kind === "folder" ? copy.renameFolder : copy.edit} onClick={onEdit}>
@@ -113,7 +117,7 @@ export function ProductDocActions({
         <div className={styles.versions}>
           {Array.from({ length: Math.min(latest, limit) }, (_, index) => latest - index).map((version) => (
             <button type="button" className={styles.menuRow} key={version} aria-current={version === page.version ? "true" : undefined}
-              onClick={() => { closeMenu(); onVersion(version === latest ? undefined : version); }}>
+              onClick={() => { closeMenu(); onVersion(!page.archivedAt && version === latest ? undefined : version); }}>
               {copy.version} {version}
               <small>{version === page.version ? copy.currentVersion : version === latest ? copy.latestVersion : null}</small>
             </button>
@@ -154,11 +158,24 @@ export function ProductDocActions({
         {hasPublication && <button type="button" className={styles.menuRow} onClick={() => { closeMenu(); downloadMarkdown(page); }}>
           <Download size={16} aria-hidden="true" />{copy.exportMarkdown}
         </button>}
+        {canChange && page.canPublish && <button type="button" className={styles.menuRow} onClick={() => {
+          setOpen(undefined);
+          setArchiving(true);
+        }}>
+          <Archive size={16} aria-hidden="true" />{copy.archiveItem}
+        </button>}
       </section>}
     </div>}
-    {moving && <MoveProductDoc api={api} scope={scope} document={page} copy={copy} path={path} onMoved={onMoved}
+    {moving && <MoveProductDoc api={api} scope={scope} document={page} copy={copy} path={path} onMoved={onChanged}
       onClose={() => {
         setMoving(false);
+        moreButton.current?.focus({ preventScroll: true });
+      }} />}
+    {archiving && <ArchiveProductDoc api={api} scope={scope} node={page} copy={copy}
+      onArchived={() => { setArchiving(false); onArchived(); }}
+      onClose={(stale) => {
+        setArchiving(false);
+        if (stale) onChanged();
         moreButton.current?.focus({ preventScroll: true });
       }} />}
     <span role="status" className={shared.screenReader}>{copied ? copy.copiedLink : ""}</span>

@@ -27530,6 +27530,14 @@
             "schema": {
               "type": "boolean"
             }
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "description": "List roots of archived branches. Requires publish permission. Cannot be combined with draft=true or parentId.",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -27752,6 +27760,14 @@
             "schema": {
               "type": "boolean"
             }
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "description": "Read the archived draft. Requires publish permission. Cannot be combined with draft=true or version.",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -27950,6 +27966,174 @@
         "x-tms-idempotency": "not-applicable"
       }
     },
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/archive": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "docId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "Product Docs"
+        ],
+        "operationId": "archiveProductDoc",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Archives the selected document and its active descendants.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProductDocArchiveResult"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductDocLifecycleInput"
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "not-applicable"
+      }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/restore": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "docId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "Product Docs"
+        ],
+        "operationId": "restoreProductDoc",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Restores the selected archive branch. Descendants archived separately remain archived.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProductDocArchiveResult"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductDocLifecycleInput"
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "not-applicable"
+      }
+    },
     "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/location": {
       "parameters": [
         {
@@ -28033,6 +28217,92 @@
         },
         "x-tms-idempotency": "not-applicable",
         "x-tms-concurrency": "body-version"
+      }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/appearance": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "docId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        }
+      ],
+      "patch": {
+        "tags": [
+          "Product Docs"
+        ],
+        "operationId": "setProductDocFolderAppearance",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Product Docs result.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProductDocDraftVersion"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductDocAppearanceInput"
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "not-applicable",
+        "x-tms-concurrency": "body-version",
+        "summary": "Change the shared appearance of a documentation folder."
       }
     },
     "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/cases": {
@@ -57280,6 +57550,14 @@
                 "type": "null"
               }
             ]
+          },
+          "archivedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Present when the product document is archived."
+          },
+          "appearance": {
+            "$ref": "#/components/schemas/RepositoryFolderAppearance"
           }
         }
       },
@@ -57405,6 +57683,14 @@
               "$ref": "#/components/schemas/ProductDocTitleHighlight"
             },
             "description": "Ordered, non-overlapping UTF-16 ranges in the plain title. An empty array removes all title highlights."
+          },
+          "archivedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Present when the product document is archived."
+          },
+          "appearance": {
+            "$ref": "#/components/schemas/RepositoryFolderAppearance"
           }
         }
       },
@@ -57525,6 +57811,51 @@
           "expectedDraftVersion": {
             "type": "integer",
             "minimum": 1
+          }
+        }
+      },
+      "ProductDocLifecycleInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "expectedDraftVersion"
+        ],
+        "properties": {
+          "expectedDraftVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          }
+        }
+      },
+      "ProductDocArchiveResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "draftVersion",
+          "archivedAt",
+          "affectedCount"
+        ],
+        "properties": {
+          "draftVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "archivedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "affectedCount": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of documents whose archive state changed."
           }
         }
       },
@@ -57799,6 +58130,23 @@
               "pink",
               "purple"
             ]
+          }
+        }
+      },
+      "ProductDocAppearanceInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "expectedDraftVersion",
+          "appearance"
+        ],
+        "properties": {
+          "expectedDraftVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "appearance": {
+            "$ref": "#/components/schemas/RepositoryFolderAppearance"
           }
         }
       }

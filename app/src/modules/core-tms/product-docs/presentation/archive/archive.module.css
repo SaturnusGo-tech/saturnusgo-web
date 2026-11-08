@@ -1,0 +1,43 @@
+.confirmation {
+  display: grid;
+  gap: 16px;
+  padding: 0 24px 24px;
+}
+
+.confirmation p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-block: 8px;
+  border-block-end: 1px solid var(--falcon-border);
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-inline-size: 0;
+  gap: 8px;
+  overflow-wrap: anywhere;
+}
+
+.label svg { flex: none; }
+.row button { flex: none; }

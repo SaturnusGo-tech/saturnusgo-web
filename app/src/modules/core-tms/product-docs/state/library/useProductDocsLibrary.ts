@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { ProductDocScope } from "../../domain/product-docs";
 
-export type ProductDocsShelf = "overview" | "recent" | "starred";
+export type ProductDocsShelf = "overview" | "recent" | "starred" | "archive";
 type Library = { recent: string[]; starred: string[] };
 const empty: Library = { recent: [], starred: [] };
 const maxEntries = 24;
