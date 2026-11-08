@@ -1,9 +1,8 @@
 "use client";
 
 import { Download } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactElement } from "react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
-import { NavigationTooltip } from "../../../presentation/navigation/tooltip/NavigationTooltip";
 import { getDesktopUpdate, type DesktopUpdate } from "../../model/update";
 import { DesktopDownloadsPanel } from "../DesktopDownloadsPanel";
 import css from "../desktop-downloads.module.css";
@@ -15,7 +14,9 @@ type DownloadHandoff = {
   finish: (failed: boolean) => void;
 };
 
-export function DesktopUpdateControl({ navigationTooltip = false }: { navigationTooltip?: boolean } = {}) {
+export function DesktopUpdateControl({ renderTooltip }: {
+  renderTooltip?: (label: string, action: ReactElement, enabled: boolean) => ReactElement;
+} = {}) {
   const { locale } = useTmsLocale();
   const ru = locale === "ru";
   const [update, setUpdate] = useState<DesktopUpdate | null>(null);
@@ -77,7 +78,7 @@ export function DesktopUpdateControl({ navigationTooltip = false }: { navigation
     <span className={css.updateRing} data-active={busy || undefined} />
   </span>;
   const attributes = { className: css.update, "aria-label": label, "aria-busy": busy || undefined,
-    "aria-disabled": busy || undefined, "data-testid": "desktop-update", title: navigationTooltip ? undefined : label };
+    "aria-disabled": busy || undefined, "data-testid": "desktop-update", title: renderTooltip ? undefined : label };
   const installer = update.installer;
   const action = installer ? <a {...attributes} href={installer.href} onClick={event => {
     event.preventDefault();
@@ -85,7 +86,7 @@ export function DesktopUpdateControl({ navigationTooltip = false }: { navigation
   }}>{icon}</a> : <button {...attributes} ref={trigger} type="button" aria-haspopup="dialog" aria-expanded={chooserOpen}
     onClick={() => { if (!pending.current) setChooserOpen(true); }}>{icon}</button>;
   return <div className={css.updateControl}>
-    {navigationTooltip ? <NavigationTooltip enabled={!chooserOpen} label={label}>{action}</NavigationTooltip> : action}
+    {renderTooltip ? renderTooltip(label, action, !chooserOpen) : action}
     {!installer && <DesktopDownloadsPanel open={chooserOpen} anchor={trigger} onClose={() => setChooserOpen(false)} installerFiles={update.macFiles}
       onDownload={openInstaller} />}
     <span className={css.updateAnnouncement} role="status">{busy ? openingLabel : ""}</span>

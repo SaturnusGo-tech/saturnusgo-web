@@ -65,7 +65,8 @@ export function Navigation({ view, onChange, disabled, connected, collapsed, onC
         disabled={disabled} allowManagedHooks={codexAvailable} onNavigate={navigate} onTogglePinned={state.togglePinned}/>
     </div>
     <div className={css.footer}>
-      <DesktopUpdateControl navigationTooltip/>
+      <DesktopUpdateControl renderTooltip={(label, action, enabled) =>
+        <NavigationTooltip enabled={enabled} label={label}>{action}</NavigationTooltip>}/>
       <SidebarSectionsMenu sidebar={root} availableIds={navigation.availableIds} activeId={navigation.activeId}
         preferences={state.preferences} onTogglePinned={state.togglePinned} onNavigate={navigate} disabled={disabled} allowManagedHooks={codexAvailable}/>
       <NavigationUtilityMenu connected={connected} subject={session?.subject ?? ""} workspaceId={workspaceId} tooltips={tooltips}/>
