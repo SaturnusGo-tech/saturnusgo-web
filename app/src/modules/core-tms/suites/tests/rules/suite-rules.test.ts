@@ -21,6 +21,12 @@ test("preview respects all saved criteria, descendant folder boundaries, project
   assert.equal(matchesSuite({ ...item, archivedAt: "2026-09-12" }, suite, [folder], ids), false);
   assert.equal(matchesSuite(item, suite, [{ ...folder, archivedAt: "2026-09-12" }], ids), false);
 });
+test("dynamic priority rules require an assigned priority", () => {
+  const mediumSuite = { ...suite, filter: { priority: ["medium" as const] } };
+  const mediumCase = { ...item, priority: "medium" as const };
+  assert.equal(matchesSuite(mediumCase, mediumSuite), true);
+  assert.equal(matchesSuite({ ...mediumCase, priorityAssigned: false }, mediumSuite), false);
+});
 test("mapped advanced filters and Markdown survive a title-only edit; explicit mode switch clears rules", async () => {
   const mapped = mapSuite(suite); assert.deepEqual(mapped.filter, suite.filter); assert.notEqual(mapped.filter.priority, suite.filter.priority);
   const sent: Record<string, unknown>[] = [];

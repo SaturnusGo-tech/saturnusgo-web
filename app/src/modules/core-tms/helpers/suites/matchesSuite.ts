@@ -7,7 +7,7 @@ export function matchesSuite(item: TestCaseSummary, suite: Membership, folders: 
   if (suite.type === "static") return suite.caseIds.includes(item.id);
   const rule = suite.filter;
   if (!((rule.tags ?? []).every(tag => item.tags.includes(tag)))) return false;
-  if (rule.priority?.length && !rule.priority.includes(item.priority)) return false;
+  if (rule.priority?.length && (item.priorityAssigned === false || !rule.priority.includes(item.priority))) return false;
   if (rule.lifecycle?.length && !rule.lifecycle.includes(item.lifecycle)) return false;
   const folder = rule.folderId ? folders.find(value => value.id === rule.folderId && value.projectId === suite.projectId && !value.archivedAt) : undefined;
   if (rule.folderId && !folder) return false;
