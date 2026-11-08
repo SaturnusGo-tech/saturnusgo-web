@@ -3,6 +3,7 @@ import test from "node:test";
 import { componentHarness, invoke, nodes } from "../../../portfolios/tests/support/component-harness";
 import { browserHarness, elements } from "../../../presentation/cases/browser/tests/browser-harness";
 import type { FolderActionsDialog } from "../../presentation/actions/FolderActionsDialog";
+import type { FolderBranchProps } from "../../presentation/branch/RepositoryFolderBranch";
 import type { RepositoryCreation } from "../../model/creation/repository-creation";
 import type { FolderResource, RepositoryFolder } from "../../model/folder";
 import type { FolderNode } from "../../model/tree";
@@ -12,11 +13,14 @@ test("New subfolder closes the action menu and enters inline creation for that f
   const branches = () => elements(app.renderTree(), node => node.type === "RepositoryFolderBranch");
   const parent = branches().find(node => (node.props.node as FolderNode).folder.id === "pay")!;
   const folder = (parent.props.node as FolderNode).folder;
-  (parent.props.onMenu as (item: typeof folder) => void)(folder);
+  const trigger = {} as HTMLButtonElement;
+  (parent.props.onMenu as FolderBranchProps["onMenu"])(folder, trigger);
   const menu = elements(app.renderTree(), node => node.type === "FolderActionsDialog")[0]; assert.ok(menu);
+  assert.equal(menu.props.trigger, trigger);
   const component = h.load<{ FolderActionsDialog: typeof FolderActionsDialog }>(new URL("../../presentation/actions/FolderActionsDialog.tsx", import.meta.url)).FolderActionsDialog;
   const render = () => nodes(h.render(() => component(menu.props as never)));
-  const create = render().find(node => node.type === "button" && (node.props.children as unknown[])?.includes("New subfolder")); assert.ok(create);
+  assert.equal(render().find(node => node.type === "Popover")?.props.placement, "right-start");
+  const create = render().find(node => node.type === "button" && Array.isArray(node.props.children) && node.props.children.includes("New subfolder")); assert.ok(create);
   invoke(create, "onClick");
   assert.equal(elements(app.renderTree(), node => node.type === "FolderActionsDialog").length, 0);
   assert.equal((branches()[0].props.creation as RepositoryCreation).activeFolderId, folder.id);
@@ -35,9 +39,9 @@ test("unavailable or busy inline creation cannot close the menu or start a draft
     const resource: FolderResource = { items: [folder], busy, loading: false, canManage: true, error: "", reload() {},
       create: async () => null, update: async () => false, archive: async () => false, restore: async () => false,
       moveCases: async () => ({ ok: false, message: "Unavailable" }), archiveCases: async () => ({ ok: false, message: "Unavailable" }) };
-    const content = h.render(() => component({ folder, resource, ru: false, onClose: () => { called++; },
+    const content = h.render(() => component({ folder, trigger: {} as HTMLButtonElement, resource, ru: false, onClose: () => { called++; },
       onCreateCase() {}, onCreateFolder: busy ? () => { called++; } : undefined }));
-    const create = nodes(content).find(node => node.type === "button" && (node.props.children as unknown[])?.includes("New subfolder")); assert.ok(create);
+    const create = nodes(content).find(node => node.type === "button" && Array.isArray(node.props.children) && node.props.children.includes("New subfolder")); assert.ok(create);
     assert.equal(create.props.disabled, true); invoke(create, "onClick"); assert.equal(called, 0);
   }
 });
@@ -58,11 +62,11 @@ test("Name and location closes the only menu and opens architecture for that fol
   app.props.selectedCaseId = "profile-case";
   const branch = elements(app.renderTree(), node => node.type === "RepositoryFolderBranch")[0];
   const folder = (branch.props.node as FolderNode).folder;
-  (branch.props.onMenu as (item: typeof folder) => void)(folder);
+  (branch.props.onMenu as FolderBranchProps["onMenu"])(folder, {} as HTMLButtonElement);
   const menu = elements(app.renderTree(), node => node.type === "FolderActionsDialog")[0]; assert.ok(menu);
   const component = h.load<{ FolderActionsDialog: typeof FolderActionsDialog }>(new URL("../../presentation/actions/FolderActionsDialog.tsx", import.meta.url)).FolderActionsDialog;
   const content = () => nodes(h.render(() => component(menu.props as never)));
-  const edit = content().find(node => node.type === "button" && (node.props.children as unknown[])?.includes("Name and location")); assert.ok(edit);
+  const edit = content().find(node => node.type === "button" && Array.isArray(node.props.children) && node.props.children.includes("Name and location")); assert.ok(edit);
   invoke(edit, "onClick");
   assert.deepEqual(opened, [folder.id]);
   assert.equal(elements(app.renderTree(), node => node.type === "FolderActionsDialog").length, 0);

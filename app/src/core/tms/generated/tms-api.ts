@@ -1508,6 +1508,8 @@ export interface paths {
                 dashboardId?: components["schemas"]["Identifier"];
                 /** @description Comma-separated project IDs for shared dashboards. The anchor project must be present. */
                 projectIds?: string;
+                /** @description Set to true for your private project dashboard. Omit dashboardId and projectIds when using this mode. */
+                board?: "true";
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -1518,14 +1520,14 @@ export interface paths {
             };
             cookie?: never;
         };
-        /** Read your private dashboard preferences or widget positions */
+        /** Read your private dashboard, preferences or widget positions */
         get: operations["getDashboardPersonalView"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        /** Update your private dashboard preferences or widget positions */
+        /** Save your private dashboard, preferences or widget positions */
         patch: operations["updateDashboardPersonalView"];
         trace?: never;
     };
@@ -9561,6 +9563,16 @@ export interface components {
                     widgetId: components["schemas"]["Identifier"];
                     position: components["schemas"]["DashboardWidgetPosition"];
                 }[];
+            } | {
+                /** @constant */
+                kind: "board";
+                rowVersion: number;
+                /** Format: date-time */
+                updatedAt: string | null;
+                board: null | {
+                    name: string;
+                    widgets: components["schemas"]["DashboardPersonalWidget"][];
+                };
             };
         };
         DashboardPersonalPreferences: {
@@ -9601,6 +9613,11 @@ export interface components {
                     widgetId: components["schemas"]["Identifier"];
                     position: components["schemas"]["DashboardWidgetPosition"];
                 }[];
+            } | {
+                /** @constant */
+                kind: "board";
+                name: string;
+                widgets: components["schemas"]["DashboardPersonalWidget"][];
             };
         };
         /** @enum {string} */
@@ -9621,6 +9638,13 @@ export interface components {
             title: string;
             position: components["schemas"]["DashboardWidgetPosition"];
             settings?: components["schemas"]["DashboardWidgetSettings"];
+        };
+        DashboardPersonalWidget: {
+            id: components["schemas"]["Identifier"];
+            type: components["schemas"]["DashboardWidgetType"];
+            title: string;
+            position: components["schemas"]["DashboardWidgetPosition"];
+            settings: components["schemas"]["DashboardWidgetSettings"];
         };
         DashboardWidget: {
             id: components["schemas"]["Identifier"];
@@ -17028,6 +17052,8 @@ export interface operations {
                 dashboardId?: components["schemas"]["Identifier"];
                 /** @description Comma-separated project IDs for shared dashboards. The anchor project must be present. */
                 projectIds?: string;
+                /** @description Set to true for your private project dashboard. Omit dashboardId and projectIds when using this mode. */
+                board?: "true";
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -17068,6 +17094,8 @@ export interface operations {
                 dashboardId?: components["schemas"]["Identifier"];
                 /** @description Comma-separated project IDs for shared dashboards. The anchor project must be present. */
                 projectIds?: string;
+                /** @description Set to true for your private project dashboard. Omit dashboardId and projectIds when using this mode. */
+                board?: "true";
             };
             header: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */

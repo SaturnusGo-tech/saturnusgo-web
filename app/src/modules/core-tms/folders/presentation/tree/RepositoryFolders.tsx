@@ -1,6 +1,7 @@
+import { Button } from "@heroui/button";
 import { useDroppable } from "@dnd-kit/core";
 import { useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { PiArchiveDuotone, PiFolderPlusDuotone, PiUploadSimple, PiPlus } from "react-icons/pi";
+import { PiArchiveDuotone, PiPlus } from "react-icons/pi";
 import type { TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import type { FolderResource, RepositoryFolder } from "../../model/folder";
 import type { RepositoryCreation } from "../../model/creation/repository-creation";
@@ -13,16 +14,18 @@ import { useRepositoryWidth, REPOSITORY_MIN, REPOSITORY_MAX } from "../resize/us
 import { RepositoryDragSelectionContext } from "../dnd/drag-click";
 import { RepositoryDropReveal } from "./RepositoryDropReveal";
 import { RepositoryEmptyState } from "./empty/RepositoryEmptyState";
+import { FalconTooltip } from "../../../presentation/common/tooltip/FalconTooltip";
 import css from "../styles/repository.module.css";
 
 export function RepositoryFolders(props: {
   resource: FolderResource; cases: readonly TestCaseSummary[]; selected: ReadonlySet<string>; selectedFolder: string; selectedFolderId?: string;
   activeCaseId: string; ru: boolean; locked: boolean; onToggle: (id: string) => void; onScope: (ids: readonly string[]) => void;
   onFolder: (path: string, id?: string) => void; onCase: (item: TestCaseSummary) => void; onCreate: (path?: string) => void;
-  onNewFolder: () => void; onImport: () => void; onManageFolder?: (folderId: string) => void;
+  onNewFolder: () => void; onSelectionMode: () => void; onManageFolder?: (folderId: string) => void;
   controls?: ReactNode; selectionActions?: ReactNode; task?: ReactNode; filtered?: boolean; selectionMode?: boolean; includeArchived?: boolean; hasArchivedCases?: boolean; onArchiveChange?: (archived: boolean) => void;
 }) {
   const { resource, ru } = props;
+  const newFolderLabel = ru ? "Новая папка" : "New folder";
   const moving = useContext(RepositoryDragSelectionContext);
   const resize = useRepositoryWidth();
   const [revealed, setExpanded] = useState<Set<string>>(new Set());
@@ -32,7 +35,8 @@ export function RepositoryFolders(props: {
   const hasArchivedData = resource.items.some(folder => Boolean(folder.archivedAt)) || (props.hasArchivedCases ?? props.cases.some(item => Boolean(item.archivedAt)));
   useEffect(() => { if (!resource.loading && !hasArchivedData) setArchive(false); }, [resource.loading, hasArchivedData]);
   useEffect(() => { props.onArchiveChange?.(archive); }, [archive, props.onArchiveChange]);
-  const [menu, setMenu] = useState<RepositoryFolder | null>(null);
+  const [menu, setMenu] = useState<{ folder: RepositoryFolder; trigger: HTMLButtonElement } | null>(null);
+  const menuId = menu ? `repository-folder-actions-${menu.folder.id}` : undefined;
   const [activeCreator, setActiveCreator] = useState<string | null>(null);
   const [createdFolderId, setCreatedFolderId] = useState<string | null>(null);
   useEffect(() => {
@@ -92,22 +96,43 @@ export function RepositoryFolders(props: {
     {props.task ?? <>
     <header className={css.heading}>
       <button className={css.repositoryTitle} disabled={props.locked} title={ru ? "Показать все тест-кейсы" : "Show all test cases"}
-        onClick={() => { setArchive(false); props.onFolder(""); }}>{ru ? "Репозиторий" : "Repository"}</button><div>
-      <button disabled={props.locked || !resource.canManage} onClick={props.onImport} className={css.headerAction} aria-label={ru ? "Импорт тест-кейсов" : "Import test cases"}><PiUploadSimple size={16} /><span>{ru ? "Импорт" : "Import"}</span></button>
-      <button disabled={props.locked || !resource.canManage || props.selectionMode} onClick={props.onNewFolder} className={`${css.headerAction} ${css.newFolder}`} title={ru ? "Новая папка" : "New folder"} aria-label={ru ? "Новая папка" : "New folder"}><PiFolderPlusDuotone size={18} /><span>{ru ? "Новая папка" : "New folder"}</span></button>
-      <button className={css.newCase} disabled={props.locked || !resource.canManage || archive} onClick={() => props.onCreate()} aria-label={ru ? "Новый тест-кейс" : "New test case"} title={ru ? "Новый тест-кейс" : "New test case"}><PiPlus size={18} /></button>
-    </div></header>
+        onClick={() => { setArchive(false); props.onFolder(""); }}>{ru ? "Репозиторий" : "Repository"}</button>
+      <Button type="button" size="sm" radius="full" className={css.newCase}
+        isDisabled={props.locked || !resource.canManage || archive} onPress={() => props.onCreate()}
+        aria-label={ru ? "Создать тест-кейс" : "Create test case"}>
+        <PiPlus size={15} aria-hidden="true" />{ru ? "Создать" : "Create"}
+      </Button>
+    </header>
     {props.controls}
     <div ref={drop.setNodeRef} className={css.treeHeading} data-drag-root={moving.active || undefined} data-drop={drop.isOver || undefined}>
-      <span>{moving.active ? (ru ? "В корень репозитория" : "Move to repository root") : archive ? (ru ? "Архив папок" : "Archived folders") : (ru ? "Папки" : "Folders")}</span>
-      {props.selectionActions}
-      {hasArchivedData && <button className={css.archiveToggle} disabled={moving.active || props.selectionMode} aria-hidden={props.selectionMode || undefined} tabIndex={props.selectionMode ? -1 : undefined} aria-pressed={archive} aria-label={ru ? "Показать архив папок" : "Show archived folders"} onClick={() => setArchive(!archive)}><PiArchiveDuotone size={16} /></button>}</div>
+      <div className={css.foldersLabel}>
+        <span>{moving.active ? (ru ? "В корень репозитория" : "Move to repository root") : archive ? (ru ? "Архив папок" : "Archived folders") : (ru ? "Папки" : "Folders")}</span>
+        {!archive && !moving.active && !props.selectionMode && <FalconTooltip label={newFolderLabel}>
+          <Button type="button" size="sm" variant="light" isIconOnly className={css.newFolder}
+            isDisabled={props.locked || !resource.canManage} onPress={props.onNewFolder} aria-label={newFolderLabel}>
+            <PiPlus size={12} aria-hidden="true" />
+          </Button>
+        </FalconTooltip>}
+      </div>
+      {!moving.active && <div className={css.treeActions}>
+        {hasArchivedData && <button type="button" className={css.archiveToggle} aria-pressed={archive}
+          disabled={Boolean(props.selectionMode)} aria-hidden={props.selectionMode || undefined} tabIndex={props.selectionMode ? -1 : undefined}
+          aria-label={ru ? "Показать архив папок" : "Show archived folders"} onClick={() => setArchive(!archive)}><PiArchiveDuotone size={16} /></button>}
+        <button type="button" className={css.selectCases} disabled={props.locked || resource.busy}
+          aria-label={ru ? "Выбрать тест-кейсы" : "Select test cases"} aria-pressed={Boolean(props.selectionMode)} onClick={props.onSelectionMode}>
+          {props.selectionMode ? (ru ? "Готово" : "Done") : (ru ? "Выбрать" : "Select")}
+        </button>
+      </div>}
+      {props.selectionMode && !moving.active && <div className={css.selectionActions}>{props.selectionActions}</div>}
+    </div>
     <div className={css.treeScroll} aria-busy={resource.loading}>
       {resource.error && <div className={css.loadError} role="alert"><span>{resource.error}</span><button onClick={resource.reload}>{ru ? "Обновить" : "Refresh"}</button></div>}
       {resource.loading && !resource.items.length ? <div className={css.skeleton} role="status" aria-label={ru ? "Загрузка папок" : "Loading folders"}><i /><i /><i /><i /></div> : <ul className={css.tree}>
         {roots.map((node) => <RepositoryFolderBranch key={node.folder.id} node={node} depth={0} expanded={expanded} selected={props.selected}
           customize={!props.selectionMode} creation={creation} selectedFolder={props.selectedFolder} selectedFolderId={props.selectedFolderId} activeCaseId={props.activeCaseId} ru={ru} locked={props.locked || resource.busy || resource.loading}
-          canManage={resource.canManage} canSelect={Boolean(props.selectionMode) && resource.canManage} onExpand={toggle} onReveal={reveal} onFolder={props.onFolder} onCase={props.onCase} onToggle={props.onToggle} onScope={props.onScope} onMenu={setMenu} />)}
+          canManage={resource.canManage} canSelect={Boolean(props.selectionMode) && resource.canManage} onExpand={toggle} onReveal={reveal} onFolder={props.onFolder} onCase={props.onCase} onToggle={props.onToggle} onScope={props.onScope}
+          activeMenuFolderId={menu?.folder.id} menuId={menuId}
+          onMenu={(folder, trigger) => setMenu(current => current?.trigger === trigger ? null : { folder, trigger })} />)}
         {tree.unfiled.map((item) => <RepositoryCaseLeaf key={item.id} item={item} depth={0} selected={props.selected.has(item.id)} active={props.activeCaseId === item.id}
           creation={creation} locked={props.locked || resource.busy || resource.loading} canManage={resource.canManage} canSelect={Boolean(props.selectionMode) && resource.canManage} ru={ru} onToggle={props.onToggle} onOpen={props.onCase} />)}
         {!roots.length && !tree.unfiled.length && !resource.error && (props.filtered || archive
@@ -118,6 +143,8 @@ export function RepositoryFolders(props: {
     <div {...resize.handleProps} className={css.resizeHandle} role="separator" tabIndex={0} aria-orientation="vertical"
       aria-label={ru ? "Изменить ширину репозитория" : "Resize repository"} aria-valuemin={REPOSITORY_MIN} aria-valuemax={REPOSITORY_MAX} aria-valuenow={resize.width}
       title={ru ? "Потяните, чтобы изменить ширину. Двойной клик — сбросить." : "Drag to resize. Double click to reset."} />
-    {menu && <FolderActionsDialog folder={menu} resource={resource} ru={ru} onClose={() => setMenu(null)} onCreateCase={props.onCreate} onCreateFolder={creation?.begin} onManageFolder={props.onManageFolder} />}
+    {menu && <FolderActionsDialog key={menu.folder.id} id={menuId} folder={menu.folder} trigger={menu.trigger}
+      resource={resource} ru={ru} onClose={() => setMenu(current => current?.trigger === menu.trigger ? null : current)}
+      onCreateCase={props.onCreate} onCreateFolder={creation?.begin} onManageFolder={props.onManageFolder} />}
   </aside>;
 }

@@ -34,10 +34,8 @@
 .controls .search .tool { flex-shrink: 0; height: 25px; min-width: 27px; padding: 0 5px; border-radius: 7px; }
 .search > .tool { font-size: 10px; background: var(--falcon-panel); border: 1px solid var(--falcon-border-subtle); }
 .search .filter { border-left: 1px solid var(--falcon-border-subtle); padding-left: 5px; margin-left: 3px; }
-.controls .select { padding: 0 7px; font-size: 12px; border-radius: 999px; color: var(--falcon-text-secondary); }
-.controls .select[aria-pressed=true] { color: var(--falcon-link); }
 .controls { gap: 7px; margin-inline: 3px; }
-@container repository-controls (max-width: 350px) { .controls .select { padding-inline: 2px; font-size: 11px; } .search { gap: 6px; padding-left: 8px; } }
+@container repository-controls (max-width: 350px) { .search { gap: 6px; padding-left: 8px; } }
 
 /* A bounded reveal keeps intrinsic button width from wrapping the search toolbar. */
 .selectAllReveal { display:block; max-width:0; min-width:0; overflow:hidden; opacity:0; visibility:hidden; transition:max-width 220ms cubic-bezier(.22,.61,.36,1),opacity 180ms ease,visibility 0s 220ms; }
@@ -48,13 +46,68 @@
 .controls:not([data-inline]) { grid-template-columns:minmax(120px,1fr) auto; align-items:center; }
 .controls:not([data-inline]) .ql,.controls .queryHint { grid-column:1/-1; }
 
-.controls .select[aria-pressed=true], .controls .select[aria-pressed=true]:hover { background: var(--falcon-hover); color: var(--falcon-text); padding-inline: 12px; }
-
 .tools { display: flex; align-items: center; gap: 3px; min-width: 0; }
 .controls[data-repository-controls] { grid-template-columns: minmax(0,1fr); }
 @container repository-controls (max-width: 400px) { .tools .tool > span { display: none; } }
 
-/* Reserve the selection toggle width so changing its label never resizes the search. */
-.controls[data-repository-controls] .select { flex: 0 0 78px; padding-inline: 7px; }
-
 .controls:has(> [data-ql-disclosure]) { row-gap: 0; }
+
+.searchRow .repositorySearch[data-input-shell] {
+  --tms-focus-border: transparent;
+  --tms-focus-ring: transparent;
+  --tms-input-hover-border: transparent;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.repositorySearch .searchControl {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  min-height: 36px;
+  padding: 0 9px;
+  border: 1px solid var(--falcon-border-subtle);
+  border-radius: 10px;
+  background: var(--falcon-control);
+  box-shadow: none;
+}
+.repositorySearch .searchControl:focus-within { border-color: var(--falcon-icon-muted); }
+.searchInner { display: flex; width: 100%; min-width: 0; align-items: center; gap: 7px; }
+.searchInner > svg { flex: none; color: var(--falcon-text-muted); }
+.repositorySearch .searchText { padding: 0; min-width: 0; color: var(--falcon-text); font: inherit; font-size: 12px; }
+.searchText::placeholder { color: var(--falcon-text-secondary); }
+.searchText::-webkit-search-cancel-button { display: none; }
+.searchInner .searchClear {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: 6px;
+  color: var(--falcon-text-secondary);
+}
+.searchInner .searchClear:hover { background: var(--falcon-hover); color: var(--falcon-text); }
+.controls .repositoryTool {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  flex: none;
+  gap: 4px;
+  height: 32px;
+  min-width: 32px;
+  padding-inline: 6px;
+  border: 1px solid var(--falcon-border-subtle);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--falcon-text-secondary);
+  font-size: 11px;
+}
+.controls .repositoryTool:is(:hover, [aria-expanded="true"]) { background: var(--falcon-hover); color: var(--falcon-text); }
+.controls .repositoryTool[data-active] { color: var(--falcon-link); }
+.repositoryTool > svg { flex: none; }
+.repositoryTool b { font-size: 10px; }
+
+@media (forced-colors: active) {
+  .repositorySearch .searchControl:focus-within { outline: 1px solid Highlight; }
+}

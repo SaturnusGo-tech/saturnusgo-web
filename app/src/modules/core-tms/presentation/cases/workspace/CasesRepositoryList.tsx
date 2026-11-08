@@ -21,7 +21,7 @@ export function CasesRepositoryList({ props, view, locale, listPaneRef, move }: 
       selectedFolder={props.selectedFolder} selectedFolderId={props.selectedFolderId} activeCaseId={props.selectedCaseId} ru={locale === "ru"} locked={Boolean(props.editor)}
       onToggle={view.bulkSelection.toggleOne} onScope={view.bulkSelection.toggleScope} onFolder={props.onSelectFolder}
       onCase={(item) => view.selectRow({ testCase: item, folderPath: item.folderPath })} onCreate={view.createCase}
-      onNewFolder={props.onNewFolder} onManageFolder={props.onManageFolder} onImport={() => props.onImport?.()} />}
+      onNewFolder={props.onNewFolder} onManageFolder={props.onManageFolder} onSelectionMode={view.toggleSelectionMode} />}
     {!props.folders && <section ref={listPaneRef} className={styles.listPane} data-bulk-active={view.bulkSelection.selectedIds.length > 0 || undefined} aria-label={locale === "ru" ? "Список тест-кейсов" : "Test case list"}>
       <CasesToolbar
         folderArchived={view.folderArchived}

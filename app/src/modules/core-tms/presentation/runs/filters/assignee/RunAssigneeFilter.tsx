@@ -3,11 +3,11 @@ import { MemberAvatar } from "../../../../workspace/members/avatar/MemberAvatar"
 import { RunFilterOptions } from "../options/RunFilterOptions";
 import css from "../options/run-filter-options.module.css";
 
-export function RunAssigneeFilter({ workspaceId, selected, onChange, ru }: {
-  workspaceId: string; selected: string[]; onChange: (value: string) => void; ru: boolean;
+export function RunAssigneeFilter({ workspaceId, selected, onChange, ru, popover }: {
+  workspaceId: string; selected: string[]; onChange: (value: string) => void; ru: boolean; popover?: boolean;
 }) {
   const members = useWorkspaceMembers(workspaceId, true);
-  return <RunFilterOptions label={ru ? "Ответственные" : "Assignees"} multiple selected={selected.length?selected:["all"]}
+  return <RunFilterOptions popover={popover} label={ru ? "Ответственные" : "Assignees"} multiple selected={selected.length?selected:["all"]}
     options={[{ value: "all", label: ru ? "Все ответственные" : "All assignees" }, { value: "unassigned", label: ru ? "Не назначен" : "Not assigned" },
       ...members.items.map((member) => ({ value: member.id, label: member.name, detail: member.email,
         avatar: <MemberAvatar identityId={member.id} name={member.name} /> }))]}

@@ -38,6 +38,7 @@ function harness() {
     require(name: string) {
       if (name === "react/jsx-runtime") return { jsx, jsxs: jsx };
       if (name.endsWith("TmsSessionContext")) return { useOptionalTmsSession: () => null };
+      if (name.endsWith("useWorkspaceCapabilities")) return { useWorkspaceCapabilities: () => ({ value: null }) };
       if (name.endsWith("workspace-view-access")) return { workspaceViewAllowed };
       if (name.endsWith("company-features")) return { companyViewAvailable };
       if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ t: (key: string) => key }) };

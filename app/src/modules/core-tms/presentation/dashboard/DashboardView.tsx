@@ -3,6 +3,7 @@ import { transitionContent } from "../workspace/motion/transition/content-transi
 import { useTmsSession } from "../../auth/presentation/session/TmsSessionContext";
 import { useEffect, useRef, useState } from "react";
 import { LoaderCircle, Plus, Pencil } from "lucide-react";
+import { usePersonalDashboardBoard } from "../../dashboards/layout/personal/board/usePersonalDashboardBoard";
 import { usePersonalDashboardLayout } from "../../dashboards/layout/personal/usePersonalDashboardLayout";
 import { useDashboardLayout } from "../../dashboards/layout/application/useDashboardLayout";
 import { createBoardWidget, widgetKey } from "../../dashboards/layout/model/widget-catalog";
@@ -29,22 +30,45 @@ function DashboardWorkspace(props: DashboardViewProps) {
   const navigation = useDrillNavigation(sourceModel);
   const model = { ...sourceModel, analytics: { ...sourceModel.analytics, openDrill: navigation.openAnalytics, selectRelatedDrill: navigation.related },
     workbench: { ...sourceModel.workbench, openDrill: navigation.openWorkbench } };
-  const teamLayout = useDashboardLayout({ workspaceId: data.workspace.id, projectId });
-  const personalLayout = usePersonalDashboardLayout(teamLayout.board, props.serverAnalytics === true);
-  const personalEditing = Boolean(personalLayout?.draft);
-  const layout = teamLayout.draft ? teamLayout : personalLayout?.board ? personalLayout : teamLayout;
+  const boardScope = { workspaceId: data.workspace.id, projectId };
+  const canManageTeam = data.meta.authorization.capabilities.includes("report:manage");
+  const canComposePersonal = props.serverAnalytics === true && data.meta.authorization.capabilities.includes("report:read");
+  const teamLayout = useDashboardLayout(boardScope);
+  const personalBoard = usePersonalDashboardBoard(boardScope, canComposePersonal);
+  const legacyLayout = usePersonalDashboardLayout(teamLayout.board,
+    canComposePersonal && !personalBoard?.loading && !personalBoard?.board);
+  const personalEditing = Boolean(personalBoard?.draft);
+  const layout = teamLayout.draft ? teamLayout
+    : personalBoard && (personalBoard.draft || personalBoard.board) ? personalBoard
+    : legacyLayout?.board ? legacyLayout : teamLayout;
   const [catalogScope, setCatalogScope] = useState<string | null>(null);
   const scope = `${data.workspace.id}:${projectId}`;
-  const board = layout.draft ?? layout.board; const editing = Boolean(layout.draft);
-  const canEdit = data.meta.authorization.capabilities.includes("report:manage");
+  const board = layout.draft ?? layout.board;
+  const editing = Boolean(layout.draft);
+  const loading = layout.loading || Boolean(personalBoard?.loading && !teamLayout.draft);
   const disabled = layout.saving || layout.retryPending;
+  const canEditPersonal = Boolean(personalBoard && !personalBoard.loading && !personalBoard.failure);
+  const canEdit = editing || canEditPersonal || (!canComposePersonal && canManageTeam);
   const currentProject = data.projects.find((project) => project.id === projectId)?.name ?? projectId;
-  const edit = () => { teamLayout.controller.edit(t("dashboardLayout.defaultName")); };
+  const editPersonal = () => {
+    if (canEditPersonal) {
+      const template = legacyLayout?.board ?? teamLayout.board;
+      personalBoard?.controller.edit(t("dashboardLayout.personalName"), template ? {
+        name: t("dashboardLayout.personalName"), widgets: template.widgets,
+      } : undefined);
+    }
+  };
+  const editTeam = () => teamLayout.controller.edit(t("dashboardLayout.defaultName"));
+  const edit = canComposePersonal ? editPersonal : editTeam;
   const openCatalog = () => transitionContent(() => {
     if (!editing) edit();
     setCatalogScope(scope);
   });
-  const catalogOpen = Boolean(teamLayout.draft) && catalogScope === scope;
+  const catalogOpen = editing && catalogScope === scope;
+  const fallbackFailure = personalBoard?.failure ?? legacyLayout?.failure;
+  const layoutFailure = layout === teamLayout && !teamLayout.draft && canEditPersonal ? null : layout.failure;
+  const loadFailure = layoutFailure === "unavailable" && !board;
+  const failure = layoutFailure ?? fallbackFailure;
   const addButton = useRef<HTMLButtonElement>(null);
   const wasCatalogOpen = useRef(false);
   useEffect(() => { setCatalogScope(null); }, [scope]);
@@ -63,39 +87,37 @@ function DashboardWorkspace(props: DashboardViewProps) {
     <header className={styles.header}>
       <div className={styles.heading}>
         <span className={styles.eyebrow}>{currentProject}<span> / </span>{t("dashboard.analyticsTitle")}</span>
-        {teamLayout.draft ? <input data-inline-title className={styles.name} aria-label={t("dashboardLayout.name")} maxLength={200}
+        {editing ? <input data-inline-title className={styles.name} aria-label={t("dashboardLayout.name")} maxLength={200}
           value={layout.draft!.name} disabled={disabled || layout.failure === "conflict"} onChange={(event) => layout.controller.rename(event.target.value)} />
           : <h1>{board?.name ?? t("dashboard.analyticsTitle")}</h1>}
         {editing && <p>{t(personalEditing ? "dashboardLayout.personalEditHint" : "dashboardLayout.editHint")}</p>}
       </div>
-      {!layout.loading && <div className={styles.actions}>
+      {!loading && <div className={styles.actions}>
         {editing ? <>
           <button type="button" className={styles.quiet} disabled={disabled} onClick={() => { setCatalogScope(null); layout.controller.cancel(); }}>{t("dashboardLayout.cancel")}</button>
-          {!personalEditing && <button type="button" ref={addButton} className={styles.secondary} disabled={disabled || layout.failure === "conflict"} onClick={openCatalog}><Plus size={15} />{t("dashboardLayout.add")}</button>}
+          <button type="button" ref={addButton} className={styles.secondary} disabled={disabled || layout.failure === "conflict"} onClick={openCatalog}><Plus size={15} />{t("dashboardLayout.add")}</button>
           <button type="button" className={styles.primary} disabled={layout.saving || !layout.draft!.name.trim() || layout.failure === "conflict"}
             onClick={() => void layout.controller.save()}>{layout.saving && <LoaderCircle size={15} className={surface.spin} />}{t(layout.saving ? "dashboardLayout.saving" : layout.retryPending ? "dashboardLayout.retry" : "dashboardLayout.save")}</button>
         </> : <>
-          {personalLayout?.board?.widgets.length ? <button type="button" className={styles.secondary}
-            onClick={() => personalLayout.controller.edit(personalLayout.board!.name)}>{t("dashboardLayout.personalEdit")}</button> : null}
+          {canComposePersonal && canManageTeam && !teamLayout.loading && !teamLayout.failure &&
+            <button type="button" className={styles.quiet} onClick={editTeam}>{t("dashboardLayout.editTeam")}</button>}
           {canEdit && board && <button type="button" className={styles.editButton} onClick={edit}
             aria-label={t("dashboardLayout.edit")} title={t("dashboardLayout.edit")}><Pencil size={15} />{t("dashboardLayout.edit")}</button>}
         </>}
       </div>}
     </header>
-    {(layout.failure || personalLayout?.failure) && <div className={styles.failure} role="alert">
-      <p>{!layout.failure ? t("dashboardLayout.personalSyncError") : t(!layout.board && !layout.draft && layout.failure === "unavailable" ? "dashboardLayout.loadError" : `dashboardLayout.${layout.failure}`)}</p>
+    {failure && <div className={styles.failure} role="alert">
+      <p>{!layoutFailure ? t("dashboardLayout.personalSyncError") : t(loadFailure ? "dashboardLayout.loadError" : `dashboardLayout.${layoutFailure}`)}</p>
       {!layout.retryPending && <button type="button" onClick={() => {
-        if (!layout.failure) void personalLayout?.controller.load();
-        else if (personalEditing && layout.failure === "conflict") {
-          layout.controller.cancel();
-          void teamLayout.controller.load();
-        }
-        else void layout.controller.load();
+        const failed = layoutFailure ? layout : personalBoard?.failure ? personalBoard : legacyLayout;
+        void failed?.controller.load();
       }}>{t(layout.draft ? "dashboardLayout.reload" : "dashboardLayout.retry")}</button>}
     </div>}
-    {layout.loading ? <div className={styles.loading} role="status"><LoaderCircle size={20} className={surface.spin} />{t("dashboardLayout.loading")}</div>
-      : !board ? !layout.failure && <DashboardEmpty editing={false} canEdit={canEdit} onAdd={openCatalog} />
-      : !board.widgets.length ? <DashboardEmpty editing={editing} canEdit={canEdit && !disabled && layout.failure !== "conflict"} onAdd={openCatalog} />
-      : <DashboardContent key={scope} {...props} layout={layout} model={model} personalEditing={personalEditing} />}
+    {loading ? <div className={styles.loading} role="status"><LoaderCircle size={20} className={surface.spin} />{t("dashboardLayout.loading")}</div>
+      : !board ? !layoutFailure && !personalBoard?.failure && <DashboardEmpty editing={false} personal={canComposePersonal}
+        canEdit={canEdit} onAdd={openCatalog} />
+      : !board.widgets.length ? <DashboardEmpty editing={editing} personal={personalEditing || (!editing && canComposePersonal)}
+        canEdit={canEdit && !disabled && layout.failure !== "conflict"} onAdd={openCatalog} />
+      : <DashboardContent key={scope} {...props} layout={layout} model={model} />}
   </div>;
 }

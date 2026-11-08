@@ -1,7 +1,8 @@
-.dialog { width: min(384px, calc(100vw - 32px)) !important; max-height: calc(100dvh - 48px); border-radius: 16px !important; overflow: auto; background: var(--falcon-panel) !important; }
-.dialog.dialog > header { min-height: 0; padding: 17px 18px 8px; border-bottom: 0; gap: 12px; }
-.dialog.dialog > header h2 { font-size: 15px; line-height: 1.4; font-weight: 600; overflow-wrap: anywhere; }
-.dialog.dialog > header > button { flex-shrink: 0; width: 28px; height: 28px; min-height: 28px; border-radius: 7px; }
+.dialog { display: block; width: min(304px, calc(100vw - 24px)); max-height: min(420px, calc(100dvh - 24px)); padding: 0; overflow: auto; border: 1px solid var(--falcon-border); border-radius: 12px; background: var(--falcon-elevated); color: var(--falcon-text); box-shadow: var(--falcon-shadow-popover); }
+.header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px 6px 14px; }
+.header h2 { margin: 0; font-size: 14px; line-height: 1.4; font-weight: 600; overflow-wrap: anywhere; }
+.close { display: grid; place-items: center; flex: 0 0 26px; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 7px; color: var(--falcon-icon); background: transparent; cursor: pointer; }
+.close:hover:not(:disabled) { background: var(--falcon-hover); }
 .context { display: flex; align-items: center; gap: 9px; min-width: 0; margin: 0 18px 12px; color: var(--falcon-text-secondary); font-size: 12px; line-height: 1.5; }
 .folder { display: grid; place-items: center; flex: 0 0 28px; width: 28px; height: 28px; border-radius: 7px; background: var(--falcon-surface); }
 .badge { flex-shrink: 0; margin-left: auto; padding: 2px 6px; border-radius: 5px; color: var(--falcon-text-muted); background: var(--falcon-hover); font-size: 11px; }
@@ -10,8 +11,8 @@
 .group + .group { border-top: 1px solid var(--falcon-border); }
 :is(.actions > button, .group > button) { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 38px; padding: 8px 10px; border: 0; border-radius: 7px; color: var(--falcon-text); background: transparent; font: inherit; font-size: 13px; line-height: 1.4; text-align: left; cursor: pointer; transition: background 140ms ease, color 140ms ease; }
 :is(.actions > button, .group > button):hover:not(:disabled) { background: var(--falcon-hover); }
-:is(.actions > button, .group > button):focus-visible, .footer button:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: -2px; }
-:is(.actions > button, .group > button):disabled, .footer button:disabled { opacity: .45; cursor: default; }
+:is(.actions > button, .group > button, .footer button, .close):focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: -2px; }
+:is(.actions > button, .group > button, .footer button, .close):disabled { opacity: .45; cursor: default; }
 :is(.actions > button, .group > button) > svg { flex: 0 0 18px; width: 18px; height: 18px; color: var(--falcon-icon-muted); }
 :is(.actions > button, .group > button) > .chevron { margin-left: auto; flex-basis: 14px; width: 14px; height: 14px; }
 .dialog .actions .appearance > div[data-labelled] > button { min-height: 38px; border-radius: 7px; gap: 10px; }

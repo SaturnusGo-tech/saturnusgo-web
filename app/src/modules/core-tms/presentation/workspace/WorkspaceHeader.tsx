@@ -1,6 +1,9 @@
 import { ApiScopeSelector } from "../../api-sources/scope/selector/ApiScopeSelector";
 import { RepositoryScopeSelector } from "../../repository-scope/presentation/selector/RepositoryScopeSelector";
 import { FolderOpen, PlusSquareAdd, SidebarMenuMobile } from "@openai/apps-sdk-ui/components/Icon";
+import { Button } from "@heroui/button";
+import { PiUploadSimple } from "react-icons/pi";
+import { companyViewAvailable } from "../../auth/managed/domain/features/company-features";
 import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { workspaceDisplayName } from "../../localization/format/workspace/display-name";
@@ -30,6 +33,9 @@ export function WorkspaceHeader({
   }, locale);
   const workspaceReady =
     model.connection === "connected" || model.connection === "demo";
+  const ru = locale === "ru";
+  const showImport = model.view === "cases" && !model.repositoryScope.aggregate
+    && companyViewAvailable("imports", session?.companyCapabilities);
   function editEnvironment() {
     transitionContent(() => {
       model.closeResourceEditors(); model.setDialog(null);
@@ -72,12 +78,21 @@ export function WorkspaceHeader({
         </div>
       </div>}
 
-      {model.project && (model.view === "dashboard" || model.view === "cases") && <button type="button" className={shellStyles.environmentShortcut}
-        onClick={editEnvironment} disabled={!workspaceReady} data-testid="open-environments"
-        title={languageTag.startsWith("ru") ? "Открыть окружения" : "Open environments"}
-        aria-label={languageTag.startsWith("ru") ? "Открыть окружения" : "Open environments"}>
-        <PlusSquareAdd width={23} height={23} aria-hidden="true" />
-      </button>}
+      {model.project && (model.view === "dashboard" || model.view === "cases") && <div className={shellStyles.headerActions}>
+        {showImport && <Button type="button" size="sm" radius="full" variant="solid" className={shellStyles.importShortcut}
+          data-testid="open-case-import" onPress={() => model.setView("imports")}
+          isDisabled={!workspaceReady || !model.folders.canManage || model.folders.busy || model.dialog === "case"
+            || !model.data.meta.authorization.capabilities.includes("attachment:manage")}
+          aria-label={ru ? "Импорт тест-кейсов" : "Import test cases"}>
+          <PiUploadSimple size={15} aria-hidden="true" />{ru ? "Импорт" : "Import"}
+        </Button>}
+        <button type="button" className={shellStyles.environmentShortcut}
+          onClick={editEnvironment} disabled={!workspaceReady} data-testid="open-environments"
+          title={languageTag.startsWith("ru") ? "Открыть окружения" : "Open environments"}
+          aria-label={languageTag.startsWith("ru") ? "Открыть окружения" : "Open environments"}>
+          <PlusSquareAdd width={23} height={23} aria-hidden="true" />
+        </button>
+      </div>}
     </header>
   );
 }

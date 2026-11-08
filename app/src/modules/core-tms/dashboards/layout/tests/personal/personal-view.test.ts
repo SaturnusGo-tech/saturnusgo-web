@@ -1,12 +1,14 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { TmsApiError } from "../../../../../../core/tms/transport/http";
+import { createTmsHttpClient, TmsApiError } from "../../../../../../core/tms/transport/http";
+import { DashboardLayoutController } from "../../application/DashboardLayoutController";
+import { createPersonalDashboardBoardSource } from "../../personal/board/personal-board-source";
 import { applyPersonalLayout } from "../../personal/personal-layout-source";
 import { defaultPreferences } from "../../preferences/preferences";
 import type { PersonalView, PersonalViewSource } from "../../preferences/data/personal-view-source";
 import { DashboardPreferenceSync } from "../../preferences/sync/dashboard-preference-sync";
-import type { ProjectBoard } from "../../model/layout";
+import type { BoardDraft, BoardWidget, ProjectBoard } from "../../model/layout";
 
 type View = Extract<PersonalView, { kind: "preferences" }>;
 const version = (rowVersion: number, preferences = defaultPreferences) => ({
@@ -86,4 +88,43 @@ void test("private widget positions reorder and resize the display while preserv
   } });
   assert.deepEqual(view.widgets.map(widget => [widget.id, widget.position.width]), [["b", 3], ["a", 6]]);
   assert.deepEqual(board.widgets.map(widget => [widget.id, widget.position.width]), [["a", 3], ["b", 3]]);
+});
+
+void test("a tester's personal draft never writes the shared dashboard endpoint", async () => {
+  const scope = { workspaceId: "workspace", projectId: "project" };
+  const widget: BoardWidget = { id: "personal-widget", type: "summary", title: "Coverage",
+    position: { x: 0, y: 0, width: 3, height: 1 }, settings: {} };
+  const teamBoard: BoardDraft = { name: "Team", widgets: [{ ...widget, id: "team-widget" }] };
+  let saved: BoardDraft | null = null;
+  let rowVersion = 0;
+  const http = createTmsHttpClient({ apiBase: "https://tms.example/api/v1", credentials: "include",
+    fetch: async (url, init) => {
+      assert.equal(String(url), "https://tms.example/api/v1/projects/project/dashboard-personal-view?workspaceId=workspace&board=true");
+      if (init?.method === "PATCH") {
+        const headers = new Headers(init.headers);
+        assert.equal(headers.get("if-match"), `"dashboard-personal-view:${rowVersion}"`);
+        assert.equal(headers.get("idempotency-key"), "private-board-command");
+        const { change: { kind, name, widgets } } = JSON.parse(String(init.body));
+        assert.equal(kind, "board");
+        saved = { name, widgets };
+        rowVersion++;
+      }
+      return new Response(JSON.stringify({ data: { kind: "board", rowVersion, updatedAt: null, board: saved } }), {
+        headers: { etag: `"dashboard-personal-view:${rowVersion}"` },
+      });
+    },
+  });
+  const controller = new DashboardLayoutController(createPersonalDashboardBoardSource(http), scope, () => "private-board-command");
+  await controller.load();
+  assert.equal(controller.getState().board, null);
+  controller.edit("My dashboard", teamBoard);
+  controller.remove("team-widget");
+  controller.add([widget]);
+  controller.rename("My release checks");
+  await controller.save();
+  assert.deepEqual(saved, { name: "My release checks", widgets: [widget] });
+  assert.deepEqual(teamBoard.widgets.map(({ id }) => id), ["team-widget"]);
+  await controller.load();
+  assert.equal(controller.getState().board?.name, "My release checks");
+  assert.equal(controller.getState().board?.etag, '"dashboard-personal-view:1"');
 });

@@ -1,6 +1,7 @@
 "use client";
 
-import { addToast, HeroUIProvider, ToastProvider } from "@heroui/react";
+import { HeroUIProvider } from "@heroui/system";
+import { addToast, ToastProvider } from "@heroui/toast";
 import { useReducedMotion } from "framer-motion";
 import { useEffect, useRef, type ReactNode } from "react";
 import styles from "./workspace-ui.module.css";

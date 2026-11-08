@@ -16,8 +16,8 @@ import { dashboardSections, widgetSection, sectionMoveTarget, sectionLabels } fr
 import surface from "../dashboard.module.css";
 import styles from "./layout.module.css";
 
-export function DashboardContent({ onOpenRow, layout, model, personalEditing }: DashboardViewProps & {
-  layout: DashboardLayoutModel; model: DashboardModel; personalEditing: boolean;
+export function DashboardContent({ onOpenRow, layout, model }: DashboardViewProps & {
+  layout: DashboardLayoutModel; model: DashboardModel;
 }) {
   const { languageTag, t, locale } = useTmsLocale();
   const { analytics, workbench, snapshot, preferences } = model;
@@ -53,7 +53,7 @@ export function DashboardContent({ onOpenRow, layout, model, personalEditing }: 
         <WidgetGrid widgets={widgets.filter(widget => widgetSection(widgetKey(widget)) === section)} editing={editing}
           disabled={layout.saving || layout.retryPending || layout.failure === "conflict"}
           onMove={(id, index) => { const to = sectionMoveTarget(widgets, section, index); if (to >= 0) layout.controller.move(id, to); }}
-          onRemove={personalEditing ? undefined : layout.controller.remove} onResize={layout.controller.resize}
+          onRemove={layout.controller.remove} onResize={layout.controller.resize}
           render={(widget, title) => <WidgetRenderer widget={widgetKey(widget)} title={title} model={model} onOpenRow={onOpenRow} />} />
       </section>)}
     </div>

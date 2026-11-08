@@ -6,6 +6,7 @@ import ts from "typescript";
 import { componentHarness, nodes, invoke } from "../../../../../portfolios/tests/support/component-harness";
 import { filterCaseRows } from "../../../model/caseListModel";
 import type { CaseFilterMenu } from "../../CasesToolbarPopovers";
+import type { RepositoryFilterPicker } from "../picker/RepositoryFilterPicker";
 import type { CaseListRow } from "../../../types";
 
 function menu() {
@@ -13,14 +14,18 @@ function menu() {
   const module = { exports: {} };
   const proxy = new Proxy({}, { get: (_target, key) => String(key) });
   const jsx = (type: unknown, props: unknown) => ({ type, props });
+  const pickerHarness = componentHarness(undefined, { requestAnimationFrame: () => 0 });
+  const { RepositoryFilterPicker: renderPicker } = pickerHarness.load<{ RepositoryFilterPicker: typeof RepositoryFilterPicker }>(
+    new URL("../picker/RepositoryFilterPicker.tsx", import.meta.url));
   const fields = componentHarness().load(new URL("../../fields/CaseFieldFilterSections.tsx", import.meta.url));
   runInNewContext(ts.transpileModule(readFileSync(new URL("../../CasesToolbarPopovers.tsx", import.meta.url), "utf8"), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2021, jsx: ts.JsxEmit.ReactJSX },
-  }).outputText, { module, exports: module.exports, require: (name: string) => {
-    if (name === "react") return { useState: (initial: unknown) => { const i = cursor++; if (!(i in values)) values[i] = initial; return [values[i], (value: unknown) => { values[i] = value; }]; }, useRef: () => ({ current: null }), useEffect() {} };
+  }).outputText, { module, requestAnimationFrame: () => 0, exports: module.exports, require: (name: string) => {
+    if (name === "react") return { useState: (initial: unknown) => { const i = cursor++; if (!(i in values)) values[i] = initial; return [values[i], (value: unknown) => { values[i] = value; }]; }, useRef: () => ({ current: null }) };
     if (name === "react/jsx-runtime") return { jsx, jsxs: jsx };
     if (name.endsWith("WorkspacePeopleContext")) return { useWorkspacePeople: () => ({ workspaceId: "workspace" }) };
     if (name.endsWith("CaseFieldFilterSections")) return fields;
+    if (name.endsWith("RepositoryFilterPicker")) return { RepositoryFilterPicker: "RepositoryFilterPicker" };
     if (name.endsWith("useFilterPopup")) return { useFilterPopup() {} };
     if (name.endsWith("localization/format/labels")) return { localizedComponentLabel: (_locale: string, value: string) => value };
     return name.endsWith(".css") ? { default: proxy } : proxy;
@@ -32,7 +37,10 @@ function menu() {
     facets, options: { folders: ["/Mobile", "/Web"], components: ["Auth", "Billing"],
       productGroups: [{ id: "group-mobile", label: "Mobile" }, { id: "group-web", label: "Web" }],
       products: [{ id: "product-auth", label: "Auth" }, { id: "product-billing", label: "Billing" }] },
-    onFilters: value => { filters = value; }, onFacets: value => { facets = value; }, onClose() { closeCount++; }, ...extra })); };
+    onFilters: value => { filters = value; }, onFacets: value => { facets = value; }, onClose() { closeCount++; }, ...extra }))
+      .flatMap(node => node.type === "RepositoryFilterPicker"
+        ? pickerHarness.render(() => nodes(renderPicker(node.props as Parameters<typeof renderPicker>[0])))
+        : [node]); };
   const section = (id: string) => invoke(render().find(node => node.props["data-filter-section"] === id)!, "onClick");
   const option = (label: string) => render().find(node => node.props.role === "option" && nodes(node).some(child => child.props.title === label))!;
   const fieldOptions = () => render().find(node => node.type === "RunFilterOptions")!;
@@ -158,4 +166,21 @@ test("maintenance is an independent repository filter and reset clears it withou
   assert.equal(h.option("На доработке").props["aria-selected"], true);
   invoke(h.render().find(node => node.type === "button" && node.props.children === "Сбросить")!, "onClick");
   assert.equal(h.filters().maintenanceStatus, undefined);
+});
+
+test("repository picker searches categories and their values independently", () => {
+  const h = menu();
+  const render = () => h.render({ repositoryTrigger: { current: {} as HTMLButtonElement } });
+  const categorySearch = () => render().find(node => node.props["aria-label"] === "Добавить фильтр")!;
+  assert.equal(render().some(node => "data-filter-value-panel" in node.props), false);
+  invoke(categorySearch(), "onValueChange", "приор");
+  assert.deepEqual(render().filter(node => "data-filter-section" in node.props).map(node => node.props["data-filter-section"]), ["priority"]);
+  invoke(render().find(node => node.type === "Listbox")!, "onAction", "priority");
+  invoke(render().find(node => node.props["aria-label"] === "Фильтр по значению")!, "onValueChange", "выс");
+  const values = render().filter(node => "data-filter-value" in node.props);
+  assert.equal(values.length, 1);
+  invoke(values[0], "onPress");
+  assert.equal(h.filters().priority, "high");
+  assert.equal(categorySearch().props.value, "приор");
+  assert.equal(h.closeCount(), 0);
 });

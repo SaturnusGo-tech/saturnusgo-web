@@ -24,13 +24,15 @@ export type FolderBranchProps = {
   selectedFolder: string; selectedFolderId?: string; activeCaseId: string; ru: boolean; locked: boolean; canManage: boolean;
   onExpand: (id: string) => void; onFolder: (path: string, id?: string) => void; onCase: (item: TestCaseSummary) => void;
   onReveal?: (id: string) => void;
-  onToggle: (id: string) => void; onScope: (ids: readonly string[]) => void; onMenu: (folder: RepositoryFolder) => void;
+  activeMenuFolderId?: string; menuId?: string;
+  onToggle: (id: string) => void; onScope: (ids: readonly string[]) => void; onMenu: (folder: RepositoryFolder, trigger: HTMLButtonElement) => void;
 };
 
 export function RepositoryFolderBranch(props: FolderBranchProps) {
   const { node, depth, ru } = props;
   const folder = node.folder;
   const open = props.expanded.has(folder.id);
+  const menuOpen = props.activeMenuFolderId === folder.id;
   const motion = useDisclosureMotion(open);
   const childrenId = `repository-children-${folder.id}`;
   const checkbox = useRef<HTMLInputElement>(null);
@@ -57,7 +59,10 @@ export function RepositoryFolderBranch(props: FolderBranchProps) {
         onClick={() => { if (!props.locked && Date.now() > suppress.current) { props.onFolder(folder.path, folder.id); if (!open) props.onExpand(folder.id); } }}>
         <span className={css.folderLabel}>{folder.name}</span>{!(props.hideRootCount && depth === 0) && <small>{node.caseIds.length}</small>}
       </button></div>
-      {props.canManage && <button type="button" className={css.menuButton} disabled={props.locked || !props.canManage} onClick={() => props.onMenu(folder)} aria-label={`${ru ? "Действия с папкой" : "Folder actions"} ${folder.name}`}><PiDotsThree size={19} /></button>}
+      {props.canManage && <button type="button" className={css.menuButton} disabled={props.locked}
+        aria-haspopup="dialog" aria-expanded={menuOpen} aria-controls={menuOpen ? props.menuId : undefined}
+        onClick={event => props.onMenu(folder, event.currentTarget)}
+        aria-label={`${ru ? "Действия с папкой" : "Folder actions"} ${folder.name}`}><PiDotsThree size={19} /></button>}
     </div>
     {props.creation && props.canManage && !folder.archivedAt && <RepositoryQuickAdd target={{ kind: "folder", id: folder.id, name: folder.name }}
       creation={props.creation} disabled={props.locked} ru={ru} />}

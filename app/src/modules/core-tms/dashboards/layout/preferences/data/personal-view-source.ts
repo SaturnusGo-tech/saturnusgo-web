@@ -16,6 +16,7 @@ export function personalViewSource<K extends PersonalView["kind"]>(http: TmsHttp
   type View = Extract<PersonalView, { kind: K }>;
   const path: keyof paths = "/projects/{projectId}/dashboard-personal-view";
   const query = new URLSearchParams({ workspaceId: scope.workspaceId });
+  if (kind === "board") query.set("board", "true");
   if (dashboardId) query.set("dashboardId", dashboardId);
   const url = `${path.replace("{projectId}", encodeURIComponent(scope.projectId))}?${query}`;
   function checked(data: PersonalView, etag: string | null): PersonalResource<View> {

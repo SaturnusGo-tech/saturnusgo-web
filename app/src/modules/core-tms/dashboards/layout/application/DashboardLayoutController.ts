@@ -36,10 +36,10 @@ export class DashboardLayoutController {
       if (this.reader === reader) this.reader = null;
     }
   }
-  edit = (name: string) => {
+  edit = (name: string, template?: BoardDraft) => {
     if (this.state.loading || this.state.saving || this.state.retryPending) return;
     this.reader?.abort();
-    const board = this.state.board;
+    const board = this.state.board ?? template;
     this.emit({ draft: board ? { name: board.name, widgets: placeWidgets(board.widgets) } : { name, widgets: [] }, failure: null });
   };
   cancel = () => {

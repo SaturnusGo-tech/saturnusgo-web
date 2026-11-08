@@ -49,7 +49,7 @@ export function browserHarness(transition = (update: () => void) => update()) {
     folders: { items: folders, loading: false, busy: false, canManage: true, error: "" },
     onSelectFolder: (path: string, id?: string) => { props.selectedFolder = path; props.selectedFolderId = id ?? ""; },
     onSelectCase: (id: string) => { props.selectedCaseId = id; props.testCase = items.find((item) => item.id === id); },
-    onNew: () => calls.push("new"), onNewFolder() {}, onImport() {},
+    onNew: () => calls.push("new"), onNewFolder() {},
   } as unknown as CasesViewProps;
   const bulk = h.load<{ useCaseBulkSelection: typeof useCaseBulkSelection }>(new URL("../../bulk/selection-hook/useCaseBulkSelection.ts", import.meta.url), () => selection);
   const controller = h.load<{ useCasesViewController: typeof useCasesViewController }>(new URL("../../view/useCasesViewController.ts", import.meta.url), (name) => {

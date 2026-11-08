@@ -1,8 +1,10 @@
 export const enDashboardLayoutMessages = {
   "dashboardLayout.emptyTitle": "Your project. Your perspective.",
   "dashboardLayout.emptyText": "Build a dashboard around what matters to your team. Choose widgets, arrange them, and keep the project’s quality in view.",
-  "dashboardLayout.personalEdit": "Personal layout",
-  "dashboardLayout.personalEditHint": "Arrange or resize widgets for your own view.",
+  "dashboardLayout.personalName": "My dashboard",
+  "dashboardLayout.editTeam": "Edit team dashboard",
+  "dashboardLayout.personalEmptyText": "Choose the widgets you need and arrange them in your own dashboard.",
+  "dashboardLayout.personalEditHint": "Add, remove or arrange widgets for your own dashboard. Your layout is private.",
   "dashboardLayout.personalSyncError": "Could not sync your dashboard preferences.",
   "dashboardLayout.edit": "Customize",
   "dashboardLayout.add": "Add widgets", "dashboardLayout.addAll": "Add all widgets",

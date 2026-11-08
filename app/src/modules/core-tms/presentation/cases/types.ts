@@ -15,7 +15,6 @@ export type CasesViewProps = {
   repository?: ReactNode;
   projectName?: string;
   folders?: FolderResource;
-  onImport?: () => void;
   query: string;
   onQuery: (value: string) => void;
   testCases: TestCaseSummary[];

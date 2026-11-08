@@ -17,7 +17,6 @@ export function WorkspaceCasesStage({ model }: { model: WorkspaceModel }) {
       ? model.portfolioRepository.catalog?.projects.find((project) => project.id === model.selectedCase?.projectId)?.name
       : model.project?.name}
     folders={model.folders}
-    onImport={() => model.setView("imports")}
     query={model.query}
     onQuery={model.setQuery}
     testCases={model.projectCases}

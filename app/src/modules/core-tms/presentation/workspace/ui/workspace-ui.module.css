@@ -23,11 +23,16 @@
   background: var(--falcon-elevated);
   color: var(--falcon-text);
   box-shadow: var(--falcon-shadow);
+  transition: opacity 140ms ease-out;
 }
+/* HeroUI removes the notification from its queue on transitionend. */
+.toast[data-toast-exiting="true"] { opacity: 0; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .toast { transition-duration: 1ms; } }
 .toastContent { display: flex; align-items: center; gap: 9px; min-inline-size: 0; }
 .toastTitle { font-size: 13px; font-weight: 500; line-height: 1.4; }
 .toastIcon { inline-size: 16px; block-size: 16px; flex: none; }
 .toastClose {
+  position: static;
   display: grid;
   place-items: center;
   inline-size: 24px;
@@ -37,7 +42,9 @@
   border-radius: 50%;
   color: var(--falcon-icon);
   background: transparent;
+  opacity: 1;
   cursor: pointer;
 }
 .toastClose:hover { background: var(--falcon-hover); }
+.toastClose:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 1px; }
 .closeIcon { inline-size: 12px; block-size: 12px; }
