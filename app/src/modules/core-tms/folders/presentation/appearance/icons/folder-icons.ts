@@ -1,4 +1,4 @@
-import { PiFolderSimpleDuotone, PiBriefcaseDuotone, PiArchiveDuotone, PiCubeDuotone, PiCodeDuotone,
+import { PiFolderSimpleLight, PiBriefcaseDuotone, PiArchiveDuotone, PiCubeDuotone, PiCodeDuotone,
   PiBugDuotone, PiTestTubeDuotone, PiFlaskDuotone, PiShieldDuotone, PiLockDuotone, PiKeyDuotone,
   PiGearDuotone, PiWrenchDuotone, PiDatabaseDuotone, PiCloudDuotone, PiGlobeDuotone, PiBrowserDuotone,
   PiDevicesDuotone, PiDesktopDuotone, PiLaptopDuotone, PiDeviceMobileDuotone, PiDeviceTabletDuotone,
@@ -10,7 +10,7 @@ import { PiFolderSimpleDuotone, PiBriefcaseDuotone, PiArchiveDuotone, PiCubeDuot
 import type { IconType } from "react-icons";
 import type { FolderIconId } from "../../../model/appearance/folder-appearance";
 export const folderIcons: Record<FolderIconId, IconType> = {
-  folder: PiFolderSimpleDuotone, briefcase: PiBriefcaseDuotone, archive: PiArchiveDuotone, box: PiCubeDuotone,
+  folder: PiFolderSimpleLight, briefcase: PiBriefcaseDuotone, archive: PiArchiveDuotone, box: PiCubeDuotone,
   code: PiCodeDuotone, bug: PiBugDuotone, "test-tube": PiTestTubeDuotone, flask: PiFlaskDuotone,
   shield: PiShieldDuotone, lock: PiLockDuotone, key: PiKeyDuotone, gear: PiGearDuotone, wrench: PiWrenchDuotone,
   database: PiDatabaseDuotone, cloud: PiCloudDuotone, globe: PiGlobeDuotone, browser: PiBrowserDuotone,

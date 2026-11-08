@@ -4,6 +4,7 @@ import type { FolderIconId } from "../../../model/appearance/folder-appearance";
 import { folderPalette } from "../../../model/appearance/folder-appearance";
 import type { FolderPickerEditor } from "./FolderAppearancePicker";
 import { folderIcons } from "../icons/folder-icons";
+import visualStyles from "../visual/folder-visual.module.css";
 import css from "./appearance-picker.module.css";
 
 export function FolderAppearanceIcons({ editor, ru, defaultIcon = "folder", defaultColor = "var(--falcon-folder)" }: {
@@ -39,7 +40,7 @@ export function FolderAppearanceIcons({ editor, ru, defaultIcon = "folder", defa
       {(Object.keys(folderIcons) as FolderIconId[]).map(iconId => { const Icon = folderIcons[iconId]; return <button key={iconId}
         type="button" tabIndex={id === iconId ? 0 : -1} aria-label={iconId === "folder" ? (ru ? "Стандартная папка" : "Default folder") : iconId}
         aria-pressed={id === iconId && (!appearance || appearance.kind === "icon")} title={iconId} onClick={() => choose(iconId)}
-        style={{ color: color ?? defaultColor }}><Icon size={22} /></button>; })}
+        style={{ color: color ?? defaultColor }}><Icon size={22} className={color ? visualStyles.tintedIcon : undefined} /></button>; })}
     </div>
     <div className={css.palette} aria-label={ru ? "Цвет иконки" : "Icon color"}>
       <button type="button" className={css.defaultColor} aria-label={ru ? "Стандартный цвет" : "Default color"} aria-pressed={color === null}

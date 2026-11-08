@@ -1,3 +1,4 @@
 .visual { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; min-width: 26px; flex: 0 0 26px; font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; font-size: 22px; line-height: 1; vertical-align: middle; overflow: visible; }
 .visual > svg { display: block; flex: none; width: 22px; height: 22px; color: inherit; }
+.tintedIcon { filter: brightness(1.10); }
 .visual > img { display: block; width: 22px; height: 22px; object-fit: contain; border-radius: 3px; }
