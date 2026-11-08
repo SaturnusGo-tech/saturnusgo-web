@@ -20,6 +20,7 @@ import {
 } from "../../list/CaseBadges";
 import styles from "./caseMetadata.module.css";
 import { InspectorFieldValue } from "../../inspector/inline/InspectorFieldValue";
+import rail from "../../inspector/propertyRail.module.css";
 import { MetadataSelect, type MetadataOption } from "./MetadataSelect";
 
 type Props = {
@@ -83,7 +84,7 @@ export function CaseMetadataControls(props: Props) {
     const content = active ? control : <InspectorFieldValue label={label} onEdit={canEdit ? () => {
       setActiveField(field); props.onRequestEdit?.();
     } : undefined}>{badges[field]}</InspectorFieldValue>;
-    return props.showLabels ? <div className={styles.labelledControl}><span className={styles.controlLabel}>{label}</span>{content}</div> : content;
+    return props.showLabels ? <div className={styles.labelledControl}><dt className={styles.controlLabel}>{label}</dt><dd className={styles.controlValue}>{content}</dd></div> : content;
   };
   const requestTypeChange = (type: TestCaseRevision["type"]) => {
     if (discardedProcedureCount(props.revision, type) > 0) setPendingType(type);
@@ -92,13 +93,14 @@ export function CaseMetadataControls(props: Props) {
   const discardCount = pendingType
     ? discardedProcedureCount(props.revision, pendingType) : 0;
 
+  const List = props.showLabels ? "dl" : "div";
   return <>
-    <div className={styles.controls}>
+    <List className={`${styles.controls} ${props.showLabels ? rail.readRows : ""}`}>
       {labelled("lifecycle", ru ? "Статус" : "Status", <MetadataSelect label={ru ? "Статус" : "Status"} value={props.revision.lifecycle} options={lifecycle} onChange={(value) => update("lifecycle", value)} autoFocus={props.autoFocus && !activeField} autoOpen={activeField === "lifecycle"} />)}
       {labelled("priority", ru ? "Приоритет" : "Priority", <MetadataSelect label={ru ? "Приоритет" : "Priority"} value={props.revision.priority} options={priority} autoOpen={activeField === "priority"} onChange={(value) => update("priority", value)} />)}
       {labelled("type", ru ? "Тип" : "Type", <MetadataSelect label={ru ? "Тип" : "Type"} value={props.revision.type} options={type} autoOpen={activeField === "type"} onChange={requestTypeChange} />)}
       {labelled("estimatedMinutes", ru ? "Оценка" : "Estimate", <MetadataSelect label={ru ? "Оценка" : "Estimate"} value={rawEstimate} options={estimate} autoOpen={activeField === "estimatedMinutes"} onChange={(value) => update("estimatedMinutes", value === "none" ? null : Number(value))} />)}
-    </div>
+    </List>
     {pendingType && <Modal
       title={ru ? "Сменить тип тест-кейса?" : "Change test case type?"}
       subtitle={ru ? "Процедура другого типа несовместима с новым типом." : "The existing procedure is incompatible with the new type."}

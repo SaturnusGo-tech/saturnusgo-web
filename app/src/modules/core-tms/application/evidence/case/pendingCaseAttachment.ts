@@ -31,7 +31,7 @@ export function appendPendingCaseAttachments(
   let rejected = 0;
   for (const file of input.files) {
     const key = fingerprint(file);
-    if (fingerprints.has(key) || entries.length >= MAX_PENDING_CASE_ATTACHMENTS) {
+    if (!file.size || fingerprints.has(key) || entries.length >= MAX_PENDING_CASE_ATTACHMENTS) {
       rejected += 1;
       continue;
     }
@@ -60,6 +60,19 @@ export function filesFromClipboard(data: Pick<DataTransfer, "files" | "items">) 
     .filter((item) => item.kind === "file")
     .map((item) => item.getAsFile())
     .filter((file): file is File => Boolean(file));
+}
+
+export function filterPendingCaseAttachments(
+  entries: PendingCaseAttachment[],
+  validStepIds: ReadonlySet<string>,
+  validChecklistIds?: ReadonlySet<string>,
+) {
+  return entries.filter(({ stepId, fieldKey }) => {
+    if (stepId) return validStepIds.has(stepId);
+    const checklistPrefix = "checklist:";
+    return !validChecklistIds || !fieldKey.startsWith(checklistPrefix)
+      || validChecklistIds.has(fieldKey.slice(checklistPrefix.length));
+  });
 }
 
 export function groupPendingCaseAttachments(entries: PendingCaseAttachment[]) {

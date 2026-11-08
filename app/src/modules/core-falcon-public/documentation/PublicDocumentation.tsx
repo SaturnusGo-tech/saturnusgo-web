@@ -2,11 +2,13 @@
 
 import { useEffect, useId, useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { writeClipboardText } from "../../../shared/lib/clipboard";
-import type { DocArticle } from "../../core-tms/documentation/model/article";
+import type { DocArticle, DocBlock } from "../../core-tms/documentation/model/article";
 import { buildDocumentationFolders } from "../../core-tms/documentation/model/library";
+import { barChartText } from "../../core-tms/documentation/model/search";
 import { documentationCopy } from "../../core-tms/documentation/localization/ui-copy";
 import { DocumentationArticleContent, DocumentationArticleSections } from "../../core-tms/documentation/presentation/article/DocumentationArticleContent";
 import { DocumentationBlocks } from "../../core-tms/documentation/presentation/content/blocks/DocumentationBlocks";
+import { ArticleWalkthrough } from "../../core-tms/documentation/presentation/walkthrough/ArticleWalkthrough";
 import { DocumentationHome } from "../../core-tms/documentation/presentation/home/DocumentationHome";
 import { ArticleCopyButton } from "./ArticleContent";
 import { publicDocLabels } from "./copy";
@@ -125,6 +127,7 @@ export function DocumentationReader({ catalog: { articles, groups }, locale, act
         if (block.kind === "steps") return block.items.map((item, index) => `${index + 1}. ${item.title}\n${item.text}`).join("\n");
         if (block.kind === "table") return [block.columns, ...block.rows].map(row => row.join(" | ")).join("\n");
         if (block.kind === "articles") return block.ids.flatMap(id => articleById.get(id)?.title ?? []).join("\n");
+        if (block.kind === "bar-chart") return barChartText(block);
         return block.title;
       })])].join("\n\n");
       await writeClipboardText(text); setCopied(true);
@@ -132,9 +135,12 @@ export function DocumentationReader({ catalog: { articles, groups }, locale, act
     } catch { setCopied(false); }
   }
 
+  const renderBlocks = (blocks: DocBlock[]) =>
+    <DocumentationBlocks blocks={blocks} navigation={navigation} articleById={articleById} renderCopy={renderCopy}
+      renderWalkthrough={block => <ArticleWalkthrough block={block} copy={documentationCopy[locale]} />} />;
   const defaultArticle = <DocumentationArticleContent article={active} navigation={navigation} copy={documentationCopy[locale]} locale={locale}
     related={active.related.flatMap(id => articleById.get(id) ?? [])} previous={articles[articles.indexOf(active) - 1]} next={articles[articles.indexOf(active) + 1]}
-    renderBlocks={blocks => <DocumentationBlocks blocks={blocks} navigation={navigation} articleById={articleById} renderCopy={renderCopy} />} />;
+    renderBlocks={renderBlocks} />;
 
   const header = <header className={styles.header}>
     <button ref={navigationToggleRef} className={styles.mobileToggle} type="button" onClick={() => navigationOpen ? closeNavigation() : setNavigationOpen(true)}
@@ -189,7 +195,7 @@ export function DocumentationReader({ catalog: { articles, groups }, locale, act
       if (element && panel) element.inert = navigationOpen;
     }} className={`${styles.layout} ${isHome ? styles.homeLayout : ""}`}>
       <main id="public-doc-content" tabIndex={panel ? -1 : undefined} className={`${styles.main} ${isHome ? styles.homeMain : ""}`}>
-        {isHome ? renderHome?.(active) ?? <DocumentationHome catalog={{ docArticles: articles, docGroups: groups, articleById, locale }} href={href} onNavigate={navigate} renderIntroduction={article => <DocumentationArticleSections article={article} navigation={navigation} sectionLinkLabel={documentationCopy[locale].sectionLink} renderBlocks={blocks => <DocumentationBlocks blocks={blocks} navigation={navigation} articleById={articleById} renderCopy={renderCopy} />} />} /> : renderArticle?.(active) ?? defaultArticle}
+        {isHome ? renderHome?.(active) ?? <DocumentationHome catalog={{ docArticles: articles, docGroups: groups, articleById, locale }} href={href} onNavigate={navigate} renderIntroduction={article => <DocumentationArticleSections article={article} navigation={navigation} sectionLinkLabel={documentationCopy[locale].sectionLink} renderBlocks={renderBlocks} />} /> : renderArticle?.(active) ?? defaultArticle}
       </main>
       {!isHome && <aside className={styles.outline} aria-label={labels.onPage}><p>{labels.onPage}</p><nav>{active.sections.map(section => <a key={section.id} href={href(active.id, section.id)} aria-current={activeSection === section.id ? "location" : undefined} onClick={event => { setActiveSection(section.id); if (panel) navigate(event, active.id, section.id); }}>{section.title}</a>)}</nav></aside>}
     </div>

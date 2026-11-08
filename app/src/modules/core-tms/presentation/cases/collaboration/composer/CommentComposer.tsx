@@ -43,7 +43,8 @@ export function CommentComposer({ ru, projectId, initial, reply, pending, failur
   }}>
     <div className={css.editorFrame} data-reply={Boolean(reply)}>
     <div ref={(element) => { if (element) element.inert = pending; }}>
-      <MarkdownField allowAttachments={false} compact autoFocus={!persistent || Boolean(reply)} value={body}
+      <MarkdownField allowAttachments={false} onTransferFiles={files.enabled && !pending && !files.uploading ? files.add : undefined}
+        compact autoFocus={!persistent || Boolean(reply)} value={body}
         label={ru ? "Текст комментария" : "Comment text"} onChange={setBody}
         renderFooter={(emoji) => emojiHost ? createPortal(emoji, emojiHost) : null}
         contextContent={reply && <div className={css.replyQuote} role="note" aria-label={ru ? "Исходное сообщение" : "Original message"}>

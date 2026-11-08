@@ -1,7 +1,8 @@
-.controls { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.controls { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 0; }
 .readControls { align-items: start; }
 .labelledControl { min-width: 0; display: grid; justify-items: start; gap: 6px; }
 .controlLabel { color: var(--falcon-text-muted); font-size: 11px; font-weight: 500; }
+.controlValue { width: 100%; min-width: 0; margin: 0; }
 .labelledControl .select { width: 100%; }
 .readControls .labelledControl > .chip { min-height: 24px; justify-content: flex-start; padding: 2px 8px; font-size: 11px; }
 .select { position: relative; min-width: 124px; }
@@ -63,13 +64,7 @@
   border: 1px solid var(--falcon-border-strong);
   border-radius: 12px;
   box-shadow: var(--falcon-shadow-popover);
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-3px);
-  visibility: hidden;
-  transition: opacity 110ms ease, transform 110ms ease, visibility 0s linear 110ms;
 }
-.menu[data-open="true"] { opacity: 1; pointer-events: auto; transform: translateY(0); visibility: visible; transition-delay: 0s; }
 .menu > button {
   width: 100%;
   min-height: 30px;
@@ -85,8 +80,8 @@
   cursor: pointer;
   text-align: left;
 }
-.menu > button:hover,
-.select .menu > button:focus-visible { outline: 1px solid var(--falcon-action); outline-offset: -1px; box-shadow: none; background: var(--falcon-hover); }
+.menu > button:hover { background: var(--falcon-hover); }
+.menu > button:focus-visible { outline: 1px solid var(--falcon-text-muted); outline-offset: -1px; box-shadow: none; }
 .menu > button[data-selected="true"] { background: var(--falcon-selected); }
 .menu > button > svg { justify-self: end; color: var(--falcon-action); }
 .menu .optionLabel {
@@ -97,6 +92,7 @@
   border: 0;
   border-radius: 0;
 }
+.menu .optionLabel > span { overflow: hidden; text-overflow: ellipsis; }
 
 .chip {
   flex: 0 0 auto;
@@ -132,6 +128,22 @@
 .typeAutomated { --metadata-fg: var(--falcon-warning-on-solid); --metadata-bg: var(--falcon-warning-solid); --metadata-border: var(--falcon-warning-border); }
 .estimate { --metadata-fg: var(--falcon-text-secondary); --metadata-bg: var(--falcon-control); --metadata-border: var(--falcon-border); }
 
+:global(html.dark) .controls :is(.priorityMedium, .typeManual) {
+  --metadata-fg: var(--falcon-text);
+  --metadata-bg: color-mix(in srgb, var(--falcon-info-solid) 72%, var(--falcon-surface));
+}
+
+:global(html.dark) .controls .trigger:is(.priorityMedium, .typeManual) {
+  color: var(--metadata-fg);
+  background: var(--metadata-bg);
+  border-color: var(--metadata-border);
+}
+
+:global(html.dark) .controls .trigger:is(.priorityMedium, .typeManual):is(:hover, [aria-expanded="true"]) {
+  background: color-mix(in srgb, var(--metadata-bg) 95%, var(--falcon-info-solid));
+  border-color: var(--metadata-fg);
+}
+
 .chip {
   color: var(--metadata-fg, var(--falcon-text-secondary));
   background: var(--metadata-bg, var(--falcon-control));
@@ -151,5 +163,25 @@
 
 @media (max-width: 520px) { .controls { width: 100%; } }
 
-.menu:popover-open { position:fixed; inset:auto; margin:0; left:var(--menu-left); top:var(--menu-top); min-width:var(--menu-width); max-width:min(220px,calc(100vw - 24px)); }
+.menu[data-popup-positioned] { position:fixed; inset:auto; margin:0; left:var(--menu-left); top:var(--menu-top); min-width:var(--menu-width); max-width:min(220px,calc(100vw - 24px)); }
 .menu::backdrop { background:transparent; pointer-events:none; }
+
+[data-case-property-rail] .labelledControl .select {
+  min-width: 0;
+}
+[data-case-property-rail] .labelledControl .trigger {
+  height: auto;
+  min-height: 28px;
+  padding-block: 2px;
+  padding-inline: 7px 8px;
+  border-radius: 8px;
+}
+[data-case-property-rail] .labelledControl .triggerLabel {
+  overflow: visible;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  text-overflow: clip;
+}
+@media (pointer: coarse) {
+  [data-case-property-rail] .labelledControl .trigger { min-height: 34px; }
+}

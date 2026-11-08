@@ -1,6 +1,6 @@
-import type { ProductDocScope, ProductDocSection } from "../../domain/product-docs";
+import type { ProductDocScope, ProductDocSection, ProductDocTitleHighlight } from "../../domain/product-docs";
 
-export interface DraftContent { title: string; sections: ProductDocSection[] }
+export interface DraftContent { title: string; sections: ProductDocSection[]; titleHighlights?: ProductDocTitleHighlight[] }
 export interface BufferedProductDocDraft extends DraftContent {
   baseline: DraftContent & { version: number };
 }

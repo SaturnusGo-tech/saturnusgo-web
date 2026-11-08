@@ -1,0 +1,125 @@
+:global([data-editor-block-type="image"]):has(> .image) { display: block; }
+:global([data-editor-block-type="image"]):has(> .image) > :first-child { display: none; }
+
+.image { display: grid; justify-items: start; width: fit-content; max-width: 100%; margin: 10px 0; }
+.preview { position: relative; max-width: 100%; }
+.select {
+  display: block;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  cursor: pointer;
+}
+.select img { display: block; max-width: 100%; height: auto; border-radius: inherit; }
+.select:hover { outline: 1px solid var(--falcon-border-strong); }
+.image[data-selected] .select, .select:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 2px; }
+.placeholder {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 1px solid var(--falcon-border);
+  border-radius: 7px;
+  color: var(--falcon-text-secondary);
+  font-size: 13px;
+}
+
+.tools {
+  position: absolute;
+  inset: 6px 6px auto auto;
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--falcon-border);
+  border-radius: 8px;
+  background: var(--falcon-elevated);
+  color: var(--falcon-text);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+.image:is(:hover, :focus-within, [data-selected]) .tools { opacity: 1; pointer-events: auto; }
+.tools button, .alt button {
+  display: grid;
+  min-height: 27px;
+  min-width: 27px;
+  place-items: center;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.tools button:hover, .alt button:hover { background: var(--falcon-hover); }
+.image button:focus-visible, .alt input:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 1px; }
+.resize {
+  position: absolute;
+  inset: auto -8px -8px auto;
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: nwse-resize;
+  opacity: 0;
+  pointer-events: none;
+  touch-action: none;
+  transition: opacity 120ms ease;
+}
+.resize::after {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border: 1px solid var(--falcon-surface);
+  border-radius: 50%;
+  background: var(--falcon-focus);
+}
+.image:is(:hover, :focus-within, [data-selected]) .resize { opacity: 1; pointer-events: auto; }
+.alt { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; max-width: 100%; }
+.alt input {
+  min-height: 31px;
+  width: min(240px, 100%);
+  padding: 5px 8px;
+  border: 1px solid var(--falcon-border-strong);
+  border-radius: 6px;
+  background: var(--falcon-control);
+  color: var(--falcon-text);
+  font: inherit;
+  font-size: 13px;
+}
+.alt button { padding: 5px 9px; font: inherit; font-size: 13px; color: var(--falcon-text); }
+.feedback {
+  position: fixed;
+  z-index: 10;
+  inset: auto 20px 20px auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100vw - 40px);
+  padding: 10px 12px;
+  border: 1px solid var(--falcon-border);
+  border-radius: 9px;
+  background: var(--falcon-elevated);
+  box-shadow: var(--falcon-shadow);
+  color: var(--falcon-text);
+  font-size: 13px;
+}
+.feedback button {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.feedback button:hover { background: var(--falcon-hover); }
+@media (hover: none) { .image :is(.tools, .resize) { opacity: 1; pointer-events: auto; } }
+@media (prefers-reduced-motion: reduce) { .tools, .resize { transition: none; } }

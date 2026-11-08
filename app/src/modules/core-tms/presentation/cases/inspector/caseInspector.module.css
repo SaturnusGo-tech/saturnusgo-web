@@ -7,10 +7,12 @@
 .headerActions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .headerTextButton { min-height: 34px; display: inline-flex; align-items: center; gap: 7px; padding: 0 12px; color: var(--falcon-text-secondary); background: transparent; border: 1px solid var(--falcon-border-strong); border-radius: 12px; cursor: pointer; font: inherit; font-size: 13px; font-weight: 500; white-space: nowrap; transition: background-color 160ms ease, color 160ms ease; }
 .headerTextButton:hover { color: var(--falcon-text); background: var(--falcon-hover); }
-.headerActions .headerRunButton { min-height: 28px; padding-inline: 9px; gap: 5px; font-size: 11px; border-radius: 10px; background: var(--falcon-action); color: var(--falcon-on-action); border-color: transparent; }
+.headerEditActions { display: flex; align-items: center; gap: inherit; }
+.headerActions :is(.headerRunButton, .headerQuarantineButton) { min-height: 28px; min-inline-size: 100px; justify-content: center; gap: 5px; padding-inline: 9px; border-color: transparent; border-radius: 999px; font-size: 11px; }
+.headerActions .headerRunButton { background: var(--falcon-action); color: var(--falcon-on-action); }
 .headerActions .headerRunButton:hover:not(:disabled) { background: var(--falcon-action-hover); color: var(--falcon-on-action); }
 .headerActions .headerRunButton svg { color: inherit; }
-.headerActions .headerQuarantineButton { min-height: 28px; padding-inline: 9px; gap: 5px; font-size: 11px; border-color: transparent; border-radius: 10px; background: color-mix(in srgb, var(--falcon-text) 7%, var(--falcon-surface)); color: var(--falcon-text-secondary); }
+.headerActions .headerQuarantineButton { background: color-mix(in srgb, var(--falcon-text) 7%, var(--falcon-surface)); color: var(--falcon-text-secondary); }
 .headerActions .headerQuarantineButton:hover:not(:disabled) { background: var(--falcon-hover); }
 @media(prefers-reduced-motion:reduce) { .headerTextButton { transition: none; } }
 .headerTextButton:disabled { cursor: default; opacity: .45; }
@@ -58,6 +60,16 @@
 .sectionActions button { border-radius: 12px; }
 .sectionActions .saveButton { color: var(--falcon-on-action); background: var(--falcon-action); border-color: var(--falcon-action); }
 .sectionActions button:disabled { cursor: wait; opacity: .6; }
+.sectionHeaderActions { display: flex; align-items: center; gap: 3px; min-block-size: 30px; margin-inline-start: auto; }
+.sectionHeaderActions button {
+  display: grid; place-items: center; width: 24px; height: 24px; padding: 0;
+  color: var(--falcon-text-secondary); background: transparent; border: 0; border-radius: 50%; cursor: pointer;
+}
+.sectionHeaderActions button:hover { color: var(--falcon-text); background: var(--falcon-hover); }
+.sectionHeaderActions .saveButton { color: var(--falcon-on-action); background: var(--falcon-action); }
+.sectionHeaderActions .saveButton:hover { color: var(--falcon-on-action); background: var(--falcon-action-hover); }
+.sectionHeaderActions button:disabled { cursor: wait; opacity: .6; }
+@media (pointer: coarse) { .sectionHeaderActions button { width: 30px; height: 30px; } }
 .compactFields, .railFields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .sideRail .compactFields, .sideRail .railFields { grid-template-columns: 1fr; }
 .sideRail .wideField { grid-column: auto; }
@@ -117,6 +129,7 @@
 .createActions button:disabled { cursor: not-allowed; opacity: .55; }
 .creationFooter .validationMessage { margin-right: auto; }
 .validationMessage { color: var(--falcon-text-muted); font-size: 10px; line-height: 1.3; }
+.headerFeedback { display: grid; gap: 4px; padding: 0 24px 10px; }
 
 @media (prefers-reduced-motion: reduce) { .section { animation: none; } .sectionBody { transition: none; } }
 @container case-inspector (max-width: 620px) {
@@ -141,8 +154,6 @@
 .ownerField { min-width: 0; display: grid; gap: 9px; }
 .ownerField > span { color: var(--falcon-text-muted); font-size: 10px; font-weight: 500; }
 .ownerField > div > button { min-height: 36px; padding: 7px 10px; border-radius: 12px; font-size: 12px; }
-.borderedMarkdown > div { border: 1px solid var(--falcon-border-strong); border-radius: 12px; padding: 8px; min-width: 0; }
-.borderedMarkdown > div:focus-within { border-color: var(--falcon-action); }
 .titleInput[aria-invalid="true"] { border-color: var(--falcon-danger-border); }
 
 :global([data-appearance="glass"]) .shell { background: transparent; }
@@ -157,17 +168,6 @@
 @container case-inspector (min-width: 621px) {
   :global([data-appearance="glass"]) .sideRail { border-left: 1px solid var(--falcon-border); padding-left: 22px; }
 }
-
-.additionalInput > div { padding: 4px 8px; }
-.additionalInput [data-editor-shell][data-appearance="plain"] > :global(.mdxeditor) { height: auto; min-height: 0; }
-.additionalInput [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-toolbar) { min-height: 28px; padding: 0 0 3px; }
-.additionalInput [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-root-contenteditable) { height: auto; min-height: 32px; max-height: 200px; padding: 0; }
-.additionalInput [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-contenteditable-wrapper > [contenteditable]),
-.additionalInput [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-root-contenteditable > div:not(.mdxeditor-contenteditable-wrapper)) { min-height: 32px; padding: 4px 2px; }
-.additionalInput [data-editor-shell] :global([class*="_placeholder_"]) { padding: 4px 2px; }
-.additionalInput [data-editor-shell] > div:has(> textarea) { height: 32px; min-height: 32px; }
-.additionalInput textarea { height: 32px !important; min-height: 32px !important; padding: 4px 2px !important; }
-.additionalInput [data-editor-shell][data-appearance="plain"] > div:has(> button) { min-height: 26px; padding-block: 0; }
 
 .section.narrativeSection [data-editor-shell][data-appearance="plain"],
 .section.narrativeSection [data-editor-shell][data-appearance="plain"]:is(:hover, :focus-within) { padding: 8px 10px; border: 1px solid var(--falcon-border-strong) !important; border-radius: 12px; background: var(--falcon-control) !important; }

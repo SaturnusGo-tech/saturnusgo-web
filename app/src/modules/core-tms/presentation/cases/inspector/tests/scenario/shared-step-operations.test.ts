@@ -7,6 +7,8 @@ import {
   duplicateStepAfter, emptyScenarioStep, insertStepAfter, sharedScenarioStep,
 } from "../../steps/stepOperations";
 import { caseRevisionAttachmentIds } from "../../model";
+import { createEmptyRevision } from "../../../../../helpers/cases/caseRevision";
+
 
 const menu = readFileSync(new URL("../../steps/menu/StepActionMenu.tsx", import.meta.url), "utf8");
 const menuCss = readFileSync(new URL("../../steps/menu/stepActionMenu.module.css", import.meta.url), "utf8");
@@ -101,4 +103,13 @@ test("step action menu stays inside the scenario edge and flips vertically", () 
   assert.match(menu, /spaceBelow/);
   assert.match(menuCss, /\.menu\[data-trigger="icon"\] \{ right: 0; left: auto/);
   assert.match(menuCss, /\.menu\[data-placement="top"\]/);
+});
+
+test("the case gallery deduplicates revision files and published comment references", () => {
+  const revision = { ...createEmptyRevision("en"), attachmentIds: ["case-file"], steps: [] };
+  assert.deepEqual(caseRevisionAttachmentIds(revision, [
+    { body: "Screenshot\n\n[photo.png](/falcon-attachments/comment-photo)" },
+    { body: "[same.png](/falcon-attachments/comment-photo)\n\n[case-file](/falcon-attachments/case-file)" },
+    { deletedAt: "2026-11-08T00:00:00.000Z", body: "[old.png](/falcon-attachments/deleted-photo)" },
+  ]), ["case-file", "comment-photo"]);
 });

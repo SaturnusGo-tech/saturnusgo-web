@@ -1,4 +1,4 @@
-import { useDocumentationCopy } from "../../localization/useDocumentationCopy";
+import type { documentationCopy } from "../../localization/ui-copy";
 import { useId, useRef, type RefObject } from "react";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import type { ScreenshotStep } from "../../model/visual/walkthrough";
@@ -6,7 +6,8 @@ import { InlineText } from "../content/InlineText";
 import styles from "./walkthrough.module.css";
 import { useScreenshotMotion } from "./motion/useScreenshotMotion";
 
-export function ScreenshotDialog({ steps, selected, onSelect, originRef }: {
+export function ScreenshotDialog({ copy, steps, selected, onSelect, originRef }: {
+  copy: (typeof documentationCopy)["en" | "ru"];
   steps: ScreenshotStep[];
   selected: number | null;
   onSelect: (value: number | null) => void;
@@ -14,7 +15,6 @@ export function ScreenshotDialog({ steps, selected, onSelect, originRef }: {
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const image = useRef<HTMLImageElement>(null);
-  const copy = useDocumentationCopy();
   const titleId = useId();
   const descriptionId = useId();
   const step = selected === null ? null : steps[selected];

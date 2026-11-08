@@ -33,6 +33,6 @@ export function GuideVisuals({ visual, copy, startIndex = 0, screenshots = visua
         </li>)}
       </ol>
     </div>
-    <ScreenshotDialog steps={screenshots} selected={selected} onSelect={setSelected} originRef={origin} />
+    <ScreenshotDialog copy={docsCopy} steps={screenshots} selected={selected} onSelect={setSelected} originRef={origin} />
   </section>;
 }

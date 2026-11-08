@@ -86,6 +86,7 @@ import { createHash } from "node:crypto";
 import { readFileSync, readdirSync, realpathSync } from "node:fs";
 import { join, relative, resolve, sep } from "node:path";
 import { documentationMediaLocale } from "../../app/src/modules/core-tms/documentation/model/visual/guide-media";
+import { isProductDocsPreviewImage } from "../../app/src/modules/core-tms/documentation/content/product-docs/guide-captures";
 import { verifySuppliedCodexCaptures } from "./supplied/verify";
 
 
@@ -106,13 +107,31 @@ if (process.argv[1]?.endsWith("documentation-captures/verify.ts")) {
     const legacy = `public/falcon/docs/2026-09${locale === "ru" ? "-ru" : ""}`;
     for (const file of readdirSync(legacy).filter(file => file.endsWith(".jpg"))) legacyDigests.push(createHash("sha256").update(readFileSync(join(legacy, file))).digest("hex"));
   }
+  const previewMedia = media.filter(({ src, locale }) => isProductDocsPreviewImage(src, locale));
+  const demo = JSON.parse(readFileSync("public/falcon/docs/2026-11-preview/provenance.json", "utf8")).captures as {
+    file: string; source: string; locale: "en" | "ru"; sha256: string;
+    viewport: { width: number; height: number; deviceScaleFactor: number };
+  }[];
+  if (demo.length !== previewMedia.length || new Set(demo.map(record => record.file)).size !== demo.length) {
+    throw new Error("Product Docs preview screenshot inventory does not match the guides");
+  }
+  for (const image of previewMedia) {
+    const record = demo.find(record => record.file === image.src && record.locale === image.locale);
+    const bytes = readFileSync(join(publicDirectory, image.src.slice(1)));
+    if (!record || record.source !== "isolated-product-docs-preview" || record.viewport.width !== 1728
+      || record.viewport.height !== 1117 || record.viewport.deviceScaleFactor !== 2
+      || image.width !== 3456 || image.height !== 2234 || bytes.length >= 1_400_000
+      || createHash("sha256").update(bytes).digest("hex") !== record.sha256) {
+      throw new Error(`Invalid Product Docs preview screenshot: ${image.src}`);
+    }
+  }
   const codexLegacy = JSON.parse(readFileSync("public/falcon/docs/2026-11/codex-provenance.json", "utf8"));
   const supplied = verifySuppliedCodexCaptures(publicDirectory,
     codexLegacy.files.filter((file: { source?: string }) => file.source === "user-supplied-codex-desktop"), media);
   legacyDigests.push(...codexLegacy.files.filter((file: { source?: string }) => file.source !== "user-supplied-codex-desktop")
     .flatMap((file: { sha256: string; sourcePngSha256: string }) => [file.sha256, file.sourcePngSha256]));
-  verifyProductionCaptures({ publicDirectory, images, records, media: media.filter(image => !supplied.has(image.src)),
+  verifyProductionCaptures({ publicDirectory, images, records, media: media.filter(image => !supplied.has(image.src) && !isProductDocsPreviewImage(image.src, image.locale)),
     legacyDigests, complete: process.argv.includes("--complete"), requireLanguage: process.argv.includes("--require-language") });
   console.log(JSON.stringify({ productionCaptures: images.length, suppliedCodexCaptures: supplied.size,
-    activeReferences: media.length, complete: process.argv.includes("--complete"), requireLanguage: process.argv.includes("--require-language"), verified: true }));
+    syntheticProductDocsCaptures: previewMedia.length, activeReferences: media.length, complete: process.argv.includes("--complete"), requireLanguage: process.argv.includes("--require-language"), verified: true }));
 }

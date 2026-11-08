@@ -1,0 +1,140 @@
+.layout > [data-case-property-rail] {
+  container: case-properties / inline-size;
+  gap: 12px;
+}
+
+.layout > [data-case-property-rail] > section + section {
+  padding-block-start: 10px;
+  border-block-start: 1px solid var(--falcon-border-subtle);
+}
+
+.layout > [data-case-property-rail] > section > header {
+  padding-block-end: 4px;
+}
+
+.layout .readRows {
+  margin: 0;
+  gap: 0;
+}
+
+.layout .additionalRows {
+  row-gap: 6px;
+}
+
+.additionalRows {
+  --case-details-focus-border: color-mix(in srgb, var(--falcon-text-muted) 48%, var(--falcon-border));
+  --case-details-input-inset: 12px;
+}
+
+.additionalRows dd.additionalInput [data-editor-shell][data-appearance="plain"] {
+  --tms-focus-border: var(--case-details-focus-border);
+  --tms-focus-ring: transparent;
+  --tms-input-hover-border: var(--falcon-border);
+  border: 1px solid var(--falcon-border) !important;
+  border-radius: 10px;
+}
+
+.additionalRows dd.additionalInput [data-editor-shell][data-appearance="plain"]:focus-within {
+  border-color: var(--case-details-focus-border) !important;
+}
+
+dd.additionalInput [data-editor-shell][data-appearance="plain"] > :global(.mdxeditor) { height: auto; min-height: 0; }
+dd.additionalInput [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-toolbar) { min-height: 26px; padding: 1px 5px; }
+dd.additionalInput [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-root-contenteditable) { height: auto; min-height: 28px; max-height: 180px; padding: 0; }
+dd.additionalInput [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-contenteditable-wrapper > [contenteditable]),
+dd.additionalInput [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-root-contenteditable > div:not(.mdxeditor-contenteditable-wrapper)) {
+  box-sizing: border-box;
+  min-height: 28px;
+  padding: 4px var(--case-details-input-inset);
+}
+dd.additionalInput [data-editor-shell][data-appearance="plain"] :global([class*="_placeholder_"]) { padding: 4px var(--case-details-input-inset); }
+dd.additionalInput [data-editor-shell][data-appearance="plain"] > div:has(> textarea) { height: 28px; min-height: 28px; }
+dd.additionalInput [data-editor-shell][data-appearance="plain"] > div > textarea { height: 28px; min-height: 28px; padding: 4px var(--case-details-input-inset); }
+dd.additionalInput [data-editor-shell][data-appearance="plain"] > div:has(> button) { min-height: 24px; padding: 0 5px; }
+
+.layout .readRows > div:has(> dt) {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: min(43%, 8.25rem) minmax(0, 1fr);
+  align-items: center;
+  justify-items: stretch;
+  gap: 8px;
+  min-block-size: 34px;
+  min-inline-size: 0;
+  margin: 0;
+  padding-block: 3px;
+}
+
+.layout .readRows > div.wideRow {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 4px;
+  padding-block: 6px;
+}
+
+.layout .readRows > div > dt {
+  color: var(--falcon-text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.layout .readRows > div > dd {
+  min-inline-size: 0;
+  margin: 0;
+  color: var(--falcon-text);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.layout .readRows > div:not(.wideRow) > dd > button {
+  min-block-size: 26px;
+  max-inline-size: calc(100% + 6px);
+  margin: 0 -4px;
+  padding: 2px 4px;
+}
+
+.layout .ownerControl > div > button {
+  box-sizing: border-box;
+  min-block-size: 28px;
+  padding-block: 1px;
+  padding-inline-end: 8px;
+  border-radius: 8px;
+  font-size: inherit;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .layout [data-field-editing] > header > div:last-child,
+  .layout [data-field-editing] .readRows > div > dd > input,
+  .layout [data-field-editing] .readRows > div > dd > div > button[aria-haspopup],
+  .layout [data-field-editing] .ownerControl > div > button,
+  .layout [data-field-editing] .wideRow [data-editor-shell]:has(:global(.mdxeditor-root-contenteditable), textarea) {
+    animation: fieldEditReveal 180ms cubic-bezier(.16, 1, .3, 1) both;
+  }
+}
+
+@keyframes fieldEditReveal {
+  from { opacity: .55; }
+  to { opacity: 1; }
+}
+
+@container case-properties (max-width: 185px) {
+  .layout .readRows > div:has(> dt) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3px;
+  }
+}
+
+.layout .readRows > div[data-documentation-field] {
+  grid-template-columns: minmax(max-content, min(43%, 8.25rem)) minmax(0, 1fr);
+  align-items: start;
+  column-gap: 8px;
+}
+
+@media (pointer: coarse) {
+  .layout .readRows > div:not(.wideRow) > dd > button,
+  .layout .additionalRows > div > dd > input,
+  .layout .ownerControl > div > button { min-block-size: 34px; }
+}

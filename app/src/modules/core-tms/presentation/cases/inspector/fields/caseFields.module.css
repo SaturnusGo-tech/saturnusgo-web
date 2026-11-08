@@ -7,5 +7,17 @@
 .facts dd { margin:0; font-size:13px; overflow-wrap:anywhere; }
 .editing { gap:14px; }
 
-.error { margin: 6px 0; color: var(--falcon-danger); font-size: 12px; line-height: 1.45; }
+:global([data-case-property-rail]) .editing dd > div > button[aria-haspopup="dialog"] {
+  box-sizing: border-box;
+  min-block-size: 28px;
+  padding-block: 3px;
+}
+
+@media (pointer: coarse) {
+  :global([data-case-property-rail]) .editing dd > div > button[aria-haspopup="dialog"] { min-block-size: 34px; }
+}
+
+.loading, .error { margin: 6px 0; font-size: 12px; line-height: 1.45; }
+.loading { color: var(--falcon-text-muted); }
+.error { color: var(--falcon-danger); }
 .error button { display: block; margin-top: 4px; padding: 3px 0; border: 0; background: transparent; color: var(--falcon-text); font: inherit; text-decoration: underline; cursor: pointer; }

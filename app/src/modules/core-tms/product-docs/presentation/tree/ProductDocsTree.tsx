@@ -1,40 +1,52 @@
 "use client";
 
-import { BookOpen, FileText, Folder, Minus, Plus, Search } from "lucide-react";
-import { useEffect, useId, useState } from "react";
+import { ChevronRight, Clock3, LayoutGrid, Star } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
 import type { ProductDocNode, ProductDocsApi, ProductDocScope } from "../../domain/product-docs";
 import type { ProductDocsCopy } from "../../localization/copy";
+import type { TmsLocale } from "../../../localization/model/locale";
 import { useProductDocList } from "../../state/tree/useProductDocList";
+import type { ProductDocsShelf } from "../../state/library/useProductDocsLibrary";
+import { ProductDocsDisclosure } from "../motion/ProductDocsDisclosure";
 import { ReadState } from "../status/ReadState";
 import styles from "../product-docs.module.css";
+import { ProductDocSectionAppearance } from "./appearance/control/ProductDocSectionAppearance";
+import { ProductDocSectionIcon } from "./appearance/ProductDocSectionIcon";
+import treeStyles from "./product-docs-tree.module.css";
 
 type TreeProps = {
+  id: string;
   api: ProductDocsApi;
   scope: ProductDocScope;
-  projectName?: string;
   copy: ProductDocsCopy;
+  locale: TmsLocale;
   selectedId?: string;
   path?: readonly ProductDocNode[];
   refresh: number;
   draft: boolean;
-  onHome(): void;
+  query: string;
+  shelf: ProductDocsShelf;
+  treeControls?: ReactNode;
+  onHome(shelf?: ProductDocsShelf): void;
   onSelect(node: ProductDocNode): void;
+  onEscape(): void;
 };
 
 export function ProductDocsTree(props: TreeProps) {
-  const [query, setQuery] = useState("");
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState<ReadonlySet<string>>(() => new Set());
-  const searchId = useId();
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setSearch(query.trim()), 230);
+    const timer = window.setTimeout(() => setSearch(props.query.trim()), 180);
     return () => window.clearTimeout(timer);
-  }, [query]);
+  }, [props.query]);
 
   useEffect(() => {
     const path = props.path;
-    if (path?.length) setOpen((current) => new Set([...current, ...path.map((node) => node.id)]));
+    if (path?.length) setOpen((current) => {
+      const missing = path.filter((node) => !current.has(node.id));
+      return missing.length ? new Set([...current, ...missing.map((node) => node.id)]) : current;
+    });
   }, [props.path]);
 
   function toggle(id: string) {
@@ -51,21 +63,28 @@ export function ProductDocsTree(props: TreeProps) {
     props.onSelect(node);
   }
 
-  return <aside className={styles.tree} aria-label={props.copy.tree}>
-    <button type="button" className={styles.space} onClick={props.onHome}>
-      <span className={styles.spaceIcon}><BookOpen size={18} aria-hidden="true" /></span>
-      <span><strong>{props.projectName || props.copy.title}</strong>
-        {props.projectName && <small>{props.copy.title}</small>}</span>
-    </button>
-    <label className={styles.search} htmlFor={searchId}>
-      <Search size={16} aria-hidden="true" />
-      <input id={searchId} type="search" aria-label={props.copy.search} placeholder={props.copy.search}
-        maxLength={120} value={query} onChange={(event) => setQuery(event.target.value)} />
-    </label>
-    <nav aria-label={search ? props.copy.searchResults : props.copy.tree} className={styles.treeNav}>
-      <h2>{search ? props.copy.searchResults : props.copy.tree}</h2>
-      <Branch {...props} parentId={null} query={search} open={open} onToggle={toggle} onChoose={choose} />
+  return <aside id={props.id} className={`${styles.tree} ${treeStyles.sidebar}`} aria-label={props.copy.tree} onKeyDown={(event) => {
+    if (event.key === "Escape" && !event.defaultPrevented) props.onEscape();
+  }}>
+    <nav className={treeStyles.views} aria-label={props.copy.browse}>
+      {([
+        ["overview", props.copy.libraryHome, LayoutGrid],
+        ["recent", props.copy.recent, Clock3],
+        ["starred", props.copy.starred, Star],
+      ] as const).map(([shelf, title, Icon]) => <button key={shelf} type="button" className={treeStyles.view}
+        aria-current={!props.selectedId && props.shelf === shelf ? "page" : undefined} onClick={() => props.onHome(shelf)}>
+        <Icon className={shelf === "starred" ? treeStyles.star : undefined} size={15} aria-hidden="true" /> {title}
+      </button>)}
     </nav>
+    <div className={styles.treeContent}>
+      <div className={styles.treeHeading}>
+        <h2>{search ? props.copy.searchResults : props.copy.content}</h2>
+        {!search && props.treeControls}
+      </div>
+      <nav aria-label={search ? props.copy.searchResults : props.copy.tree} className={`${styles.treeNav} ${treeStyles.navigation}`}>
+        <Branch {...props} parentId={null} query={search} open={open} onToggle={toggle} onChoose={choose} />
+      </nav>
+    </div>
   </aside>;
 }
 
@@ -87,27 +106,34 @@ function Branch(props: TreeProps & {
   if (error && !data?.nodes.length) return <ReadState copy={props.copy} status="error" retry={retry} />;
 
   return <>
-    {data?.nodes.length ? <ul className={styles.branch}>
+    {data?.nodes.length ? <ul className={treeStyles.branch}>
       {data.nodes.map((node) => {
         const expanded = props.open.has(node.id);
         const selected = props.selectedId === node.id;
-        const Icon = node.kind === "folder" ? Folder : FileText;
+        const section = node.kind === "folder";
+        const knownParent = props.path?.some((ancestor) => ancestor.id === node.id);
         return <li key={node.id}>
-          <div className={styles.treeRow} data-current={selected || undefined}>
-            {!props.query && <button type="button" className={styles.disclosure}
-              aria-label={node.title} aria-expanded={expanded} onClick={() => props.onToggle(node.id)}>
-              {expanded ? <Minus size={13} aria-hidden="true" /> : <Plus size={13} aria-hidden="true" />}
-            </button>}
-            <button type="button" className={styles.node} aria-current={selected ? "page" : undefined}
+          <div className={treeStyles.row} data-current={selected || undefined}>
+            {section && <div className={treeStyles.sectionMark}>
+              {props.draft && data.canEdit
+                ? <ProductDocSectionAppearance scope={props.scope} node={node} locale={props.locale} />
+                : <ProductDocSectionIcon scope={props.scope} node={node} size={17} />}
+            </div>}
+            <button type="button" className={treeStyles.node} aria-current={selected ? "page" : undefined}
               onClick={() => props.onChoose(node)} title={node.title}>
-              <Icon size={15} aria-hidden="true" />
-              <span>{node.title}</span>
-              {node.kind === "page" && node.publishedVersion === null && <small>{props.copy.draft}</small>}
+              <span className={treeStyles.label}>{node.title}</span>
+              {!section && node.publishedVersion === null && <small>{props.copy.draft}</small>}
             </button>
+            {!props.query && <button type="button" className={treeStyles.disclosure}
+              data-quiet={(!section && !knownParent && !expanded) || undefined}
+              aria-label={`${expanded ? props.copy.collapseBranch : props.copy.expandBranch} ${node.title}`}
+              aria-expanded={expanded} onClick={() => props.onToggle(node.id)}>
+              <ChevronRight size={13} aria-hidden="true" />
+            </button>}
           </div>
-          {expanded && !props.query && <div className={styles.nested}>
-            <Branch {...props} parentId={node.id} />
-          </div>}
+          <ProductDocsDisclosure open={expanded && !props.query}>
+            <div className={treeStyles.nested}><Branch {...props} parentId={node.id} /></div>
+          </ProductDocsDisclosure>
         </li>;
       })}
     </ul> : <p className={styles.treeEmpty}>{props.query ? props.copy.noResults : props.copy.noPages}</p>}

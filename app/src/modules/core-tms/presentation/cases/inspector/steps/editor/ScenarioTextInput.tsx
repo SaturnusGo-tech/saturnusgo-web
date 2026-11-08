@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useRef, type ReactNode, type ClipboardEventHandler, type KeyboardEventHandler } from "react";
+import { useLayoutEffect, useRef, type ReactNode, type ClipboardEventHandler, type DragEventHandler, type KeyboardEventHandler } from "react";
 
 import { EmojiButton } from "../../../../common/emoji/EmojiButton";
 import { useTextareaEmoji } from "../../../../common/emoji/selection/useTextareaEmoji";
@@ -16,6 +16,8 @@ type Props = {
   onChange: (value: string) => void;
   onKeyDown?: KeyboardEventHandler<HTMLTextAreaElement>;
   onPaste?: ClipboardEventHandler<HTMLTextAreaElement>;
+  onDragOver?: DragEventHandler<HTMLTextAreaElement>;
+  onDrop?: DragEventHandler<HTMLTextAreaElement>;
   renderFooter?: (emoji: ReactNode) => ReactNode;
   ru?: boolean;
 };
@@ -44,5 +46,7 @@ export function ScenarioTextInput(props: Props) {
     onChange={(event) => history.record(event.target.value, (event.nativeEvent as InputEvent).inputType === "insertText")}
     onKeyDown={(event) => { if (!history.onKeyDown(event)) props.onKeyDown?.(event); }}
     onPaste={props.onPaste}
+    onDragOver={props.onDragOver}
+    onDrop={props.onDrop}
   />{props.renderFooter?.(<EmojiButton locale={props.ru ? "ru" : "en"} onOpen={emoji.remember} onSelect={emoji.insert} />)}</>;
 }

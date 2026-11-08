@@ -4,6 +4,7 @@ import {
   MAX_PENDING_CASE_ATTACHMENTS,
   appendPendingCaseAttachments,
   filesFromClipboard,
+  filterPendingCaseAttachments,
   groupPendingCaseAttachments,
 } from "../pendingCaseAttachment";
 
@@ -59,4 +60,23 @@ test("clipboard extraction supports direct files and file-kind items", () => {
     ],
   } as unknown as DataTransfer);
   assert.deepEqual(fallback, [screenshot]);
+});
+
+test("empty draft attachments are rejected before committing a case", () => {
+  const result = appendPendingCaseAttachments([], {
+    fieldKey: "description",
+    files: [new File([], "empty.png", { type: "image/png" }), file("valid.png")],
+  }, () => "attachment-1");
+  assert.equal(result.rejected, 1);
+  assert.deepEqual(result.entries.map(({ file }) => file.name), ["valid.png"]);
+});
+
+test("removing a checklist item discards only that item's pending case files", () => {
+  const entries = [
+    { id: "case", fieldKey: "description", file: file("case.png") },
+    { id: "step", fieldKey: "step:old:action", stepId: "old", file: file("step.png") },
+    { id: "check", fieldKey: "checklist:present", file: file("check.png") },
+    { id: "removed", fieldKey: "checklist:old", file: file("removed.png") },
+  ];
+  assert.deepEqual(filterPendingCaseAttachments(entries, new Set(), new Set(["present"])).map(({ id }) => id), ["case", "check"]);
 });

@@ -3,6 +3,7 @@ import test from "node:test";
 import type { TestCase } from "../../../../../../core/tms/contracts/legacy-contract";
 import { resolvePendingOperation } from "../../../../../../core/tms/idempotency/pending-operation";
 import { createEmptyRevision, normalizeRevisionTags } from "../../../../helpers/cases/caseRevision";
+import * as pendingCaseAttachment from "../../../../application/evidence/case/pendingCaseAttachment";
 import { componentHarness } from "../../../../portfolios/tests/support/component-harness";
 import type { useCaseActions } from "../../../../state/case-actions/useCaseActions";
 import { reconcileMaintenance, type CaseMaintenance } from "../../model/case-maintenance";
@@ -22,11 +23,13 @@ test("a delayed content-save receipt accepts the saved revision without revertin
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en", t: (key: string) => key }) };
     if (name.endsWith("caseRevision")) return { createEmptyRevision, normalizeRevisionTags };
     if (name.endsWith("pending-operation")) return { resolvePendingOperation };
-    if (name.endsWith("pendingCaseAttachment")) return { pendingCaseAttachmentSignature: () => "" };
+    if (name.endsWith("pendingCaseAttachment")) return pendingCaseAttachment;
     if (name.endsWith("saveCaseWithAttachments")) return { saveCaseWithAttachments: () => receipt };
     if (name.endsWith("case-maintenance")) return { reconcileMaintenance };
+    if (name.endsWith("useCaseDocumentation")) return { useCaseDocumentation: () => ({fields: {}, save: async () => true, reset() {}}) };
   });
   const state = { connection: "connected", editing: true, caseDraft: { ...original.current, title: "Saved revision" }, caseFolderPath: "/",
+    data: { workspace: { id: "workspace" } },
     selectedCaseEtag: "content-1", beginCaseSubmission: () => true, finishCaseSubmission() {},
     setData: (update: (value: { testCases: TestCase[] }) => { testCases: TestCase[] }) => { items = update({ testCases: items }).testCases; },
     setSelectedCaseDetail: (update: TestCase | null | ((value: TestCase | null) => TestCase | null)) => { detail = typeof update === "function" ? update(detail) : update; },

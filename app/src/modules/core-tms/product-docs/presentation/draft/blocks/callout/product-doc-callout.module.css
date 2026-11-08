@@ -1,0 +1,19 @@
+.callout {
+  --callout-tone: var(--falcon-link);
+  box-sizing: border-box;
+  inline-size: fit-content;
+  min-inline-size: min(100%, 15ch);
+  max-inline-size: min(100%, 75ch);
+  margin-block: 12px;
+  padding: 9px 12px;
+  border-inline-start: 2px solid var(--callout-tone);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--callout-tone) 9%, var(--falcon-sidebar));
+  color: var(--falcon-text);
+  overflow-wrap: anywhere;
+}
+.callout[data-tone="tip"] { --callout-tone: var(--falcon-success); }
+.callout[data-tone="caution"] { --callout-tone: var(--falcon-warning, var(--falcon-danger)); }
+.callout[data-tone="danger"] { --callout-tone: var(--falcon-danger); }
+.callout :global([contenteditable]) { padding: 0; }
+.callout p:last-child { margin-block-end: 0; }

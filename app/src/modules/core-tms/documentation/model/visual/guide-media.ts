@@ -8,7 +8,7 @@ export type DocumentationMedia = {
   src: string;
   alt: string;
 };
-const screenshotPath = /^\/falcon\/docs\/\d{4}-(?:0[1-9]|1[0-2])(-ru)?\/([a-z0-9][a-z0-9-]{0,139})\.jpg$/;
+const screenshotPath = /^\/falcon\/docs\/\d{4}-(?:0[1-9]|1[0-2])(?:-preview)?(-ru)?\/([a-z0-9][a-z0-9-]{0,139})\.jpg$/;
 
 export function documentationMediaLocale(src: string): "en" | "ru" | null {
   const match = screenshotPath.exec(src);

@@ -1,0 +1,23 @@
+.visual {
+  --falcon-folder: var(--falcon-icon);
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  vertical-align: middle;
+}
+
+.visual[data-section-icon-tone="info"] { --falcon-folder: var(--falcon-info); }
+.visual[data-section-icon-tone="discovery"] { --falcon-folder: var(--falcon-discovery); }
+.visual[data-section-icon-tone="success"] { --falcon-folder: var(--falcon-success); }
+
+.visual [data-folder-visual] {
+  width: var(--section-icon-size);
+  height: var(--section-icon-size);
+  min-width: 0;
+  font-size: var(--section-icon-size);
+}
+
+.visual [data-folder-visual] > :is(svg, img) {
+  width: var(--section-icon-size);
+  height: var(--section-icon-size);
+}

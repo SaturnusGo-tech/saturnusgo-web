@@ -6784,6 +6784,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/comments": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+            };
+            cookie?: never;
+        };
+        /** @description Lists page-level comments on a published article, newest first. */
+        get: operations["listProductDocComments"];
+        put?: never;
+        /** @description Adds a page-level comment as the authenticated user. Retries use the same idempotency key. */
+        post: operations["createProductDocComment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/workspaces/{workspaceId}/projects/{projectId}/product-docs/cases/{caseId}/requirements": {
         parameters: {
             query?: never;
@@ -11153,7 +11178,7 @@ export interface components {
         FalconMcpConnection: {
             id: string;
             projectIds: string[];
-            scopes: ("falcon:read" | "falcon:cases:create" | "falcon:runs:create")[];
+            scopes: ("falcon:read" | "falcon:cases:create" | "falcon:runs:create" | "falcon:cases:write" | "falcon:repository:write" | "falcon:suites:write" | "falcon:environments:write" | "falcon:runs:manage" | "falcon:execution:write" | "falcon:defects:write" | "falcon:attachments:write" | "falcon:workflows:write" | "falcon:catalog:write" | "falcon:dashboards:write" | "falcon:projects:manage" | "falcon:dashboard-preferences:write" | "falcon:dashboard-reminders:write" | "falcon:product-docs:write")[];
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -11191,7 +11216,7 @@ export interface components {
                 resource: string;
                 /** Format: uri */
                 oauthIssuer: string;
-                scopes: ("falcon:read" | "falcon:cases:create" | "falcon:runs:create" | "falcon:cases:write" | "falcon:repository:write" | "falcon:suites:write" | "falcon:environments:write" | "falcon:runs:manage" | "falcon:execution:write" | "falcon:defects:write" | "falcon:attachments:write" | "falcon:workflows:write" | "falcon:catalog:write" | "falcon:dashboards:write" | "falcon:projects:manage" | "falcon:dashboard-preferences:write" | "falcon:dashboard-reminders:write" | "offline_access")[];
+                scopes: ("falcon:read" | "falcon:cases:create" | "falcon:runs:create" | "falcon:cases:write" | "falcon:repository:write" | "falcon:suites:write" | "falcon:environments:write" | "falcon:runs:manage" | "falcon:execution:write" | "falcon:defects:write" | "falcon:attachments:write" | "falcon:workflows:write" | "falcon:catalog:write" | "falcon:dashboards:write" | "falcon:projects:manage" | "falcon:dashboard-preferences:write" | "falcon:dashboard-reminders:write" | "falcon:product-docs:write" | "offline_access")[];
                 /** @constant */
                 authentication: "oauth";
             };
@@ -11385,7 +11410,7 @@ export interface components {
                 /** @description Null when a historically referenced project is unavailable. The client renders a localized unavailable-project label. */
                 name: string | null;
             }[];
-            scopes: ("falcon:read" | "falcon:cases:create" | "falcon:runs:create" | "falcon:cases:write" | "falcon:repository:write" | "falcon:suites:write" | "falcon:environments:write" | "falcon:runs:manage" | "falcon:execution:write" | "falcon:defects:write" | "falcon:attachments:write" | "falcon:workflows:write" | "falcon:catalog:write" | "falcon:dashboards:write" | "falcon:projects:manage" | "falcon:dashboard-preferences:write" | "falcon:dashboard-reminders:write")[];
+            scopes: ("falcon:read" | "falcon:cases:create" | "falcon:runs:create" | "falcon:cases:write" | "falcon:repository:write" | "falcon:suites:write" | "falcon:environments:write" | "falcon:runs:manage" | "falcon:execution:write" | "falcon:defects:write" | "falcon:attachments:write" | "falcon:workflows:write" | "falcon:catalog:write" | "falcon:dashboards:write" | "falcon:projects:manage" | "falcon:dashboard-preferences:write" | "falcon:dashboard-reminders:write" | "falcon:product-docs:write")[];
             /** @enum {string} */
             status: "active" | "revoked" | "expired";
             /** Format: date-time */
@@ -12267,7 +12292,7 @@ export interface components {
                 /** Format: uri */
                 issuer: string;
                 connectionName: string;
-                scopes: ("falcon:read" | "falcon:cases:create" | "falcon:runs:create" | "falcon:cases:write" | "falcon:repository:write" | "falcon:suites:write" | "falcon:environments:write" | "falcon:runs:manage" | "falcon:execution:write" | "falcon:defects:write" | "falcon:attachments:write" | "falcon:workflows:write" | "falcon:catalog:write" | "falcon:dashboards:write" | "falcon:projects:manage" | "falcon:dashboard-preferences:write" | "falcon:dashboard-reminders:write" | "offline_access")[];
+                scopes: ("falcon:read" | "falcon:cases:create" | "falcon:runs:create" | "falcon:cases:write" | "falcon:repository:write" | "falcon:suites:write" | "falcon:environments:write" | "falcon:runs:manage" | "falcon:execution:write" | "falcon:defects:write" | "falcon:attachments:write" | "falcon:workflows:write" | "falcon:catalog:write" | "falcon:dashboards:write" | "falcon:projects:manage" | "falcon:dashboard-preferences:write" | "falcon:dashboard-reminders:write" | "falcon:product-docs:write" | "offline_access")[];
                 /** @enum {string} */
                 authentication: "oauth";
                 /** @enum {string} */
@@ -12430,6 +12455,24 @@ export interface components {
             /** @description Canonical IPv4 loopback callback; port must be 1024 through 65535. */
             redirectUri: string;
         };
+        ProductDocComment: {
+            id: string;
+            author: {
+                identityId: string;
+                displayName: string;
+            };
+            body: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        ProductDocCommentInput: {
+            body: string;
+        };
+        ProductDocCommentPage: {
+            comments: components["schemas"]["ProductDocComment"][];
+            nextCursor: string | null;
+            canComment: boolean;
+        };
         ProductDocAvailability: {
             enabled: boolean;
         };
@@ -12446,6 +12489,8 @@ export interface components {
             id: string;
             title: string;
             markdown: string;
+            /** @description Ordered, non-overlapping UTF-16 ranges in the plain title. An empty array removes all title highlights. */
+            titleHighlights?: components["schemas"]["ProductDocTitleHighlight"][];
         };
         ProductDocDetail: {
             id: string;
@@ -12459,6 +12504,8 @@ export interface components {
             canPublish: boolean;
             sections: components["schemas"]["ProductDocSection"][];
             version: number | null;
+            /** @description Ordered, non-overlapping UTF-16 ranges in the plain title. An empty array removes all title highlights. */
+            titleHighlights?: components["schemas"]["ProductDocTitleHighlight"][];
         };
         ProductDocList: {
             nodes: components["schemas"]["ProductDocNode"][];
@@ -12477,6 +12524,8 @@ export interface components {
             title: string;
             sections: components["schemas"]["ProductDocSection"][];
             expectedDraftVersion: number;
+            /** @description Ordered, non-overlapping UTF-16 ranges in the plain title. An empty array removes all title highlights. */
+            titleHighlights?: components["schemas"]["ProductDocTitleHighlight"][];
         };
         ProductDocPublishInput: {
             expectedDraftVersion: number;
@@ -12516,10 +12565,18 @@ export interface components {
             nextCursor: string | null;
         };
         ProductDocLinkInput: {
+            /** @description Create the association only if the article is not already linked to the test case. */
+            preserveExisting?: boolean;
             sectionId: string | null;
         };
         ProductDocLinkResult: {
             docId: string;
+        };
+        ProductDocTitleHighlight: {
+            start: number;
+            end: number;
+            /** @enum {string} */
+            color: "yellow" | "blue" | "green" | "pink" | "purple";
         };
     };
     responses: {
@@ -27374,6 +27431,88 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["ProductDocArticleCases"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listProductDocComments: {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Product Docs result. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProductDocCommentPage"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createProductDocComment: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductDocCommentInput"];
+            };
+        };
+        responses: {
+            /** @description Product Docs result. */
+            201: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProductDocComment"];
                     };
                 };
             };

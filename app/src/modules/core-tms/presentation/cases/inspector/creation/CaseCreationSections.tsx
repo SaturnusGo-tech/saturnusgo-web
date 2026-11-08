@@ -13,6 +13,7 @@ import { InspectorSectionView } from "../section/InspectorSectionView";
 import { InspectorSteps } from "../steps/InspectorSteps";
 import css from "../caseInspector.module.css";
 import type { SharedStep, SharedStepSummary } from "../../../../shared-steps/model/shared-step";
+import { DraftRequirements } from "../../../../product-docs/requirements/draft/DraftRequirements";
 
 type Props = {
   locale: TmsLocale;
@@ -28,6 +29,13 @@ export function CaseCreationSections({
   const ru = locale === "ru";
   const [layout, setLayout] = useScenarioLayout();
   const patch = (next: Partial<TestCaseRevision>) => editor.onChange({ ...revision, ...next });
+  const documentation = editor.documentation && <DraftRequirements projectId={editor.projectId} ru={ru}
+    value={editor.documentation.value} onChange={editor.documentation.onChange} retry={editor.documentation.retry} disabled={editor.submitting} />;
+  if (editor.documentation?.retry) return <div className={css.creationContent}>
+    <CreationSection title={ru ? "Ссылки на статьи" : "Linked pages"}>
+      <dl className={css.compactSummary}>{documentation}</dl>
+    </CreationSection>
+  </div>;
   return <div className={`${css.content} ${css.creationContent} ${css.overviewLayout}`}>
     <main className={css.primaryColumn}>
       <CreationNarrativeSection section="description" title={ru ? "Описание" : "Description"}
@@ -44,14 +52,14 @@ export function CaseCreationSections({
         <FolderPathPicker value={editor.folderPath} folders={editor.folders} onChange={editor.onFolderPath} ru={ru} disabled={editor.submitting} />
       </CreationSection>
       <CreationSection title={ru ? "Поля" : "Custom fields"}>
-        <CaseCustomFields projectId={editor.projectId} revision={revision} editing requiredFields={editor.requiredFields}
+        <CaseCustomFields projectId={editor.projectId} revision={revision} editing creating requiredFields={editor.requiredFields}
           canCreate={editor.canCreateFieldValues} disabled={editor.submitting} ru={ru} onPatch={patch} />
       </CreationSection>
       <CreationSection title={ru ? "Свойства" : "Properties"}>
         <CaseMetadataControls locale={locale} revision={revision} editing showLabels onChange={editor.onChange} />
       </CreationSection>
       <CreationSection title={ru ? "Дополнительно" : "Additional details"}>
-        <InspectorDetails revision={revision} editing autoFocus={false} ru={ru} onPatch={patch} />
+        <InspectorDetails revision={revision} editing autoFocus={false} ru={ru} onPatch={patch} documentation={documentation} />
       </CreationSection>
     </aside>
   </div>;

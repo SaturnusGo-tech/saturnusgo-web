@@ -46,6 +46,14 @@ export function createProductDocsApi(http: TmsHttpClient): ProductDocsApi {
     move: (scope, id, input) => http.mutate<Contract["ProductDocDraftVersion"]>(
       docPath(scope, id) + "/location", "PATCH", input satisfies Contract["ProductDocMoveInput"],
     ),
+    listComments: (scope, id, options) => read<Contract["ProductDocCommentPage"]>(
+      docPath(scope, id) + "/comments" + query(options), options?.signal,
+    ),
+    async postComment(scope, id, body, options) {
+      return (await http.mutateResource<Contract["ProductDocComment"]>(
+        docPath(scope, id) + "/comments", "POST", { body } satisfies Contract["ProductDocCommentInput"], options,
+      )).data;
+    },
     listArticleCases: (scope, id, options) => read<Contract["ProductDocArticleCases"]>(
       docPath(scope, id) + "/cases" + query(options), options?.signal,
     ),
@@ -56,8 +64,9 @@ export function createProductDocsApi(http: TmsHttpClient): ProductDocsApi {
       `${endpoint(scope)}/runs/${encodeURIComponent(runId)}/items/${encodeURIComponent(itemId)}/requirements${query(options)}`,
       options?.signal,
     ),
-    linkRequirement: (scope, caseId, docId, sectionId) => http.mutate<Contract["ProductDocLinkResult"]>(
-      `${caseRequirements(scope, caseId)}/${encodeURIComponent(docId)}`, "PUT", {sectionId} satisfies Contract["ProductDocLinkInput"],
+    linkRequirement: (scope, caseId, docId, sectionId, options) => http.mutate<Contract["ProductDocLinkResult"]>(
+      `${caseRequirements(scope, caseId)}/${encodeURIComponent(docId)}`, "PUT",
+      {sectionId, ...options} satisfies Contract["ProductDocLinkInput"],
     ),
     unlinkRequirement: (scope, caseId, docId) => http.mutate<Contract["ProductDocLinkResult"]>(
       `${caseRequirements(scope, caseId)}/${encodeURIComponent(docId)}`, "DELETE",

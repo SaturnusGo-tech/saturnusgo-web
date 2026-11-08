@@ -7,6 +7,8 @@ export type DocBlock =
   | { kind: "steps"; items: { title: string; text: string }[] }
   | { kind: "callout"; tone: "note" | "warning" | "success"; title: string; text: string }
   | { kind: "table"; columns: string[]; rows: string[][] }
+  | { kind: "bar-chart"; title: string; summary: string; maximum: number;
+      bars: { label: string; value: number; tone: "pass" | "fail" | "pending" }[] }
   | { kind: "code"; language: string; text: string; caption: string }
   | { kind: "articles"; ids: string[] };
 

@@ -4,6 +4,8 @@ export function useMetadataPopover(open: boolean, trigger: RefObject<HTMLButtonE
     const element = menu.current;
     if (!element || !element.showPopover) return;
     if (!open) { if (element.matches(":popover-open")) element.hidePopover(); return; }
+    // Use fixed popup sizing for the first measurement, before choosing a side.
+    element.dataset.popupPositioned = "true";
     element.showPopover();
     const position = () => {
       const bounds = trigger.current?.getBoundingClientRect();
@@ -12,7 +14,9 @@ export function useMetadataPopover(open: boolean, trigger: RefObject<HTMLButtonE
       const width = element.offsetWidth;
       const height = Math.min(element.scrollHeight + 2, 226, innerHeight - 24);
       const below = innerHeight - bounds.bottom - 12;
-      const top = below < height && bounds.top > height + 12 ? bounds.top - height - 4 : bounds.bottom + 4;
+      const upwards = below < height && bounds.top > height + 12;
+      const top = upwards ? bounds.top - height - 4 : bounds.bottom + 4;
+      element.dataset.popupSide = upwards ? "top" : "bottom";
       element.style.setProperty("--menu-left", `${Math.max(12, Math.min(bounds.left, innerWidth - width - 12))}px`);
       element.style.setProperty("--menu-top", `${Math.max(12, Math.min(top, innerHeight - height - 12))}px`);
       element.style.maxHeight = `${Math.min(226, innerHeight - 24)}px`;

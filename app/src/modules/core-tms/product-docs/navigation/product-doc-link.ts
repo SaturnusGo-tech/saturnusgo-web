@@ -1,4 +1,4 @@
-import type { ProductDocSelection } from "../domain/product-docs";
+import type { ProductDocScope, ProductDocSelection } from "../domain/product-docs";
 
 const safeId = /^[A-Za-z0-9_-]{1,128}$/;
 
@@ -24,4 +24,19 @@ export function writeProductDocSelection(url: URL, selection?: ProductDocSelecti
   if (selection.version !== undefined) url.searchParams.set("docVersion", String(selection.version));
   if (selection.sectionId) url.searchParams.set("docSection", selection.sectionId);
   return url;
+}
+
+export function readScopedProductDocLink(href: string, current: string, scope: ProductDocScope) {
+  try {
+    const base = new URL(current);
+    const target = new URL(href, base);
+    if (!/^https?:$/.test(target.protocol) || target.origin !== base.origin || target.username || target.password) return undefined;
+    if (target.pathname !== base.pathname && !/^\/(?:testcases\/umbrella-home\/)?work\/?$/.test(target.pathname)) return undefined;
+    if (target.searchParams.get("workspaceId") !== scope.workspaceId || target.searchParams.get("projectId") !== scope.projectId) return undefined;
+    const selection = readProductDocSelection(target.href);
+    if (target.searchParams.has("docSection") && !selection?.sectionId) return undefined;
+    return selection;
+  } catch {
+    return undefined;
+  }
 }

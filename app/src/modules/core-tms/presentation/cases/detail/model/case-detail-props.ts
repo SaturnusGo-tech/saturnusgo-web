@@ -1,0 +1,30 @@
+import type { Activity, TestCaseRevision, TestCaseSummary } from "../../../../../../core/tms/contracts/legacy-contract";
+import type { TmsLocale } from "../../../../localization/model/locale";
+import type { SharedStep, SharedStepSummary } from "../../../../shared-steps/model/shared-step";
+import type { CaseCollaborationViewModel } from "../../collaboration/model";
+import type { CaseInspectorEditor } from "../../inspector/model";
+
+export type CaseDetailPanelProps = {
+  locale: TmsLocale;
+  languageTag: string;
+  testCase?: TestCaseSummary;
+  revision: TestCaseRevision | null;
+  linkIds: string[];
+  activity: Activity[];
+  collaboration: CaseCollaborationViewModel;
+  onOpenDefect: (defectId: string) => void;
+  sharedSteps: readonly SharedStepSummary[];
+  onResolveSharedStep: (id: string) => Promise<SharedStep | null>;
+  selectedFolder: string;
+  editor?: CaseInspectorEditor;
+  canAttach?: boolean;
+  onNew: (folder?: string) => void;
+  onEdit: () => void;
+  onClone: () => void;
+  onCreateDefect?: () => void;
+  onArchive: () => void;
+  onRunCase: () => void;
+  fullscreen: boolean;
+  onToggleFullscreen: () => void;
+  onClose?: () => void;
+};

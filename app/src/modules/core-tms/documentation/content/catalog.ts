@@ -1,3 +1,4 @@
+import { productDocAuthoring } from "./product-docs/authoring";
 import { codexQaArticle } from "./integrations/codex/codex-qa";
 import { codexPromptArticles } from "./codex-prompts";
 import { navigationArticle } from "./navigation/sidebar";
@@ -34,6 +35,7 @@ import type { DocArticle } from "../model/article";
 export const docGroups = [
   { id: "start", title: "Getting started" },
   { id: "cases", title: "Test repository" },
+  { id: "product-docs", title: "Product documentation" },
   { id: "runs", title: "Runs and results" },
   { id: "defects", title: "Working with defects" },
   { id: "notifications", title: "Notifications" },
@@ -44,7 +46,7 @@ export const docGroups = [
 export const docArticles: readonly DocArticle[] = [
   supportArticle,
   ...gettingStarted, navigationArticle, settingsArticle, ...companyAccessArticles, portfoliosArticle, dashboardArticle, ...caseAuthoring, customFieldsArticle, customFieldValuesArticle, writingAssistantArticle, coloredMarkerArticle, caseCommentsArticle, ...caseOrganization,
-  suitesArticle, ...executionArticles, ...defectArticles, notificationsArticle, ...notificationChannelArticles, integrationOverview, codexQaArticle,
+  productDocAuthoring, suitesArticle, ...executionArticles, ...defectArticles, notificationsArticle, ...notificationChannelArticles, integrationOverview, codexQaArticle,
   boardAndYouTrack[1], ...trackerArticles, boardAndYouTrack[0], githubArticle,
   ...communicationArticles, swaggerArticle, ...plannedIntegrations, troubleshootingArticle, ...codexPromptArticles, toolsArticle, ...referenceArticles,
 ];

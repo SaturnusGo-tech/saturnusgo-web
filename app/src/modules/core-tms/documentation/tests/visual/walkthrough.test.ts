@@ -6,6 +6,7 @@ import { docArticles, articleById } from "../../content/catalog";
 import { searchArticles } from "../../model/search";
 import screenshots from "../../content/walkthroughs/media/screenshots.json";
 import production from "../../content/walkthroughs/media/screenshots.production.json";
+import { isProductDocsPreviewImage } from "../../content/product-docs/guide-captures";
 import { historicalGuideMedia } from "../../model/visual/compatibility/historical-media";
 
 const flows = docArticles.flatMap((article) => article.sections.flatMap((section) =>
@@ -30,7 +31,7 @@ function jpegDimensions(bytes: Buffer) {
 test("practical guide articles retain meaningful, captioned screenshot states", () => {
   // The English edition retains full company-access and company-administration text instructions;
   // administrator screenshots are pending authenticated English capture.
-  for (const id of ["falcon-ai-writing", "colored-marker", "test-suites", "create-test-case", "edit-test-case", "archive-test-case", "shared-steps", "create-run", "execute-run",
+  for (const id of ["falcon-ai-writing", "colored-marker", "test-suites", "create-test-case", "edit-test-case", "archive-test-case", "shared-steps", "create-run", "execute-run", "product-docs-authoring",
     "workspace", "portfolios", "organize-cases", "import-export", "dashboard", "create-defect", "jira", "linear", "trello", "github", "slack", "confluence", "swagger"]) {
     assert.ok(flows.some(({ article }) => article.id === id), id);
   }
@@ -40,7 +41,8 @@ test("practical guide articles retain meaningful, captioned screenshot states", 
     for (const step of block.steps) {
       assert.ok(step.title && step.instruction.length > 40 && step.result.length > 40, article.id);
       assert.ok(step.image.alt.length > 30, article.id);
-      assert.match(step.image.src, /^\/falcon\/docs\/(?:2026-09\/[a-z0-9-]+-en-20260928|2026-11\/[a-z0-9-]+)\.jpg$/);
+      if (article.id === "product-docs-authoring") assert.ok(isProductDocsPreviewImage(step.image.src, "en"));
+      else assert.match(step.image.src, /^\/falcon\/docs\/(?:2026-09\/[a-z0-9-]+-en-20260928|2026-11\/[a-z0-9-]+)\.jpg$/);
     }
   }
 });
@@ -54,7 +56,7 @@ test("every published screenshot has accurate dimensions and fits the asset budg
   for (const [src, image] of used) {
     const bytes = readFileSync(resolve("public", src.slice(1)));
     assert.deepEqual(jpegDimensions(bytes), { width: image.width, height: image.height }, src);
-    const captured = registered.has(src) || supplied.has(src);
+    const captured = registered.has(src) || supplied.has(src) || isProductDocsPreviewImage(src, "en");
     assert.ok(bytes.length < (captured ? 1_400_000 : 350_000), `${src}: compress without changing the capture viewport`);
     if (captured) productionTotal += bytes.length; else legacyTotal += bytes.length;
   }

@@ -70,9 +70,8 @@ test("case Markdown inputs attach or paste private files from the conventional l
   assert.match(attachmentUi, /<Paperclip size=\{15\} \/>/);
   assert.match(attachmentUi, /type="file" multiple/);
   assert.doesNotMatch(attachmentUi, /accept=/);
-  assert.match(source, /onPasteCapture=\{\(event\)/);
-  assert.match(source, /filesFromClipboard\(event\.clipboardData\)/);
-  assert.match(source, /event\.preventDefault\(\);[\s\S]*addFiles\(files\)/);
+  assert.match(source, /onPasteCapture=\{transfer.onPaste\}/);
+  assert.match(source, /onDropCapture=\{transfer.onDrop\}/);
   assert.match(content, /attachmentKey="description"/);
   assert.match(content, /attachmentKey="preconditions"/);
   assert.match(details, /attachmentKey="test-data"/);
@@ -116,7 +115,7 @@ test("case chrome is quiet until the user asks to edit", () => {
 test("case content and editable custom fields retain the two-column hierarchy", () => {
   assert.match(content, /overviewLayout/);
   assert.match(content, /<main className=\{css\.primaryColumn\}>[\s\S]*Описание[\s\S]*Предусловия[\s\S]*Сценарий/);
-  assert.match(content, /<aside className=\{css\.sideRail\}[\s\S]*Поля[\s\S]*<FolderPathPicker[\s\S]*<CaseCustomFields[\s\S]*Свойства[\s\S]*Дополнительно/);
+  assert.match(content, /<aside className=\{css\.sideRail\}[\s\S]*Поля[\s\S]*<CaseCustomFields[\s\S]*<FolderPathPicker[\s\S]*Свойства[\s\S]*Дополнительно/);
   assert.match(content, /controls\("properties"\)[\s\S]*<CaseMetadataControls/);
 });
 
@@ -153,7 +152,7 @@ test("scenario editing keeps one compact field per action and preserves Markdown
   assert.doesNotMatch(scenarioStep, /insertScenarioLine|removeScenarioLine/);
   assert.match(scenarioStep, /Ожидаемый результат/);
   assert.match(scenarioStep, /ScenarioAttachmentControls/);
-  assert.match(scenarioStep, /onPaste=\{actionAttachments\.paste\}/);
+  assert.match(scenarioStep, /\{\.\.\.actionAttachments\.transfer\}/);
   assert.doesNotMatch(scenarioStep, /Обязательный шаг|Required step/);
   assert.match(scenarioInput, /rows=\{1\}/);
   assert.match(scenarioInput, /node\.scrollHeight/);

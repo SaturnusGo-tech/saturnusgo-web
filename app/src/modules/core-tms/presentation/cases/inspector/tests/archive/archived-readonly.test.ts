@@ -4,6 +4,7 @@ import test from "node:test";
 import { runInNewContext } from "node:vm";
 import ts from "typescript";
 import * as model from "../../model";
+import * as markdownImages from "../../attachments/links/caseMarkdownImages";
 import { createEmptyRevision } from "../../../../../helpers/cases/caseRevision";
 
 type Node = { type: string; props: Record<string, unknown> };
@@ -20,9 +21,10 @@ function render(path: string, exported: string, props: unknown, menu = false) {
       if (name === "react/jsx-runtime") return { jsx, jsxs: jsx };
       if (name === "react") return {
         useState: (initial: unknown) => [menu && stateIndex++ === 1 ? true : typeof initial === "function" ? initial() : initial, () => {}],
-        useEffect: () => {}, useRef: (current: unknown) => ({ current }), useId: () => "inspector",
+        useEffect: () => {}, useMemo: (value: () => unknown) => value(), useRef: (current: unknown) => ({ current }), useId: () => "inspector",
       };
       if (name.endsWith("inspector/model") || name === "./model") return model;
+      if (name.endsWith("caseMarkdownImages")) return markdownImages;
       if (name.endsWith("useCaseActivityNavigation")) return { useCaseActivityNavigation: () => {} };
       if (name.endsWith("useCreateCaseExit")) return { useCreateCaseExit: () => (close: () => void) => close() };
       if (name.endsWith("useCreateCaseEntrance")) return { useCreateCaseEntrance: () => {} };
@@ -101,7 +103,7 @@ test("archived inspector refuses edits and draft changes, while active creation 
 test("archiving an open draft disables title/save, retains cancel and displays the stored revision", () => {
   let edits = 0; let runs = 0; let submits = 0; let cancels = 0; let prevented = 0;
   const all = render("../../../detail/CaseDetailPanel.tsx", "CaseDetailPanel", {
-    locale: "en", languageTag: "en-US", testCase: archivedCase, revision, activity: [], collaboration: { defects: { items: [] } },
+    locale: "en", languageTag: "en-US", testCase: archivedCase, revision, activity: [], collaboration: { comments: { items: [] }, defects: { items: [] } },
     editor: { mode: "edit", value: { ...revision, title: "Unsaved title" }, folderPath: "/Archived", onSubmit: () => { submits++; }, onCancel: () => { cancels++; } },
     onEdit: () => { edits++; }, onRunCase: () => { runs++; },
   });
@@ -120,7 +122,7 @@ test("archiving an open draft disables title/save, retains cancel and displays t
 
 test("creation has one accessible conventional title input instead of duplicate visible title labels", () => {
   const all = render("../../../detail/CaseDetailPanel.tsx", "CaseDetailPanel", {
-    locale: "en", languageTag: "en-US", revision, activity: [], collaboration: { defects: { items: [] } },
+    locale: "en", languageTag: "en-US", revision, activity: [], collaboration: { comments: { items: [] }, defects: { items: [] } },
     editor: { mode: "create", value: revision, folderPath: "/", onChange() {}, onCancel() {}, onSubmit() {} },
   });
   const inputs = all.filter(node => node.type === "input" && node.props["aria-label"] === "Test case title");

@@ -5,9 +5,9 @@ import dynamic from "next/dynamic";
 import { createContext, useCallback, useContext, type ReactNode } from "react";
 import { MarkdownContextContent } from "./context/MarkdownContextContent";
 import { useColorMode } from "../../../../../../shared/_hooks/useColorMode";
-import { filesFromClipboard } from "../../../../application/evidence/case/pendingCaseAttachment";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import { useCaseAttachmentDraft } from "../attachments/CaseAttachmentDraftContext";
+import { fileTransferHandlers } from "../attachments/input/fileTransfer";
 import { MarkdownPendingAttachments } from "./attachments/MarkdownAttachmentUi";
 import css from "./markdownField.module.css";
 import plain from "./plain/plainMarkdown.module.css";
@@ -15,6 +15,7 @@ import { MarkdownTransition, MarkdownReadyContext } from "./transition/MarkdownT
 import { highlightRemarkPlugins } from "./highlight/render/remarkHighlights";
 import typography from "./typography/markdownTypography.module.css";
 import markerCss from "./highlight/highlight.module.css";
+import { ProductDocDescriptionLink } from "../../../../product-docs/requirements/description/ProductDocDescriptionLink";
 
 type Props = {
   value: string;
@@ -26,6 +27,7 @@ type Props = {
   attachmentKey?: string;
   attachmentStepId?: string;
   allowAttachments?: boolean;
+  onTransferFiles?: (files: File[]) => void;
   contextContent?: ReactNode;
   appearance?: "plain";
   onRequestEdit?: () => void;
@@ -48,6 +50,7 @@ type LoadingEditorState = {
 };
 
 const LoadingEditorContext = createContext<LoadingEditorState | null>(null);
+const caseDocumentationComponents = {a: ProductDocDescriptionLink};
 
 function loadMarkdownEditor() {
   return import("./InitializedMarkdownEditor");
@@ -93,6 +96,8 @@ function MarkdownFieldContent(props: Props) {
   const attachments = useCaseAttachmentDraft();
   const addFilesToDraft = attachments?.add;
   const colorMode = theme === "dark" ? "dark" : "light";
+  const productDocLinks = props.attachmentKey === "description"
+    || props.attachmentKey === "preconditions" || props.attachmentKey === "test-data";
   const attachmentEnabled = props.allowAttachments !== false && Boolean(
     attachments?.enabled && props.attachmentKey,
   );
@@ -111,24 +116,20 @@ function MarkdownFieldContent(props: Props) {
     } : undefined}>
     {!props.value.trim() ? <p className={css.empty}>{props.emptyLabel}</p> : <MDEditor.Markdown
       className={`${css.rendered} ${markerCss.surface} ${typography.prose}`} source={props.value} skipHtml remarkPlugins={highlightRemarkPlugins}
+      components={productDocLinks ? caseDocumentationComponents : undefined}
       urlTransform={(url) => isSafeUrl(url) ? url : ""}
       wrapperElement={{ "data-color-mode": colorMode }} />}
     {attachments && <MarkdownPendingAttachments locale={locale} entries={pending} onRemove={attachments.remove} />}
   </div>;
   const addFiles = attachmentEnabled ? addAttachmentFiles : undefined;
+  const transfer = fileTransferHandlers(props.onTransferFiles ?? addFiles);
   const draftProblem = attachments?.problem;
   let attachmentProblem = "";
   if (draftProblem && draftProblem.fieldKey === props.attachmentKey) {
     attachmentProblem = draftProblem.message;
   }
   return <div className={`${css.field} ${props.appearance === "plain" ? plain.plain : ""}`} data-editor-shell data-appearance={props.appearance} data-color-mode={colorMode} role="group" aria-label={props.label}
-    onPasteCapture={(event) => {
-      if (!addFiles) return;
-      const files = filesFromClipboard(event.clipboardData);
-      if (files.length === 0) return;
-      event.preventDefault();
-      addFiles(files);
-    }}>
+    onPasteCapture={transfer.onPaste} onDragOver={transfer.onDragOver} onDropCapture={transfer.onDrop}>
     <LoadingEditorContext.Provider value={{
       value: props.value,
       label: props.label,
@@ -140,6 +141,8 @@ function MarkdownFieldContent(props: Props) {
     }}>
       <MarkdownContextContent.Provider value={props.contextContent}>
       <WysiwygMarkdownEditor
+        productDocLinks={productDocLinks}
+        suppressEmailLinkPreview={props.attachmentKey === "test-data"}
         renderFooter={props.renderFooter}
         markdown={props.value}
         label={props.label}

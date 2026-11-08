@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { componentHarness, nodes } from "../../../../../portfolios/tests/support/component-harness";
+import { fileTransferHandlers } from "../../attachments/input/fileTransfer";
 import type { MarkdownField } from "../../markdown/MarkdownField";
 export async function assertLazyMarkdownLoading() {
   const h = componentHarness(); let imports = 0; let mountEditor!: () => Promise<unknown>;
@@ -11,6 +12,7 @@ export async function assertLazyMarkdownLoading() {
     if (name === "@uiw/react-md-editor/nohighlight") return { default: { Markdown: "RenderedMarkdown" } };
     if (name.endsWith("useColorMode")) return { useColorMode: () => ({ theme: "dark" }) };
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "ru" }) };
+    if (name.endsWith("fileTransfer")) return { fileTransferHandlers };
     if (name.endsWith("CaseAttachmentDraftContext")) return { useCaseAttachmentDraft: () => undefined };
     if (name.endsWith("InitializedMarkdownEditor")) { imports++; throw new Error("Chunk unavailable"); }
   });

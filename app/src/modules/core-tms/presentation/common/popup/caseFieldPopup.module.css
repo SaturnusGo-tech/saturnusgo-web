@@ -1,0 +1,95 @@
+.panel[popover] {
+  --entry-offset: -4px;
+  opacity: 0;
+  transform: translateY(var(--entry-offset));
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 130ms ease-out, transform 130ms ease-out, visibility 0s linear 130ms;
+}
+
+.panel[data-popup-side="top"] { --entry-offset: 4px; }
+.panel[popover][data-open="true"] {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+  pointer-events: auto;
+  transition-duration: 180ms, 180ms, 0s;
+  transition-delay: 0s;
+  transition-timing-function: cubic-bezier(.2, .72, .3, 1);
+}
+
+@supports (transition-behavior: allow-discrete) {
+  .panel[popover] {
+    transition-property: opacity, transform, visibility, display, overlay;
+    transition-duration: 130ms, 130ms, 0s, 130ms, 130ms;
+    transition-delay: 0s, 0s, 130ms, 0s, 0s;
+    transition-behavior: normal, normal, normal, allow-discrete, allow-discrete;
+  }
+  .panel[popover][data-open="true"] { transition-duration: 180ms, 180ms, 0s, 180ms, 180ms; }
+}
+
+@starting-style {
+  .panel[popover][data-open="true"] { opacity: 0; transform: translateY(var(--entry-offset)); }
+}
+
+:global([data-case-property-rail]) button.option:is(:hover, :focus-visible, [aria-selected="true"]) {
+  background-color: transparent;
+}
+
+:global([data-case-property-rail]) button.option:focus-visible {
+  outline: 1px solid var(--falcon-text-muted);
+  outline-offset: -1px;
+  box-shadow: none;
+}
+
+:global([data-case-property-rail]) .optionLabel {
+  max-inline-size: 100%;
+  inline-size: fit-content;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: left calc(100% - 1px);
+  background-repeat: no-repeat;
+  background-size: 0 1px;
+  transition: background-size 160ms ease-out;
+}
+
+:global([data-case-property-rail]) .option[aria-selected="true"] .optionLabel { font-weight: 600; }
+:global([data-case-property-rail]) .option[aria-selected="true"] > svg:last-child { color: var(--falcon-text); }
+@media (hover: hover) {
+  :global([data-case-property-rail]) .option:hover:not(:disabled) .optionLabel { background-size: 100% 1px; }
+}
+
+:global([data-case-property-rail]) button.trigger:focus-visible {
+  outline: 1px solid var(--falcon-text-muted);
+  outline-offset: 1px;
+  box-shadow: none;
+}
+
+:global([data-case-property-rail]) button.valueTrigger {
+  --value-inset: 5px;
+  inline-size: calc(100% + var(--value-inset));
+  margin-inline-start: calc(0px - var(--value-inset));
+  padding-inline-start: calc(var(--value-inset) - 1px);
+  gap: 7px;
+}
+
+:global([data-case-property-rail]) button.valueTrigger > .valueLabel {
+  min-inline-size: 0;
+  overflow: visible;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  text-overflow: clip;
+}
+
+:global([data-case-property-rail]) .search {
+  --tms-focus-border: var(--falcon-text-muted);
+  --tms-focus-ring: transparent;
+}
+
+:global([data-case-property-rail]) .search:focus-within {
+  border-color: var(--falcon-text-muted);
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel[popover], .panel[popover][data-open="true"], :global([data-case-property-rail]) .optionLabel { transition: none; }
+}

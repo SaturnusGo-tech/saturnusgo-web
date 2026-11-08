@@ -101,7 +101,7 @@ function ArticlePanel({ api, scope, locale, selection, onClose, onOpenFull, trig
     </header>
     <div className={styles.scroll}>
       {article.status === "ready"
-        ? <ProductDocArticle document={article.data} copy={copy} sectionId={selection.sectionId} />
+        ? <ProductDocArticle document={article.data} copy={copy} versionPinned={selection.version !== undefined} sectionId={selection.sectionId} />
         : <ReadState copy={copy} status={article.status} retry={article.retry} />}
     </div>
   </motion.aside>;

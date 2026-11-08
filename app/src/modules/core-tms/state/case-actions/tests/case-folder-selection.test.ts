@@ -1,4 +1,5 @@
 import { saveCaseWithAttachments } from "../../../application/evidence/case/save/saveCaseWithAttachments";
+import * as pendingCaseAttachment from "../../../application/evidence/case/pendingCaseAttachment";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { runInNewContext } from "node:vm";
@@ -17,7 +18,8 @@ function harness(folderPath: string, folderId: string | null | undefined, archiv
   let selectedFolderId = "folder-a";
   const notices: string[] = [];
   const state = {
-    connection: "connected", editing: archived, caseDraft: { title: "New case", tags: [], steps: [] }, caseFolderPath: folderPath,
+    connection: "connected", editing: archived, caseDraft: { title: "New case", tags: [], steps: [], checklist: [] }, caseFolderPath: folderPath,
+    data: { workspace: { id: "workspace-a" } },
     isCaseSubmitting: () => false,
     setCaseDraft: () => { throw new Error("Archived case must not open an editor"); },
     beginCaseSubmission: () => true, finishCaseSubmission: () => undefined,
@@ -35,6 +37,7 @@ function harness(folderPath: string, folderId: string | null | undefined, archiv
       if (name === "react") return { useRef: (current: unknown) => ({ current }), useState: (value: unknown) => [value, () => {}] };
       if (name.endsWith("pending-operation")) return { resolvePendingOperation };
       if (name.endsWith("case-maintenance")) return { reconcileMaintenance };
+      if (name.endsWith("useCaseDocumentation")) return { useCaseDocumentation: () => ({fields: {}, save: async () => true, reset() {}}) };
       if (name.endsWith("mutation-failure")) return { isRequiredCustomFieldFailure: () => false, toTmsMutationFailure: (value: unknown) => value, formatTmsMutationFailure: () => "Unexpected failure" };
       if (name.endsWith("TmsHttpClientContext")) return { useTmsHttpClient: () => ({}) };
       if (name.endsWith("AttachmentClientProvider")) return { useAttachmentClient: () => ({ upload }) };
@@ -44,7 +47,7 @@ function harness(folderPath: string, folderId: string | null | undefined, archiv
         return { createTestCase: response, cloneTestCase: response, getTestCase: response };
       }
       if (name.endsWith("caseRevision")) return { normalizeRevisionTags: (tags: string[]) => tags };
-      if (name.endsWith("pendingCaseAttachment")) return { pendingCaseAttachmentSignature: () => "" };
+      if (name.endsWith("pendingCaseAttachment")) return pendingCaseAttachment;
       if (name.endsWith("saveCaseWithAttachments")) return { saveCaseWithAttachments };
       if (name.endsWith("uploadCaseAttachments") || name.endsWith("createUid")) return {};
       throw new Error(`Unexpected import ${name}`);

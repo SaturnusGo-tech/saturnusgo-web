@@ -29,9 +29,11 @@ import { stripRawHtml } from "./code/stripRawHtml";
 import { MarkdownContextArea } from "./context/MarkdownContextContent";
 import { MarkdownReadyContext } from "./transition/MarkdownTransition";
 import { MarkdownToolbar } from "./writing/MarkdownToolbar";
+import { suppressEmailLinkPreviewPlugin } from "./links/suppressEmailLinkPreviewPlugin";
 import { highlightPlugin } from "./highlight/editor/highlightPlugin";
 import typography from "./typography/markdownTypography.module.css";
 import markerCss from "./highlight/highlight.module.css";
+import { productDocDescriptionPaste } from "../../../../product-docs/requirements/description/editor/productDocDescriptionPaste";
 
 import { MarkdownEmojiFooter, MarkdownEmojiFooterContext } from "./emoji/MarkdownEmojiFooter";
 
@@ -51,6 +53,8 @@ export type InitializedMarkdownEditorProps = {
   onAttachmentFiles?: (files: File[]) => void;
   onRemoveAttachment?: (id: string) => void;
   renderFooter?: (emoji: ReactNode) => ReactNode;
+  productDocLinks?: boolean;
+  suppressEmailLinkPreview?: boolean;
 };
 
 export default function InitializedMarkdownEditor(props: InitializedMarkdownEditorProps) {
@@ -71,18 +75,20 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
     thematicBreakPlugin(),
     highlightPlugin(),
     linkPlugin({ validateUrl: props.validateUrl }),
+    ...(props.productDocLinks ? [productDocDescriptionPaste()] : []),
     linkDialogPlugin({
       onClickLinkCallback: (url) => {
         if (!props.validateUrl(url)) return;
         window.open(url, "_blank", "noopener,noreferrer");
       },
     }),
+    ...(props.suppressEmailLinkPreview ? [suppressEmailLinkPreviewPlugin()] : []),
     markdownShortcutPlugin(),
     toolbarPlugin({
       toolbarContents: () => <MarkdownToolbar locale={props.locale} />,
     }),
     contextContentPlugin(),
-  ], [props.locale, props.onAttachmentFiles, props.validateUrl]);
+  ], [props.locale, props.onAttachmentFiles, props.productDocLinks, props.suppressEmailLinkPreview, props.validateUrl]);
 
   useEffect(() => {
     const safe = stripRawHtml(props.markdown);
@@ -142,7 +148,7 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
       ref={editorRef}
       overlayContainer={overlayContainer ?? undefined}
       markdown={initialMarkdown}
-      className={`${css.wysiwyg} ${markerCss.surface} ${props.compact ? css.compact : ""}`}
+      className={`${css.wysiwyg} ${markerCss.surface} ${props.compact ? css.compact : ""} ${props.suppressEmailLinkPreview ? css.quietEmailLinks : ""}`}
       contentEditableClassName={`${css.editorContent} ${typography.prose}`}
       autoFocus={props.autoFocus && !onReady ? { defaultSelection: "rootStart", preventScroll: true } : false}
       placeholder={props.locale === "ru" ? "Введите текст…" : "Enter text…"}

@@ -2,6 +2,7 @@ import { Check, ChevronDown } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { KeyboardEvent, ReactNode } from "react";
 import styles from "./caseMetadata.module.css";
+import popup from "../../../common/popup/caseFieldPopup.module.css";
 import { useMetadataPopover } from "./popover/useMetadataPopover";
 import { nextMetadataOption } from "./navigation/nextMetadataOption";
 
@@ -80,7 +81,7 @@ export function MetadataSelect<T extends string>({
       <button
         ref={triggerRef}
         type="button"
-        className={styles.trigger}
+        className={`${styles.trigger} ${popup.trigger} ${selected?.tone ?? ""}`}
         aria-label={label}
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -97,6 +98,7 @@ export function MetadataSelect<T extends string>({
           }
           if (event.key === "Escape" && open) {
             event.preventDefault();
+            event.stopPropagation();
             close();
           }
         }}
@@ -108,16 +110,18 @@ export function MetadataSelect<T extends string>({
         id={menuId}
         ref={menuRef}
         popover="manual"
-        className={styles.menu}
+        className={`${styles.menu} ${popup.panel}`}
         role="listbox"
         aria-label={label}
         aria-hidden={!open}
+        inert={!open}
         data-open={open}
         onKeyDown={(event) => {
           if (["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
             move(event, event.key as "ArrowDown" | "ArrowUp" | "Home" | "End");
           } else if (event.key === "Escape") {
             event.preventDefault();
+            event.stopPropagation();
             close();
           } else if (event.key === "Tab") {
             setOpen(false);
@@ -137,6 +141,7 @@ export function MetadataSelect<T extends string>({
             ref={(node) => { optionRefs.current[index] = node; }}
             type="button"
             role="option"
+            className={popup.option}
             aria-selected={option.value === value}
             tabIndex={open && index === activeIndex ? 0 : -1}
             data-selected={option.value === value}
@@ -146,7 +151,7 @@ export function MetadataSelect<T extends string>({
               close();
             }}
           >
-            <span className={styles.optionLabel}>{option.icon}{option.label}</span>
+            <span className={styles.optionLabel}>{option.icon}<span className={popup.optionLabel}>{option.label}</span></span>
             {option.value === value && <Check size={13} aria-hidden="true" />}
           </button>
         ))}

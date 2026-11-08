@@ -1,22 +1,16 @@
 import { KlipyError, type KlipyItem, type KlipyPage } from "../model/klipy-types";
+import { klipyMediaUrl, klipyProviderUrl } from "../model/klipy-urls";
 
 const object = (value: unknown): Record<string, unknown> => {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new KlipyError("response");
   return value as Record<string, unknown>;
 };
-function providerUrl(input: unknown, hosts: readonly string[]) {
-  if (typeof input !== "string" || input.length > 4096) throw new KlipyError("response");
-  let url: URL; try { url = new URL(input); } catch { throw new KlipyError("response"); }
-  if (url.protocol !== "https:" || !hosts.includes(url.hostname) || url.username || url.password ||
-    url.hash || url.port && url.port !== "443") throw new KlipyError("response");
-  return input;
-}
 function item(input: unknown): KlipyItem {
   const value = object(input);
   if (typeof value.id !== "string" || !/^[A-Za-z0-9_-]{1,200}$/.test(value.id) || value.type === "ad") throw new KlipyError("response");
   const formats = object(value.media_formats), media = object(formats.tinygif ?? formats.gif);
-  const url = providerUrl(media.url, ["static.klipy.com", "static1.klipy.com", "static2.klipy.com"]);
-  const sourceUrl = value.itemurl ? providerUrl(value.itemurl, ["klipy.com"]) : undefined;
+  const url = klipyMediaUrl(media.url);
+  const sourceUrl = value.itemurl ? klipyProviderUrl(value.itemurl, ["klipy.com"]) : undefined;
   return { appearance: { kind: "gif", provider: "klipy", id: value.id, url, ...(sourceUrl ? { sourceUrl } : {}) },
     title: typeof value.title === "string" ? value.title : "GIF",
     description: typeof value.content_description === "string" ? value.content_description : "",

@@ -69,7 +69,7 @@ export function ScenarioStepEditor(props: Props) {
             placeholder={props.ru ? "Действие или запрос" : "Action or request"}
             autoFocus={props.autoFocus}
             onChange={(action) => props.onChange({ action })}
-            onPaste={actionAttachments.paste}
+            {...actionAttachments.transfer}
             renderFooter={(emoji) => <ScenarioAttachmentControls prefix={emoji} fieldKey={`step:${props.step.id}:action`} stepId={props.step.id} />} />}
       </div>
     </div>
@@ -83,7 +83,7 @@ export function ScenarioStepEditor(props: Props) {
         placeholder={props.ru ? "Что должно произойти" : "What should happen"}
         onChange={(expectedResult) => props.onChange({ expectedResult })}
         renderFooter={!props.attachmentScope ? (emoji) => <ScenarioAttachmentControls prefix={emoji} fieldKey={`step:${props.step.id}:expected`} stepId={props.step.id} /> : undefined}
-        onPaste={expectedAttachments.paste}
+        {...expectedAttachments.transfer}
       />
     </div>}
 
@@ -94,7 +94,7 @@ export function ScenarioStepEditor(props: Props) {
         placeholder={props.ru ? "Тестовые данные (необязательно)" : "Test data (optional)"}
         onChange={(testData) => props.onChange({ testData })}
         renderFooter={!props.attachmentScope ? (emoji) => <ScenarioAttachmentControls prefix={emoji} fieldKey={`step:${props.step.id}:data`} stepId={props.step.id} /> : undefined}
-        onPaste={dataAttachments.paste}
+        {...dataAttachments.transfer}
       />
     </div>}
     {!collapsed && !props.attachmentScope && <SavedScenarioAttachments ids={props.step.attachmentIds} />}

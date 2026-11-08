@@ -127,6 +127,7 @@ export function CasesView(props: CasesViewProps) {
             revision={props.editor?.value ?? props.revision}
             editor={props.editor}
             linkIds={props.linkIds}
+            canAttach={props.canAttach}
             activity={props.activity}
             collaboration={props.collaboration}
             onOpenDefect={props.onOpenDefect}

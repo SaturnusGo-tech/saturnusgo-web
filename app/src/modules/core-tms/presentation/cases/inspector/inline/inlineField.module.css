@@ -3,6 +3,21 @@
 .value:hover { background: var(--falcon-hover); }
 .value:focus-visible, .label:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 2px; }
 .label { padding: 0; color: inherit; background: transparent; border: 0; border-radius: 4px; font: inherit; text-align: left; cursor: text; }
-.input { box-sizing: border-box; width: 100%; min-width: 0; min-height: 36px; padding: 7px 9px; color: var(--falcon-text); background: var(--falcon-control); border: 1px solid var(--falcon-border-strong); border-radius: 12px; outline: 0; font: inherit; }
-.input:focus { border-color: var(--falcon-focus); }
+.input {
+  --tms-focus-border: var(--case-details-focus-border);
+  --tms-focus-ring: transparent;
+  --tms-input-hover-border: var(--falcon-border);
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 28px;
+  padding: 3px var(--case-details-input-inset);
+  color: var(--falcon-text);
+  background: var(--falcon-control);
+  border: 1px solid var(--falcon-border);
+  border-radius: 10px;
+  outline: 0;
+  font: inherit;
+}
+.input:focus { border-color: var(--case-details-focus-border); }
 @media (prefers-reduced-motion: reduce) { .value { transition: none; } }

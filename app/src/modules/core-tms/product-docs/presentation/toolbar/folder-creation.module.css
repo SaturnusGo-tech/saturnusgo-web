@@ -1,0 +1,43 @@
+.panel {
+  position: fixed;
+  inset: auto;
+  z-index: 24;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 10px;
+  overflow: auto;
+  border: 1px solid var(--falcon-border);
+  border-radius: 12px;
+  color: var(--falcon-text);
+  background: var(--falcon-elevated);
+  box-shadow: var(--falcon-shadow-popover);
+}
+
+.form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 30px 30px;
+  align-items: center;
+  gap: 4px;
+}
+
+.form .input {
+  --tms-focus-border: var(--falcon-text-muted);
+  --tms-focus-ring: transparent;
+  min-width: 0;
+  height: 32px;
+  padding: 4px 10px;
+  border: 1px solid var(--falcon-border);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.form .input:focus-visible {
+  border-color: var(--falcon-text-muted);
+  outline: none;
+}
+
+.form p { grid-column: 1 / -1; margin: 2px 0 0; }
+
+@supports not selector(:popover-open) {
+  .panel[aria-hidden="true"] { display: none; }
+}

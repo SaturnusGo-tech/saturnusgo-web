@@ -121,6 +121,10 @@
 .editorLoadingInput:focus { outline: 0; box-shadow: none; }
 
 .editorOverlayHost { width: 0; height: 0; overflow: hidden; }
+/* Prevent a preview flash while the editor clears its automatic link state. */
+.quietEmailLinks :global([data-radix-popper-content-wrapper]:has([data-testid="link-dialog-preview"][href^="mailto:" i])) {
+  display: none;
+}
 :global(.mdxeditor-popup-container).wysiwyg {
   position: absolute;
   z-index: 280;

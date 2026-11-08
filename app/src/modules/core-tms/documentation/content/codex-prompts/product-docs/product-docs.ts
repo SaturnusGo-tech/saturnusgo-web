@@ -1,0 +1,28 @@
+import { code, paragraph, section, type DocArticle } from "../../../model/article";
+
+export const productDocPrompts: DocArticle = {
+  id: "codex-prompts-product-docs",
+  title: "Write product documentation",
+  description: "Turn requirements into QA pages, review changes against the source and prepare a draft for publication.",
+  group: "codex-prompts",
+  keywords: ["product documentation", "QA requirements", "source PDF", "page draft", "manage-product-docs", "Codex"],
+  related: ["codex-prompts", "product-docs-authoring", "codex-web-qa"],
+  sections: [
+    section("requirements", "Draft requirements from a source",
+      paragraph("Use an attached specification, a design or an approved set of notes to draft a rule that testers can verify."),
+      code("prompt", "Prepare a QA requirements page",
+        `Use manage-product-docs in Falcon project [project]. Read [attached PDF, design link or approved notes] and draft a page under [folder or parent page]. For each rule, describe the trigger, expected behavior and exceptions. Cite the source section or page. List unclear points separately and ask me to resolve them. Show the draft first and save it only after I confirm the destination and content. I’ll publish it in Falcon.`)),
+    section("revision", "Review a change to a published rule",
+      paragraph("Use this when a requirement changes and test cases already link to specific sections."),
+      code("prompt", "Propose a focused revision",
+        `Open [Falcon page link] in [project]. Compare the latest publication and any saved draft with [approved change]. Show the affected sections and proposed edits. Keep existing section IDs so their links continue to work. If another draft or change already exists, show it before replacing any text. Wait for approval before saving. Leave publication to me in Falcon.`)),
+    section("coverage", "Check the cases affected by a rule",
+      paragraph("Use this to prepare a coverage review while leaving the repository and documentation as they are."),
+      code("prompt", "Trace a rule to test coverage",
+        `Read [Falcon page and section] in [project] and record its publication version. Review the cases from [case links, if known] and search [folder] using terms from the rule. Show which rules are covered, which cases may be stale and which rules have no check in the material you reviewed. Include case links and evidence for each gap. Keep this review read-only.`)),
+    section("release-guide", "Write a release verification guide",
+      paragraph("Use a release brief and run results to prepare a guide another tester can follow."),
+      code("prompt", "Draft a release verification guide",
+        `In Falcon project [project], use [release brief] and [run or report] to draft a verification guide for [release]. Include the build, environment, smoke checks, stop conditions and owners where they are known. Link to the exact run and relevant product pages. Identify missing information and wait for my review before saving the draft. I’ll publish it in Falcon.`)),
+  ],
+};

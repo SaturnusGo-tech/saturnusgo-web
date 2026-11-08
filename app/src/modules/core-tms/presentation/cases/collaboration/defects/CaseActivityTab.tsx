@@ -7,6 +7,7 @@ import type { TmsLocale } from "../../../../localization/model/locale";
 import type { CaseCollaborationViewModel } from "../model";
 import { activityActorLabel, caseActivityForKey } from "../model";
 import { CaseDefectRecord } from "./CaseDefectRecord";
+import { CaseTabEmpty } from "../../detail/tabs/empty/CaseTabEmpty";
 import styles from "../../cases.module.css";
 import css from "../caseCollaboration.module.css";
 
@@ -28,9 +29,7 @@ export function CaseActivityTab(props: Props) {
     && !props.model.defects.refreshFailed
     && props.model.defects.items.length === 0 && caseActivity.length === 0;
 
-  if (empty) return <div className={styles.tabEmpty}>
-    <FileClock size={22} /><span>{ru ? "История пока пуста" : "No activity yet"}</span>
-  </div>;
+  if (empty) return <CaseTabEmpty kind="history" locale={props.locale} />;
 
   return <div className={styles.contextList}>
     {history.loading && <div role="status" aria-label={ru ? "Загрузка истории" : "Loading history"} aria-busy="true" className={css.historySkeleton}><i /><i /><i /></div>}

@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import type { DocArticle, DocBlock } from "../../app/src/modules/core-tms/documentation/model/article";
+import { barChartText } from "../../app/src/modules/core-tms/documentation/model/search";
 import { documentationMediaLocale, documentationSectionMedia, type DocumentationMedia } from "../../app/src/modules/core-tms/documentation/model/visual/guide-media";
 
 type Locale = "en" | "ru";
@@ -21,6 +22,7 @@ function blockText(block: DocBlock, articles: ReadonlyMap<string, DocArticle>): 
     case "steps": return block.items.map((item, index) => `${index + 1}. ${item.title}\n${item.text}`).join("\n\n");
     case "callout": return `${block.title}\n${block.text}`;
     case "table": return [block.columns, ...block.rows].map(row => row.join(" | ")).join("\n");
+    case "bar-chart": return barChartText(block);
     case "code": return `${block.caption}\n\`\`\`${block.language}\n${block.text}\n\`\`\``;
     case "articles": return block.ids.map(id => {
       const article = articles.get(id);

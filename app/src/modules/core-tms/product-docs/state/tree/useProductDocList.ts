@@ -13,12 +13,13 @@ export function useProductDocList(api: ProductDocsApi, scope: ProductDocScope, o
 }) {
   const { workspaceId, projectId } = scope;
   const { parentId, q, refresh, draft } = options;
-  const key = JSON.stringify([workspaceId, projectId, parentId, q, refresh, draft]);
+  const key = JSON.stringify([workspaceId, projectId, parentId, q, draft]);
+  const pageKey = JSON.stringify([key, refresh]);
   const [loaded, setLoaded] = useState<Loaded>();
   const [page, setPage] = useState<{ key: string; cursor?: string; attempt: number }>();
   const active = loaded?.key === key ? loaded : undefined;
-  const cursor = page?.key === key ? page.cursor : undefined;
-  const attempt = page?.key === key ? page.attempt : undefined;
+  const cursor = page?.key === pageKey ? page.cursor : undefined;
+  const attempt = page?.key === pageKey ? page.attempt : undefined;
   useEffect(() => {
     const abort = new AbortController();
     setLoaded((previous) => previous?.key === key ? { ...previous, error: false, loading: true } : undefined);
@@ -38,16 +39,16 @@ export function useProductDocList(api: ProductDocsApi, scope: ProductDocScope, o
       }));
     });
     return () => abort.abort();
-  }, [api, workspaceId, projectId, parentId, q, draft, key, cursor, attempt]);
+  }, [api, workspaceId, projectId, parentId, q, draft, key, refresh, cursor, attempt]);
 
   return {
     data: active?.data,
     loading: !active || active.loading,
     error: active?.error ?? false,
-    retry() { setPage({ key, cursor, attempt: (attempt ?? 0) + 1 }); },
+    retry() { setPage({ key: pageKey, cursor, attempt: (attempt ?? 0) + 1 }); },
     more() {
       if (!active?.data.nextCursor || active.loading) return;
-      setPage({ key, cursor: active.data.nextCursor, attempt: 0 });
+      setPage({ key: pageKey, cursor: active.data.nextCursor, attempt: 0 });
     },
   };
 }

@@ -1,0 +1,37 @@
+.figure {
+  margin: 24px 0 28px;
+  padding: clamp(14px, 3vw, 22px);
+  border: 1px solid var(--docs-line);
+  border-radius: 12px;
+  background: var(--docs-panel);
+  color: var(--docs-copy);
+}
+.caption { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 4px 16px; }
+.caption strong { font-size: 16px; }
+.caption span { font-size: 14px; color: var(--docs-muted); }
+.plot { margin-block-start: 18px; --chart-columns: clamp(4.5rem, 14vw, 6.5rem) minmax(0, 1fr) 2ch; }
+.bars { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.row, .axis { display: grid; grid-template-columns: var(--chart-columns); gap: 12px; }
+.row { align-items: center; font-size: 14px; }
+.row > strong { text-align: end; font-variant-numeric: tabular-nums; }
+.track {
+  display: block;
+  height: 12px;
+  background: var(--docs-control);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.fill { display: block; height: 100%; border-radius: 6px; background: var(--docs-muted); }
+.fill[data-tone="pass"] { background: var(--falcon-success, var(--docs-muted)); }
+.fill[data-tone="fail"] { background: var(--falcon-danger, var(--docs-muted)); }
+.axis { margin-block-start: 10px; }
+.axis > div {
+  grid-column: 2;
+  display: flex;
+  justify-content: space-between;
+  padding-block-start: 6px;
+  border-block-start: 1px solid var(--docs-line);
+  color: var(--docs-muted);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}

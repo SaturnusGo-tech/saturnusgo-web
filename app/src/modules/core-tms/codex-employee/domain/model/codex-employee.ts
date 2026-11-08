@@ -5,7 +5,7 @@ export type CodexEmployee = Readonly<Omit<components["schemas"]["CodexEmployeeSt
 export type PersonalCodexConnection = Readonly<components["schemas"]["FalconMcpConnection"]>;
 export interface CodexEmployeePort {
     status(signal: AbortSignal): Promise<CodexEmployee>;
-    connections(signal: AbortSignal): Promise<readonly PersonalCodexConnection[]>;
+    connections(signal: AbortSignal, workspaceId?: string): Promise<readonly PersonalCodexConnection[]>;
     deactivate(employee: CodexEmployee, commandId: string, signal: AbortSignal): Promise<void>;
     revoke(grantId: string, signal: AbortSignal): Promise<void>;
 }

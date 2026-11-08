@@ -2,11 +2,12 @@ import { articles, code, paragraph, section, type DocArticle } from "../../model
 import { configurationPrompts } from "./configuration/configuration";
 import { defectPrompts } from "./defects/defects";
 import { reportingPrompts } from "./reporting/reporting";
+import { productDocPrompts } from "./product-docs/product-docs";
 import { repositoryPrompts } from "./repository/repository";
 import { runPrompts } from "./runs/runs";
 import { webQaPrompts } from "./web-qa/web-qa";
 
-const topics = [repositoryPrompts, runPrompts, webQaPrompts, defectPrompts, reportingPrompts, configurationPrompts];
+const topics = [repositoryPrompts, productDocPrompts, runPrompts, webQaPrompts, defectPrompts, reportingPrompts, configurationPrompts];
 const overview: DocArticle = {
   id: "codex-prompts",
   title: "Codex playbook",

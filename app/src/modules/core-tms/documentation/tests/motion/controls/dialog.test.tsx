@@ -3,6 +3,7 @@ import { test } from "node:test";
 import { act, create } from "react-test-renderer";
 import React, { useState } from "react";
 import { useScreenshotMotion } from "../../../presentation/walkthrough/motion/useScreenshotMotion";
+import { documentationCopy } from "../../../localization/ui-copy";
 import type { ScreenshotDialog } from "../../../presentation/walkthrough/ScreenshotDialog";
 import { componentHarness, invoke, nodes } from "../../../../portfolios/tests/support/component-harness";
 import { motionDom } from "../fake-dom";
@@ -33,11 +34,10 @@ test("close waits for the shared element, restores focus and ignores navigation 
 test("native Escape and backdrop dismiss through motion while arrows preserve existing navigation", () => {
   const h = componentHarness(); let closes = 0, prevented = 0; const selected: number[] = [];
   const { ScreenshotDialog: render } = h.load<{ ScreenshotDialog: typeof ScreenshotDialog }>(new URL("../../../presentation/walkthrough/ScreenshotDialog.tsx", import.meta.url), name => {
-    if (name.endsWith("useDocumentationCopy")) return { useDocumentationCopy: () => ({}) };
     if (name.endsWith("useScreenshotMotion")) return { useScreenshotMotion: () => ({ close: () => closes++, closed() {}, select: (value: number) => selected.push(value) }) };
   });
   const steps = Array.from({ length: 3 }, () => ({ title: "Step", instruction: "Do", result: "Done", image: { src: "/image.jpg", alt: "View", width: 1440, height: 900 } }));
-  const dialog = nodes(h.render(() => render({ steps, selected: 1, onSelect() {} }))).find(node => node.type === "dialog")!;
+  const dialog = nodes(h.render(() => render({ copy: documentationCopy.en, steps, selected: 1, onSelect() {} }))).find(node => node.type === "dialog")!;
   invoke(dialog, "onCancel", { preventDefault: () => prevented++ }); assert.equal(prevented, 1); assert.equal(closes, 1);
   const backdrop = {}; invoke(dialog, "onClick", { target: backdrop, currentTarget: backdrop }); assert.equal(closes, 2);
   for (const key of ["ArrowLeft", "ArrowRight"]) invoke(dialog, "onKeyDown", { key, preventDefault: () => prevented++ });

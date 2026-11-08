@@ -1,10 +1,11 @@
 import { docArticles as englishArticles, docGroups as englishGroups } from "../../core-tms/documentation/content/catalog";
 import { docArticles as russianArticles, docGroups as russianGroups } from "../../core-tms/documentation/content-ru/catalog";
+import { isProductDocsPreviewImage } from "../../core-tms/documentation/content/product-docs/guide-captures";
 import type { DocSection } from "../../core-tms/documentation/model/article";
 import type { PublicDocBlock, PublicDocCatalog, PublicDocLocale, PublicDocSection } from "./model";
 
 // This server-side projection is the only bridge to the in-app guide. New articles
-// are private by default; walkthroughs include production screenshots and context.
+// are private by default. Production walkthroughs stay in the workspace guide.
 const publicArticleIds = new Set([
   "introduction", "quick-start", "workspace", "navigation", "settings", "portfolios", "dashboard",
   "create-test-case", "edit-test-case", "archive-test-case", "custom-fields", "custom-field-values",
@@ -13,6 +14,7 @@ const publicArticleIds = new Set([
   "telegram-notifications", "browser-notifications", "integration-overview", "codex-web-qa",
   "codex-prompts", "codex-prompts-repository", "codex-prompts-runs", "codex-prompts-web-qa",
   "codex-prompts-defects", "codex-prompts-reporting", "codex-prompts-configuration",
+  "product-docs-authoring", "codex-prompts-product-docs",
   "youtrack", "jira", "linear", "trello", "github", "slack", "confluence", "swagger",
   "integration-troubleshooting", "api-testing", "permissions", "glossary", "contact-support",
 ]);
@@ -25,7 +27,11 @@ function publicSection(section: DocSection, articleId: string, locale: PublicDoc
       : "The connected Falcon plugin in Codex helps you find and maintain test cases, prepare runs, and save results from authorized QA actions. Your role and connection permissions determine the available actions." }],
   };
   const blocks: PublicDocBlock[] = section.blocks.flatMap((block): PublicDocBlock[] => {
-    if (block.kind === "walkthrough") return [];
+    if (block.kind === "walkthrough") {
+      if (articleId !== "product-docs-authoring") return [];
+      const steps = block.steps.filter(step => isProductDocsPreviewImage(step.image.src, locale));
+      return steps.length ? [{ ...block, steps }] : [];
+    }
     if (block.kind === "articles") {
       const ids = block.ids.filter(id => publicArticleIds.has(id));
       return ids.length ? [{ kind: "articles", ids }] : [];

@@ -19,6 +19,7 @@ const supportedScopes = new Set(Object.keys({
   "falcon:projects:manage": true,
   "falcon:dashboard-preferences:write": true,
   "falcon:dashboard-reminders:write": true,
+  "falcon:product-docs:write": true,
   offline_access: true,
 } satisfies Record<CodexEmployee["setup"]["scopes"][number], true>));
 

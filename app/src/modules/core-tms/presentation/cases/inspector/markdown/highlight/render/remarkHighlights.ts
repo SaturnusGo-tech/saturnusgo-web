@@ -8,15 +8,17 @@ import type { Extension as MdastExtension } from "mdast-util-from-markdown";
 import { directiveLiteral, highlightColorOf } from "../model/highlightSyntax";
 
 /** Only our exact color vocabulary reaches HTML; arbitrary directive attributes never do. */
-export function remarkHighlights() {
+export function remarkHighlights({ preserveOtherDirectives = false } = {}) {
   return (tree: Root) => {
     normalizeMarkerLinks(tree);
     function childrenOf(parent: { children: RootContent[] }) {
       parent.children = parent.children.map((node) => {
         if (["textDirective", "leafDirective", "containerDirective"].includes(node.type)) {
           const color = highlightColorOf(node);
-          if (!color) return { type: "text", value: directiveLiteral(node) };
-          node.data = { hName: "mark", hProperties: { "data-marker": color } };
+          if (!color && (!preserveOtherDirectives || ("name" in node && node.name === "highlight"))) {
+            return { type: "text", value: directiveLiteral(node) };
+          }
+          if (color) node.data = { hName: "mark", hProperties: { "data-marker": color } };
         }
         if ("children" in node) childrenOf(node as { children: RootContent[] });
         return node;

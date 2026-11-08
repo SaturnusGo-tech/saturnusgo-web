@@ -1,0 +1,59 @@
+.root { position: relative; }
+.action {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  gap: 5px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--falcon-text);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 540;
+  cursor: pointer;
+}
+.action:hover:not(:disabled) { background: var(--falcon-hover); }
+.action:focus-visible, .notice :is(a, button):focus-visible {
+  outline: 2px solid var(--falcon-focus);
+  outline-offset: 2px;
+}
+.action:disabled { color: var(--falcon-text-secondary); cursor: default; }
+.action .mark { width: 18px; height: 18px; }
+.notice {
+  position: absolute;
+  z-index: 7;
+  inset-block-start: calc(100% + 8px);
+  inset-inline-end: 0;
+  width: min(264px, calc(100vw - 28px));
+  padding: 11px 12px;
+  border: 1px solid var(--falcon-border);
+  border-radius: 10px;
+  background: var(--falcon-elevated);
+  color: var(--falcon-text);
+  box-shadow: var(--falcon-shadow-popover);
+  font-size: 12px;
+}
+.notice p { margin: 0 17px 9px 0; line-height: 1.4; }
+.notice button, .notice a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--falcon-link);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+.notice :is(a, button):hover { background: var(--falcon-hover); }
+.notice .dismiss {
+  position: absolute;
+  inset-block-start: 5px;
+  inset-inline-end: 5px;
+  color: var(--falcon-text-secondary);
+}
+.links { display: flex; flex-wrap: wrap; gap: 6px; }

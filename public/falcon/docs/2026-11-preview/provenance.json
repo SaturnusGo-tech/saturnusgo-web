@@ -1,0 +1,124 @@
+{
+  "captures": [
+    {
+      "file": "/falcon/docs/2026-11-preview/product-docs-overview.jpg",
+      "source": "isolated-product-docs-preview",
+      "locale": "en",
+      "sourceState": "overview",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sha256": "1506b84d86670d43ce55841ffad23abc14b7856e3af961082283e7032f969bd1"
+    },
+    {
+      "file": "/falcon/docs/2026-11-preview/product-docs-rule.jpg",
+      "source": "isolated-product-docs-preview",
+      "locale": "en",
+      "sourceState": "published-v2",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sha256": "3e3c06c0839f402c775708597d584d7c752e6487a2b2e3fd78f5a98dff86f646"
+    },
+    {
+      "file": "/falcon/docs/2026-11-preview/product-docs-editor.jpg",
+      "source": "isolated-product-docs-preview",
+      "locale": "en",
+      "sourceState": "editing-v2",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sha256": "387fb06acf18dbeb5060651f5ec3b2eafdcbf0768245e87e81869b8e09f2582b"
+    },
+    {
+      "file": "/falcon/docs/2026-11-preview/product-docs-case.jpg",
+      "source": "isolated-product-docs-preview",
+      "locale": "en",
+      "sourceState": "case-linked-to-v2",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sha256": "19d00ce6c35903c5d0a486ba435bc9dbe3987b8724ae44ae9985f84ac7c55292"
+    },
+    {
+      "file": "/falcon/docs/2026-11-preview/product-docs-run.jpg",
+      "source": "isolated-product-docs-preview",
+      "locale": "en",
+      "sourceState": "pinned-run-v1",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sha256": "1e9a1c045df95043fd4e193684d4afdf21ab15d12254f76f36b8ee5a2d7fabe6"
+    },
+    {
+      "file": "/falcon/docs/2026-11-preview-ru/product-docs-overview.jpg",
+      "source": "isolated-product-docs-preview",
+      "locale": "ru",
+      "sourceState": "overview",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sha256": "d5f16c3c3f4f301b5ce24e7bfcd2ba3b2a3662d1af5a9e79d8fcd812efc54af5"
+    },
+    {
+      "file": "/falcon/docs/2026-11-preview-ru/product-docs-rule.jpg",
+      "source": "isolated-product-docs-preview",
+      "locale": "ru",
+      "sourceState": "published-v2",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sha256": "2f236b52b2f199de1e01d4506a285f7db228b549487b7dd2b912081736c646e7"
+    },
+    {
+      "file": "/falcon/docs/2026-11-preview-ru/product-docs-editor.jpg",
+      "source": "isolated-product-docs-preview",
+      "locale": "ru",
+      "sourceState": "editing-v2",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sha256": "861e72d559416fee910e6a926cdb18329c4a4123bd45721178f6d2db14f5fb92"
+    },
+    {
+      "file": "/falcon/docs/2026-11-preview-ru/product-docs-case.jpg",
+      "source": "isolated-product-docs-preview",
+      "locale": "ru",
+      "sourceState": "case-linked-to-v2",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sha256": "566d5660dab7dd6e338c1d1d31f499921a935ea2c094ed14d04c058920dc9691"
+    },
+    {
+      "file": "/falcon/docs/2026-11-preview-ru/product-docs-run.jpg",
+      "source": "isolated-product-docs-preview",
+      "locale": "ru",
+      "sourceState": "pinned-run-v1",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sha256": "cf99a99c6c237803a01a125be83a0285990b597aef043f3f6f7ebce659d763bd"
+    }
+  ]
+}

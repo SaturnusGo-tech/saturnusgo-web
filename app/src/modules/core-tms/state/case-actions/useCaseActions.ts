@@ -12,7 +12,7 @@ import {
 } from "../../../../core/tms/idempotency/pending-operation";
 import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
 import { useAttachmentClient } from "../../attachments/presentation/context/AttachmentClientProvider";
-import { pendingCaseAttachmentSignature, type PendingCaseAttachment, type CaseAttachmentProgress } from "../../application/evidence/case/pendingCaseAttachment";
+import { filterPendingCaseAttachments, pendingCaseAttachmentSignature, type PendingCaseAttachment, type CaseAttachmentProgress } from "../../application/evidence/case/pendingCaseAttachment";
 import { saveCaseWithAttachments, type CaseSaveCheckpoint } from "../../application/evidence/case/save/saveCaseWithAttachments";
 import { createEmptyRevision, normalizeRevisionTags } from "../../helpers/cases/caseRevision";
 import { createUid } from "../../helpers/id/createUid";
@@ -23,6 +23,7 @@ import {
 import type { useWorkspaceDerived } from "../workspace-derived/useWorkspaceDerived";
 import type { useWorkspaceState } from "../workspace/useWorkspaceState";
 import { reconcileMaintenance } from "../../test-cases/maintenance/model/case-maintenance";
+import { useCaseDocumentation } from "./documentation/useCaseDocumentation";
 
 function summaryOf(testCase: TestCase, etag: string): TestCaseSummary {
   const { current: _current, linkIds: _linkIds, ...summary } = testCase;
@@ -41,14 +42,14 @@ export function useCaseActions(
   const saveCheckpoint = useRef<CaseSaveCheckpoint | null>(null);
   const [caseAttachmentRecovery, setCaseAttachmentRecovery] = useState(false);
   const [caseRequiredFields, setCaseRequiredFields] = useState(false);
-
+  const documentation = useCaseDocumentation(http, locale, notify);
   function commit(testCase: TestCase, etag: string | null, append = false) {
     const summary: TestCaseSummary = state.connection === "demo"
       ? summaryOf(testCase, "")
       : summaryOf(testCase, etag ?? "");
     state.setData((current) => ({
       ...current,
-      testCases: append
+      testCases: append && !current.testCases.some(item => item.id === summary.id)
         ? [...current.testCases, summary]
         : current.testCases.map((item) => item.id === summary.id ? reconcileMaintenance(summary, item) : item),
     }));
@@ -65,6 +66,7 @@ export function useCaseActions(
     saveCheckpoint.current = null;
     setCaseAttachmentRecovery(false);
     setCaseRequiredFields(false);
+    documentation.reset();
     state.setCaseDraft(createEmptyRevision(locale));
     state.setCaseFolderPath(folderPath);
     state.setEditing(false);
@@ -77,6 +79,7 @@ export function useCaseActions(
     saveCheckpoint.current = null;
     setCaseAttachmentRecovery(false);
     setCaseRequiredFields(false);
+    documentation.reset();
     state.setCaseDraft(structuredClone(derived.selectedRevision));
     state.setCaseFolderPath(derived.selectedCase?.folderPath ?? "/Unsorted");
     state.setEditing(true);
@@ -94,7 +97,7 @@ export function useCaseActions(
       revision: { ...state.caseDraft, tags: normalizeRevisionTags(state.caseDraft.tags) },
     };
     const validStepIds = new Set(input.revision.steps.map(({ id }) => id));
-    const validFiles = files.filter(({ stepId }) => !stepId || validStepIds.has(stepId));
+    const validFiles = filterPendingCaseAttachments(files, validStepIds, new Set(input.revision.checklist.map(({ id }) => id)));
 
     try {
       if (state.connection === "demo") {
@@ -105,7 +108,6 @@ export function useCaseActions(
           ? { ...previous, folderPath: input.folderPath, currentRevision: revision.revision, revisionCount: previous.revisionCount + 1, current: revision, title: revision.title, type: revision.type, lifecycle: revision.lifecycle, priority: revision.priority, component: revision.component, ownerIdentityId: revision.ownerIdentityId, tags: revision.tags, estimatedMinutes: revision.estimatedMinutes, updatedAt: now }
           : { id: createUid("case"), projectId: derived.project.id, key: `${derived.project.key}-TC-${String(derived.projectCases.length + 1).padStart(3, "0")}`, folderPath: input.folderPath, currentRevision: 1, revisionCount: 1, title: revision.title, type: revision.type, lifecycle: revision.lifecycle, priority: revision.priority, component: revision.component, ownerIdentityId: revision.ownerIdentityId, tags: revision.tags, estimatedMinutes: revision.estimatedMinutes, current: revision, linkIds: [], archivedAt: null, createdAt: now, updatedAt: now };
         commit(testCase, null, !previous);
-
       } else {
         const signature = JSON.stringify({
           caseId: state.editing ? derived.selectedCase?.id ?? null : null,
@@ -129,7 +131,12 @@ export function useCaseActions(
           },
           reload: (id) => getTestCase(http, id),
         });
+        saveCheckpoint.current.saved = refreshed;
         commit(refreshed.data, refreshed.etag, !state.editing);
+        setCaseAttachmentRecovery(false);
+        if (!await documentation.save({
+          workspaceId: state.data.workspace.id, projectId: refreshed.data.projectId,
+        }, refreshed.data.id, refreshed.data.current, state.editing)) return;
       }
     } catch (caught) {
       for (const file of validFiles) if (!saveCheckpoint.current?.completed.has(file.id)) onProgress?.(file.id, "error");
@@ -154,10 +161,10 @@ export function useCaseActions(
     caseOperation.current = null;
     saveCheckpoint.current = null;
     setCaseAttachmentRecovery(false);
+    documentation.reset();
     state.setDialog(null);
     notify(state.editing ? t("actions.caseRevisionSaved") : t("actions.caseCreated"));
   }
-
   async function cloneCase() {
     if (!derived.selectedCase || derived.selectedCase.archivedAt) return;
     try {
@@ -189,5 +196,5 @@ export function useCaseActions(
     notify(restoring ? t("actions.caseRestored") : t("actions.caseArchived"));
   }
 
-  return { caseAttachmentRecovery, caseRequiredFields, openNewCase, openEditCase, saveCase, cloneCase, toggleArchiveCase };
+  return { caseAttachmentRecovery, caseRequiredFields, ...documentation.fields, openNewCase, openEditCase, saveCase, cloneCase, toggleArchiveCase };
 }

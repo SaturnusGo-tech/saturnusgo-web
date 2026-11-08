@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { appendPendingCaseAttachments, type PendingCaseAttachment } from "../../../../application/evidence/case/pendingCaseAttachment";
+import { appendPendingCaseAttachments, filterPendingCaseAttachments, type PendingCaseAttachment } from "../../../../application/evidence/case/pendingCaseAttachment";
 import type { TmsLocale } from "../../../../localization/model/locale";
 
 type DraftContext = {
@@ -22,6 +22,7 @@ export function CaseAttachmentDraftProvider(props: {
   locked?: boolean;
   entries: PendingCaseAttachment[];
   validStepIds: ReadonlySet<string>;
+  validChecklistIds?: ReadonlySet<string>;
   onEntries: (entries: PendingCaseAttachment[]) => void;
   children: React.ReactNode;
 }) {
@@ -29,11 +30,11 @@ export function CaseAttachmentDraftProvider(props: {
   const [problem, setProblem] = useState<DraftContext["problem"]>(null);
   useEffect(() => { entriesRef.current = props.entries; }, [props.entries]);
   useEffect(() => {
-    const next = entriesRef.current.filter(({ stepId }) => !stepId || props.validStepIds.has(stepId));
+    const next = filterPendingCaseAttachments(entriesRef.current, props.validStepIds, props.validChecklistIds);
     if (next.length === entriesRef.current.length) return;
     entriesRef.current = next;
     props.onEntries(next);
-  }, [props.validStepIds, props.onEntries]);
+  }, [props.validStepIds, props.validChecklistIds, props.onEntries]);
 
   const update = useCallback((entries: PendingCaseAttachment[]) => {
     entriesRef.current = entries;
@@ -44,8 +45,8 @@ export function CaseAttachmentDraftProvider(props: {
     const result = appendPendingCaseAttachments(entriesRef.current, { fieldKey, files, stepId });
     update(result.entries);
     setProblem(result.rejected > 0 ? { fieldKey, message: props.locale === "ru"
-      ? "Часть файлов не добавлена: дубликат или превышен лимит 20 вложений."
-      : "Some files were not added: duplicate or the 20-file limit was reached." } : null);
+      ? "Часть файлов не добавлена: пустой файл, дубликат или превышен лимит 20 вложений."
+      : "Some files were not added because they were empty, duplicates, or exceeded the 20-file limit." } : null);
   }, [props.locale, props.locked, update]);
   const remove = useCallback((id: string) => {
     if (props.locked) return;

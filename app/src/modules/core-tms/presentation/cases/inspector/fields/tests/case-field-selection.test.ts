@@ -21,6 +21,18 @@ test("explicit regression false remains an ID selection, not a missing boolean",
   const next=updateCaseField(createEmptyRevision(),regression,[{id:"no",value:false,label:"false",parentValueId:null}]);
   assert.equal(next.regression,false);assert.equal(next.customFields?.[0].values[0].id,"no");
 });
+test("changing a saved value preserves its position in the snapshot", () => {
+  const platform = field("platform", null);
+  const channel = field("channel", null);
+  const initial = createEmptyRevision();
+  const first = { ...initial, ...updateCaseField(initial, platform, [value("web")]) };
+  const revision = { ...first, ...updateCaseField(first, channel, [value("release")]) };
+  const next = updateCaseField(revision, platform, [value("desktop")]);
+  assert.deepEqual(next.customFields?.map(item => [item.fieldId, item.values[0].id]), [
+    ["platform", "desktop"],
+    ["channel", "release"],
+  ]);
+});
 test("cancelling field edits restores immutable values and preserves another edited section",()=>{
   const original={...createEmptyRevision(),...updateCaseField(createEmptyRevision(),product,[value("legacy")])};
   const saved=copyInspectorRevision(original); original.customFields![0].values[0].label="Changed label";

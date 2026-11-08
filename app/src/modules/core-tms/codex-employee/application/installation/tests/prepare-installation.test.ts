@@ -17,6 +17,7 @@ test("internal registration accepts the workspace setup scopes advertised by the
   const contract = JSON.parse(readFileSync(new URL("../../../../../../core/tms/generated/tms-openapi.json", import.meta.url), "utf8"));
   const scopes = contract.components.schemas.CodexSetup.properties.server.properties.scopes.items.enum;
   assert.ok(scopes.includes("falcon:dashboard-reminders:write"));
+  assert.ok(scopes.includes("falcon:product-docs:write"));
   await prepareCodexInstallation({ ...setup("company.test"), scopes });
 });
 test("credentials, query tokens, fragments, insecure transport and cross-company URLs are rejected", async () => {

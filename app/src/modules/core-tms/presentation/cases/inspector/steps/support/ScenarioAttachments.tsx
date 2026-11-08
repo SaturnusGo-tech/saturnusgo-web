@@ -1,10 +1,10 @@
 "use client";
 
-import type { ClipboardEvent, ReactNode } from "react";
-import { filesFromClipboard } from "../../../../../application/evidence/case/pendingCaseAttachment";
+import type { ReactNode } from "react";
 import { useTmsLocale } from "../../../../../localization/context/useTmsLocale";
 import { AttachmentLink } from "../../../../../attachments/presentation/link/AttachmentLink";
 import { useCaseAttachmentDraft } from "../../attachments/CaseAttachmentDraftContext";
+import { fileTransferHandlers } from "../../attachments/input/fileTransfer";
 import {
   MarkdownAttachmentButton,
   MarkdownPendingAttachments,
@@ -25,14 +25,7 @@ export function useScenarioAttachments({ fieldKey, stepId }: DraftAttachmentsPro
     problem: draft?.problem?.fieldKey === fieldKey ? draft.problem.message : "",
     addFiles,
     remove: draft?.remove,
-    paste(event: ClipboardEvent<HTMLTextAreaElement>) {
-      if (!draft?.enabled) return false;
-      const files = filesFromClipboard(event.clipboardData);
-      if (files.length === 0) return false;
-      event.preventDefault();
-      draft.add(fieldKey, files, stepId);
-      return true;
-    },
+    transfer: fileTransferHandlers(draft?.enabled && !draft.locked ? addFiles : undefined),
   };
 }
 

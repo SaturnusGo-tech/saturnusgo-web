@@ -10,6 +10,7 @@ export function WorkspaceCasesStage({ model }: { model: WorkspaceModel }) {
   const structure = useFolderStructureScreen();
   if (structure.open && !model.repositoryScope.aggregate) return <FolderStructurePage key={`${model.data.workspace.id}:${model.project?.id}`} resource={model.folders} ru={locale === "ru"} onBack={structure.close} focusFolderId={structure.focusFolderId} onFocusHandled={structure.clearFocus} />;
   const selectionAllowed = !model.repositoryScope.aggregate || model.portfolioRepository.catalog?.projects.some(project => project.id === model.selectedCase?.projectId);
+  const capabilities = model.data.meta.authorization.capabilities;
   return <CasesView key={model.repositoryScope.aggregate ? model.repositoryScope.key : model.project?.id}
     repository={model.repositoryScope.aggregate ? <PortfolioRepository key={model.repositoryScope.key} model={model} /> : undefined}
     folders={model.folders}
@@ -29,6 +30,7 @@ export function WorkspaceCasesStage({ model }: { model: WorkspaceModel }) {
     testCase={selectionAllowed ? model.selectedCase : undefined}
     revision={model.selectedRevision}
     linkIds={model.selectedCaseDetail?.linkIds ?? []}
+    canAttach={model.connection === "connected" && capabilities.includes("test_case:manage") && capabilities.includes("attachment:manage")}
     onNew={model.openNewCase}
     onEdit={model.openEditCase}
     onClone={model.cloneCase}
@@ -67,6 +69,10 @@ export function WorkspaceCasesStage({ model }: { model: WorkspaceModel }) {
       onSubmit: model.saveCase,
       submitting: model.caseSubmitting,
       attachmentsPending: model.caseAttachmentRecovery,
+      documentationRetry: model.caseDocumentationRetry,
+      documentation: !model.editing && model.connection === "connected" ? {
+        value: model.caseDocumentation, onChange: model.setCaseDocumentation, retry: model.caseDocumentationRetry,
+      } : undefined,
       onCancel: () => {
         if (!model.caseSubmitting) model.resetCaseEditor(model.selectedFolder);
       },

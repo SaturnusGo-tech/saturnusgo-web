@@ -2,7 +2,7 @@ import {
   Archive, Bug, Check, Copy, Files, Link2, Maximize2, Minimize2,
   MoreHorizontal, Play, RotateCcw, X,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { TestCaseSummary } from "../../../../../../core/tms/contracts/legacy-contract";
 import type { TmsLocale } from "../../../../localization/model/locale";
 import { buildCaseDeepLink } from "../../../../test-cases/navigation/case-deep-link";
@@ -14,6 +14,7 @@ type Props = {
   testCase?: TestCaseSummary;
   creating: boolean;
   editorOpen: boolean;
+  children?: ReactNode;
   fullscreen: boolean;
   onRunCase: () => void;
   onToggleFullscreen: () => void;
@@ -35,7 +36,7 @@ export function CaseDetailHeaderActions(props: Props) {
   useEffect(() => {
     setCopied(null);
     setMenuOpen(false);
-  }, [item?.id]);
+  }, [item?.id, props.editorOpen]);
   useEffect(() => {
     if (!menuOpen) return;
     const closeOutside = (event: PointerEvent) => {
@@ -70,14 +71,15 @@ export function CaseDetailHeaderActions(props: Props) {
         : (ru ? "Карточка тест-кейса" : "Test case")}</span>
     </div>
     <div className={inspector.headerActions}>
-      {!props.creating && <button type="button" disabled={props.editorOpen || archived} title={archived ? restoreTitle : undefined}
+      {props.children ?? (!props.creating && !props.editorOpen && <>
+      <button type="button" disabled={archived} title={archived ? restoreTitle : undefined}
         className={`${inspector.headerTextButton} ${inspector.headerRunButton}`} onClick={() => { if (!archived) props.onRunCase(); }}>
-        <Play size={14} />{ru ? "Запустить" : "Run"}</button>}
-      {!props.creating && <button type="button" disabled={props.editorOpen}
+        <Play size={14} />{ru ? "Запустить" : "Run"}</button>
+      <button type="button"
         className={`${inspector.headerTextButton} ${inspector.headerQuarantineButton}`} onClick={props.onArchive}>
         {item?.archivedAt ? <RotateCcw size={14} /> : <Archive size={14} />}
         {item?.archivedAt ? (ru ? "Восстановить" : "Restore") : (ru ? "Карантин" : "Quarantine")}
-      </button>}
+      </button></>)}
       {!props.creating && <div ref={menuRoot} className={inspector.headerActionMenuRoot}
         onKeyDown={(event) => {
           if (event.key !== "Escape" || !menuOpen) return;
@@ -90,7 +92,7 @@ export function CaseDetailHeaderActions(props: Props) {
           className={inspector.iconButton} aria-haspopup="menu" aria-expanded={menuOpen}
           onClick={() => setMenuOpen((open) => !open)}
           aria-label={ru ? "Другие действия" : "More actions"}><MoreHorizontal size={15} /></button>
-        {menuOpen && <div role="menu" className={inspector.headerActionMenu}>
+        {menuOpen && !props.editorOpen && <div role="menu" className={inspector.headerActionMenu}>
           {item && <button type="button" role="menuitem" onClick={() => { setMenuOpen(false); void copy(item.key, "key"); }}>
             {copied === "key" ? <Check size={14} /> : <Copy size={14} />}{ru ? "Копировать ID" : "Copy ID"}
           </button>}

@@ -1,0 +1,28 @@
+.link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  max-width: 100%;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: var(--falcon-hover);
+  color: var(--falcon-text);
+  font-weight: 500;
+  text-decoration: none;
+  vertical-align: baseline;
+}
+.link:hover { color: var(--falcon-text); text-decoration: underline; text-underline-offset: 2px; }
+.link:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 2px; }
+.link > span:first-child { align-self: center; flex: 0 0 16px; width: 16px; height: 16px; }
+.link > span:first-child > :is(svg, img) { display: block; width: 16px; height: 16px; margin: 0; border: 0; border-radius: 0; background: transparent; }
+.link > span:last-child { min-width: 0; overflow-wrap: anywhere; }
+.link small { color: var(--falcon-text-secondary); font-size: .9em; }
+.editorLink::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-inline-end: .25em;
+  background: url("/falcon/product-docs/mark.webp") center / contain no-repeat;
+  vertical-align: -.12em;
+  content: "";
+}

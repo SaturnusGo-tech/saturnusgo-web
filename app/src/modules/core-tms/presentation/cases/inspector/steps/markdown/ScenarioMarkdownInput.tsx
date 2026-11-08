@@ -1,7 +1,7 @@
 "use client";
 
 import { Bold, Code, FileCode2, List, Pencil, Check } from "lucide-react";
-import { useLayoutEffect, useRef, useState, type ReactNode, type ClipboardEventHandler } from "react";
+import { useLayoutEffect, useRef, useState, type ReactNode, type ClipboardEventHandler, type DragEventHandler } from "react";
 import { ScenarioMarkdown } from "./ScenarioMarkdown";
 import { formatStepSelection, type StepFormat } from "./format/formatSelection";
 import { pasteMarkdown } from "./paste/pasteMarkdown";
@@ -21,6 +21,8 @@ type Props = {
   id?: string; value: string; label: string; placeholder: string; ru: boolean;
   autoFocus?: boolean; onChange: (value: string) => void;
   onPaste?: ClipboardEventHandler<HTMLTextAreaElement>;
+  onDragOver?: DragEventHandler<HTMLDivElement>;
+  onDrop?: DragEventHandler<HTMLDivElement>;
   renderFooter?: (emoji: ReactNode) => ReactNode;
 };
 
@@ -77,7 +79,7 @@ export function ScenarioMarkdownInput(props: Props) {
     { kind: "code", Icon: FileCode2, label: props.ru ? "Блок кода" : "Code block" },
     { kind: "list", Icon: List, label: props.ru ? "Список" : "List" },
   ] as const;
-  return <div ref={shell} className={css.input} data-editing={editing} onBlur={(event) => {
+  return <div ref={shell} onDragOver={props.onDragOver} onDropCapture={props.onDrop} className={css.input} data-editing={editing} onBlur={(event) => {
     if (!writing && !emojiOpen && !event.currentTarget.contains(event.relatedTarget as Node | null)) setEditing(false);
   }}>
     <div className={css.toolbarReveal}><div><div className={css.toolbar} role="group" aria-label={props.ru ? "Форматирование шага" : "Step formatting"}>

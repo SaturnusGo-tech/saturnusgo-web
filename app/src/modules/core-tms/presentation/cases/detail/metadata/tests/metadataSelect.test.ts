@@ -14,7 +14,7 @@ test("metadata listbox wraps arrow navigation and supports boundaries", () => {
 });
 
 test("metadata trigger is one control with its chevron inside", () => {
-  assert.match(source, /className=\{styles\.trigger\}/);
+  assert.match(source, /className=\{\x60\$\{styles\.trigger\} /);
   assert.match(source, /aria-haspopup="listbox"/);
   assert.match(source, /aria-expanded=\{open\}/);
   assert.match(source, /className=\{styles\.triggerLabel\}/);

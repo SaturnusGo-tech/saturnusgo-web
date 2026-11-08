@@ -6,18 +6,19 @@ import { HighlightPalette } from "../palette/HighlightPalette";
 import type { HighlightColor } from "../model/highlightColors";
 import css from "../toolbar/highlightToolbar.module.css";
 
-type Props = { locale: "ru" | "en"; onChoose: (color: HighlightColor | null) => void; onOpen?: () => void; tabIndex?: number };
+type Props = { locale: "ru" | "en"; onChoose: (color: HighlightColor | null) => void; onOpen?: () => void;
+  tabIndex?: number; label?: string; disabled?: boolean };
 
 export function RawHighlightToolbar(props: Props) {
   const button = useRef<HTMLButtonElement>(null), menu = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
-  const label = props.locale === "ru" ? "Маркер" : "Highlight";
+  const label = props.label ?? (props.locale === "ru" ? "Маркер" : "Highlight");
   useLayoutEffect(() => {
     if (!open || !button.current || !menu.current) return;
     const rect = button.current.getBoundingClientRect();
     menu.current.style.left = `${Math.max(8, Math.min(rect.left, window.innerWidth - 234))}px`;
     menu.current.style.top = `${rect.bottom + 114 > window.innerHeight ? Math.max(8, rect.top - 112) : rect.bottom + 6}px`;
-    menu.current.showPopover();
+    menu.current.showPopover?.();
   }, [open]);
   useEffect(() => {
     if (!open) return;
@@ -32,7 +33,7 @@ export function RawHighlightToolbar(props: Props) {
     return () => { document.removeEventListener("pointerdown", outside, true); document.removeEventListener("keydown", key, true); };
   }, [open]);
   return <>
-    <button ref={button} type="button" tabIndex={props.tabIndex} className={css.trigger}
+    <button ref={button} type="button" tabIndex={props.tabIndex} className={css.trigger} disabled={props.disabled}
       title={label} aria-label={label} aria-expanded={open} aria-haspopup="dialog"
       onMouseDown={(event) => event.preventDefault()}
       onClick={() => { if (!open) props.onOpen?.(); setOpen((value) => !value); }}><Highlighter size={15} /></button>

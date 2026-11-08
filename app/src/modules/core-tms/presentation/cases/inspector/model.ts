@@ -3,6 +3,9 @@ import type { FormEvent } from "react";
 import type { TestCaseRevision } from "../../../../../core/tms/contracts/legacy-contract";
 import type { PendingCaseAttachment, CaseAttachmentProgress } from "../../../application/evidence/case/pendingCaseAttachment";
 import { revisionTagsAreValid } from "../../../helpers/cases/caseRevision";
+import type { DraftProductDocRequirement } from "../../../product-docs/domain/product-docs";
+import { readCommentAttachments } from "../../../test-cases/collaboration/model/attachments/comment-attachments";
+import type { TestCaseComment } from "../../../test-cases/collaboration/model/test-case-collaboration";
 
 export type InspectorSection =
   | "description" | "component" | "properties" | "preconditions" | "details" | "steps";
@@ -32,13 +35,14 @@ export function inspectorTabsForMode(creating: boolean): InspectorTabId[] {
 
 export function canRemoveInspectorRow(count: number) { return count > 1; }
 
-export function caseRevisionAttachmentIds(revision: TestCaseRevision) {
+export function caseRevisionAttachmentIds(revision: TestCaseRevision, comments: readonly Pick<TestCaseComment, "body" | "deletedAt">[] = []) {
   return Array.from(new Set([
     ...revision.attachmentIds,
     ...revision.steps.flatMap((step) => step.attachmentIds ?? []),
     ...revision.steps.flatMap((step) => (
       step.sharedStep?.items.flatMap((item) => item.attachmentIds ?? []) ?? []
     )),
+    ...comments.flatMap(comment => comment.deletedAt ? [] : readCommentAttachments(comment.body).attachments.map(({ id }) => id)),
   ]));
 }
 
@@ -57,6 +61,12 @@ export type CaseInspectorEditor = {
   onCancel: () => void;
   submitting?: boolean;
   attachmentsPending?: boolean;
+  documentationRetry?: boolean;
+  documentation?: {
+    value: readonly DraftProductDocRequirement[];
+    onChange(value: readonly DraftProductDocRequirement[]): void;
+    retry: boolean;
+  };
 };
 
 export function inspectorTabAfterKey(

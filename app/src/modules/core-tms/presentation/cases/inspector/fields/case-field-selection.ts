@@ -1,8 +1,11 @@
 import type { TestCaseRevision } from "../../../../../../core/tms/contracts/legacy-contract";
 import type { CustomFieldDefinition, CustomFieldSelection } from "../../../../custom-fields/model/custom-field";
 export function updateCaseField(revision: TestCaseRevision, field: CustomFieldDefinition, values: readonly CustomFieldSelection[]): Partial<TestCaseRevision> {
-  let fields = (revision.customFields ?? []).filter(item => item.fieldId !== field.id);
-  fields.push({ fieldId: field.id, name: field.name, type: field.type, systemKey: field.systemKey, values: values.map(value => ({ ...value })) });
+  let fields = [...(revision.customFields ?? [])];
+  const index = fields.findIndex(item => item.fieldId === field.id);
+  const snapshot = { fieldId: field.id, name: field.name, type: field.type, systemKey: field.systemKey, values: values.map(value => ({ ...value })) };
+  if (index === -1) fields.push(snapshot);
+  else fields[index] = snapshot;
   if (field.systemKey === "product_group") {
     const parent = values[0]?.id ?? null;
     fields = fields.map(item => item.systemKey === "product" && item.values.some(value => value.parentValueId !== parent) ? { ...item, values: [] } : item);

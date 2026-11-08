@@ -1,0 +1,98 @@
+.empty {
+  box-sizing: border-box;
+  display: grid;
+  min-block-size: 100%;
+  place-items: center;
+  padding: 32px 20px 40px;
+  text-align: center;
+}
+
+.content {
+  display: grid;
+  justify-items: center;
+  min-inline-size: 0;
+}
+
+.illustration {
+  display: block;
+  inline-size: min(174px, 66%);
+  block-size: auto;
+  aspect-ratio: 3 / 2;
+  margin-block-end: 16px;
+  object-fit: contain;
+}
+
+.content h3 {
+  margin: 0;
+  color: var(--falcon-text);
+  font-size: 17px;
+  font-weight: 650;
+  line-height: 1.3;
+  text-wrap: balance;
+}
+
+.content p {
+  max-inline-size: 37ch;
+  margin: 6px 0 0;
+  color: var(--falcon-text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.attachmentAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-block-size: 34px;
+  max-inline-size: 100%;
+  margin-block-start: 17px;
+  padding: 5px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--falcon-action);
+  color: var(--falcon-on-action);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.attachmentAction svg { flex-shrink: 0; }
+.attachmentAction:hover { background: var(--falcon-action-hover); }
+.attachmentAction:active { background: var(--falcon-action-active); }
+.empty .attachmentAction:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 3px; }
+
+.content .attachmentError {
+  margin-block-start: 10px;
+  color: var(--falcon-danger);
+}
+
+.attachmentStatus {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 5px 10px;
+  margin: 16px 24px 0;
+  color: var(--falcon-text-muted);
+  font-size: 13px;
+}
+
+.attachmentStatus button {
+  min-block-size: 30px;
+  padding: 4px 9px;
+  border: 1px solid var(--falcon-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--falcon-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.attachmentStatus button:hover:not(:disabled) { background: var(--falcon-hover); }
+.attachmentStatus button:disabled { opacity: .6; cursor: wait; }
+
+@media (pointer: coarse) {
+  .attachmentAction, .attachmentStatus button { min-block-size: 44px; }
+}

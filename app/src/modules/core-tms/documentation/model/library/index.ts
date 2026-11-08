@@ -38,6 +38,7 @@ const subfolders: Readonly<Record<string, readonly FolderDefinition[]>> = {
   ],
   "codex-prompts": [
     { id: "coverage", title: { en: "Coverage and setup", ru: "Покрытие и настройки" }, articleIds: ["codex-prompts-repository", "codex-prompts-configuration"] },
+    { id: "product-docs", title: { en: "Product documentation", ru: "Документация продукта" }, articleIds: ["codex-prompts-product-docs"] },
     { id: "execution", title: { en: "Execution and follow-up", ru: "Проверки и дефекты" }, articleIds: ["codex-prompts-runs", "codex-prompts-web-qa", "codex-prompts-defects"] },
     { id: "reporting", title: { en: "Reports and monitoring", ru: "Отчёты и мониторинг" }, articleIds: ["codex-prompts-reporting"] },
   ],

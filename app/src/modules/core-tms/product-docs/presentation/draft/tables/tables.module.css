@@ -1,0 +1,128 @@
+.tableInsert {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+}
+
+.tableAppearance .tableInsert button.sizeTrigger {
+  min-width: 20px;
+  padding-inline: 3px;
+}
+
+.tableInsert .sizeTrigger[aria-expanded="true"] {
+  background: var(--falcon-selected);
+  color: var(--falcon-link);
+}
+
+.sizePicker {
+  position: absolute;
+  z-index: 5;
+  inset-block-start: calc(100% + 6px);
+  inset-inline-end: 0;
+  width: max-content;
+  padding: 10px;
+  border: 1px solid var(--falcon-border);
+  border-radius: 7px;
+  background: var(--falcon-elevated);
+  box-shadow: 0 6px 18px rgb(0 0 0 / 15%);
+}
+
+.sizeGrid {
+  display: grid;
+  grid-template-columns: repeat(10, 17px);
+  gap: 3px;
+}
+
+.sizePicker .sizeGrid button.sizeCell {
+  box-sizing: border-box;
+  width: 17px;
+  min-width: 0;
+  height: 17px;
+  min-height: 0;
+  padding: 0;
+  border: 1px solid var(--falcon-border-strong);
+  border-radius: 3px;
+  background: var(--falcon-surface);
+  cursor: pointer;
+}
+
+.sizePicker .sizeGrid button[data-highlighted="true"] {
+  border-color: var(--falcon-focus);
+  background: var(--falcon-info-bg);
+}
+
+.sizePicker .sizeGrid button:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 0; }
+.sizeValue { padding-block-start: 8px; text-align: center; font-size: 12px; color: var(--falcon-text-secondary); }
+
+.tableAppearance :global(.mdxeditor-root-contenteditable) table {
+  margin-block: 15px 19px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.tableAppearance :global(.mdxeditor-root-contenteditable) table > thead > tr > th,
+.tableAppearance :global(.mdxeditor-root-contenteditable) table > tfoot > tr > th,
+.tableAppearance :global(.mdxeditor-root-contenteditable) table > tbody [data-tool-cell] {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.tableAppearance :global(.mdxeditor-root-contenteditable) table > thead th:first-child,
+.tableAppearance :global(.mdxeditor-root-contenteditable) table > thead th:last-child { width: 24px; }
+.tableAppearance :global(.mdxeditor-root-contenteditable) table > thead th[data-tool-cell]:not(:last-child) { text-align: center; }
+
+.tableAppearance :global(.mdxeditor-root-contenteditable) table > tbody > tr > :is(td, th)[data-active] {
+  box-sizing: border-box;
+  height: 38px;
+  padding: 7px 10px;
+  border: 1px solid var(--falcon-border-strong);
+  vertical-align: top;
+  font-weight: inherit;
+}
+
+.tableAppearance :global(.mdxeditor-root-contenteditable) table > tbody > tr > th[data-active] {
+  background: var(--falcon-panel);
+  font-weight: 600;
+}
+
+.tableAppearance :global(.mdxeditor-root-contenteditable) table > tbody > tr > :is(td, th)[data-active="true"] {
+  outline: 0;
+  box-shadow: inset 0 0 0 1.5px var(--falcon-focus);
+}
+
+.tableAppearance :global(.mdxeditor-root-contenteditable) table [data-tool-cell] button {
+  border-radius: 4px;
+  color: var(--falcon-text-secondary);
+  cursor: pointer;
+  opacity: .52;
+  transition: opacity 120ms ease, background-color 120ms ease;
+}
+
+.tableAppearance :global(.mdxeditor-root-contenteditable) table [data-tool-cell] button:hover,
+.tableAppearance :global(.mdxeditor-root-contenteditable) table [data-tool-cell] button:is(:focus-visible, [data-state="open"], [data-active="true"]) {
+  background: var(--falcon-hover);
+  color: var(--falcon-text);
+  opacity: 1;
+}
+
+.tableAppearance :global(.mdxeditor-root-contenteditable) table [data-tool-cell] button:focus-visible {
+  outline: 2px solid var(--falcon-focus);
+  outline-offset: -1px;
+}
+
+.tableAppearance :global(.mdxeditor-root-contenteditable) table [data-tool-cell] svg { width: 15px; height: 15px; }
+.tableAppearance :global(.mdxeditor-root-contenteditable) table [data-tool-cell] button[aria-haspopup] { padding: 2px 4px; }
+
+.tableAppearance :global([class*="_tableColumnEditorPopoverContent_"]) {
+  padding: 4px;
+  border: 1px solid var(--falcon-border);
+  border-radius: 7px;
+  background: var(--falcon-elevated);
+  box-shadow: 0 5px 18px rgb(0 0 0 / 14%);
+}
+
+.tableAppearance :global([class*="_tableColumnEditorPopoverContent_"]) button { border-radius: 4px; cursor: pointer; }
+.tableAppearance :global([class*="_tableColumnEditorPopoverContent_"]) button svg { width: 16px; height: 16px; }
+.tableAppearance :global([class*="_tableColumnEditorPopoverContent_"]) :global([class*="_popoverArrow_"]) { display: none; }

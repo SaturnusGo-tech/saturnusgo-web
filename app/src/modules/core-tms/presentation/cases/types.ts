@@ -55,6 +55,7 @@ export type CasesViewProps = {
   sharedSteps: readonly SharedStepSummary[];
   onResolveSharedStep: (id: string) => Promise<SharedStep | null>;
   editor?: CaseInspectorEditor;
+  canAttach?: boolean;
 };
 
 export type CaseListRow = {

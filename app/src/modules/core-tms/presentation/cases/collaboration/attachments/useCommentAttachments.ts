@@ -44,9 +44,11 @@ export function useCommentAttachments(projectId: string | undefined, initial: Co
   }
   function add(files: File[]) {
     if (!client || !projectId || active.current || !files.length) return;
-    if (current.current.length + files.length > 20) { setProblem(ru ? "Можно добавить до 20 файлов." : "You can attach up to 20 files."); return; }
-    setProblem("");
-    const added: CommentUpload[] = files.map(file => ({ key: crypto.randomUUID(), name: file.name, file, phase: "preparing" }));
+    const valid = files.filter(file => file.size > 0);
+    if (current.current.length + valid.length > 20) { setProblem(ru ? "Можно добавить до 20 файлов." : "You can attach up to 20 files."); return; }
+    setProblem(valid.length < files.length ? (ru ? "Пустые файлы пропущены." : "Empty files were skipped.") : "");
+    if (!valid.length) return;
+    const added: CommentUpload[] = valid.map(file => ({ key: crypto.randomUUID(), name: file.name, file, phase: "preparing" }));
     update(rows => [...rows, ...added]); void run(added);
   }
   return { entries, problem, uploading, enabled: Boolean(client && projectId), add,

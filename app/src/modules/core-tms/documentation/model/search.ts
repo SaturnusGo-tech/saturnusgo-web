@@ -9,8 +9,13 @@ export function blockText(block: DocBlock): string {
       `${step.title} ${step.instruction} ${step.result} ${step.image.alt}`).join(" ")}`;
     case "list": return block.items.join(" ");
     case "table": return [block.columns, ...block.rows].flat().join(" ");
+    case "bar-chart": return barChartText(block);
     case "articles": return "";
   }
+}
+
+export function barChartText(block: Extract<DocBlock, { kind: "bar-chart" }>) {
+  return [block.title, block.summary, ...block.bars.map(({label, value}) => `${label} ${value}`)].join("\n");
 }
 const normalize = (text: string, locale: "en" | "ru" = "en") => text.toLocaleLowerCase(locale).replace(/[**`]/g, "");
 export const articleText = (article: DocArticle) => article.sections.map((s) => `${s.title} ${s.blocks.map(blockText).join(" ")}`).join(" ");

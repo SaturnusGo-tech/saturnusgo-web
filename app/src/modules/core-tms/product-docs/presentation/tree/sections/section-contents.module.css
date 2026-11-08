@@ -1,0 +1,31 @@
+.section {
+  box-sizing: border-box;
+  max-width: 1080px;
+  padding: 32px clamp(18px, 4vw, 48px) 40px;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 24px;
+}
+
+.heading h1 {
+  margin: 0;
+  color: var(--falcon-text);
+  font-size: 28px;
+  font-weight: 650;
+  line-height: 1.25;
+  letter-spacing: -.025em;
+  overflow-wrap: anywhere;
+}
+
+.empty {
+  margin: 0;
+  color: var(--falcon-text-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.section > button { margin-top: 12px; }

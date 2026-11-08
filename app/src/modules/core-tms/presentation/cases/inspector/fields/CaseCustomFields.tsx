@@ -3,26 +3,60 @@ import type { TestCaseRevision } from "../../../../../../core/tms/contracts/lega
 import { useWorkspacePeople } from "../../../../workspace/members/context/WorkspacePeopleContext";
 import { useCustomFieldCatalog } from "../../../../custom-fields/state/catalog/useCustomFieldCatalog";
 import { CustomFieldPicker } from "../../../../custom-fields/presentation/picker/CustomFieldPicker";
+import type { CustomFieldDefinition, CustomFieldSystemKey } from "../../../../custom-fields/model/custom-field";
 import { customFieldLabel, customValueLabel } from "../../../../custom-fields/application/field-labels";
 import { updateCaseField } from "./case-field-selection";
 import { InspectorFieldValue } from "../inline/InspectorFieldValue";
+import rail from "../propertyRail.module.css";
 import css from "./caseFields.module.css";
-export function CaseCustomFields({ projectId = "", revision, editing, canCreate = false, disabled, ru, requiredFields, onPatch, onRequestEdit }: {
-  projectId?: string; revision: TestCaseRevision; editing: boolean; canCreate?: boolean; disabled?: boolean; ru: boolean;
+
+type FieldSnapshot = NonNullable<TestCaseRevision["customFields"]>[number];
+type LegacyField = "product" | "regression";
+type FieldRow = { key: string; definition?: CustomFieldDefinition; snapshot?: FieldSnapshot; legacy?: LegacyField };
+type InlineEdit = { key: string; order: readonly string[] };
+
+function rowKey(fieldId: string, systemKey?: CustomFieldSystemKey | null) {
+  return systemKey === "product" || systemKey === "regression" ? `system:${systemKey}` : fieldId;
+}
+
+function fieldRows(revision: TestCaseRevision, definitions: readonly CustomFieldDefinition[], inlineEdit: InlineEdit | null, creating: boolean, requiredFields?: boolean) {
+  const snapshots = revision.customFields ?? [];
+  const byId = new Map(definitions.map(definition => [definition.id, definition]));
+  const order = inlineEdit?.order ?? (creating ? definitions.map(field => rowKey(field.id, field.systemKey)) : []);
+  const position = new Map(order.map((key, index) => [key, index]));
+  const rows: FieldRow[] = [];
+  for (const snapshot of snapshots) {
+    const key = rowKey(snapshot.fieldId, snapshot.systemKey);
+    if (snapshot.values.length || position.has(key)) rows.push({ key, snapshot, definition: byId.get(snapshot.fieldId) });
+  }
+  for (const legacy of ["product", "regression"] as const) {
+    if (snapshots.some(snapshot => snapshot.systemKey === legacy) || (legacy === "product" && !revision.component)) continue;
+    rows.push({ key: `system:${legacy}`, legacy, definition: definitions.find(definition => definition.systemKey === legacy) });
+  }
+  const visible = new Set(rows.flatMap(row => row.definition ? [row.definition.id] : []));
+  for (const definition of definitions) {
+    if (visible.has(definition.id) || (inlineEdit && !(requiredFields && definition.required))) continue;
+    rows.push({ key: rowKey(definition.id, definition.systemKey), definition, snapshot: snapshots.find(snapshot => snapshot.fieldId === definition.id) });
+  }
+  return position.size ? rows.sort((a, b) => (position.get(a.key) ?? order.length) - (position.get(b.key) ?? order.length)) : rows;
+}
+
+export function CaseCustomFields({ projectId = "", revision, editing, creating = false, canCreate = false, disabled, ru, requiredFields, onPatch, onRequestEdit }: {
+  projectId?: string; revision: TestCaseRevision; editing: boolean; creating?: boolean; canCreate?: boolean; disabled?: boolean; ru: boolean;
   requiredFields?: boolean; onPatch(value: Partial<TestCaseRevision>): void; onRequestEdit?: () => void;
 }) {
   const { workspaceId, offline } = useWorkspacePeople();
-  const [activeField, setActiveField] = useState<string | null>(null);
+  const [inlineEdit, setInlineEdit] = useState<InlineEdit | null>(null);
   const errorId = useId();
   const fieldList = useRef<HTMLDListElement>(null);
   const editFields = useRef<HTMLButtonElement>(null);
   const fallbackError = useRef<HTMLParagraphElement>(null);
   const catalog = useCustomFieldCatalog(workspaceId, projectId, editing && !offline);
-  useEffect(() => { if (!editing) setActiveField(null); }, [editing, workspaceId, projectId]);
+  useEffect(() => { if (!editing) setInlineEdit(null); }, [editing, workspaceId, projectId]);
   useEffect(() => { if (editing && catalog.cursor && !catalog.pending && !catalog.loading && !catalog.failure) void catalog.more(); },
     [editing, catalog.cursor, catalog.pending, catalog.loading, catalog.failure, catalog.more]);
-  const snapshots = revision.customFields ?? [];
   const definitions = editing ? catalog.items : [];
+  const rows = fieldRows(revision, definitions, editing ? inlineEdit : null, creating, requiredFields);
   const catalogReady = editing && !catalog.loading && !catalog.cursor;
   const showFallback = requiredFields && (!definitions.some(field => field.required) || Boolean(catalog.failure));
   useEffect(() => {
@@ -32,57 +66,49 @@ export function CaseCustomFields({ projectId = "", revision, editing, canCreate 
     }
   }, [requiredFields, catalogReady, disabled]);
   const canEdit = !disabled && !offline && Boolean(onRequestEdit);
-  function begin(fieldId: string) {
+  function begin(key: string) {
     if (!canEdit) return;
-    setActiveField(fieldId);
+    setInlineEdit(previous => ({ key, order: previous?.order ?? rows.map(row => row.key) }));
     onRequestEdit?.();
   }
-  function readValue(label: string, value: string, fieldId?: string) {
-    return <InspectorFieldValue label={label} onEdit={canEdit && fieldId ? () => begin(fieldId) : undefined}>
+  function readValue(label: string, value: string, key?: string) {
+    return <InspectorFieldValue label={label} onEdit={canEdit && key ? () => begin(key) : undefined}>
       {value || (ru ? "Не указано" : "Not specified")}
     </InspectorFieldValue>;
   }
-  const hasSystemField = (systemKey: "product" | "regression") => snapshots.some(field => field.systemKey === systemKey)
-    || definitions.some(field => field.systemKey === systemKey);
   return <>
+    <dl ref={fieldList} className={`${css.facts} ${rail.readRows}${editing ? ` ${css.editing}` : ""}`}>
+      {rows.map(({ key, definition: field, snapshot, legacy }) => {
+        const systemKey = field?.systemKey ?? snapshot?.systemKey ?? legacy;
+        const selected = snapshot?.values ?? [];
+        const product = systemKey === "product" && !snapshot ? revision.component : "";
+        const placeholder = systemKey === "regression" ? String(Boolean(revision.regression)) : product || undefined;
+        const missing = requiredFields && field?.required && systemKey !== "regression" && !product.trim() && selected.length === 0;
+        const label = customFieldLabel(field ?? snapshot ?? { name: legacy === "product" ? "Product" : "Regression", systemKey: legacy ?? null }, ru);
+        const explicitlyActive = inlineEdit?.key === key;
+        const active = !inlineEdit || explicitlyActive || missing;
+        const validationId = missing ? `${errorId}-${key}` : undefined;
+        const text = selected.map(value => customValueLabel(value, ru)).join(", ") || placeholder || "";
+        return <div key={key} className={css.field}><dt>{label}{field?.required && <b aria-label={ru ? "Обязательное поле" : "Required"}> *</b>}</dt><dd>
+          {field && active ? <CustomFieldPicker workspaceId={workspaceId} projectId={projectId} field={field} selected={selected}
+            autoOpen={explicitlyActive} invalid={missing} errorId={validationId}
+            canCreate={canCreate} disabled={disabled || offline} placeholder={placeholder}
+            parentValueId={systemKey === "product" ? revision.productGroupId ?? undefined : undefined}
+            onChange={values => onPatch(updateCaseField(revision, field, values))} /> : readValue(label, text, !editing || field || catalog.loading ? key : undefined)}
+          {missing && <p role="alert" id={validationId} className={css.error}>
+            {ru ? `Выберите значение для поля «${label}».` : `Choose a value for ${label}.`}
+          </p>}
+        </dd>
+        </div>;
+      })}
+    </dl>
+    {editing && catalog.loading && <p role="status" className={css.loading}>{ru ? "Загрузка полей…" : "Loading fields…"}</p>}
+    {editing && Boolean(catalog.failure) && <p role="alert" className={css.error}>{ru ? "Не удалось загрузить поля." : "Could not load fields."} <button type="button" onClick={catalog.refresh}>{ru ? "Повторить" : "Retry"}</button></p>}
     {showFallback && <p ref={fallbackError} tabIndex={-1} role="alert" className={css.error}>
       {ru ? "Выберите значения обязательных полей." : "Choose a value for each required field."}
       {!editing && canEdit && <button ref={editFields} type="button" onClick={onRequestEdit}>
         {ru ? "Изменить поля" : "Edit custom fields"}
       </button>}
     </p>}
-    <dl ref={fieldList} className={editing ? `${css.facts} ${css.editing}` : css.facts}>
-      {editing && catalog.loading && <div role="status">{ru ? "Загрузка полей…" : "Loading fields…"}</div>}
-      {editing && Boolean(catalog.failure) && <div role="alert">{ru ? "Не удалось загрузить поля." : "Could not load fields."} <button type="button" onClick={catalog.refresh}>{ru ? "Повторить" : "Retry"}</button></div>}
-      {definitions.map(field => {
-        const snapshot = snapshots.find(item => item.fieldId === field.id);
-        const selected = snapshot?.values ?? [];
-        const legacyProduct = field.systemKey === "product" && !snapshot && Boolean(revision.component.trim());
-        const missing = requiredFields && field.required && field.systemKey !== "regression" && !legacyProduct && selected.length === 0;
-        const label = customFieldLabel(field, ru);
-        const explicitlyActive = activeField === field.id || activeField === `system:${field.systemKey}`;
-        const active = activeField === null || explicitlyActive || missing;
-        const text = selected.map(value => customValueLabel(value, ru)).join(", ")
-          || (field.systemKey === "regression" ? String(Boolean(revision.regression)) : field.systemKey === "product" ? revision.component : "");
-        return <div key={field.id} className={css.field}><dt>{label}{field.required && <b aria-label={ru ? "Обязательное поле" : "Required"}> *</b>}</dt><dd>
-          {active ? <CustomFieldPicker workspaceId={workspaceId} projectId={projectId} field={field} selected={selected}
-            autoOpen={explicitlyActive} invalid={missing} errorId={missing ? `${errorId}-${field.id}` : undefined}
-            canCreate={canCreate} disabled={disabled || offline} placeholder={field.systemKey === "regression" ? "false" : undefined}
-            parentValueId={field.systemKey === "product" ? revision.productGroupId ?? undefined : undefined}
-            onChange={values => onPatch(updateCaseField(revision, field, values))} /> : readValue(label, text, field.id)}
-          {missing && <p role="alert" id={`${errorId}-${field.id}`} className={css.error}>
-            {ru ? `Выберите значение для поля «${label}».` : `Choose a value for ${label}.`}
-          </p>}
-        </dd>
-        </div>;
-      })}
-      {snapshots.filter(field => field.values.length && !definitions.some(item => item.id === field.fieldId)).map(field => {
-        const label = customFieldLabel(field, ru);
-        return <div key={field.fieldId}><dt>{label}</dt><dd>{readValue(label,
-          field.values.map(value => customValueLabel(value, ru)).join(", "), !editing ? field.fieldId : undefined)}</dd></div>;
-      })}
-      {!hasSystemField("product") && revision.component && <div><dt>{ru ? "Продукт" : "Product"}</dt><dd>{readValue(ru ? "Продукт" : "Product", revision.component, "system:product")}</dd></div>}
-      {!hasSystemField("regression") && <div><dt>{ru ? "Регресс" : "Regression"}</dt><dd>{readValue(ru ? "Регресс" : "Regression", String(Boolean(revision.regression)), "system:regression")}</dd></div>}
-    </dl>
   </>;
 }

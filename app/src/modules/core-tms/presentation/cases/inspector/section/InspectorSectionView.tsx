@@ -12,6 +12,7 @@ type Props = {
   ru: boolean;
   count?: number;
   headingActions?: React.ReactNode;
+  actionsInHeader?: boolean;
   disabled?: boolean;
   onEdit: (section: InspectorSection) => void;
   onCancel: (section: InspectorSection) => void;
@@ -35,8 +36,21 @@ export function InspectorSectionView(props: Props) {
     props.onSave(props.section);
     restoreFocus();
   }
+  const cancelLabel = props.ru ? "Отмена" : "Cancel";
+  const applyLabel = props.ru ? "Применить" : "Apply";
+  const actions = active && !props.persistentEditing && (
+    <div className={props.actionsInHeader ? css.sectionHeaderActions : css.sectionActions}>
+      <button type="button" disabled={props.disabled} onClick={cancel} aria-label={cancelLabel} title={cancelLabel}>
+        <X size={props.actionsInHeader ? 12 : 13} aria-hidden />{!props.actionsInHeader && cancelLabel}
+      </button>
+      <button type="button" className={css.saveButton} disabled={props.disabled} onClick={save} aria-label={applyLabel} title={applyLabel}>
+        <Check size={props.actionsInHeader ? 12 : 13} aria-hidden />{!props.actionsInHeader && applyLabel}
+      </button>
+    </div>
+  );
   return <section
     className={`${css.section} ${props.section === "description" || props.section === "preconditions" ? css.narrativeSection : ""}`}
+    data-field-editing={props.actionsInHeader && active ? "" : undefined}
     onKeyDown={(event) => {
       if (!active || props.persistentEditing || event.key !== "Escape") return;
       event.preventDefault();
@@ -59,20 +73,9 @@ export function InspectorSectionView(props: Props) {
       >
         <Pencil size={14} />
       </button>}
+      {props.actionsInHeader && actions}
     </header>
     <div className={css.sectionBody}>{props.children}</div>
-    {active && !props.persistentEditing && <div className={css.sectionActions}>
-      <button type="button" disabled={props.disabled} onClick={cancel}>
-        <X size={13} />{props.ru ? "Отмена" : "Cancel"}
-      </button>
-      <button
-        type="button"
-        className={css.saveButton}
-        disabled={props.disabled}
-        onClick={save}
-      >
-        <Check size={13} />{props.ru ? "Применить" : "Apply"}
-      </button>
-    </div>}
+    {!props.actionsInHeader && actions}
   </section>;
 }

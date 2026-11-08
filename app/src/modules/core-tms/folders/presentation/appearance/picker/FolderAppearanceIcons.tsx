@@ -2,12 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { HexColorPicker } from "react-colorful";
 import type { FolderIconId } from "../../../model/appearance/folder-appearance";
 import { folderPalette } from "../../../model/appearance/folder-appearance";
-import type { useFolderAppearanceEditor } from "../../../state/appearance-editor/useFolderAppearanceEditor";
+import type { FolderPickerEditor } from "./FolderAppearancePicker";
 import { folderIcons } from "../icons/folder-icons";
 import css from "./appearance-picker.module.css";
 
-export function FolderAppearanceIcons({ editor, ru }: { editor: ReturnType<typeof useFolderAppearanceEditor>; ru: boolean }) {
-  const appearance = editor.preview, id = appearance?.kind === "icon" ? appearance.iconId : "folder";
+export function FolderAppearanceIcons({ editor, ru, defaultIcon = "folder", defaultColor = "var(--falcon-folder)" }: {
+  editor: FolderPickerEditor; ru: boolean; defaultIcon?: FolderIconId; defaultColor?: string;
+}) {
+  const appearance = editor.preview, id = appearance?.kind === "icon" ? appearance.iconId : defaultIcon;
   const color = appearance?.kind === "icon" ? appearance.color : null, effective = color ?? "#5797F6";
   const [hex, setHex] = useState(effective);
   const latest = useRef(hex), dragging = useRef(false), grid = useRef<HTMLDivElement>(null); latest.current = hex;
@@ -37,7 +39,7 @@ export function FolderAppearanceIcons({ editor, ru }: { editor: ReturnType<typeo
       {(Object.keys(folderIcons) as FolderIconId[]).map(iconId => { const Icon = folderIcons[iconId]; return <button key={iconId}
         type="button" tabIndex={id === iconId ? 0 : -1} aria-label={iconId === "folder" ? (ru ? "Стандартная папка" : "Default folder") : iconId}
         aria-pressed={id === iconId && (!appearance || appearance.kind === "icon")} title={iconId} onClick={() => choose(iconId)}
-        style={{ color: color ?? "var(--falcon-folder)" }}><Icon size={22} /></button>; })}
+        style={{ color: color ?? defaultColor }}><Icon size={22} /></button>; })}
     </div>
     <div className={css.palette} aria-label={ru ? "Цвет иконки" : "Icon color"}>
       <button type="button" className={css.defaultColor} aria-label={ru ? "Стандартный цвет" : "Default color"} aria-pressed={color === null}

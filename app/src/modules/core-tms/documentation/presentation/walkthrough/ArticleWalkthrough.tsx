@@ -1,4 +1,4 @@
-import { useDocumentationCopy } from "../../localization/useDocumentationCopy";
+import type { documentationCopy } from "../../localization/ui-copy";
 import { useRef, useState } from "react";
 import { Expand } from "lucide-react";
 import type { WalkthroughBlock } from "../../model/visual/walkthrough";
@@ -6,8 +6,10 @@ import { InlineText } from "../content/InlineText";
 import { ScreenshotDialog } from "./ScreenshotDialog";
 import styles from "./walkthrough.module.css";
 
-export function ArticleWalkthrough({ block }: { block: WalkthroughBlock }) {
-  const copy = useDocumentationCopy();
+export function ArticleWalkthrough({ block, copy }: {
+  block: WalkthroughBlock;
+  copy: (typeof documentationCopy)["en" | "ru"];
+}) {
   const [selected, setSelected] = useState<number | null>(null);
   const origin = useRef<HTMLButtonElement>(null);
   return <div className={styles.root} data-guide-image-scope>
@@ -28,6 +30,6 @@ export function ArticleWalkthrough({ block }: { block: WalkthroughBlock }) {
         </figure>
       </li>)}
     </ol>
-    <ScreenshotDialog steps={block.steps} selected={selected} onSelect={setSelected} originRef={origin} />
+    <ScreenshotDialog copy={copy} steps={block.steps} selected={selected} onSelect={setSelected} originRef={origin} />
   </div>;
 }

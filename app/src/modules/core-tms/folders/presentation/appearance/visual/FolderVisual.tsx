@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { PiFolderOpenDuotone, PiFolderSimpleDuotone } from "react-icons/pi";
-import type { FolderAppearance } from "../../../model/appearance/folder-appearance";
+import type { FolderAppearance, FolderIconId } from "../../../model/appearance/folder-appearance";
 import { useFolderAppearanceContext } from "../../../state/appearance/folder-appearance-context";
 import { folderIcons } from "../icons/folder-icons";
 import css from "./folder-visual.module.css";
 
-export function FolderVisual({ appearance, folderId, path, projectId, open = false }: {
+export function FolderVisual({ appearance, folderId, path, projectId, open = false, fallbackIcon }: {
   appearance?: FolderAppearance; folderId?: string; path?: string; projectId?: string; open?: boolean;
+  fallbackIcon?: FolderIconId;
 }) {
   const context = useFolderAppearanceContext();
   const folder = context.folders.find(item => (!projectId && !context.projectId || item.projectId === (projectId ?? context.projectId)) &&
@@ -29,7 +30,9 @@ export function FolderVisual({ appearance, folderId, path, projectId, open = fal
     return () => { controller.abort(); clearTimeout(timer); };
   }, [assetId, context.read, generation]);
   const Default = open ? PiFolderOpenDuotone : PiFolderSimpleDuotone;
-  const Icon = selected?.kind === "icon" && selected.iconId !== "folder" ? folderIcons[selected.iconId] ?? Default : Default;
+  const Icon = selected?.kind === "icon"
+    ? selected.iconId === "folder" ? Default : folderIcons[selected.iconId] ?? Default
+    : fallbackIcon ? folderIcons[fallbackIcon] ?? Default : Default;
   return <span className={css.visual} data-folder-visual data-kind={selected?.kind ?? "default"}
     title={gif ? "GIF via KLIPY" : undefined} role={gif ? "img" : undefined}
     aria-label={gif ? "GIF via KLIPY" : undefined} aria-hidden={gif ? undefined : true}

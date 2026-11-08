@@ -5,13 +5,14 @@ import test from "node:test";
 import { documentationCatalog } from "../../localization/catalog/locale-catalog";
 import screenshots from "../../content-ru/walkthroughs/media/screenshots.json";
 import production from "../../content-ru/walkthroughs/media/screenshots.production.json";
+import { isProductDocsPreviewImage } from "../../content/product-docs/guide-captures";
 import { historicalGuideMedia } from "../../model/visual/compatibility/historical-media";
 
 test("Russian guide uses its own complete screenshot inventory with valid dimensions", () => {
   const used = new Map(documentationCatalog("ru", true).docArticles.flatMap(a => a.sections.flatMap(s =>
     s.blocks.flatMap(b => b.kind === "walkthrough" ? b.steps.map(step => [step.image.src, step.image] as const) : []))));
   for (const [src, image] of used) {
-    assert.match(src, /^\/falcon\/docs\/(?:2026-09-ru\/[a-z0-9-]+|2026-11-ru\/[a-z0-9-]+)\.jpg$/);
+    if (!isProductDocsPreviewImage(src, "ru")) assert.match(src, /^\/falcon\/docs\/(?:2026-09-ru\/[a-z0-9-]+|2026-11-ru\/[a-z0-9-]+)\.jpg$/);
     assert.ok(image.alt.length > 20, src);
     const bytes = readFileSync(resolve("public", src.slice(1)));
     assert.equal(bytes.readUInt16BE(0), 0xffd8, src);

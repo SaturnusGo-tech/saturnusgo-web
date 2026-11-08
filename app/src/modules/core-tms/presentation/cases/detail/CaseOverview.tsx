@@ -1,4 +1,3 @@
-import { Requirements } from "../../../product-docs/requirements/Requirements";
 import type { TestCaseRevision } from "../../../../../core/tms/contracts/legacy-contract";
 import type { CaseInspectorEditor } from "../inspector/model";
 import type { TmsLocale } from "../../../localization/model/locale";
@@ -35,6 +34,7 @@ export function CaseOverview({
   return <>
     <CaseInspectorContent
       testCaseId={testCaseId}
+      projectId={projectId}
       locale={locale}
       revision={revision}
       archived={archived}
@@ -43,8 +43,8 @@ export function CaseOverview({
       onResolveSharedStep={onResolveSharedStep}
       onRequestEdit={onRequestEdit}
     />
-    {testCaseId && <Requirements projectId={projectId} subject={{caseId: testCaseId, readOnly: archived || Boolean(editor)}} ru={locale === "ru"} />}
     {testCaseId && <CaseCommentsSection
+      hideHeading
       caseId={testCaseId}
       locale={locale}
       languageTag={languageTag}

@@ -1,10 +1,11 @@
 import { FolderVisual } from "../../../../folders/presentation/appearance/visual/FolderVisual";
-import { PiCheck, PiCaretDown, PiCaretRight, PiMagnifyingGlass } from "react-icons/pi";
+import { PiCaretDown, PiMagnifyingGlass } from "react-icons/pi";
 import { useCallback, useId, useRef, useState } from "react";
 import { sortFolderOptions } from "./folder-options";
 import { folderChoiceAncestors, folderChoiceRows } from "./tree/folder-choice-tree";
 import { FolderBreadcrumb } from "../breadcrumb/FolderBreadcrumb";
 import { useAnchoredPopup } from "../../../common/popup/useAnchoredPopup";
+import { FolderChoiceRow } from "./choice/FolderChoiceRow";
 import css from "./parent-folder-picker.module.css";
 
 export function ParentFolderPicker({ value, options, label, searchLabel, emptyLabel, onChange, inline = false }: {
@@ -53,18 +54,13 @@ export function ParentFolderPicker({ value, options, label, searchLabel, emptyLa
         if (row && event.key === "ArrowRight" && row.hasChildren && !expanded.has(row.value)) { event.preventDefault(); toggle(row.value); }
         if (row && event.key === "ArrowLeft" && expanded.has(row.value)) { event.preventDefault(); toggle(row.value); }
       }}>
-        {visible.map((option) => <div className={css.row} key={option.value} style={{ paddingLeft: query ? 0 : Math.min(option.depth, 10) * 18 }}>
-          {option.hasChildren && !query && <button type="button" className={css.disclosure} tabIndex={-1} aria-hidden={!option.hasChildren || undefined}
-            aria-label={option.name} aria-expanded={option.hasChildren ? expanded.has(option.value) : undefined} disabled={!option.hasChildren}
-            onClick={() => toggle(option.value)}>{option.hasChildren && (expanded.has(option.value) ? <PiCaretDown size={12} /> : <PiCaretRight size={12} />)}</button>}
-          <button type="button" role="option" aria-selected={option.value === value}
-            tabIndex={option.value === value || (!visible.some((item) => item.value === value) && option === visible[0]) ? 0 : -1}
-            onClick={() => { onChange(option.value); close(); }}>
-            <FolderVisual path={option.value} open={expanded.has(option.value)} />
-            <span>{option.name}{query && option.depth > 0 && <small><FolderBreadcrumb path={option.parent} /></small>}</span>
-            {option.value === value && <PiCheck size={15} className={css.check} aria-hidden="true" />}
-          </button>
-        </div>)}
+        {visible.map((option) => <FolderChoiceRow key={option.value} name={option.name} depth={query ? 0 : option.depth}
+          selected={option.value === value}
+          tabIndex={option.value === value || (!visible.some((item) => item.value === value) && option === visible[0]) ? 0 : -1}
+          icon={<FolderVisual path={option.value} open={expanded.has(option.value)} />}
+          secondary={query && option.depth > 0 ? <FolderBreadcrumb path={option.parent} /> : undefined}
+          expanded={expanded.has(option.value)} onToggle={option.hasChildren && !query ? () => toggle(option.value) : undefined}
+          onChoose={() => { onChange(option.value); close(); }} />)}
       </div>
       {!visible.length && <p className={css.empty} role="status">{emptyLabel}</p>}
     </div>}

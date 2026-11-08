@@ -4,6 +4,7 @@ import { ArrowUpRight, CheckCircle2, Info, TriangleAlert } from "lucide-react";
 import type { DocArticle, DocBlock } from "../../../model/article";
 import type { useDocumentationNavigation } from "../../../navigation/useDocumentationNavigation";
 import { InlineText } from "../InlineText";
+import { DocumentationBarChart } from "../figure/DocumentationBarChart";
 import { DocumentationIcon } from "../../icons/DocumentationIcon";
 import styles from "../../article/reading.module.css";
 type Navigation = Pick<ReturnType<typeof useDocumentationNavigation>, "link" | "navigate">;
@@ -25,6 +26,7 @@ function Block({ block, navigation, articleById, renderWalkthrough, renderCopy }
       {block.steps.map(step => <li key={step.title}><h3>{step.title}</h3><p><InlineText text={step.instruction} /></p><p><InlineText text={step.result} /></p></li>)}
     </ol>;
     case "paragraph": return <p><InlineText text={block.text} /></p>;
+    case "bar-chart": return <DocumentationBarChart block={block} />;
     case "list": {
       const List = block.ordered ? "ol" : "ul";
       return <List className={styles.list}>{block.items.map((item, i) => <li key={i}><InlineText text={item} /></li>)}</List>;

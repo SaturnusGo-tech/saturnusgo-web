@@ -11,9 +11,11 @@ import { useCommentNavigation } from "../navigation/useCommentNavigation";
 import type { CaseCollaborationViewModel } from "../model";
 import { commentFailureLabel } from "../model";
 import css from "../caseCollaboration.module.css";
-type Props = { caseId: string; locale: TmsLocale; languageTag: string; model: CaseCollaborationViewModel; showRefresh?: boolean };
-export function CaseCommentsSection({ caseId, locale, languageTag, model, showRefresh = true }: Props) {
+type Props = { caseId: string; locale: TmsLocale; languageTag: string; model: CaseCollaborationViewModel; showRefresh?: boolean; hideHeading?: boolean };
+export function CaseCommentsSection({ caseId, locale, languageTag, model, showRefresh = true, hideHeading = false }: Props) {
   const ru = locale === "ru";
+  const headingId = `case-comments-${caseId}`;
+  const heading = ru ? "Комментарии" : "Comments";
   useCommentAncestors(caseId, model);
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const [composer, setComposer] = useState<{ reply?: TestCaseComment }>({});
@@ -34,10 +36,12 @@ export function CaseCommentsSection({ caseId, locale, languageTag, model, showRe
       const ok = await model.addComment(draft.body, draft);
       if (ok && currentCase.current === caseId) { setComposer({}); setComposerVersion(value => value + 1); } return ok;
     }} />;
-  return <section className={css.commentsSection} aria-labelledby={`case-comments-${caseId}`}>
-    <header className={css.commentsHeading}><MessageSquare size={15} /><h3 id={`case-comments-${caseId}`}>{ru ? "Комментарии" : "Comments"}</h3>
-      {showRefresh && <button type="button" className={css.refreshComments} disabled={model.comments.refreshing || model.commentSubmitting || Boolean(model.changingCommentId)}
-        onClick={model.refreshComments} aria-label={ru ? "Обновить комментарии" : "Refresh comments"}><RotateCw size={14} /></button>}</header>
+  const refresh = showRefresh && <button type="button" className={css.refreshComments}
+    disabled={model.comments.refreshing || model.commentSubmitting || Boolean(model.changingCommentId)}
+    onClick={model.refreshComments} aria-label={ru ? "Обновить комментарии" : "Refresh comments"}><RotateCw size={14} aria-hidden="true" /></button>;
+  return <section className={css.commentsSection} aria-labelledby={headingId}>
+    {hideHeading ? <h3 className={css.srOnly} id={headingId}>{heading}</h3>
+      : <header className={css.commentsHeading}><MessageSquare size={15} aria-hidden="true" /><h3 id={headingId}>{heading}</h3>{refresh}</header>}
     {model.comments.status === "loading" && <div className={css.commentSkeleton} role="status" aria-busy="true" aria-label={ru ? "Загрузка комментариев" : "Loading comments"}><span /><span /><span /></div>}
     {model.comments.status === "unavailable" && <p className={css.commentsEmpty}>{ru ? "Комментарии доступны при подключении к серверу" : "Connect to the server to view comments"}</p>}
     {model.comments.status === "error" && <div className={css.loadState} role="alert"><AlertCircle size={18} />
@@ -56,6 +60,7 @@ export function CaseCommentsSection({ caseId, locale, languageTag, model, showRe
         <button type="button" disabled={model.comments.loadingMore || model.comments.refreshing}
           onClick={model.comments.hasMore ? model.loadMoreComments : model.refreshComments}>
           {model.comments.loadingMore ? (ru ? "Загрузка…" : "Loading…") : (ru ? "Загрузить ещё" : "Load more")}</button></div>}
+      {hideHeading && refresh && <div className={css.commentsRefreshRow}>{refresh}</div>}
     </>}
   </section>;
 }

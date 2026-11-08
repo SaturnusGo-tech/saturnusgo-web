@@ -1,5 +1,6 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { FilterTransition } from "../../../presentation/cases/toolbar/filter/FilterTransition";
+import popup from "../../../presentation/common/popup/caseFieldPopup.module.css";
 import { MemberAvatar } from "../avatar/MemberAvatar";
 import { useEffect, useId, useRef, useState } from "react";
 import { PiCaretDown, PiCheck, PiMagnifyingGlass } from "react-icons/pi";
@@ -60,15 +61,15 @@ export function ResponsiblePicker({ workspaceId, value, onChange, disabled = fal
   return <div ref={root} className={styles.root} data-open={open || undefined} onKeyDown={(event) => {
     if (event.key === "Escape" && open) { event.preventDefault(); event.stopPropagation(); setOpen(false); trigger.current?.focus(); }
   }}>
-    <button ref={trigger} className={styles.trigger} type="button" disabled={disabled || offline} aria-label={ariaLabel ?? label}
+    <button ref={trigger} className={`${styles.trigger} ${popup.trigger} ${popup.valueTrigger}`} type="button" disabled={disabled || offline} aria-label={ariaLabel ?? label}
       aria-haspopup="listbox" aria-expanded={open} aria-controls={listId} onClick={() => { place(); setOpen((current) => !current); }}>
-      <MemberAvatar identityId={value} name={selected ?? ""} offline={offline} /><span className={styles.label}>{value ? selected || (ru ? "Назначенный участник" : "Assigned member") : unselectedLabel ?? empty}</span><PiCaretDown aria-hidden="true" />
+      <MemberAvatar identityId={value} name={selected ?? ""} offline={offline} /><span className={`${styles.label} ${popup.valueLabel}`}>{value ? selected || (ru ? "Назначенный участник" : "Assigned member") : unselectedLabel ?? empty}</span><PiCaretDown aria-hidden="true" />
     </button>
     <AnimatePresence>{open && <motion.div className={styles.popover} data-above={above}
       style={{ maxHeight: availableHeight, width: placement.width, left: placement.left }} initial={{ opacity: 0, y: reduced ? 0 : above ? 4 : -4 }}
       animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: reduced ? 0 : above ? 4 : -4 }}
       transition={{ duration: reduced ? 0 : .18 }}><FilterTransition view="members">
-      <label className={styles.search} data-input-shell><PiMagnifyingGlass aria-hidden="true" /><input ref={search} value={members.search}
+      <label className={`${styles.search} ${popup.search}`} data-input-shell><PiMagnifyingGlass aria-hidden="true" /><input ref={search} value={members.search}
         placeholder={ru ? "Имя или почта" : "Name or email"} aria-label={ru ? "Найти участника" : "Find a member"}
         maxLength={120} onChange={(event) => members.setSearch(event.target.value)} onKeyDown={(event) => {
           if (event.key === "ArrowDown") { event.preventDefault(); root.current?.querySelector<HTMLButtonElement>("[role=option]")?.focus(); }
@@ -79,9 +80,9 @@ export function ResponsiblePicker({ workspaceId, value, onChange, disabled = fal
         if (event.key === "ArrowDown" || event.key === "ArrowUp") { event.preventDefault(); options[(index + (event.key === "ArrowDown" ? 1 : options.length - 1)) % options.length]?.focus(); }
         if (event.key === "Home" || event.key === "End") { event.preventDefault(); options[event.key === "Home" ? 0 : options.length - 1]?.focus(); }
       }}>
-        <button type="button" role="option" aria-selected={!value && !noSelection} onClick={() => choose(null)}><span className={styles.label}>{empty}</span>{!value && !noSelection && <PiCheck />}</button>
-        {members.items.map((member) => <button type="button" key={member.id} role="option" aria-selected={value === member.id} onClick={() => choose(member.id, member.name)}>
-          <MemberAvatar identityId={member.id} name={member.name} offline={offline} /><span className={styles.label}><span title={member.name}>{member.name}</span><small title={member.email ?? undefined}>{member.email}</small></span>{value === member.id && <PiCheck />}
+        <button type="button" role="option" className={popup.option} aria-selected={!value && !noSelection} onClick={() => choose(null)}><span className={styles.label}><span className={popup.optionLabel}>{empty}</span></span>{!value && !noSelection && <PiCheck aria-hidden="true" />}</button>
+        {members.items.map((member) => <button type="button" key={member.id} role="option" className={popup.option} aria-selected={value === member.id} onClick={() => choose(member.id, member.name)}>
+          <MemberAvatar identityId={member.id} name={member.name} offline={offline} /><span className={styles.label}><span className={popup.optionLabel} title={member.name}>{member.name}</span><small title={member.email ?? undefined}>{member.email}</small></span>{value === member.id && <PiCheck aria-hidden="true" />}
         </button>)}
       </div>
       {members.loading && <div role="status" aria-label={ru ? "Загрузка участников" : "Loading members"} className={styles.skeleton}><i /><i /></div>}

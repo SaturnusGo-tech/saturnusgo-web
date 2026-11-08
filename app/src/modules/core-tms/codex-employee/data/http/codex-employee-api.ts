@@ -8,11 +8,20 @@ export function createCodexEmployeeApi(http: TmsHttpClient): CodexEmployeePort {
             const { provider, status, identityId, rowVersion, capacity, canManage, canActivate, canDeactivate, canConnect, connectUrl, setup } = result.data;
             return { provider, status, identityId, rowVersion, capacity: { ...capacity }, canManage, canActivate, canDeactivate, canConnect, connectUrl, setup: { ...setup, scopes: [...setup.scopes] }, etag: result.etag };
         },
-        async connections(signal) {
-            const result = await http.get<{
-                data: components["schemas"]["FalconMcpConnection"][];
-            }>("/profile/mcp-connections", signal);
-            return result.data.map((row): PersonalCodexConnection => ({ ...row, projectIds: [...row.projectIds], scopes: [...row.scopes] }));
+        async connections(signal, workspaceId) {
+            const result: PersonalCodexConnection[] = [];
+            const query = workspaceId ? new URLSearchParams({ workspaceId, limit: "100" }) : null;
+            const seen = new Set<string>();
+            for (;;) {
+                const page = await http.get<{ data: PersonalCodexConnection[]; meta?: { nextCursor?: string | null } }>(
+                    query ? `/profile/mcp-connections?${query}` : "/profile/mcp-connections", signal);
+                result.push(...page.data.map(row => ({ ...row, projectIds: [...row.projectIds], scopes: [...row.scopes] })));
+                const next = page.meta?.nextCursor;
+                if (!query || !next) return result;
+                if (seen.has(next)) throw new Error("Invalid Falcon MCP connection cursor");
+                seen.add(next);
+                query.set("cursor", next);
+            }
         },
         async deactivate(employee, commandId, signal) {
             if (!employee.canDeactivate || !employee.etag)

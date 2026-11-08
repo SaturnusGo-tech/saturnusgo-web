@@ -20,6 +20,7 @@ export function AnimatedSelect({
   menuMinWidth = 0,
   scrollLabels = false,
   disabled = false,
+  triggerIcon,
 }: {
   label: string;
   value: string;
@@ -30,6 +31,7 @@ export function AnimatedSelect({
   menuMinWidth?: number;
   scrollLabels?: boolean;
   disabled?: boolean;
+  triggerIcon?: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
   const menuId = useId();
@@ -37,6 +39,7 @@ export function AnimatedSelect({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const selectedIndex = Math.max(0, options.findIndex((option) => option.value === value));
   const selected = options[selectedIndex] ?? options[0];
+  const selectedIcon = triggerIcon ?? selected?.icon;
 
   const menuRef = useRef<HTMLDivElement>(null);
   const dismiss = useCallback(() => setOpen(false), []);
@@ -81,7 +84,7 @@ export function AnimatedSelect({
           }
         }}
       >
-        <span className={selected?.icon ? styles.optionLabel : undefined}>{selected?.icon}{scrollLabels ? <OverflowLabel text={selected?.label ?? "—"} /> : <span>{selected?.label ?? "—"}</span>}</span>
+        <span className={selectedIcon ? styles.optionLabel : undefined}>{selectedIcon}{scrollLabels ? <OverflowLabel text={selected?.label ?? "—"} /> : <span>{selected?.label ?? "—"}</span>}</span>
         <ChevronDown size={16} aria-hidden="true" />
       </button>
       <div

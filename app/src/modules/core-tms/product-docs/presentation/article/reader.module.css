@@ -1,0 +1,17 @@
+.article, .prose { text-align: start; }
+
+.version { margin: 7px 0 16px; color: var(--falcon-text-secondary); font-size: 12px; line-height: 1.5; }
+
+.prose.prose a, .outline.outline a, .breadcrumbs.breadcrumbs button {
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+  transition: color 150ms ease, text-decoration-color 150ms ease, background-color 150ms ease;
+}
+.prose.prose a { text-decoration-color: color-mix(in srgb, currentColor 45%, transparent); }
+.prose.prose a:is(:hover, :focus-visible), .outline.outline a:is(:hover, :focus-visible),
+.breadcrumbs.breadcrumbs button:is(:hover, :focus-visible) { text-decoration-color: currentColor; }
+
+@media (prefers-reduced-motion: reduce) {
+  .prose.prose a, .outline.outline a, .breadcrumbs.breadcrumbs button { transition: none; }
+}

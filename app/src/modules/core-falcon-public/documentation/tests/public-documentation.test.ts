@@ -3,9 +3,10 @@ import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import test from "node:test";
 import { htmlLanguageForPath, isFalconPublicPath } from "../../../../shared/_components/route-flags";
+import { isProductDocsPreviewImage } from "../../../core-tms/documentation/content/product-docs/guide-captures";
 import { documentationCatalog } from "../../../core-tms/documentation/localization/catalog/locale-catalog";
 import { buildDocumentationFolders } from "../../../core-tms/documentation/model/library";
-import { searchArticles } from "../../../core-tms/documentation/model/search";
+import { barChartText, searchArticles } from "../../../core-tms/documentation/model/search";
 import { publicDocumentationCatalog } from "../catalog";
 
 test("both readers expose the complete localized Codex playbook", () => {
@@ -17,7 +18,7 @@ test("both readers expose the complete localized Codex playbook", () => {
     const workspacePlaybook = workspace.docArticles.filter(article => article.group === "codex-prompts");
     const library = publicPlaybook.find(article => article.id === "codex-prompts");
     assert.ok(library);
-    assert.equal(publicPlaybook.length, 7);
+    assert.equal(publicPlaybook.length, 8);
     assert.deepEqual(publicPlaybook.map(article => article.sections), workspacePlaybook.map(article => article.sections));
     const libraryFolder = buildDocumentationFolders(articles, groups, locale).find(folder => folder.id === "codex-prompts");
     assert.deepEqual(libraryFolder?.articleIds, [library.id]);
@@ -32,7 +33,7 @@ test("both readers expose the complete localized Codex playbook", () => {
   assert.deepEqual(sectionsByLocale[0], sectionsByLocale[1]);
 });
 
-test("the public guide exposes only curated text in both languages", async () => {
+test("the public guide exposes curated text and synthetic Product Docs images in both languages", async () => {
   const module = await import("../catalog").catch(() => null);
   assert.ok(module, "The isolated public documentation catalog must exist");
   for (const locale of ["en", "ru"] as const) {
@@ -43,11 +44,23 @@ test("the public guide exposes only curated text in both languages", async () =>
     assert.ok(ids.has("organize-cases"));
     for (const hidden of ["company-access", "company-administration", "falcon-ai-writing", "falcon-ai-chat"]) assert.ok(!ids.has(hidden));
     const serialized = JSON.stringify(catalog);
-    assert.doesNotMatch(serialized, /"kind":"walkthrough"|\/falcon\/docs\/20|workspace_umbrella|project_[a-z0-9]|umbrella-home\.youtrack|Umbrella-Host|Umbrella Home/i);
+    assert.doesNotMatch(serialized, /\/falcon\/docs\/2026-(?:09|11)(?:-ru)?\/|workspace_umbrella|project_[a-z0-9]|umbrella-home\.youtrack|Umbrella-Host|Umbrella Home/i);
+    const guide = catalog.articles.find(article => article.id === "product-docs-authoring");
+    assert.ok(guide);
+    assert.deepEqual(guide.sections, documentationCatalog(locale, false).articleById.get(guide.id)?.sections);
+    const chart = guide.sections.find(section => section.id === "rule-example")?.blocks.find(block => block.kind === "bar-chart");
+    assert.ok(chart);
+    assert.equal(chart.maximum, 12);
+    assert.deepEqual(chart.bars.map(bar => bar.value), [8, 2, 2]);
+    assert.match(barChartText(chart), locale === "ru" ? /С ошибкой 2/ : /Failed 2/);
     for (const article of catalog.articles) {
       assert.ok(!article.adminOnly);
       for (const id of article.related) assert.ok(ids.has(id));
       for (const section of article.sections) for (const block of section.blocks) {
+        if (block.kind === "walkthrough") {
+          assert.equal(article.id, "product-docs-authoring");
+          for (const { image } of block.steps) assert.ok(isProductDocsPreviewImage(image.src, locale));
+        }
         if (block.kind === "articles") for (const id of block.ids) assert.ok(ids.has(id));
       }
     }
