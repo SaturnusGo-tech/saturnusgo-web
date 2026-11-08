@@ -19,6 +19,7 @@
 .system :is(button, a):focus-visible { outline: 2px solid var(--sidebar-focus); outline-offset: -2px; }
 .system[data-collapsed="true"] { --nav-row: 36px; --nav-inset: 8px; }
 .system[data-collapsed="true"] .header { padding-left: 10px; }
+.system[data-collapsed="true"] .brand { width: 32px; flex-shrink: 0; }
 .system[data-collapsed="true"] .wordmark { opacity: 0; transition-delay: 0ms; }
 .system[data-collapsed="true"] .label { opacity: 0; transform: translateX(-5px); transition-delay: 0ms; pointer-events: none; }
 .system[data-collapsed="true"] .heading { opacity: 0; height: 0; padding: 0; transition-delay: 0ms; }

@@ -2,11 +2,13 @@ import { workspaceViewDisabledWithoutProject } from "../../../auth/managed/domai
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import type { SidebarGroupId, SidebarNavigationId } from "../model/sidebar-navigation";
 import { sidebarCatalog, sidebarGroupLabels } from "./sidebar-catalog";
+import { NavigationTooltip } from "../tooltip/NavigationTooltip";
 import css from "../styles/sidebar-system.module.css";
 
-export function NavigationGroups({ groups, activeId, disabled, allowManagedHooks, activeRunCount, onNavigate }: {
+export function NavigationGroups({ groups, activeId, disabled, allowManagedHooks, activeRunCount, tooltips, onNavigate }: {
   groups: readonly { id: SidebarGroupId; ids: readonly SidebarNavigationId[] }[];
   activeId: SidebarNavigationId | null; disabled: boolean; allowManagedHooks: boolean; activeRunCount: number;
+  tooltips?: boolean;
   onNavigate: (id: SidebarNavigationId) => void;
 }) {
   const { locale, t } = useTmsLocale();
@@ -17,13 +19,15 @@ export function NavigationGroups({ groups, activeId, disabled, allowManagedHooks
       const unavailable = workspaceViewDisabledWithoutProject(id, disabled, allowManagedHooks);
       const active = activeId === id && !unavailable;
       const running = id === "runs" && activeRunCount > 0;
-      return <button key={id} type="button" className={css.item} data-active={active}
-        onClick={() => onNavigate(id)} disabled={unavailable} data-testid={`nav-${id}`}
-        data-nav-label={label} aria-current={active ? "page" : undefined}
-        aria-label={running ? `${label}, ${activeRunCount} ${locale === "ru" ? "активных" : "active"}` : label}>
-        <span className={css.icon} aria-hidden="true"><Icon width={24} height={24}/>{running && <span className={css.dot}/>}</span>
-        <span className={css.label}>{label}</span>
-      </button>;
+      return <NavigationTooltip key={id} enabled={tooltips} label={label}>
+        <button type="button" className={css.item} data-active={active}
+          onClick={() => onNavigate(id)} disabled={unavailable} data-testid={`nav-${id}`}
+          aria-current={active ? "page" : undefined}
+          aria-label={running ? `${label}, ${activeRunCount} ${locale === "ru" ? "активных" : "active"}` : label}>
+          <span className={css.icon} aria-hidden="true"><Icon width={24} height={24}/>{running && <span className={css.dot}/>}</span>
+          <span className={css.label}>{label}</span>
+        </button>
+      </NavigationTooltip>;
     })}
   </section>)}</>;
 }

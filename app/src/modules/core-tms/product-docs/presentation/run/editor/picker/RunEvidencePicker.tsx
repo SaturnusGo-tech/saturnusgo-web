@@ -6,7 +6,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFieldPage } from "../../../../../custom-fields/state/list/useFieldPage";
 import { useTmsLocale } from "../../../../../localization/context/useTmsLocale";
 import { parseCaseQuery } from "../../../../../presentation/cases/model/query/parse";
-import { DetailStatus } from "../../../../../presentation/dashboard/detail/records/RecordSignals";
 import { emptyRunFilters, type RunFilterState } from "../../../../../presentation/runs/filters/run-filter-model";
 import { useWorkspaceMembers } from "../../../../../workspace/members/state/useWorkspaceMembers";
 import type { CaptureProductDocRunInput, RunEvidenceCandidate, RunEvidencePage, RunEvidenceQuery } from "../../../../domain/run/productDocRunCandidates";
@@ -16,6 +15,7 @@ import { useRunEvidenceCatalog } from "../../../../state/run/catalog/useRunEvide
 import { runSnapshotPattern } from "../../markdown/runDirective";
 import { RunEvidenceQuery as RunEvidenceQueryControl } from "./query/RunEvidenceQuery";
 import { RunEvidenceFilters, runEvidenceFilterCount } from "./RunEvidenceFilters";
+import { RunEvidenceRow } from "./rows/RunEvidenceRow";
 import styles from "./run-evidence-inspector.module.css";
 
 const spinnerSlots = { base: styles.spinner, wrapper: styles.spinnerWheel, circle1: styles.spinnerTrack };
@@ -38,6 +38,7 @@ export function RunEvidencePicker({ scope, load, capture, onChoose }: Props) {
   const qlOpen = overlay === "ql";
   const filtersOpen = overlay === "filters";
   const [choice, setChoice] = useState("");
+  const [lastPage, setLastPage] = useState<{ load: Props["load"]; items: readonly RunEvidenceCandidate[] }>();
   const [capturePending, setCapturePending] = useState(false);
   const [captureFailed, setCaptureFailed] = useState(false);
   const captureRequest = useRef<AbortController | null>(null);
@@ -53,15 +54,22 @@ export function RunEvidencePicker({ scope, load, capture, onChoose }: Props) {
     return { items: page.items, nextCursor: page.nextCursor };
   }, [filters, debouncedQl, load]);
   const page = useFieldPage(loadPage, true);
+  const replacingRuns = page.loading || waitingForQl;
+  const visibleRuns = page.loading && lastPage?.load === load ? lastPage.items : page.items;
   const folderCatalog = useRunEvidenceCatalog(scope, filters.projects, qlOpen ? "folders" : undefined);
   const members = useWorkspaceMembers(scope.workspaceId, qlOpen);
-  const tags = useMemo(() => [...new Set([...filters.tags, ...page.items.flatMap((run) => run.tags)])], [filters.tags, page.items]);
-  const components = useMemo(() => [...new Set([...filters.components, ...page.items.flatMap((run) => run.components)])], [filters.components, page.items]);
-  const groups = useMemo(() => groupRunEvidence(page.items, grouping, ru ? "Без значения" : "Unspecified"), [page.items, grouping, ru]);
+  const tags = useMemo(() => [...new Set([...filters.tags, ...visibleRuns.flatMap((run) => run.tags)])], [filters.tags, visibleRuns]);
+  const components = useMemo(() => [...new Set([...filters.components, ...visibleRuns.flatMap((run) => run.components)])], [filters.components, visibleRuns]);
+  const groups = useMemo(() => groupRunEvidence(visibleRuns, grouping, ru ? "Без значения" : "Unspecified"), [visibleRuns, grouping, ru]);
   const selected = groups.flatMap((group) => group.rows).find((row) => row.id === choice)?.run;
   const loading = page.loading || page.pending || waitingForQl;
   const searchActive = Boolean(page.search.trim() || debouncedQl.trim() || runEvidenceFilterCount(filters));
 
+  useEffect(() => {
+    if (!page.loading && !page.pending && !page.failure) {
+      setLastPage((previous) => previous?.items === page.items ? previous : { load, items: page.items });
+    }
+  }, [load, page.loading, page.pending, page.failure, page.items]);
   useEffect(() => {
     if (invalidQl) return;
     const timeout = window.setTimeout(() => setDebouncedQl(ql), ql ? 180 : 0);
@@ -107,18 +115,6 @@ export function RunEvidencePicker({ scope, load, capture, onChoose }: Props) {
     }
   }
 
-  function itemLabel(run: RunEvidenceCandidate) {
-    const context = [grouping !== "project" ? run.projectName : "", run.environmentName].filter(Boolean).join(" · ");
-    const created = Number.isFinite(Date.parse(run.createdAt)) ? new Date(run.createdAt) : null;
-    return <>
-      <span className={styles.runKey} title={run.key}>{run.key}</span>
-      <strong className={styles.runTitle} title={run.name}>{run.name}</strong>
-      <span className={styles.runContext} title={context}>{context}</span>
-      <span className={styles.runStatus}><DetailStatus status={run.status} /></span>
-      {created && <time className={styles.runDate} dateTime={run.createdAt} title={fullDate.format(created)}>{shortDate.format(created)}</time>}
-    </>;
-  }
-
   const loadingLabel = ru ? "Загружаем прогоны…" : "Loading runs…";
   return <>
     <div className={styles.body}>
@@ -131,7 +127,7 @@ export function RunEvidencePicker({ scope, load, capture, onChoose }: Props) {
           placeholder={ru ? "Название или ID…" : "Name or ID…"} value={page.search} isDisabled={capturePending}
           onValueChange={(value) => { page.setSearch(value); clearSelection(); }}
           onKeyDown={(event) => {
-            if (event.key !== "ArrowDown") return;
+            if (event.key !== "ArrowDown" || replacingRuns) return;
             const first = list.current?.querySelector<HTMLElement>('[role="option"]:not([aria-disabled="true"])');
             if (first) { event.preventDefault(); first.focus(); }
           }} />
@@ -143,6 +139,7 @@ export function RunEvidencePicker({ scope, load, capture, onChoose }: Props) {
           open={filtersOpen} instantClose={qlOpen} onOpenChange={(open) => toggleOverlay("filters", open)}
           filters={{ ...filters, groups: grouping ? [grouping] : [] }} onChange={changeFilters} />
       </div>
+      {replacingRuns && visibleRuns.length > 0 && <span className={styles.loadingAnnouncement} role="status">{loadingLabel}</span>}
       <div className={styles.results} aria-busy={loading}
         onKeyDownCapture={(event) => {
           if (event.key !== "ArrowUp" || event.target !== list.current?.querySelector('[role="option"]')) return;
@@ -150,33 +147,36 @@ export function RunEvidencePicker({ scope, load, capture, onChoose }: Props) {
           event.stopPropagation();
           search.current?.focus();
         }}>
-        <Listbox ref={list} classNames={{ base: styles.listbox, list: styles.list }}
-          itemClasses={{ base: styles.option, title: styles.runLabel, selectedIcon: styles.optionIcon }}
-          aria-label={ru ? "Доступные прогоны" : "Available runs"} items={groups}
-          disabledKeys={capturePending ? groups.flatMap(({ rows }) => rows.map((row) => row.id)) : []}
-          selectionMode="single" selectedKeys={choice ? [choice] : []} disallowEmptySelection hideEmptyContent
-          variant="flat" onSelectionChange={(keys) => {
-            if (keys === "all") return;
-            const [key] = keys;
-            if (typeof key === "string") { setChoice(key); setCaptureFailed(false); }
-          }}>
-          {(section) => <ListboxSection key={section.id || "runs"} title={section.label || undefined} items={section.rows}
-            classNames={{ heading: styles.groupHeading, group: styles.list }}>
-            {(row) => <ListboxItem key={row.id} textValue={`${row.run.name} ${row.run.key}`}
-              selectedIcon={({ isSelected }) => isSelected ? <Check size={15} aria-hidden="true" />
-                : <ChevronRight size={15} aria-hidden="true" />}>
-              {itemLabel(row.run)}
-            </ListboxItem>}
-          </ListboxSection>}
-        </Listbox>
+        <div className={styles.listFrame} data-pending={replacingRuns || undefined} inert={replacingRuns}
+          aria-hidden={replacingRuns || undefined}>
+          <Listbox ref={list} classNames={{ base: styles.listbox, list: styles.list }}
+            itemClasses={{ base: styles.option, title: styles.runLabel, selectedIcon: styles.optionIcon }}
+            aria-label={ru ? "Доступные прогоны" : "Available runs"} items={groups}
+            disabledKeys={capturePending ? groups.flatMap(({ rows }) => rows.map((row) => row.id)) : []}
+            selectionMode="single" selectedKeys={choice ? [choice] : []} disallowEmptySelection hideEmptyContent
+            variant="flat" onSelectionChange={(keys) => {
+              if (keys === "all" || replacingRuns) return;
+              const [key] = keys;
+              if (typeof key === "string") { setChoice(key); setCaptureFailed(false); }
+            }}>
+            {(section) => <ListboxSection key={section.id || "runs"} title={section.label || undefined} items={section.rows}
+              classNames={{ heading: styles.groupHeading, group: styles.list }}>
+              {(row) => <ListboxItem key={row.id} textValue={`${row.run.name} ${row.run.key}`}
+                selectedIcon={({ isSelected }) => isSelected ? <Check size={15} aria-hidden="true" />
+                  : <ChevronRight size={15} aria-hidden="true" />}>
+                <RunEvidenceRow run={row.run} showProject={grouping !== "project"} shortDate={shortDate} fullDate={fullDate} />
+              </ListboxItem>}
+            </ListboxSection>}
+          </Listbox>
+        </div>
         {!loading && !page.failure && page.items.length === 0 && <div className={styles.empty} role="status">
           {searchActive ? (ru ? "Совпадений нет." : "No matching runs.") : (ru ? "Нет доступных прогонов." : "No available runs.")}
         </div>}
-        {loading && (page.items.length === 0
+        {loading && (visibleRuns.length === 0
           ? <div className={styles.pending} role="status" aria-label={loadingLabel}>
             {[0, 1].map((row) => <div key={row}><Skeleton className={styles.skeleton} disableAnimation /><Skeleton className={styles.skeleton} disableAnimation /></div>)}
           </div>
-          : <div className={styles.empty} role="status"><Spinner variant="simple" classNames={spinnerSlots} aria-hidden="true" />{loadingLabel}</div>)}
+          : !replacingRuns && <div className={styles.empty} role="status"><Spinner variant="simple" classNames={spinnerSlots} aria-hidden="true" />{loadingLabel}</div>)}
         {Boolean(page.failure) && <div className={styles.empty} role="alert">
           {ru ? "Не удалось загрузить прогоны." : "Couldn’t load runs."}
           <Button disableRipple variant="light" size="sm" isDisabled={capturePending} onPress={() => page.cursor ? void page.more() : page.refresh()}>{ru ? "Повторить" : "Retry"}</Button>

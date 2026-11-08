@@ -1,0 +1,6 @@
+.tooltip { z-index: 130; }
+.tooltipContent { padding: 5px 8px; border: 1px solid var(--falcon-border); border-radius: 7px; background: var(--falcon-elevated); color: var(--falcon-text); box-shadow: var(--falcon-shadow-popover); font-size: 12px; line-height: 1.4; }
+@media (prefers-reduced-motion: no-preference) {
+  .tooltipContent { animation: tooltip-enter 100ms ease-out both; }
+}
+@keyframes tooltip-enter { from { opacity: 0; } to { opacity: 1; } }

@@ -44,7 +44,7 @@ export function SupportContact({workspaceId,navigationClasses,menuItem=false}:{w
     finally{setCapturing(false);}
   }
   const close=()=>{if(!model.busy&&!capturing)setOpen(false);};
-  return <><button type="button" role={menuItem ? "menuitem" : undefined} className={navigationClasses?.button ?? nav.navigationUtilityButton} onClick={show} aria-label={ru?'Связаться с нами':'Contact us'} data-nav-label={ru?'Связаться с нами':'Contact us'} data-testid="nav-support-utility">
+  return <><button type="button" role={menuItem ? "menuitem" : undefined} className={navigationClasses?.button ?? nav.navigationUtilityButton} onClick={show} aria-label={ru?'Связаться с нами':'Contact us'} data-testid="nav-support-utility">
     <span className={navigationClasses?.icon ?? nav.navigationIcon} aria-hidden="true"><MessageCircleMore size={20}/></span><span className={navigationClasses?.label ?? nav.navigationLabel}>{ru?'Связаться с нами':'Contact us'}</span>
   </button>{typeof document!=='undefined'&&createPortal(<><SupportToast receiptId={accepted} ru={ru} onDismiss={dismissToast}/>{dialogMotion.present&&<div ref={dialogMotion.ref} data-support-overlay className={css.overlay}>
     <Modal title={ru?'Новое обращение':'Contact Falcon'} onClose={close} panelClassName={css.panel} wide>

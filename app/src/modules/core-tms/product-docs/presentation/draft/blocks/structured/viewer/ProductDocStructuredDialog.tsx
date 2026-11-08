@@ -9,9 +9,10 @@ export function ProductDocStructuredDialog({ kind, source, title, closeLabel, is
   kind: "diagram" | "math"; source: string; title: string; closeLabel: string; isOpen: boolean; onClose(): void;
   result: ReturnType<typeof useProductDocStructuredRender>; showSource?: boolean;
 }) {
-  const large = kind === "diagram" && !showSource;
+  const diagram = kind === "diagram" && !showSource;
+  const className = diagram ? styles.expanded : kind === "math" && !showSource ? styles.expandedFormula : undefined;
   return <ProductDocModal isOpen={isOpen} onClose={onClose} title={title} closeLabel={closeLabel}
-    className={large ? styles.expanded : undefined} bodyClassName={large ? styles.expandedContent : undefined}>
+    className={className} bodyClassName={diagram ? styles.expandedContent : undefined}>
     <div className={styles.expandedBody}>
       {showSource ? <pre>{source}</pre> :
         <ProductDocStructuredPreview kind={kind} source={source} result={result} expanded />}

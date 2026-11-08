@@ -2,11 +2,11 @@
 
 import type { Element } from "hast";
 import type { Root } from "mdast";
-import { useState, type ReactNode } from "react";
-import ReactMarkdown from "react-markdown";
+import { createContext, memo, useContext, useState, type ReactNode } from "react";
+import ReactMarkdown, { type Components } from "react-markdown";
 import remarkDirective from "remark-directive";
 import remarkGfm from "remark-gfm";
-import type { ProductDocsCopy } from "../../../localization/copy";
+import { productDocsCopy, type ProductDocsCopy } from "../../../localization/copy";
 import { FalconCheckbox } from "../../../../presentation/common/checkbox/FalconCheckbox";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import { remarkHighlights } from "../../../../presentation/cases/inspector/markdown/highlight/render/remarkHighlights";
@@ -71,7 +71,10 @@ function renderDocumentBlocks() {
   };
 }
 
-function ImageReference({ alt, src, title, copy }: { alt?: string; src?: string; title?: string; copy: ProductDocsCopy }) {
+const MarkdownCopy = createContext(productDocsCopy("en"));
+
+function ImageReference({ alt, src, title }: { alt?: string; src?: string; title?: string }) {
+  const copy = useContext(MarkdownCopy);
   const ru = useTmsLocale().locale === "ru";
   const [revealed, setRevealed] = useState(false);
   const [unavailable, setUnavailable] = useState(false);
@@ -108,40 +111,48 @@ const embedRenderers = { [dashboardDirectiveName]: MarkdownDashboard, [runDirect
       selected={Number(node?.properties.choice)} />;
   } };
 
-export function ProductDocMarkdown({ markdown, copy }: { markdown: string; copy: ProductDocsCopy }) {
+// ReactMarkdown uses these functions as component types. Keep them stable when the article re-renders.
+const markdownComponents: Components = {
+  ...embedRenderers,
+  blockquote: ({ children, node }) => {
+    const tone = node?.properties["data-tone"];
+    return isProductDocCalloutTone(tone)
+      ? <ProductDocCallout tone={tone}>{children}</ProductDocCallout>
+      : <blockquote>{children}</blockquote>;
+  },
+  a: ProductDocSmartLink,
+  input: MarkdownTask,
+  table: ({ children }) => <div className={tableStyles.scroll}><table>{children}</table></div>,
+  hr: () => <hr className={blockStyles.divider} />,
+  pre: ({ node, children }) => {
+    const block = node?.children[0];
+    if (block?.type !== "element" || block.tagName !== "code") return <pre>{children}</pre>;
+    const classes = block.properties.className;
+    const language = Array.isArray(classes) ? classes.find((value) => String(value).startsWith("language-")) : "";
+    const code = block.children.map((child) => child.type === "text" ? child.value : "").join("").replace(/\n$/, "");
+    const languageName = String(language ?? "").slice(9);
+    const kind = structuredBlockKind(languageName);
+    if (kind) return <ProductDocStructuredBlockReader kind={kind} source={code} />;
+    const meta = block.data?.meta;
+    return <ProductDocCodeSnippet code={code} language={languageName} meta={typeof meta === "string" ? meta : ""} />;
+  },
+  img: ({ alt, src, title }) => {
+    const url = typeof src === "string" ? src : undefined;
+    return <ImageReference key={url} alt={alt} title={title} src={url} />;
+  },
+};
+
+function MarkdownTask({ type, checked }: { type?: string; checked?: boolean }) {
   const ru = useTmsLocale().locale === "ru";
-  return <div className={`${layoutStyles.articleLayouts} ${markerStyles.surface} ${calloutStyles.prose}`}><ReactMarkdown skipHtml
-    remarkPlugins={[remarkGfm, remarkDirective, [remarkHighlights, { preserveOtherDirectives: true }], renderDocumentBlocks]}
-    components={{
-      ...embedRenderers,
-      blockquote: ({ children, node }) => {
-        const tone = node?.properties["data-tone"];
-        return isProductDocCalloutTone(tone)
-          ? <ProductDocCallout tone={tone}>{children}</ProductDocCallout>
-          : <blockquote>{children}</blockquote>;
-      },
-      a: ProductDocSmartLink,
-      input: ({ type, checked }) => type === "checkbox"
-        ? <span className={styles.taskControl}><FalconCheckbox isReadOnly isSelected={checked}
-          aria-label={ru ? "Состояние задачи" : "Task status"} /></span>
-        : null,
-      table: ({ children }) => <div className={tableStyles.scroll}><table>{children}</table></div>,
-      hr: () => <hr className={blockStyles.divider} />,
-      pre: ({ node, children }) => {
-        const block = node?.children[0];
-        if (block?.type !== "element" || block.tagName !== "code") return <pre>{children}</pre>;
-        const classes = block.properties.className;
-        const language = Array.isArray(classes) ? classes.find((value) => String(value).startsWith("language-")) : "";
-        const code = block.children.map((child) => child.type === "text" ? child.value : "").join("").replace(/\n$/, "");
-        const languageName = String(language ?? "").slice(9);
-        const kind = structuredBlockKind(languageName);
-        if (kind) return <ProductDocStructuredBlockReader kind={kind} source={code} />;
-        const meta = block.data?.meta;
-        return <ProductDocCodeSnippet code={code} language={languageName} meta={typeof meta === "string" ? meta : ""} />;
-      },
-      img: ({ alt, src, title }) => <ImageReference key={typeof src === "string" ? src : undefined} alt={alt} title={title}
-        src={typeof src === "string" ? src : undefined} copy={copy} />,
-    }}>
-    {markdown}
-  </ReactMarkdown></div>;
+  return type === "checkbox" ? <span className={styles.taskControl}>
+    <FalconCheckbox isReadOnly isSelected={checked} aria-label={ru ? "Состояние задачи" : "Task status"} />
+  </span> : null;
 }
+
+export const ProductDocMarkdown = memo(function ProductDocMarkdown({ markdown, copy }: { markdown: string; copy: ProductDocsCopy }) {
+  return <MarkdownCopy.Provider value={copy}>
+    <div className={`${layoutStyles.articleLayouts} ${markerStyles.surface} ${calloutStyles.prose}`}><ReactMarkdown skipHtml
+      remarkPlugins={[remarkGfm, remarkDirective, [remarkHighlights, { preserveOtherDirectives: true }], renderDocumentBlocks]}
+      components={markdownComponents}>{markdown}</ReactMarkdown></div>
+  </MarkdownCopy.Provider>;
+});

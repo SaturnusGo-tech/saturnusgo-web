@@ -144,7 +144,8 @@
   white-space: pre-wrap;
 }
 .readSource { padding-inline-end: 56px; }
-.expanded.expanded { width: min(1200px, 100%); height: min(880px, calc(100dvh - 32px)); }
+.expanded.expanded { width: 100%; height: calc(100dvh - 32px); }
+.expandedFormula.expandedFormula { width: max-content; min-width: min(440px, 100%); max-width: 100%; }
 .expandedBody { min-height: 0; padding: 0 16px 14px; }
 .expanded .expandedContent { display: flex; flex: 1; min-block-size: 0; overflow: hidden; }
 .expanded .expandedBody { display: flex; flex: 1; flex-direction: column; min-inline-size: 0; }

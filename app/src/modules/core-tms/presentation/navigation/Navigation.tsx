@@ -31,6 +31,8 @@ export function Navigation({ view, onChange, disabled, connected, collapsed, onC
   const root = useRef<HTMLElement>(null);
   const reveal = useSidebarReveal(root, collapsed, onCollapsedChange);
   const compact = !reveal.revealed;
+  const tooltips = collapsed && compact;
+  const homeLabel = t("header.dashboardAria");
   const available = (candidate: View) => (candidate !== "product-docs" || productDocs) && companyViewAvailable(candidate, session?.companyCapabilities, codexAvailable) && workspaceViewAllowed(candidate, userCapabilities, codexAvailable);
   const state = useSidebarPreferences(workspaceId, session?.subject);
   const navigation = getSidebarNavigation({ availableIds: SIDEBAR_NAVIGATION_IDS.filter(available), activeView: view, preferences: state.preferences });
@@ -51,24 +53,24 @@ export function Navigation({ view, onChange, disabled, connected, collapsed, onC
   return <nav ref={root} id="tms-navigation" data-sidebar-system data-collapsed={compact} data-peek={reveal.revealed || undefined} tabIndex={-1}
     className={`${shellStyles.navigation} ${compact ? shellStyles.navigationCollapsed : ""} ${css.system}`} aria-label={t("nav.ariaLabel")}>
     <div className={css.header}>
-      <button type="button" className={css.brand} onClick={() => navigate(available("dashboard") ? "dashboard" : "cases")}
-        aria-label={t("header.dashboardAria")} data-nav-label={t("header.dashboardAria")}>
-        <span className={css.mark} aria-hidden="true"/><span className={css.wordmark} aria-hidden="true">FALCON</span>
-      </button>
+      <NavigationTooltip enabled={tooltips} label={homeLabel}>
+        <button type="button" className={css.brand} onClick={() => navigate(available("dashboard") ? "dashboard" : "cases")} aria-label={homeLabel}>
+          <span className={css.mark} aria-hidden="true"/><span className={css.wordmark} aria-hidden="true">FALCON</span>
+        </button>
+      </NavigationTooltip>
     </div>
     <div className={css.scroll} data-sidebar-scroll>
-      <NavigationGroups groups={navigation.groups} activeId={navigation.activeId} disabled={disabled} allowManagedHooks={codexAvailable} activeRunCount={activeRunCount} onNavigate={navigate}/>
+      <NavigationGroups groups={navigation.groups} activeId={navigation.activeId} disabled={disabled} allowManagedHooks={codexAvailable} activeRunCount={activeRunCount} tooltips={tooltips} onNavigate={navigate}/>
       <RareNavigationMenu availableIds={navigation.availableIds} activeId={navigation.activeId} pinnedIds={navigation.pinnedIds}
         disabled={disabled} allowManagedHooks={codexAvailable} onNavigate={navigate} onTogglePinned={state.togglePinned}/>
     </div>
     <div className={css.footer}>
-      <DesktopUpdateControl/>
+      <DesktopUpdateControl navigationTooltip/>
       <SidebarSectionsMenu sidebar={root} availableIds={navigation.availableIds} activeId={navigation.activeId}
         preferences={state.preferences} onTogglePinned={state.togglePinned} onNavigate={navigate} disabled={disabled} allowManagedHooks={codexAvailable}/>
-      <NavigationUtilityMenu connected={connected} subject={session?.subject ?? ""} workspaceId={workspaceId}/>
+      <NavigationUtilityMenu connected={connected} subject={session?.subject ?? ""} workspaceId={workspaceId} tooltips={tooltips}/>
       <NavigationProfile collapsed={compact} workspaceId={workspaceId} onOpenSettings={() => onChange("config")} onOpenHelp={() => onChange("help")}/>
     </div>
-    <NavigationTooltip collapsed={collapsed && compact} root={root}/>
     <div className={css.resizeHandle} data-sidebar-resize role="separator" aria-orientation="vertical" tabIndex={0}
       aria-label={locale === "ru" ? "Ширина навигации" : "Navigation width"} aria-valuemin={52} aria-valuemax={240} aria-valuenow={compact ? 52 : 240}
       aria-valuetext={locale === "ru" ? (compact ? "Свёрнута" : "Развёрнута") : (compact ? "Collapsed" : "Expanded")}

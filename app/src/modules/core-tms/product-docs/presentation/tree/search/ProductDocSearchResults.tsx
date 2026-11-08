@@ -22,6 +22,10 @@ export function ProductDocSearchResults({ api, scope, copy, query, taxonomy, ref
 }) {
   const desiredQuery = query.trim();
   const [search, setSearch] = useState("");
+  const { workspaceId, projectId } = scope;
+  const [lastResults, setLastResults] = useState<{
+    api: ProductDocsApi; workspaceId: string; projectId: string; nodes: readonly ProductDocNode[];
+  }>();
   useEffect(() => {
     const timer = window.setTimeout(() => setSearch(desiredQuery), desiredQuery ? 180 : 0);
     return () => window.clearTimeout(timer);
@@ -30,19 +34,25 @@ export function ProductDocSearchResults({ api, scope, copy, query, taxonomy, ref
     q: desiredQuery || undefined, refresh, enabled: search === desiredQuery,
     productGroupId: taxonomy.productGroup?.id, productId: taxonomy.product?.id,
   });
+  useEffect(() => {
+    if (data && !loading && !error) setLastResults({ api, workspaceId, projectId, nodes: data.nodes });
+  }, [api, workspaceId, projectId, data, loading, error]);
 
   const waitingForResults = !data && loading;
+  const sameScope = lastResults?.api === api && lastResults.workspaceId === workspaceId && lastResults.projectId === projectId;
+  const rows = waitingForResults && sameScope ? lastResults.nodes : data?.nodes ?? [];
 
   return <>
     <div role="status" className={resultStyles.status}>{waitingForResults ? copy.loading : ""}</div>
     <div className={resultStyles.results} data-doc-search-results aria-busy={loading}>
-      {waitingForResults && <div className={resultStyles.placeholder} aria-hidden="true">
+      {waitingForResults && rows.length === 0 && <div className={resultStyles.placeholder} aria-hidden="true">
         {[0, 1, 2].map((row) => <div key={row}><Skeleton className={resultStyles.skeleton} disableAnimation /><Skeleton className={resultStyles.skeleton} disableAnimation /></div>)}
       </div>}
       {error && !data?.nodes.length && <ReadState copy={copy} status="error" retry={retry} />}
       {data && !error && data.nodes.length === 0 && <p className={styles.treeEmpty}>{copy.noResults}</p>}
-      {!!data?.nodes.length && <ul className={`${treeStyles.branch} ${resultStyles.reveal}`}>
-        {data.nodes.map((node) => {
+      {rows.length > 0 && <ul className={`${treeStyles.branch} ${resultStyles.reveal}`} inert={waitingForResults}
+        aria-hidden={waitingForResults || undefined} data-pending={waitingForResults || undefined}>
+        {rows.map((node) => {
           const location = node.searchPath?.map(({ title }) => title).join(" / ");
           return <li key={node.id}>
             <button type="button" className={resultStyles.result} onClick={() => onChoose(node)}>

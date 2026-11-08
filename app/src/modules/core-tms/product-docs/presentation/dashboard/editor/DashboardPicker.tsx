@@ -88,6 +88,8 @@ function DashboardPickerContent({ capture, onChoose, onClose, onExited }: Picker
   }
 
   const close = ru ? "Закрыть каталог дашбордов" : "Close dashboard catalog";
+  const status = busy ? (ru ? "Сохраняем снимок…" : "Capturing snapshot…")
+    : previews.refreshing ? (ru ? "Обновляем предпросмотр…" : "Refreshing preview…") : undefined;
   return <>
     <header className={styles.header}>
       <ModalHeader as="h2">{title}</ModalHeader>
@@ -97,21 +99,23 @@ function DashboardPickerContent({ capture, onChoose, onClose, onExited }: Picker
           items={periods.map(({ key, days }) => ({ key, label: ru ? `${days} дн.` : `${days}d` }))}
           onSelect={setPeriodKey} />
       </div>
-      <div className={styles.status} role="status" aria-label={busy ? (ru ? "Сохраняем снимок…" : "Capturing snapshot…") : undefined}>
-        {busy && <Spinner size="sm" color="current" variant="simple" aria-hidden="true" />}
+      <div className={styles.status} role="status" aria-label={status} data-refreshing={previews.refreshing && !busy || undefined}>
+        {status && <Spinner size="sm" color="current" variant="simple" aria-hidden="true" />}
       </div>
       <Button disableRipple isIconOnly variant="light" size="sm" className={styles.close} aria-label={close} title={close} onPress={onClose}>
         <X size={17} aria-hidden="true" />
       </Button>
     </header>
-    <div className={styles.body} id={panelId} role="tabpanel" aria-labelledby={dashboardTabId(panelId, periodKey)}>
+    <div className={styles.body} id={panelId} role="tabpanel" aria-labelledby={dashboardTabId(panelId, periodKey)}
+      data-preview-refreshing={previews.refreshing || undefined}>
       <WidgetCatalog dashboardName="" selected={emptySelection} onBack={onClose}
         documentInsert={{ label: title, busy }} onAdd={([widget]) => { if (widget) void submit(widget); }}
         renderPreview={(widget) => {
           const usesWorkbench = widget === "queue" || widget === "freshness" || widget === "readyForRetest";
           if (!(usesWorkbench ? previews.workbench : previews.summary)) return null;
           return <WidgetRenderer widget={widget} evidence={{
-            snapshot: previews.summary, workbench: previews.workbench, valueContext: ru ? "Предпросмотр" : "Preview",
+            snapshot: previews.summary, workbench: previews.workbench, valueContext: !usesWorkbench && previews.refreshing
+              ? ru ? "Предыдущий период" : "Previous period" : ru ? "Предпросмотр" : "Preview",
           }} />;
         }} />
     </div>

@@ -75,6 +75,9 @@
   flex: 1; min-block-size: 0; overflow: auto; overscroll-behavior: contain;
   scrollbar-width: thin; margin-block: 8px; container-type: inline-size;
 }
+.listFrame { transition: opacity 140ms ease; }
+.listFrame[data-pending] { opacity: .55; }
+.loadingAnnouncement { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); }
 .list .option, .results .more {
   box-sizing: border-box; display: flex; align-items: center; gap: 9px; inline-size: 100%;
   padding: 6px 8px; border: 0; border-radius: 8px;
@@ -123,7 +126,7 @@
 }
 .submit:hover:not(:disabled) { background: var(--falcon-action-hover); }
 .submit:disabled { opacity: .5; cursor: default; }
-.pending { display: grid; gap: 9px; padding: 8px 9px; }
+.pending { display: grid; gap: 9px; padding: 8px 9px; animation: show-pending 140ms ease 230ms both; }
 .pending > div { display: grid; gap: 5px; }
 .pending .skeleton { inline-size: 75%; block-size: 9px; border-radius: 5px; background: var(--falcon-hover); }
 .pending .skeleton:last-child { inline-size: 48%; block-size: 7px; }
@@ -131,6 +134,7 @@
 .spinnerWheel { inline-size: 15px; block-size: 15px; animation: spinner 850ms linear infinite; }
 .spinnerTrack { opacity: .25; }
 @keyframes spinner { to { transform: rotate(360deg); } }
+@keyframes show-pending { from { opacity: 0; } to { opacity: 1; } }
 @container (max-width: 460px) {
   .option .runLabel {
     grid-template-columns: minmax(0, max-content) minmax(0, 1fr) 5.9rem;
@@ -148,6 +152,6 @@
   .submit { min-block-size: 40px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .spinnerWheel { animation: none; }
-  .searchTool, .list .option { transition: none; }
+  .spinnerWheel, .pending { animation: none; }
+  .searchTool, .list .option, .listFrame { transition: none; }
 }
