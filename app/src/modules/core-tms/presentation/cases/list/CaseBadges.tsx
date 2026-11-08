@@ -7,16 +7,17 @@ import { localizedLabel } from "../../../localization/format/labels";
 import type { TmsLocale } from "../../../localization/model/locale";
 import styles from "../detail/metadata/caseMetadata.module.css";
 
-export function LifecycleBadge({ locale, lifecycle, archived }: {
+export function LifecycleBadge({ locale, lifecycle, archived, neutral }: {
   locale: TmsLocale;
   lifecycle: TestCaseSummary["lifecycle"];
   archived?: boolean;
+  neutral?: boolean;
 }) {
   const value = archived ? "archived" : lifecycle;
   const icon = value === "archived" ? <Archive size={11} />
     : value === "ready" ? <CheckCircle2 size={11} />
     : value === "deprecated" ? <Ban size={11} /> : <CircleDashed size={11} />;
-  return <span className={`${styles.chip} ${styles[`lifecycle${capital(value)}`]}`}>{icon}{localizedLabel(locale, value)}</span>;
+  return <span className={`${styles.chip} ${styles[`lifecycle${capital(value)}`]}`} data-neutral={neutral || undefined}>{icon}{localizedLabel(locale, value)}</span>;
 }
 
 export function PriorityBadge({ locale, priority }: {

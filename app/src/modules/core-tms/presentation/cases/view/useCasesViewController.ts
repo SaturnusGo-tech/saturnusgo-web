@@ -50,7 +50,7 @@ export function useCasesViewController(
   const baseRows = useMemo(() => filterCaseRows(allRows.filter(({ testCase }) => (
     (!props.filters.maintenanceStatus || props.filters.maintenanceStatus === "all" || (testCase.maintenance?.status ?? "current") === props.filters.maintenanceStatus) && (props.folders || props.filters.includeArchived || folderScope.archived || !testCase.archivedAt)
     && (props.filters.type === "all" || testCase.type === props.filters.type)
-    && (props.filters.priority === "all" || testCase.priority === props.filters.priority)
+    && (props.filters.priority === "all" || casePriority(testCase) === props.filters.priority)
     && (props.filters.lifecycle === "all" || testCase.lifecycle === props.filters.lifecycle)
     && (!props.filters.tag.trim() || testCase.tags.some((tag) => (
       tag.toLocaleLowerCase().includes(props.filters.tag.trim().toLocaleLowerCase())
@@ -177,3 +177,4 @@ export function useCasesViewController(
     selectableMatchingCount: selectableMatchingRows.length,
   };
 }
+import { casePriority } from "../../../helpers/cases/caseRevision";

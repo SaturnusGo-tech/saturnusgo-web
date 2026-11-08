@@ -43,7 +43,7 @@ function pickerHarness(disabled = false) {
     if (name === "react/jsx-runtime") return { jsx, jsxs: jsx };
     if (name.endsWith(".css")) return { default: new Proxy({}, { get: (_target, key) => String(key) }) };
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en" }) };
-    if (name.endsWith("useAnchoredPopup")) return { useAnchoredPopup() {} };
+    if (name.endsWith("PropertySelect")) return { PropertyPopover: "PropertyPopover", PropertySearch: "PropertySearch" };
     if (name.endsWith("useCustomFieldValues")) return { useCustomFieldValues: () => ({ search: "", items: [], loading: false, setSearch() {} }) };
     if (name.endsWith("useFieldValueWrite")) return { useFieldValueWrite: () => ({ reset() {} }) };
     if (name.endsWith("field-labels")) return { customFieldLabel: () => "Regression" };
@@ -61,27 +61,28 @@ function pickerHarness(disabled = false) {
       for (const slot of pending) slot.cleanup?.();
       for (const slot of pending) slot.cleanup = slot.setup?.();
     }
-    return (tree.props.children as Node[]).find(node => node?.type === "button")!;
+    assert.equal(tree.type, "PropertyPopover");
+    return tree;
   }
   return { render, update: (patch: Partial<typeof props>) => { props = { ...props, ...patch }; } };
 }
 
 test("auto-open survives the StrictMode context-effect mount rehearsal", () => {
   const picker = pickerHarness(); picker.render();
-  assert.equal(picker.render().props["aria-expanded"], true);
+  assert.equal(picker.render().props.open, true);
 });
 
 test("manual close and a parent-context change do not reopen an inline picker", () => {
   const picker = pickerHarness(); picker.render();
-  picker.render().props.onClick();
-  assert.equal(picker.render().props["aria-expanded"], false);
+  picker.render().props.onOpenChange(false);
+  assert.equal(picker.render().props.open, false);
   picker.update({ parentValueId: "other-group" }); picker.render();
-  assert.equal(picker.render().props["aria-expanded"], false);
+  assert.equal(picker.render().props.open, false);
 });
 
 test("a disabled inline picker opens when it first becomes enabled", () => {
   const picker = pickerHarness(true); picker.render();
-  assert.equal(picker.render().props["aria-expanded"], false);
+  assert.equal(picker.render().props.open, false);
   picker.update({ disabled: false }); picker.render();
-  assert.equal(picker.render().props["aria-expanded"], true);
+  assert.equal(picker.render().props.open, true);
 });

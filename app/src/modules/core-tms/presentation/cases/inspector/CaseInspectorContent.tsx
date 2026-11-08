@@ -134,7 +134,7 @@ export function CaseInspectorContent({
       </InspectorSectionView>
       <InspectorSectionView title={ru ? "Свойства" : "Properties"} editLabel={ru ? "Изменить свойства" : "Edit properties"} actionsInHeader {...controls("properties")}>
         <CaseMetadataControls onRequestEdit={requestField("properties")} locale={locale} revision={value} archived={archived} editing={sectionEditing("properties")}
-          autoFocus={!creating} showLabels onChange={readOnly ? undefined : editor?.onChange} />
+          autoFocus={!creating} disabled={editor?.submitting || editor?.attachmentsPending} showLabels onChange={readOnly ? undefined : editor?.onChange} />
       </InspectorSectionView>
       <InspectorSectionView title={ru ? "Дополнительно" : "Additional details"} actionsInHeader {...controls("details")}>
         <InspectorDetails onRequestEdit={requestField("details")} disabled={editor?.submitting || editor?.attachmentsPending} testCaseId={testCaseId} revision={value} editing={sectionEditing("details")} autoFocus={!creating} ru={ru} onPatch={patch}

@@ -11,7 +11,7 @@ import { canEditRunAttempt } from "../../application/runs/execution/attempt-edit
 import { MarkdownField } from "../cases/inspector/markdown/MarkdownField";
 import { ScenarioMarkdown } from "../cases/inspector/steps/markdown/ScenarioMarkdown";
 import { StepActualEditor } from "./actual/StepActualEditor";
-import { executableSteps } from "../../helpers/cases/caseRevision";
+import { casePriority, executableSteps } from "../../helpers/cases/caseRevision";
 import { localizedLabel } from "../../localization/format/labels";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { FormError } from "../common/error/FormError";
@@ -26,7 +26,8 @@ import { RunSelectionContext } from "./header/RunSelectionContext";
 import { useRunKeyboardShortcuts } from "./execution/useRunKeyboardShortcuts";
 import { useRunFocus } from "./execution/useRunFocus";
 import focusStyles from "./execution/run-focus.module.css";
-import { EstimateBadge, PriorityBadge, TypeBadge } from "../cases/list/CaseBadges";
+import { EstimateBadge, TypeBadge } from "../cases/list/CaseBadges";
+import { PriorityField } from "../common/properties/PriorityField";
 import styles from "../../tms.module.css";
 import runStyles from "./runs.module.css";
 type RunsViewProps = {
@@ -149,7 +150,8 @@ export function RunsView({ embedded = false, executionPending = false, emptyFilt
               <header><h2>{locale === "ru" ? "Свойства" : "Properties"}</h2></header>
               <div className={runStyles.propertyList}>
                 <div><span>{t("runs.status")}</span><span className={`${runStyles.executionBadge} ${runStyles[`execution_${selectedItem.status}`]}`}>{statusIcon[selectedItem.status]}{localizedLabel(locale, selectedItem.status)}</span></div>
-                <div><span>{locale === "ru" ? "Приоритет" : "Priority"}</span><PriorityBadge locale={locale} priority={selectedItem.preview?.priority ?? selectedItem.snapshot.priority} /></div>
+                <div><span>{locale === "ru" ? "Приоритет" : "Priority"}</span><PriorityField locale={locale}
+                  value={casePriority(selectedItem.preview ?? selectedItem.snapshot)} /></div>
                 <div><span>{locale === "ru" ? "Тип" : "Type"}</span><TypeBadge locale={locale} type={selectedItem.snapshot.type} /></div>
                 <div><span>{t("runs.estimate")}</span><EstimateBadge locale={locale} minutes={selectedItem.snapshot.estimatedMinutes} /></div>
               </div>

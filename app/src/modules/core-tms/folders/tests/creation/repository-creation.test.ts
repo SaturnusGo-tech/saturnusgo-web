@@ -38,6 +38,24 @@ test("unfiled case creation explicitly targets root and locked rows disable the 
   assert.equal(action.props.folderPath, "/"); assert.equal(action.props.disabled, true);
 });
 
+test("repository rows keep the key beside the title and distinguish an unset priority from Medium", () => {
+  const app = browserHarness();
+  const control = treeControl("case/RepositoryCaseLeaf.tsx", "RepositoryCaseLeaf");
+  const branch = find(app.renderTree(), node => node.type === "RepositoryFolderBranch")[0];
+  assert.equal(branch.props.titleMode, "inline");
+  for (const priorityAssigned of [undefined, false, true]) {
+    const row = control.render({ item: { ...item, priority: "medium", priorityAssigned }, titleMode: "inline" });
+    const button = elements(row, "button")[0];
+    const parts = button.props.children as { props?: { children?: string } }[];
+    assert.equal(parts[1]?.props?.children, item.title);
+    assert.equal(parts[2]?.props?.children, item.key);
+    const icon = elements(button, "PriorityIcon")[0];
+    assert.equal(icon.props.level, priorityAssigned === false ? null : "medium");
+    assert.equal(icon.props.empty, "circle");
+  }
+  app.dispose();
+});
+
 test("a newly created subfolder remains visible under a search filter and its collapsed parent opens", () => {
   const app = browserHarness(); app.props.query = "transfer";
   const getBranches = () => find(app.renderTree(), node => node.type === "RepositoryFolderBranch");

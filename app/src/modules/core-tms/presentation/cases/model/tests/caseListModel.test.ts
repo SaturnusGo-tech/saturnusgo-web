@@ -62,21 +62,16 @@ test("supports descending priority sorting", () => {
 
 test("case listings keep priority as one sortable signal instead of a duplicate pill column", () => {
   const table = readFileSync(new URL("../../list/CasesTable.tsx", import.meta.url), "utf8");
-  const signal = readFileSync(new URL("../../list/priority/PrioritySignal.tsx", import.meta.url), "utf8");
-  const styles = readFileSync(new URL("../../list/prioritySignal.module.css", import.meta.url), "utf8");
   const listingStyles = readFileSync(new URL("../../listing/caseListing.module.css", import.meta.url), "utf8");
   assert.match(table, /className=\{styles\.prioritySortButton\}/);
-  assert.match(table, /<PrioritySignal priority=\{item\.priority\}/);
-  assert.doesNotMatch(table, /<PriorityBadge/);
+  assert.match(table, /<PriorityIcon level=\{priority\} empty="circle"/);
+  assert.doesNotMatch(table, /<PriorityBadge|<PrioritySignal/);
   assert.equal((table.match(/key: "priority"/g) ?? []).length, 1);
-  assert.match(signal, /priority === "low" \? Diamond : Triangle/);
-  assert.match(signal, /fill=\{filled \? "currentColor" : "none"\}/);
-  assert.match(styles, /\.signal\[data-priority="high"\] \{ color: var\(--falcon-warning\); \}/);
-  assert.match(styles, /\.signal\[data-priority="critical"\] \{ color: var\(--falcon-danger\); \}/);
+  assert.match(table, /className=\{styles\.titleCell\}[^\n]*\n\s*<td className=\{styles\.keyCell\}/);
   assert.match(listingStyles, /\.flagColumn \{ width: 32px; padding-inline: 0 !important; \}/);
   assert.match(listingStyles, /\.typeColumn \{ width: 36px; padding-inline: 0 !important; \}/);
   assert.match(listingStyles, /\.keyColumn \{ width: 90px; \}/);
-  assert.match(listingStyles, /\.flagCell > svg \{ margin-inline: auto; \}/);
+  assert.match(listingStyles, /\.flagCell > svg \{ margin-inline: auto; color: var\(--falcon-icon\); \}/);
 });
 
 test("parses quoted QL values, aliases, and exclusions", () => {

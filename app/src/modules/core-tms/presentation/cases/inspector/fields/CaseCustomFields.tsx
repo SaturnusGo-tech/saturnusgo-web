@@ -2,11 +2,11 @@ import { useEffect, useId, useRef, useState } from "react";
 import type { TestCaseRevision } from "../../../../../../core/tms/contracts/legacy-contract";
 import { useWorkspacePeople } from "../../../../workspace/members/context/WorkspacePeopleContext";
 import { useCustomFieldCatalog } from "../../../../custom-fields/state/catalog/useCustomFieldCatalog";
-import { CustomFieldPicker } from "../../../../custom-fields/presentation/picker/CustomFieldPicker";
+import { CustomFieldIcon, CustomFieldPicker } from "../../../../custom-fields/presentation/picker/CustomFieldPicker";
 import type { CustomFieldDefinition, CustomFieldSystemKey } from "../../../../custom-fields/model/custom-field";
 import { customFieldLabel, customValueLabel } from "../../../../custom-fields/application/field-labels";
 import { updateCaseField } from "./case-field-selection";
-import { InspectorFieldValue } from "../inline/InspectorFieldValue";
+import { PropertyValue } from "../../../common/properties/select/PropertySelect";
 import rail from "../propertyRail.module.css";
 import css from "./caseFields.module.css";
 
@@ -71,10 +71,10 @@ export function CaseCustomFields({ projectId = "", revision, editing, creating =
     setInlineEdit(previous => ({ key, order: previous?.order ?? rows.map(row => row.key) }));
     onRequestEdit?.();
   }
-  function readValue(label: string, value: string, key?: string) {
-    return <InspectorFieldValue label={label} onEdit={canEdit && key ? () => begin(key) : undefined}>
-      {value || (ru ? "Не указано" : "Not specified")}
-    </InspectorFieldValue>;
+  function readValue(label: string, value: string, systemKey: CustomFieldSystemKey | null | undefined, key?: string) {
+    return <PropertyValue label={label} onEdit={canEdit && key ? () => begin(key) : undefined}>
+      <CustomFieldIcon systemKey={systemKey ?? null} /><span>{value || (ru ? "Не указано" : "Not specified")}</span>
+    </PropertyValue>;
   }
   return <>
     <dl ref={fieldList} className={`${css.facts} ${rail.readRows}${editing ? ` ${css.editing}` : ""}`}>
@@ -94,7 +94,7 @@ export function CaseCustomFields({ projectId = "", revision, editing, creating =
             autoOpen={explicitlyActive} invalid={missing} errorId={validationId}
             canCreate={canCreate} disabled={disabled || offline} placeholder={placeholder}
             parentValueId={systemKey === "product" ? revision.productGroupId ?? undefined : undefined}
-            onChange={values => onPatch(updateCaseField(revision, field, values))} /> : readValue(label, text, !editing || field || catalog.loading ? key : undefined)}
+            onChange={values => onPatch(updateCaseField(revision, field, values))} /> : readValue(label, text, systemKey, !editing || field || catalog.loading ? key : undefined)}
           {missing && <p role="alert" id={validationId} className={css.error}>
             {ru ? `Выберите значение для поля «${label}».` : `Choose a value for ${label}.`}
           </p>}

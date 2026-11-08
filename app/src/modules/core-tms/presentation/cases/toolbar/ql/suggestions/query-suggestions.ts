@@ -5,7 +5,7 @@ const fields = [
  ["key", "ID", "ID"], ["title", "Название", "Title"], ["lifecycle", "Статус", "Status"], ["priority", "Приоритет", "Priority"],
  ["folder", "Папка", "Folder"], ["product", "Продукт", "Product"], ["productGroup", "Группа продуктов", "Product group"], ["regression", "Регресс", "Regression"], ["tag", "Тег", "Tag"], ["type", "Тип", "Type"], ["owner", "Ответственный", "Assignee"],
 ];
-const enums: Record<string, string[]> = { regression: ["true", "false"], lifecycle: ["ready", "draft", "deprecated", "archived"], priority: ["critical", "high", "medium", "low"], type: ["manual", "checklist", "automated"] };
+const enums: Record<string, string[]> = { regression: ["true", "false"], lifecycle: ["ready", "draft", "deprecated", "archived"], priority: ["none", "critical", "high", "medium", "low"], type: ["manual", "checklist", "automated"] };
 export function querySuggestions(query: string, caret: number, options: { ru: boolean; folders: string[]; components: string[]; tags?: string[]; members?: readonly QueryMember[] }) {
  const before = query.slice(0, caret);
  const qualified = /([\p{L}\w]+)\s*(:|!=|==|=|~)\s*("[^"]*"?|'[^']*'?|«[^»]*»?|[^\s(),]*)$/u.exec(before);

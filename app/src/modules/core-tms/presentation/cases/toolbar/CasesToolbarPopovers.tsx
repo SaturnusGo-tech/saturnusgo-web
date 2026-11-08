@@ -1,8 +1,8 @@
 import { caseFieldFilterSections } from "./fields/CaseFieldFilterSections";
 import { useRef, useState, type ReactNode, type KeyboardEvent, type RefObject } from "react";
 import {
-  Ban, Bot, ChartNoAxesColumnIncreasing, Check, CheckCircle2, ChevronUp, ChevronsDown, ChevronsUp,
-  Circle, CircleDashed, CircleDot, Flag, Folder, Hand, ListChecks, Minus, Search, Star, Tags, Users, X,
+  Ban, Bot, ChartNoAxesColumnIncreasing, Check, CheckCircle2,
+  Circle, CircleDashed, CircleDot, Flag, Folder, Hand, ListChecks, Search, Star, Tags, Users, X,
   type LucideIcon,
 } from "lucide-react";
 import { useWorkspacePeople } from "../../../workspace/members/context/WorkspacePeopleContext";
@@ -14,15 +14,15 @@ import type { CaseFacetFilters, CaseFacetOptions } from "../model/caseListModel"
 import { useFilterPopup } from "./filter/useFilterPopup";
 import styles from "./filter/filter-panel.module.css";
 import { RepositoryFilterPicker } from "./filter/picker/RepositoryFilterPicker";
+import { PriorityIcon, priorityLabel, priorityLevels, type PriorityLevel } from "../../common/properties/PriorityIcon";
 
 export type ExtraFilterSection = { id: string; label: string; icon: ReactNode; summary: string; active: boolean; render: () => ReactNode };
 const resetFilters: CaseFilters = { type: "all", priority: "all", lifecycle: "all", tag: "", includeArchived: false };
-const priorities = ["all", "critical", "high", "medium", "low"] as const;
+const priorities = ["all", ...priorityLevels.map(({ key }) => key)];
 const lifecycles = ["all", "ready", "draft", "deprecated"] as const;
 const caseTypes = ["all", "manual", "checklist", "automated"] as const;
 const repositoryOrder = ["lifecycle", "owner", "priority", "type", "tag", "folders", "productGroups", "products", "regression", "maintenanceStatus"];
 const repositoryValueIcons: Record<string, LucideIcon> = {
-  critical: ChevronsUp, high: ChevronUp, medium: Minus, low: ChevronsDown,
   ready: CheckCircle2, draft: CircleDashed, deprecated: Ban,
   manual: Hand, checklist: ListChecks, automated: Bot,
 };
@@ -53,6 +53,7 @@ export function CaseFilterMenu(props: FilterProps) {
   const optionsRef = useRef<HTMLDivElement>(null);
   const labels: Record<string, string> = { folders: ru ? "Папки" : "Folders", components: ru ? "Компоненты" : "Components", type: ru ? "Тип" : "Type", priority: ru ? "Приоритет" : "Priority", lifecycle: ru ? "Статус" : "Status", tag: ru ? "Теги" : "Tags" };
   const valueLabel = (value: string) => {
+    if (section === "priority" && value !== "all") return priorityLabel(props.locale, value as PriorityLevel);
     const values: Record<string, string> = ru
       ? { all: "Все", needs_update: "На доработке", current: "Актуальные", manual: "Ручной", checklist: "Чек-лист", automated: "Автоматизированный", critical: "Критический", high: "Высокий", medium: "Средний", low: "Низкий", ready: "Готово", draft: "Черновик", deprecated: "Устарел" }
       : { all: "All", needs_update: "Needs update", current: "Current", manual: "Manual", checklist: "Checklist", automated: "Automated", critical: "Critical", high: "High", medium: "Medium", low: "Low", ready: "Ready", draft: "Draft", deprecated: "Deprecated" };
@@ -118,7 +119,8 @@ export function CaseFilterMenu(props: FilterProps) {
     const showsStatus = section === "lifecycle" || section === "priority";
     const ValueIcon = repository && (showsStatus || section === "type") ? repositoryValueIcons[value] : showsStatus && value !== "all" ? Circle : undefined;
     return { value, selected, label: optionLabel(value),
-      icon: ValueIcon && <ValueIcon size={14} strokeWidth={2.5} className={styles.tone} data-value={value} aria-hidden="true" /> };
+      icon: section === "priority" && value !== "all" ? <PriorityIcon level={value as PriorityLevel} empty="circle" size={14} />
+        : ValueIcon && <ValueIcon size={14} strokeWidth={2.5} className={styles.tone} data-value={value} aria-hidden="true" /> };
   });
   if (props.repositoryTrigger) return <RepositoryFilterPicker ru={ru} categories={categories} section={section}
     categorySearch={categorySearch} search={search} filters={props.filters} trigger={props.repositoryTrigger}

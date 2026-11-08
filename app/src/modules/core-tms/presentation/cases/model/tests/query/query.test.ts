@@ -33,6 +33,16 @@ test("normal search resolves names and emails; owner facets permit multiple peop
  assert.deepEqual(filterCaseRows(rows, { qlQuery: "owner:anna", context: { members: new Map() } }), []);
 });
 
+test("priority queries distinguish explicitly medium cases from cases with no priority", () => {
+ const priorityRows = [
+  { ...rows[0], testCase: { ...rows[0].testCase, id: "explicit", priority: "medium" } as TestCaseSummary },
+  { ...rows[0], testCase: { ...rows[0].testCase, id: "unset", priority: "medium", priorityAssigned: false } as TestCaseSummary },
+ ];
+ for (const [qlQuery, id] of [["priority:none", "unset"], ['приоритет: "без приоритета"', "unset"], ["priority:medium", "explicit"]]) {
+  assert.deepEqual(filterCaseRows(priorityRows, { qlQuery }).map(row => row.testCase.id), [id]);
+ }
+});
+
 test("malformed queries fail closed with a specific hint instead of silently ignoring a condition", () => {
  for (const query of ['owner:', 'priority: "high', 'unknown:high', 'status:ready OR', '(tag:smoke', 'priority IN ()', 'priority: (high,,low)', 'x'.repeat(4001)]) {
   assert.ok(parseCaseQuery(query).error, query); assert.deepEqual(ids(query), [], query);

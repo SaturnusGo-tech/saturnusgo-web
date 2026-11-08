@@ -34,9 +34,9 @@ test("case type surfaces expose automated with a robot icon", () => {
   assert.match(badges, /type === "automated"[\s\S]*<Bot/);
   assert.match(badges, /return <Hand/);
   assert.match(table, /<CaseTypeIcon locale=\{props\.locale\} type=\{item\.type\}/);
-  assert.match(metadata, /value: "automated"[\s\S]*styles\.typeAutomated/);
+  assert.match(metadata, /value: "automated"[^\n]*<Bot/);
   assert.match(metadata, /discardedProcedureCount[\s\S]*setPendingType/);
-  assert.match(metadata, /<Modal[\s\S]*Change and remove/);
+  assert.match(metadata, /<ProductDocModal[\s\S]*Change and remove/);
   assert.doesNotMatch(metadata, /window\.confirm|globalThis\.confirm/);
   assert.match(metadataCss, /\.typeAutomated/);
   const ql = readFileSync(new URL("../../toolbar/ql/suggestions/query-suggestions.ts", import.meta.url), "utf8");
@@ -45,7 +45,7 @@ test("case type surfaces expose automated with a robot icon", () => {
   assert.match(popovers, /props\.filters\.type === value/);
 });
 
-test("case metadata uses semantic pills in the header, properties, and edit menus", () => {
+test("case details use the docs property controls while case list badges retain semantic styles", () => {
   const detail = readFileSync(new URL("../../detail/CaseDetailPanel.tsx", import.meta.url), "utf8");
   const metadata = readFileSync(new URL("../../detail/metadata/CaseMetadataControls.tsx", import.meta.url), "utf8");
   const metadataCss = readFileSync(new URL("../../detail/metadata/caseMetadata.module.css", import.meta.url), "utf8");
@@ -56,9 +56,9 @@ test("case metadata uses semantic pills in the header, properties, and edit menu
   assert.match(metadataCss, /\.chip[\s\S]*border-radius: 999px/);
   assert.match(metadataCss, /\.lifecycleReady \{ --metadata-fg: var\(--falcon-success-on-solid\); --metadata-bg: var\(--falcon-success-solid\)/);
   assert.match(metadataCss, /\.lifecycleDeprecated \{ --metadata-fg: var\(--falcon-warning-on-solid\); --metadata-bg: var\(--falcon-warning-solid\)/);
-  assert.match(metadataCss, /\.trigger[\s\S]*border-radius: 10px/);
-  assert.match(metadataCss, /\.menu[\s\S]*border-radius: 12px/);
-  assert.doesNotMatch(metadataCss, /\.readControls[^{]*\{[^}]*background:\s*transparent/);
+  assert.match(metadata, /<PriorityField/);
+  assert.match(metadata, /<PropertySelect/);
+  assert.doesNotMatch(metadata, /LifecycleBadge|PriorityBadge|TypeBadge/);
   assert.match(casesCss, /\.detailScrim[\s\S]*z-index: 59/);
   assert.match(casesCss, /\.detailPanel \{[\s\S]*z-index: 60/);
 });

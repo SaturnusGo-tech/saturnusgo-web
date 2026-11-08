@@ -17,7 +17,7 @@ import css from "../styles/repository.module.css";
 export type FolderBranchProps = {
   customize?: boolean;
   creation?: RepositoryCreation;
-  hideRootCount?: boolean; titleMode?: "marquee";
+  hideRootCount?: boolean; titleMode?: "marquee" | "inline";
   trailing?: (item: TestCaseSummary) => ReactNode;
   canSelect?: boolean; allowArchivedSelection?: boolean; accessory?: (item: TestCaseSummary) => ReactNode;
   node: FolderNode; depth: number; expanded: ReadonlySet<string>; selected: ReadonlySet<string>;

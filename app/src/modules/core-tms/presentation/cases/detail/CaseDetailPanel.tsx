@@ -154,7 +154,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
         {!archived && props.editor && !props.editor.documentation?.retry && (creating || headerEditing === "title") ? <input disabled={uploadLocked} data-inline-title={creating ? undefined : true} autoFocus={creating || headerEditing === "title"} aria-invalid={attempted && problem === "title"} aria-label={ru ? "Название тест-кейса" : "Test case title"} className={inspector.titleInput} value={revision.title} onChange={(event) => props.editor?.onChange({ ...revision, title: event.target.value })} placeholder={ru ? "Название тест-кейса" : "Test case title"} /> : <div className={inspector.titleCopy}>
           <h2>{revision.title}{props.testCase && <span className={inspector.titleKey}>#{props.testCase.key}</span>}</h2>
           {props.testCase && <p className={inspector.caseByline}>
-            <LifecycleBadge locale={props.locale} lifecycle={revision.lifecycle} archived={Boolean(props.testCase.archivedAt)} />
+            <LifecycleBadge neutral locale={props.locale} lifecycle={revision.lifecycle} archived={Boolean(props.testCase.archivedAt)} />
             <span>{ru ? "Создан" : "Created"} {formatDate(props.testCase.createdAt)}</span>
             <span>{ru ? "Обновлён" : "Updated"} {formatDate(props.testCase.updatedAt)}</span>
           </p>}

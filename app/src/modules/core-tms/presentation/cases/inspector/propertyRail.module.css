@@ -89,27 +89,31 @@ dd.additionalInput [data-editor-shell][data-appearance="plain"] > div:has(> butt
   overflow-wrap: anywhere;
 }
 
-.layout .readRows > div:not(.wideRow) > dd > button {
-  min-block-size: 26px;
-  max-inline-size: calc(100% + 6px);
-  margin: 0 -4px;
-  padding: 2px 4px;
-}
+.layout .readRows > div:not(.wideRow) > dd > button { max-inline-size: 100%; }
 
-.layout .ownerControl > div > button {
-  box-sizing: border-box;
-  min-block-size: 28px;
-  padding-block: 1px;
-  padding-inline-end: 8px;
+.noteWrapper {
+  height: auto;
+  min-height: 29px;
+  padding: 3px 7px;
+  background: var(--falcon-control);
+  box-shadow: inset 0 0 0 1px var(--falcon-border);
   border-radius: 8px;
-  font-size: inherit;
+}
+.noteWrapper[data-focus-within="true"] { box-shadow: inset 0 0 0 1px var(--falcon-border-strong); }
+.noteWrapper .noteInput {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  box-shadow: none;
+  background: transparent;
+  font: inherit;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .layout [data-field-editing] > header > div:last-child,
   .layout [data-field-editing] .readRows > div > dd > input,
   .layout [data-field-editing] .readRows > div > dd > div > button[aria-haspopup],
-  .layout [data-field-editing] .ownerControl > div > button,
   .layout [data-field-editing] .wideRow [data-editor-shell]:has(:global(.mdxeditor-root-contenteditable), textarea) {
     animation: fieldEditReveal 180ms cubic-bezier(.16, 1, .3, 1) both;
   }
@@ -135,6 +139,5 @@ dd.additionalInput [data-editor-shell][data-appearance="plain"] > div:has(> butt
 
 @media (pointer: coarse) {
   .layout .readRows > div:not(.wideRow) > dd > button,
-  .layout .additionalRows > div > dd > input,
-  .layout .ownerControl > div > button { min-block-size: 34px; }
+  .noteWrapper { min-block-size: 34px; }
 }

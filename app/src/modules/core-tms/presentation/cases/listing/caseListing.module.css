@@ -250,12 +250,12 @@
 .selectionMode :is(.selectionCell, th:first-child, .groupHeading) input[type="checkbox"],
 .selectionMode th:first-child button { animation: selectionControlIn 180ms cubic-bezier(.2, .72, .3, 1) both; }
 .flagCell { padding-inline: 0 !important; text-align: center; }
-.flagCell > svg { margin-inline: auto; }
+.flagCell > svg { margin-inline: auto; color: var(--falcon-icon); }
 .typeCell { padding-inline: 0 !important; color: var(--falcon-icon) !important; text-align: center; }
 .keyCell { overflow: hidden; color: var(--falcon-text-muted) !important; font-variant-numeric: tabular-nums; text-overflow: ellipsis; white-space: nowrap; }
 .keyCell strong { font-size: 11px; font-weight: 500; letter-spacing: .01em; }
 .titleCell { min-width: 0; }
-.titleCell strong { display: -webkit-box; overflow: hidden; color: var(--falcon-text); font-size: 12px; font-weight: 500; line-height: 1.35; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.titleCell strong { display: block; overflow: hidden; color: var(--falcon-text); font-size: 12px; font-weight: 500; line-height: 1.35; white-space: nowrap; text-overflow: ellipsis; }
 .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .estimateCell { color: var(--falcon-text-muted) !important; font-variant-numeric: tabular-nums; white-space: nowrap; }
 

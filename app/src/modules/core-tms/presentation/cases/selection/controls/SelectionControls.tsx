@@ -23,7 +23,7 @@ export function useSelectionFilters(cases: TestCaseSummary[], initial: InitialSe
     components: [...new Set(cases.map((c) => c.component).filter(Boolean))].sort(), tags: [...new Set(cases.flatMap(item => item.tags))].sort() }), [cases]);
   const visible = useMemo(() => filterCaseRows(cases.filter((c) =>
     (!filters.maintenanceStatus || filters.maintenanceStatus === "all" || (c.maintenance?.status ?? "current") === filters.maintenanceStatus) && (filters.includeArchived || !c.archivedAt) && (filters.type === "all" || c.type === filters.type)
-    && (filters.priority === "all" || c.priority === filters.priority)
+    && (filters.priority === "all" || casePriority(c) === filters.priority)
     && (filters.lifecycle === "all" || c.lifecycle === filters.lifecycle)
     && (!filters.tag || c.tags.some((tag) => tag.toLowerCase().includes(filters.tag.toLowerCase()))))
     .map((testCase) => ({ testCase, folderPath: testCase.folderPath })), { titleQuery: deferredQuery, qlQuery: deferredQl, facets, context: { members: directory.members } })
@@ -65,3 +65,4 @@ export function SelectionControls({ state, ru, onSelectAll, action, extraSection
       folders={state.options.folders} components={state.options.components} members={state.directory.items} tags={state.options.tags} floatingSuggestions={inline && repository} /></div></QlDisclosure>
   </div>;
 }
+import { casePriority } from "../../../../helpers/cases/caseRevision";

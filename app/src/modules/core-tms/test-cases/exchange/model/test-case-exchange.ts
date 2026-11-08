@@ -30,6 +30,7 @@ export type PortableTestCase = Readonly<{
   type: "manual" | "checklist" | "automated";
   lifecycle: "draft" | "ready" | "deprecated";
   priority: "low" | "medium" | "high" | "critical";
+  priorityAssigned?: false;
   component: string;
   tags: readonly string[];
   estimatedMinutes: number | null;

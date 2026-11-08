@@ -20,6 +20,7 @@ function portable(testCase: Api["TestCase"]): PortableTestCase {
     type: revision.type,
     lifecycle: revision.lifecycle,
     priority: revision.priority,
+    ...(revision.priorityAssigned === false ? { priorityAssigned: false as const } : {}),
     component: revision.component,
     tags: [...revision.tags],
     estimatedMinutes: revision.estimatedMinutes,

@@ -18,7 +18,7 @@ export type Dialog =
 
 export type CaseFilters = {
   type: "all" | TestCaseRevision["type"];
-  priority: "all" | TestCaseRevision["priority"];
+  priority: "all" | "none" | TestCaseRevision["priority"];
   lifecycle: "all" | TestCaseRevision["lifecycle"];
   maintenanceStatus?: "all" | "current" | "needs_update";
   tag: string;

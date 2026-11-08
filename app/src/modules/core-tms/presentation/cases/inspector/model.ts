@@ -131,6 +131,7 @@ export function restoreInspectorSection(
     ...current,
     lifecycle: snapshot.lifecycle,
     priority: snapshot.priority,
+    priorityAssigned: snapshot.priorityAssigned,
     type: snapshot.type,
     estimatedMinutes: snapshot.estimatedMinutes,
     steps: snapshot.steps.map((step) => ({ ...step })),

@@ -11,7 +11,7 @@ export const fieldAliases: Record<string, CaseQlField> = {
 export const valueAliases: Record<string, readonly string[]> = {
  ready: ["ready", "готов", "готовый", "actual", "актуальный"], draft: ["draft", "черновик"],
  deprecated: ["deprecated", "устарел", "устаревший"], archived: ["archived", "архив", "архивный"],
- critical: ["critical", "критический"], high: ["high", "высокий"], medium: ["medium", "средний"], low: ["low", "низкий"],
+ none: ["none", "no priority", "без приоритета"], critical: ["critical", "urgent", "критический", "срочный"], high: ["high", "высокий"], medium: ["medium", "средний"], low: ["low", "низкий"],
  manual: ["manual", "ручной"], checklist: ["checklist", "check-list", "чеклист", "чек-лист"],
  automated: ["automated", "автоматизированный", "автоматический", "автотест"],
  unassigned: ["unassigned", "none", "null", "не назначен", "неназначен", "без ответственного"],

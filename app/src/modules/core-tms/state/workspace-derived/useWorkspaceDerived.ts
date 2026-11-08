@@ -3,6 +3,7 @@ import { defaultWorkingRun } from "../../runs/model/history/run-history";
 import type { TestCaseSummary, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
 import type { useWorkspaceState } from "../workspace/useWorkspaceState";
 import { resolveSelectedCase } from "../../test-cases/navigation/selection/selected-case";
+import { casePriority } from "../../helpers/cases/caseRevision";
 
 export const isAuthoritativelyActiveRun = (
   run: Pick<TestRunSummary, "status" | "archivedAt">,
@@ -24,7 +25,7 @@ export function useWorkspaceDerived(
       text.includes(state.query.toLowerCase()) && (!filters.maintenanceStatus || filters.maintenanceStatus === "all" || (item.maintenance?.status ?? "current") === filters.maintenanceStatus) &&
       (filters.includeArchived || !item.archivedAt) &&
       (filters.type === "all" || item.type === filters.type) &&
-      (filters.priority === "all" || item.priority === filters.priority) &&
+      (filters.priority === "all" || casePriority(item) === filters.priority) &&
       (filters.lifecycle === "all" ||
         item.lifecycle === filters.lifecycle) &&
       (!filters.tag.trim() ||

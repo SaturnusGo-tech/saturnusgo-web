@@ -2,6 +2,7 @@ import { caseFieldOptions, matchesFieldFilters, type FieldFilters, type FieldOpt
 import { parseCaseQuery } from "./query/parse";
 import { caseSearchValues, matchesCaseQuery, type CaseQueryContext } from "./query/match";
 import { normalizeQueryText as normalized } from "./query/vocabulary/fields";
+import { casePriority } from "../../../helpers/cases/caseRevision";
 export { parseCaseQlQuery } from "./query/parse";
 export type { CaseQlTerm } from "./query/parse";
 export type { CaseQlField } from "./query/vocabulary/fields";
@@ -14,7 +15,7 @@ export type CaseRowGroup = { key: string; value: string; rows: CaseListRow[] };
 export type CaseFacetFilters = FieldFilters & { folders: string[]; components: string[]; owners?: string[] };
 export type CaseFacetOptions = FieldOptions & { folders: string[]; components: string[] };
 
-const priorityRank = { low: 0, medium: 1, high: 2, critical: 3 } as const;
+const priorityRank = { none: -1, low: 0, medium: 1, high: 2, critical: 3 } as const;
 const lifecycleRank = { draft: 0, ready: 1, deprecated: 2, archived: 3 } as const;
 export function flattenCaseGroups(groups: Array<[string, TestCaseSummary[]]>): CaseListRow[] {
   return groups.flatMap(([folderPath, testCases]) => testCases.map((testCase) => ({ testCase, folderPath })));
@@ -87,7 +88,8 @@ export function groupCaseRows(rows: CaseListRow[], groupBy: CaseGroupBy): CaseRo
   const groups = new Map<string, CaseListRow[]>();
   rows.forEach((row) => {
     const item = row.testCase;
-    const value = groupBy === "folder" ? row.folderPath : groupBy === "lifecycle" ? (item.archivedAt ? "archived" : item.lifecycle) : item[groupBy] || "—";
+    const value = groupBy === "folder" ? row.folderPath : groupBy === "lifecycle" ? (item.archivedAt ? "archived" : item.lifecycle)
+      : groupBy === "priority" ? casePriority(item) : item.component || "—";
     groups.set(value, [...(groups.get(value) ?? []), row]);
   });
   return [...groups.entries()].map(([value, groupedRows]) => ({ key: `${groupBy}:${value}`, value, rows: groupedRows }));
@@ -101,7 +103,7 @@ export function sortCaseRows(rows: CaseListRow[], sort: CaseSort, languageTag: s
     if (sort.key === "key") comparison = collator.compare(left.testCase.key, right.testCase.key);
     else if (sort.key === "title") comparison = collator.compare(left.testCase.title, right.testCase.title);
     else if (sort.key === "lifecycle") comparison = lifecycleRank[left.testCase.lifecycle] - lifecycleRank[right.testCase.lifecycle];
-    else if (sort.key === "priority") comparison = priorityRank[left.testCase.priority] - priorityRank[right.testCase.priority];
+    else if (sort.key === "priority") comparison = priorityRank[casePriority(left.testCase)] - priorityRank[casePriority(right.testCase)];
     else if (sort.key === "component") comparison = collator.compare(left.testCase.component, right.testCase.component);
     else comparison = (left.testCase.estimatedMinutes ?? Number.MAX_SAFE_INTEGER) - (right.testCase.estimatedMinutes ?? Number.MAX_SAFE_INTEGER);
     return comparison === 0 ? collator.compare(left.testCase.key, right.testCase.key) : comparison * direction;

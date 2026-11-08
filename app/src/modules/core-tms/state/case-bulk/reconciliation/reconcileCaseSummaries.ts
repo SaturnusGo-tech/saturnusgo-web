@@ -32,6 +32,9 @@ export function reconcileCaseSummaries(
       ),
       lifecycle: update.lifecycle,
       priority: update.priority,
+      ...(update.priorityAssigned === false || summary.priorityAssigned === false
+        ? { priorityAssigned: update.priorityAssigned }
+        : {}),
       updatedAt: update.updatedAt,
       etag: update.etag,
     };

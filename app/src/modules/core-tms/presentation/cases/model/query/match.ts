@@ -1,4 +1,5 @@
 import type { CaseListRow } from "../../types";
+import { casePriority } from "../../../../helpers/cases/caseRevision";
 import type { CaseQueryNode, CaseQlTerm } from "./parse";
 import { normalizeQueryText, valueAliases, type CaseQlField } from "./vocabulary/fields";
 export type QueryMember = { id: string; name: string; email?: string | null };
@@ -6,10 +7,11 @@ export type CaseQueryContext = { members?: ReadonlyMap<string, QueryMember> };
 export function caseSearchValues(row: CaseListRow, context: CaseQueryContext = {}): Record<CaseQlField, string[]> {
  const item = row.testCase; const person = item.ownerIdentityId ? context.members?.get(item.ownerIdentityId) : undefined;
  const owner = item.ownerIdentityId ? [item.ownerIdentityId, person?.name ?? "", person?.email ?? ""] : [...valueAliases.unassigned];
+ const priority = casePriority(item);
  const fieldValues = (key: string) => (item.customFields ?? []).filter(field => field.systemKey === key).flatMap(field => field.values.flatMap(value => [value.id, value.label]));
  return { product: fieldValues("product"), productGroup: fieldValues("product_group"), regression: [String(item.regression ?? false)], text: [item.key, item.title, row.folderPath, item.component, ...(item.customFields??[]).flatMap(field=>field.values.map(value=>value.label)), ...item.tags, ...owner], key: [item.key], title: [item.title],
   lifecycle: [...(valueAliases[item.archivedAt ? "archived" : item.lifecycle] ?? [item.lifecycle])],
-  priority: [...(valueAliases[item.priority] ?? [item.priority])], component: [item.component], folder: [row.folderPath],
+  priority: [...(valueAliases[priority] ?? [priority])], component: [item.component], folder: [row.folderPath],
   tag: item.tags, type: [...(valueAliases[item.type] ?? [item.type])], owner };
 }
 export function matchesCaseQuery(node: CaseQueryNode | null, values: Record<CaseQlField, string[]>): boolean {

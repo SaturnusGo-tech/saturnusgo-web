@@ -1482,8 +1482,17 @@
             "name": "priority",
             "in": "query",
             "required": false,
+            "description": "Filter explicitly assigned priorities, or use none for unassigned cases.",
             "schema": {
-              "$ref": "#/components/schemas/Priority"
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Priority"
+                },
+                {
+                  "type": "string",
+                  "const": "none"
+                }
+              ]
             }
           },
           {
@@ -37533,6 +37542,11 @@
           "priority": {
             "$ref": "#/components/schemas/Priority"
           },
+          "priorityAssigned": {
+            "type": "boolean",
+            "const": false,
+            "description": "False when priority is unassigned. The effective priority remains medium for compatibility. Omitted for explicitly assigned and historical priorities."
+          },
           "component": {
             "$ref": "#/components/schemas/ShortText"
           },
@@ -37809,7 +37823,15 @@
             "$ref": "#/components/schemas/TestCaseLifecycle"
           },
           "priority": {
-            "$ref": "#/components/schemas/Priority"
+            "description": "Omit or send null to leave the case priority unassigned.",
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Priority"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "component": {
             "$ref": "#/components/schemas/ShortText"
@@ -37966,7 +37988,15 @@
             "$ref": "#/components/schemas/TestCaseLifecycle"
           },
           "priority": {
-            "$ref": "#/components/schemas/Priority"
+            "description": "Send null to clear the priority. Omit to preserve the current assignment.",
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Priority"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "component": {
             "$ref": "#/components/schemas/ShortText"
@@ -38601,7 +38631,15 @@
             "$ref": "#/components/schemas/TestCaseLifecycle"
           },
           "priority": {
-            "$ref": "#/components/schemas/Priority"
+            "description": "Send null to clear priorities. Omit to preserve the current assignments.",
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Priority"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         }
       },
@@ -38666,6 +38704,11 @@
           },
           "priority": {
             "$ref": "#/components/schemas/Priority"
+          },
+          "priorityAssigned": {
+            "type": "boolean",
+            "const": false,
+            "description": "False when priority is unassigned. The effective priority remains medium for compatibility. Omitted for explicitly assigned and historical priorities."
           },
           "updatedAt": {
             "$ref": "#/components/schemas/Timestamp"
@@ -38787,6 +38830,11 @@
           },
           "priority": {
             "$ref": "#/components/schemas/Priority"
+          },
+          "priorityAssigned": {
+            "type": "boolean",
+            "const": false,
+            "description": "False when priority is unassigned. The effective priority remains medium for compatibility. Omitted for explicitly assigned and historical priorities."
           },
           "component": {
             "$ref": "#/components/schemas/ShortText"
@@ -38921,6 +38969,11 @@
           },
           "priority": {
             "$ref": "#/components/schemas/Priority"
+          },
+          "priorityAssigned": {
+            "type": "boolean",
+            "const": false,
+            "description": "False when priority is unassigned. The effective priority remains medium for compatibility. Omitted for explicitly assigned and historical priorities."
           },
           "component": {
             "$ref": "#/components/schemas/ShortText"
@@ -50952,6 +51005,11 @@
           },
           "priority": {
             "$ref": "#/components/schemas/Priority"
+          },
+          "priorityAssigned": {
+            "type": "boolean",
+            "const": false,
+            "description": "False when priority is unassigned. The effective priority remains medium for compatibility. Omitted for explicitly assigned and historical priorities."
           },
           "component": {
             "$ref": "#/components/schemas/ShortText"

@@ -7,9 +7,9 @@ import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import type { ProductDocScope } from "../../../domain/product-docs";
 import { emptyProductDocProperties, productDocPropertiesInput, type ProductDocPropertiesInput } from "../../../domain/properties/product-doc-properties";
 import type { ProductDocsCopy } from "../../../localization/copy";
-import { ProductDocAssigneeField } from "../../properties/controls/ProductDocAssigneeField";
-import { ProductDocLabelField } from "../../properties/controls/ProductDocLabelField";
-import { ProductDocPriorityField } from "../../properties/priority/ProductDocPriorityField";
+import { PropertyAssigneeField } from "../../../../presentation/common/properties/metadata/PropertyAssigneeField";
+import { PropertyLabelField } from "../../../../presentation/common/properties/metadata/PropertyLabelField";
+import { PriorityField } from "../../../../presentation/common/properties/PriorityField";
 import styles from "./subpage-composer.module.css";
 
 export interface ProductDocSubpageInput {
@@ -63,11 +63,11 @@ export function ProductDocSubpageComposer({ id, scope, projectName, copy, disabl
     <div className={styles.footer}>
       <div className={styles.properties} role="group" aria-label={ru ? "Свойства подстраницы" : "Subpage properties"}>
         {projectName && <span className={styles.project} title={projectName}><Box size={13} aria-hidden="true" /><span>{projectName}</span></span>}
-        <ProductDocPriorityField compact locale={locale} value={properties.priority} disabled={disabled}
+        <PriorityField compact locale={locale} value={properties.priority} disabled={disabled}
           onChange={(priority) => setProperties((current) => ({ ...current, priority }))} />
-        <ProductDocAssigneeField compact scope={scope} locale={locale} value={properties.assignee} disabled={disabled}
+        <PropertyAssigneeField compact workspaceId={scope.workspaceId} locale={locale} value={properties.assignee} disabled={disabled}
           onChange={(assignee) => setProperties((current) => ({ ...current, assignee }))} />
-        <ProductDocLabelField compact locale={locale} labels={properties.labels} disabled={disabled}
+        <PropertyLabelField compact locale={locale} labels={properties.labels} disabled={disabled}
           onAdd={(label) => setProperties((current) => ({ ...current, labels: [...current.labels, label] }))}
           onRemove={(label) => setProperties((current) => ({ ...current, labels: current.labels.filter((item) => item !== label) }))} />
       </div>

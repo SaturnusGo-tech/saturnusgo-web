@@ -2,12 +2,15 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-const source = readFileSync(new URL("../MetadataSelect.tsx", import.meta.url), "utf8");
+const source = readFileSync(new URL("../../../../common/properties/select/PropertySelect.tsx", import.meta.url), "utf8");
+const metadata = readFileSync(new URL("../CaseMetadataControls.tsx", import.meta.url), "utf8");
 
-test("metadata choices use a single HeroUI trigger with managed focus and selection", () => {
-  assert.match(source, /<Dropdown placement="bottom-start" isOpen=\{open\} onOpenChange=\{setOpen\}/);
-  assert.match(source, /<DropdownTrigger>\s*<Button/);
-  assert.match(source, /<ChevronDown[^>]+aria-hidden="true"/);
-  assert.match(source, /selectionMode="single" disallowEmptySelection selectedKeys=\{\[value\]\}/);
-  assert.doesNotMatch(source, /showPopover|onKeyDown=/);
+test("test case metadata uses the shared searchable HeroUI property picker and restores focus on Escape", () => {
+  assert.match(metadata, /<PropertySelect/);
+  assert.match(metadata, /<PriorityField/);
+  assert.match(source, /<PopoverTrigger><Button ref=\{button\}/);
+  assert.match(source, /<Input autoFocus/);
+  assert.match(source, /selectionMode="single" hideSelectedIcon disallowEmptySelection selectedKeys=\{\[value\]\}/);
+  assert.match(source, /event\.key === "Escape"[\s\S]*event\.stopPropagation\(\)[\s\S]*button\.current\?\.focus/);
+  assert.doesNotMatch(metadata, /<MetadataSelect/);
 });

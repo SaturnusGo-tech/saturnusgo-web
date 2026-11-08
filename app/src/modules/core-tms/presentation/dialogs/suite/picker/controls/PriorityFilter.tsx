@@ -2,7 +2,7 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Check, ChevronDown } from "@openai/apps-sdk-ui/components/Icon";
 import { useAnchoredPopup } from "../../../../common/popup/useAnchoredPopup";
 import type { PickerPriority } from "../model/picker-model";
-import { priorityLabel } from "../rows/PickerRows";
+import { priorityLabel, priorityLevels } from "../../../../common/properties/PriorityIcon";
 import styles from "../suite-picker.module.css";
 
 export function PriorityFilter({ value, ru, onChange }: { value: PickerPriority; ru: boolean; onChange: (value: PickerPriority) => void }) {
@@ -25,11 +25,11 @@ export function PriorityFilter({ value, ru, onChange }: { value: PickerPriority;
   }}>
     <button ref={trigger} type="button" className={styles.filterTrigger} aria-label={ru ? "Приоритет" : "Priority"}
       aria-expanded={open} aria-haspopup="menu" aria-controls={open ? id : undefined} data-active={value !== "all" || undefined}
-      onClick={() => setOpen(current => !current)}>{value === "all" ? (ru ? "Приоритет" : "Priority") : priorityLabel(value, ru)}<ChevronDown width={14} height={14} /></button>
+      onClick={() => setOpen(current => !current)}>{value === "all" ? (ru ? "Приоритет" : "Priority") : priorityLabel(ru ? "ru" : "en", value)}<ChevronDown width={14} height={14} /></button>
     {open && <div ref={panel} id={id} role="menu" popover="manual" aria-label={ru ? "Приоритет" : "Priority"} className={styles.priorityMenu}>
-      {(["all", "critical", "high", "medium", "low"] as const).map(priority => <button type="button" key={priority} role="menuitemradio"
+      {(["all", ...priorityLevels.map(({ key }) => key)] as const).map(priority => <button type="button" key={priority} role="menuitemradio"
         aria-checked={value === priority} onClick={() => { onChange(priority); close(); }}>
-        <span>{priority === "all" ? (ru ? "Любой приоритет" : "Any priority") : priorityLabel(priority, ru)}</span>
+        <span>{priority === "all" ? (ru ? "Любой приоритет" : "Any priority") : priorityLabel(ru ? "ru" : "en", priority)}</span>
         {value === priority && <Check width={15} height={15} aria-hidden="true" />}
       </button>)}
     </div>}

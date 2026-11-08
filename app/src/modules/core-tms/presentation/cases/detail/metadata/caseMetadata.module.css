@@ -1,90 +1,7 @@
 .controls { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 0; }
-.readControls { align-items: start; }
 .labelledControl { min-width: 0; display: grid; justify-items: start; gap: 6px; }
 .controlLabel { color: var(--falcon-text-muted); font-size: 11px; font-weight: 500; }
 .controlValue { width: 100%; min-width: 0; margin: 0; }
-.labelledControl .select { width: 100%; }
-.readControls .labelledControl > .chip { min-height: 24px; justify-content: flex-start; padding: 2px 8px; font-size: 11px; }
-.select { position: relative; min-width: 124px; }
-.select:focus-within { z-index: 70; }
-.select:last-child { min-width: 104px; }
-
-.trigger {
-  width: 100%;
-  height: 36px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 13px;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 9px 3px 11px;
-  color: var(--falcon-text);
-  background: var(--falcon-control);
-  border: 1px solid var(--falcon-border-strong);
-  border-radius: 10px;
-  cursor: pointer;
-  text-align: left;
-}
-.trigger:hover,
-.trigger[aria-expanded="true"] {
-  border-color: var(--falcon-action);
-  background: var(--falcon-hover);
-}
-.select .trigger:focus-visible { outline: 1px solid var(--falcon-action); outline-offset: 1px; box-shadow: none; }
-.triggerLabel,
-.optionLabel {
-  min-width: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  overflow: hidden;
-  font-size: 11px;
-  font-weight: 500;
-  line-height: 16px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.triggerLabel svg,
-.optionLabel svg { flex: 0 0 auto; }
-.trigger > svg { justify-self: end; color: currentColor; opacity: .72; transition: transform 120ms ease; }
-.trigger[aria-expanded="true"] > svg { transform: rotate(180deg); }
-
-.overlay { z-index: 90; outline: none; }
-.menu {
-  width: max-content;
-  min-width: 134px;
-  max-width: min(220px, calc(100vw - 24px));
-  padding: 5px;
-  color: var(--falcon-text);
-  background: var(--falcon-elevated);
-  border: 1px solid var(--falcon-border-strong);
-  border-radius: 12px;
-  box-shadow: var(--falcon-shadow-popover);
-}
-.listbox { min-width: 0; }
-.list { display: grid; gap: 2px; max-height: 224px; overflow: auto; margin: 0; padding: 0; list-style: none; }
-.list .option {
-  min-height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 5px 7px;
-  color: inherit;
-  background: transparent;
-  border: 0;
-  border-radius: 7px;
-  cursor: pointer;
-}
-.option[data-focus-visible="true"] { outline: 1px solid var(--falcon-text-muted); outline-offset: -1px; }
-.optionLabel > span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  background: linear-gradient(currentColor, currentColor) left bottom / 0 1px no-repeat;
-  transition: background-size 160ms ease-out;
-}
-.option:is([data-hover="true"], [data-focus="true"]) .optionLabel > span { background-size: 100% 1px; }
-.option[aria-checked="true"] .optionLabel { font-weight: 650; }
-.optionCheck { inline-size: 13px; flex: none; }
 
 .chip {
   flex: 0 0 auto;
@@ -106,6 +23,7 @@
   white-space: nowrap;
 }
 .chip svg { flex: 0 0 auto; }
+.chip[data-neutral] { --metadata-fg: var(--falcon-text-secondary); --metadata-bg: transparent; --metadata-border: transparent; }
 
 .lifecycleDraft { --metadata-fg: var(--falcon-text-secondary); --metadata-bg: var(--falcon-control); --metadata-border: var(--falcon-border); }
 .lifecycleReady { --metadata-fg: var(--falcon-success-on-solid); --metadata-bg: var(--falcon-success-solid); --metadata-border: var(--falcon-success-border); }
@@ -120,22 +38,6 @@
 .typeAutomated { --metadata-fg: var(--falcon-warning-on-solid); --metadata-bg: var(--falcon-warning-solid); --metadata-border: var(--falcon-warning-border); }
 .estimate { --metadata-fg: var(--falcon-text-secondary); --metadata-bg: var(--falcon-control); --metadata-border: var(--falcon-border); }
 
-:global(html.dark) .controls :is(.priorityMedium, .typeManual) {
-  --metadata-fg: var(--falcon-text);
-  --metadata-bg: color-mix(in srgb, var(--falcon-info-solid) 72%, var(--falcon-surface));
-}
-
-:global(html.dark) .controls .trigger:is(.priorityMedium, .typeManual) {
-  color: var(--metadata-fg);
-  background: var(--metadata-bg);
-  border-color: var(--metadata-border);
-}
-
-:global(html.dark) .controls .trigger:is(.priorityMedium, .typeManual):is(:hover, [aria-expanded="true"]) {
-  background: color-mix(in srgb, var(--metadata-bg) 95%, var(--falcon-info-solid));
-  border-color: var(--metadata-fg);
-}
-
 .chip {
   color: var(--metadata-fg, var(--falcon-text-secondary));
   background: var(--metadata-bg, var(--falcon-control));
@@ -148,29 +50,4 @@
 .typeChangeWarning p { margin: 0; font-size: 12px; line-height: 1.5; }
 .typeChangeActions { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 18px; border-top: 1px solid var(--falcon-border-strong); }
 
-@media (prefers-reduced-motion: reduce) {
-  .trigger > svg,
-  .optionLabel > span { transition: none; }
-}
-
 @media (max-width: 520px) { .controls { width: 100%; } }
-
-[data-case-property-rail] .labelledControl .select {
-  min-width: 0;
-}
-[data-case-property-rail] .labelledControl .trigger {
-  height: auto;
-  min-height: 28px;
-  padding-block: 2px;
-  padding-inline: 7px 8px;
-  border-radius: 8px;
-}
-[data-case-property-rail] .labelledControl .triggerLabel {
-  overflow: visible;
-  overflow-wrap: anywhere;
-  white-space: normal;
-  text-overflow: clip;
-}
-@media (pointer: coarse) {
-  [data-case-property-rail] .labelledControl .trigger { min-height: 34px; }
-}

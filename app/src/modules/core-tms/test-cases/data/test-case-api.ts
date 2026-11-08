@@ -31,7 +31,7 @@ function revisionWrite(revision: TestCaseRevision) {
     preconditions: revision.preconditions,
     type: revision.type,
     lifecycle: revision.lifecycle,
-    priority: revision.priority,
+    priority: revision.priorityAssigned === false ? null : revision.priority,
     component: revision.component,
     customFields: revision.customFields?.map(field => ({ fieldId: field.fieldId, valueIds: field.values.map(value => value.id) })),
     ownerIdentityId: revision.ownerIdentityId,

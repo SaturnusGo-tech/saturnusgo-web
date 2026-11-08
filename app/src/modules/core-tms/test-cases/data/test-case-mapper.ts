@@ -17,6 +17,7 @@ export type RevisionSummary = {
   type: TestCaseRevision["type"];
   lifecycle: TestCaseRevision["lifecycle"];
   priority: TestCaseRevision["priority"];
+  priorityAssigned?: boolean;
   component: string;
   ownerIdentityId: string | null;
   estimatedMinutes: number | null;
@@ -34,6 +35,7 @@ export function mapTestCaseRevision(dto: ApiRevision): TestCaseRevision {
     type: dto.type,
     lifecycle: dto.lifecycle,
     priority: dto.priority,
+    ...(dto.priorityAssigned === false ? { priorityAssigned: false } : {}),
     component: dto.component,
     ...copyCaseFields(dto),
     ownerIdentityId: dto.ownerIdentityId,
@@ -69,6 +71,7 @@ export function mapTestCaseSummary(dto: ApiSummary): TestCaseSummary {
     type: dto.type,
     lifecycle: dto.lifecycle,
     priority: dto.priority,
+    ...(dto.priorityAssigned === false ? { priorityAssigned: false } : {}),
     component: dto.component,
     ...copyCaseFields(dto),
     ownerIdentityId: dto.ownerIdentityId,
@@ -96,6 +99,7 @@ export function mapTestCase(dto: ApiCase): TestCase {
     type: current.type,
     lifecycle: current.lifecycle,
     priority: current.priority,
+    ...(current.priorityAssigned === false ? { priorityAssigned: false } : {}),
     component: current.component,
     ...copyCaseFields(current),
     ownerIdentityId: current.ownerIdentityId,

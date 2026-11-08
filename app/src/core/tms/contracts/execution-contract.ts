@@ -32,6 +32,7 @@ export type TestCaseRevision = CaseFields & {
   type: "manual" | "checklist" | "automated";
   lifecycle: "draft" | "ready" | "deprecated";
   priority: "low" | "medium" | "high" | "critical";
+  priorityAssigned?: boolean;
   component: string;
   ownerIdentityId: string | null;
   tags: string[];
@@ -72,7 +73,7 @@ export type RunAttempt = RunAttemptSummary & { stepResults: StepResult[] };
 export type RunItemSummary = {
   archivedAt?: string | null;
   rowVersion?: number;
-  preview?: CaseFields & Pick<TestCaseRevision, "title" | "type" | "lifecycle" | "priority" | "component" | "tags" | "estimatedMinutes"> & { folderPath: string | null };
+  preview?: CaseFields & Pick<TestCaseRevision, "title" | "type" | "lifecycle" | "priority" | "priorityAssigned" | "component" | "tags" | "estimatedMinutes"> & { folderPath: string | null };
   id: string;
   caseId: string;
   caseKey: string;

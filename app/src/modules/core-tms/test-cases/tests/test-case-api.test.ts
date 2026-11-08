@@ -4,7 +4,8 @@ import type { components } from "../../../../core/tms/generated/tms-api";
 import type { TestCaseRevision } from "../../../../core/tms/contracts/legacy-contract";
 import { createTmsHttpClient, type TmsHttpClient, type TmsMutationOptions } from "../../../../core/tms/transport/http";
 import { createRunHistoryResource } from "../../state/run-history/run-history-resource";
-import { createTestCase, listTestCases } from "../data/test-case-api";
+import { createEmptyRevision } from "../../helpers/cases/caseRevision";
+import { createTestCase, listTestCases, reviseTestCase } from "../data/test-case-api";
 import { mapTestCaseRevision } from "../data/test-case-mapper";
 
 type Api = components["schemas"];
@@ -141,4 +142,25 @@ test("create serializes automated type while preserving normalized arbitrary tag
   assert.deepEqual(body.tags, ["smoke", "ci.backend", "owner-team-a"]);
   assert.deepEqual(body.checklist, []);
   assert.equal(created.data.current.type, "automated");
+});
+
+test("an unassigned priority survives creation and revision while an explicit medium is sent as medium", async () => {
+  const priorities: unknown[] = [];
+  const http = {
+    async mutateResource(_path: string, _method: string, body: { priority: unknown }) {
+      priorities.push(body.priority);
+      return { data: {
+        id: "case-1", projectId: "project-1", key: "HOST-TC-1", folderId: null, folderPath: "/Host",
+        currentRevision: 3, revisionCount: 3, linkIds: [], archivedAt: null, createdAt: time, updatedAt: time,
+        current: { ...revision, priority: "medium", ...(body.priority === null ? { priorityAssigned: false } : {}) },
+      }, etag: '"case-1:3"' };
+    },
+  } as unknown as TmsHttpClient;
+  const input = { projectId: "project-1", folderPath: "/Host", revision: createEmptyRevision() };
+  const created = await createTestCase(http, input, "create-no-priority");
+  assert.equal(created.data.priorityAssigned, false);
+  assert.equal(created.data.current.priorityAssigned, false);
+  await reviseTestCase(http, "case-1", { ...input, revision: created.data.current }, '"case-1:3"', "revise-no-priority");
+  await reviseTestCase(http, "case-1", { ...input, revision: { ...created.data.current, priorityAssigned: true } }, '"case-1:4"', "set-medium-priority");
+  assert.deepEqual(priorities, [null, null, "medium"]);
 });

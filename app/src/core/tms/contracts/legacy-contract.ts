@@ -45,6 +45,7 @@ export type TestCaseSummary = CaseFields & {
   type: TestCaseRevision["type"];
   lifecycle: TestCaseRevision["lifecycle"];
   priority: TestCaseRevision["priority"];
+  priorityAssigned?: boolean;
   component: string;
   ownerIdentityId: string | null;
   tags: string[];

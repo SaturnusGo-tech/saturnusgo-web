@@ -6,7 +6,7 @@ import type { TmsLocale } from "../../../localization/model/locale";
 import { groupCaseRows, visibleCaseTabStop, type CaseGroupBy, type CaseListViewMode } from "../model/caseListModel";
 import type { CaseListRow, CaseSort, CaseSortKey } from "../types";
 import { CaseTypeIcon, LifecycleBadge } from "./CaseBadges";
-import { PrioritySignal } from "./priority/PrioritySignal";
+import { PriorityIcon, priorityLabel } from "../../common/properties/PriorityIcon";
 import { CaseSelectionCheckbox } from "../bulk/checkbox/CaseSelectionCheckbox";
 import { CaseSelectionHeader } from "../bulk/checkbox/CaseSelectionHeader";
 import { selectionCoverage, type SelectionCoverage } from "../bulk/selection/caseSelection";
@@ -45,15 +45,16 @@ const columns: Array<{ key?: CaseSortKey; ru: string; en: string; className: key
   { ru: "", en: "", className: "selectionColumn" },
   { key: "priority", ru: "Приоритет", en: "Priority", className: "flagColumn" },
   { ru: "", en: "", className: "typeColumn" },
-  { key: "key", ru: "ID", en: "ID", className: "keyColumn" },
   { key: "lifecycle", ru: "Статус", en: "Status", className: "statusColumn" },
   { key: "title", ru: "Тест-кейс", en: "Test case", className: "titleColumn" },
+  { key: "key", ru: "ID", en: "ID", className: "keyColumn" },
   { key: "component", ru: "Функциональность", en: "Functionality", className: "functionColumn" },
   { key: "estimate", ru: "Оценка", en: "Estimate", className: "estimateColumn" },
 ];
 
 function groupLabel(locale: TmsLocale, groupBy: CaseGroupBy, value: string) {
-  if (groupBy === "lifecycle" || groupBy === "priority") return localizedLabel(locale, value);
+  if (groupBy === "priority") return priorityLabel(locale, value);
+  if (groupBy === "lifecycle") return localizedLabel(locale, value);
   if (groupBy === "component") return localizedComponentLabel(locale, value) || "—";
   return value || "—";
 }
@@ -139,6 +140,7 @@ export function CasesTable(props: Props) {
           </td></tr>}
           {!isCollapsed && group.rows.map((row) => {
             const item = row.testCase;
+            const priority = item.priorityAssigned === false ? null : item.priority;
             const selected = item.id === props.selectedCaseId;
             const bulkSelected = props.selectedIds.has(item.id);
             const selectable = props.selectableIds.has(item.id);
@@ -152,11 +154,11 @@ export function CasesTable(props: Props) {
                 else moveFocus(event);
               }}>
               <td className={styles.selectionCell}>{props.selectionMode && <CaseSelectionCheckbox coverage={bulkSelected ? "all" : "none"} disabled={props.interactionLocked || !selectable} label={selectable ? (ru ? `Выбрать ${item.key}` : `Select ${item.key}`) : (ru ? `${item.key} недоступен для массовых действий` : `${item.key} is unavailable for bulk actions`)} onToggle={() => props.onToggleCase(item.id)} />}</td>
-              <td className={styles.flagCell}><PrioritySignal priority={item.priority} label={localizedLabel(props.locale, item.priority)} size={14} /></td>
+              <td className={styles.flagCell} aria-label={priorityLabel(props.locale, priority)}><PriorityIcon level={priority} empty="circle" size={14} /></td>
               <td className={styles.typeCell}><CaseTypeIcon locale={props.locale} type={item.type} /></td>
-              <td className={styles.keyCell} title={item.key}><strong>{item.key}</strong></td>
               <td><LifecycleBadge locale={props.locale} lifecycle={item.lifecycle} archived={Boolean(item.archivedAt)} /></td>
               <td className={styles.titleCell}><strong title={`${item.title}\n${row.folderPath}`}>{item.title}</strong></td>
+              <td className={styles.keyCell} title={item.key}><strong>{item.key}</strong></td>
               <td className={styles.truncate} title={localizedComponentLabel(props.locale, item.component)}>{localizedComponentLabel(props.locale, item.component) || "—"}</td>
               <td className={styles.estimateCell}>{item.estimatedMinutes === null ? "—" : `${item.estimatedMinutes} ${ru ? "мин" : "min"}`}</td>
             </DraggableCaseRow>;

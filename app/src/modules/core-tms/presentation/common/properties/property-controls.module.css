@@ -1,0 +1,168 @@
+.trigger, .value {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  justify-content: flex-start;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  inline-size: fit-content;
+  min-block-size: 29px;
+  gap: 8px;
+  padding: 3px 7px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--falcon-text);
+  font-size: inherit;
+}
+.trigger { cursor: pointer; transition: background-color 150ms ease; }
+.trigger:is([data-hover="true"], [aria-expanded="true"]) { background: var(--falcon-hover); }
+.trigger:focus-visible { outline: 1px solid var(--falcon-focus); outline-offset: -1px; }
+.trigger > span:not(.member), .value > span:not(.member) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+:is(.trigger, .value, .option) > svg { flex: none; color: var(--falcon-icon); }
+.trigger, .value { --property-avatar-size: 14px; }
+.member {
+  display: inline-flex;
+  flex: none;
+  inline-size: var(--property-avatar-size, 16px);
+  block-size: var(--property-avatar-size, 16px);
+}
+.member > :first-child { inline-size: 100%; block-size: 100%; font-size: 8px; }
+.trigger[data-compact], .value[data-compact] {
+  gap: 5px;
+  max-inline-size: min(100%, 12rem);
+  min-block-size: 24px;
+  padding: 2px 8px;
+  background: var(--falcon-hover);
+  font-size: 12px;
+  line-height: 16px;
+}
+.trigger[data-compact] > svg, .value[data-compact] > svg { inline-size: 13px; block-size: 13px; }
+.trigger[data-compact]:is([data-hover="true"], [aria-expanded="true"]) { background: var(--falcon-selected); }
+.trigger[data-compact]:focus-visible { outline: 0; box-shadow: none; }
+.trigger[data-compact][data-focus-visible="true"] { outline: 1px solid var(--falcon-text-secondary); outline-offset: 1px; }
+.prioritySignal[data-level="low"] line:not(:last-child),
+.prioritySignal[data-level="medium"] line:nth-child(2) { opacity: .4; }
+.count { flex: none; font-variant-numeric: tabular-nums; color: var(--falcon-text-secondary); }
+.empty { padding-inline: 7px; color: var(--falcon-text-secondary); font-size: 13px; }
+.labels { display: flex; flex-wrap: wrap; gap: 4px; padding-inline: 7px; }
+.labels:empty { display: none; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-inline-size: 100%;
+  min-block-size: 22px;
+  block-size: auto;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--falcon-control);
+  color: var(--falcon-text);
+  font-size: 12px;
+  line-height: 16px;
+}
+.chip .chipContent { min-inline-size: 0; overflow: hidden; padding: 0; text-overflow: ellipsis; }
+.labelDot {
+  flex: none;
+  inline-size: 6px;
+  block-size: 6px;
+  border-radius: 50%;
+  background: var(--falcon-icon);
+}
+.chip .labelRemove {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  min-inline-size: 16px;
+  inline-size: 16px;
+  block-size: 16px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--falcon-text-secondary);
+}
+.chip .labelRemove:is([data-hover="true"], :focus-visible) { background: var(--falcon-selected); color: var(--falcon-text); }
+
+.positioner { z-index: 145; }
+.popover {
+  --property-menu-outline: var(--falcon-border);
+  --property-menu-divider: var(--falcon-border);
+  --property-menu-placeholder: var(--falcon-text-secondary);
+  align-items: stretch;
+  inline-size: min(256px, calc(100vw - 24px));
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 12px;
+  background: var(--falcon-elevated);
+  color: var(--falcon-text);
+  box-shadow: inset 0 0 0 .5px var(--property-menu-outline), var(--falcon-shadow-popover);
+}
+:global(.dark) .popover {
+  --property-menu-outline: var(--falcon-doc-tooltip-border);
+  --property-menu-divider: var(--falcon-doc-tooltip-divider);
+  --property-menu-placeholder: var(--falcon-doc-muted);
+  --falcon-elevated: var(--falcon-doc-popover);
+  --falcon-text: var(--falcon-doc-text);
+  --falcon-text-secondary: var(--falcon-doc-muted);
+  --falcon-icon: var(--falcon-doc-muted);
+  --falcon-selected: var(--falcon-doc-selected);
+}
+.popover .search { width: 100%; }
+.popover .searchWrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 36.5px;
+  height: auto;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: inset 0 -.5px var(--property-menu-divider);
+}
+.popover input.searchInput {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  box-shadow: none;
+  background: transparent;
+  color: var(--falcon-text);
+  font-size: 13px;
+}
+.searchInput::placeholder { color: var(--property-menu-placeholder); }
+.popover .list { max-block-size: min(232px, 38dvh); overflow: auto; padding: 5px 6px; }
+.popover .options { display: grid; margin: 0; padding: 0; list-style: none; }
+.popover .option, .popover .add {
+  display: flex;
+  align-items: center;
+  min-block-size: 32px;
+  gap: 8px;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--falcon-text);
+  font-size: 13px;
+  text-align: start;
+}
+.optionTitle { flex: 1; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; }
+.popover .option .selectedIcon { margin-inline-start: auto; color: var(--falcon-text); }
+.popover .option[data-hover="true"],
+.popover .options:not(:has(.option[data-hover="true"])) .option[data-focus-visible="true"],
+.popover .options:not(:has(.option:is([data-hover="true"], [data-focus-visible="true"]):not([data-selected="true"]))) .option[data-selected="true"],
+.popover .add:is([data-hover="true"], [data-focus-visible="true"]) { background: var(--falcon-selected); }
+.labelForm { display: grid; }
+.labelForm .labels { padding: 6px; }
+.add { justify-content: flex-start; margin: 5px 6px; }
+.add[data-disabled="true"] { opacity: .55; }
+
+.trigger[aria-invalid="true"] { box-shadow: inset 0 0 0 1px var(--falcon-border-strong); }
+.menuShortcut { color: var(--falcon-text-secondary); font-variant-numeric: tabular-nums; }
+.optionEnd { display: inline-flex; align-items: center; gap: 12px; }
+@media (pointer: coarse) { .trigger { min-block-size: 34px; } }
+
+:is(.trigger, .value) > .labels { flex: 1; padding-inline: 0; white-space: normal; }
+.labelForm .labels { max-block-size: min(170px, 30dvh); overflow-y: auto; }

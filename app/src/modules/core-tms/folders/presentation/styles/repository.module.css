@@ -59,8 +59,12 @@
 .caseButton { grid-column: 3 / -1; display: flex; align-items: flex-start; gap: 7px; padding: 8px 3px 8px 4px; min-width: 0; width: 100%; text-align: left; touch-action: pan-y; }
 .caseButton svg { color: var(--falcon-case-icon); flex-shrink: 0; margin-top: 0; }
 .caseAccessory { display: inline-flex; flex: none; overflow: visible; }
-.caseCopy { flex: 1; min-width: 0; font-size: 12px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.5; }
+.caseCopy, .caseTitle { flex: 1; min-width: 0; font-size: 12px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.5; }
 .caseButton small { font-size: 10px; display: block; color: var(--falcon-text-muted); }
+.leaf[data-title-mode="inline"] { min-height: 34px; align-items: center; }
+.leaf[data-title-mode="inline"] .caseButton { min-height: 34px; align-items: center; padding-block: 4px; }
+.leaf[data-title-mode="inline"] .caseAccessory > svg { color: var(--falcon-icon); }
+.caseKey { flex: none; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .leaf[data-quick-create] { grid-template-columns: 20px var(--repository-selection-width) minmax(0, 1fr) 25px; }
 .leaf[data-quick-create] > .caseButton { grid-column: 3; }
 .caseAddButton { grid-column: 4; align-self: center; display: grid; place-items: center; width: 25px; height: 27px;
@@ -127,7 +131,7 @@
 :global([data-appearance="glass"] [data-testid="cases-view"]) .repository { --repository-guide: var(--falcon-border-subtle); }
 :global([data-appearance="glass"] [data-testid="cases-view"]) .leaf[data-active] { background: var(--falcon-selected); }
 :global([data-appearance="glass"] [data-testid="cases-view"]) .folderName { font-size: 13px !important; }
-:global([data-appearance="glass"] [data-testid="cases-view"]) .caseCopy { font-size: 13px; }
+:global([data-appearance="glass"] [data-testid="cases-view"]) :is(.caseCopy, .caseTitle) { font-size: 13px; }
 :global([data-appearance="glass"] [data-testid="cases-view"]) .repository :is(button, input):focus-visible { outline-color: var(--falcon-focus) !important; }
 .treeHeading { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; min-height: 39px; gap: 4px 8px; padding: 4px 8px 7px; color: var(--falcon-text-muted); }
 .foldersLabel, .treeActions { display: flex; align-items: center; gap: 4px; min-width: 0; }

@@ -13,6 +13,7 @@ export function createEmptyRevision(locale: TmsLocale = "en"): TestCaseRevision 
     type: "manual",
     lifecycle: "draft",
     priority: "medium",
+    priorityAssigned: false,
     component: "",
     ownerIdentityId: null,
     tags: [],
@@ -32,6 +33,10 @@ export function createEmptyRevision(locale: TmsLocale = "en"): TestCaseRevision 
     changeNote: locale === "ru" ? "Создано в TMS" : "Created in TMS",
     createdAt: new Date().toISOString(),
   };
+}
+
+export function casePriority(revision: Pick<TestCaseRevision, "priority" | "priorityAssigned">) {
+  return revision.priorityAssigned === false ? "none" : revision.priority;
 }
 
 export function changeRevisionType(

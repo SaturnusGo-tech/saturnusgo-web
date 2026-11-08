@@ -8192,6 +8192,11 @@ export interface components {
             type: "manual" | "checklist" | "automated";
             lifecycle: components["schemas"]["TestCaseLifecycle"];
             priority: components["schemas"]["Priority"];
+            /**
+             * @description False when priority is unassigned. The effective priority remains medium for compatibility. Omitted for explicitly assigned and historical priorities.
+             * @constant
+             */
+            priorityAssigned?: false;
             component: components["schemas"]["ShortText"];
             ownerIdentityId: components["schemas"]["Identifier"] | null;
             tags: string[];
@@ -8238,7 +8243,8 @@ export interface components {
              */
             type: "manual" | "checklist" | "automated";
             lifecycle?: components["schemas"]["TestCaseLifecycle"];
-            priority?: components["schemas"]["Priority"];
+            /** @description Omit or send null to leave the case priority unassigned. */
+            priority?: components["schemas"]["Priority"] | null;
             component?: components["schemas"]["ShortText"];
             ownerIdentityId?: components["schemas"]["Identifier"] | null;
             tags?: string[];
@@ -8261,7 +8267,8 @@ export interface components {
              */
             type?: "manual" | "checklist" | "automated";
             lifecycle?: components["schemas"]["TestCaseLifecycle"];
-            priority?: components["schemas"]["Priority"];
+            /** @description Send null to clear the priority. Omit to preserve the current assignment. */
+            priority?: components["schemas"]["Priority"] | null;
             component?: components["schemas"]["ShortText"];
             ownerIdentityId?: components["schemas"]["Identifier"] | null;
             tags?: string[];
@@ -8384,7 +8391,8 @@ export interface components {
         };
         TestCaseBulkMutationPatch: {
             lifecycle?: components["schemas"]["TestCaseLifecycle"];
-            priority?: components["schemas"]["Priority"];
+            /** @description Send null to clear priorities. Omit to preserve the current assignments. */
+            priority?: components["schemas"]["Priority"] | null;
         };
         TestCaseBulkMutationRequest: {
             projectId: components["schemas"]["Identifier"];
@@ -8399,6 +8407,11 @@ export interface components {
             currentRevision: number;
             lifecycle: components["schemas"]["TestCaseLifecycle"];
             priority: components["schemas"]["Priority"];
+            /**
+             * @description False when priority is unassigned. The effective priority remains medium for compatibility. Omitted for explicitly assigned and historical priorities.
+             * @constant
+             */
+            priorityAssigned?: false;
             updatedAt: components["schemas"]["Timestamp"];
             etag: components["schemas"]["TestCaseStrongEtag"];
             changed: boolean;
@@ -8422,6 +8435,11 @@ export interface components {
             type: "manual" | "checklist" | "automated";
             lifecycle: components["schemas"]["TestCaseLifecycle"];
             priority: components["schemas"]["Priority"];
+            /**
+             * @description False when priority is unassigned. The effective priority remains medium for compatibility. Omitted for explicitly assigned and historical priorities.
+             * @constant
+             */
+            priorityAssigned?: false;
             component: components["schemas"]["ShortText"];
             ownerIdentityId: components["schemas"]["Identifier"] | null;
             tags: string[];
@@ -8447,6 +8465,11 @@ export interface components {
             type: "manual" | "checklist" | "automated";
             lifecycle: components["schemas"]["TestCaseLifecycle"];
             priority: components["schemas"]["Priority"];
+            /**
+             * @description False when priority is unassigned. The effective priority remains medium for compatibility. Omitted for explicitly assigned and historical priorities.
+             * @constant
+             */
+            priorityAssigned?: false;
             component: components["schemas"]["ShortText"];
             ownerIdentityId: components["schemas"]["Identifier"] | null;
             estimatedMinutes: number | null;
@@ -11077,6 +11100,11 @@ export interface components {
             type: "manual" | "checklist" | "automated";
             lifecycle: components["schemas"]["TestCaseLifecycle"];
             priority: components["schemas"]["Priority"];
+            /**
+             * @description False when priority is unassigned. The effective priority remains medium for compatibility. Omitted for explicitly assigned and historical priorities.
+             * @constant
+             */
+            priorityAssigned?: false;
             component: components["schemas"]["ShortText"];
             tags: string[];
             estimatedMinutes: number | null;
@@ -15296,7 +15324,8 @@ export interface operations {
                 includeArchived?: boolean;
                 search?: string;
                 lifecycle?: components["schemas"]["TestCaseLifecycle"];
-                priority?: components["schemas"]["Priority"];
+                /** @description Filter explicitly assigned priorities, or use none for unassigned cases. */
+                priority?: components["schemas"]["Priority"] | "none";
                 type?: "manual" | "checklist" | "automated";
                 component?: string;
                 tag?: string[];
