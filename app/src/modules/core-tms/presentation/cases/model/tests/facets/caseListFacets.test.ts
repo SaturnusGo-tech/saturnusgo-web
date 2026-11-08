@@ -89,13 +89,13 @@ test("toolbar exposes keyboard QL autocomplete and bounded contextual facets", (
     + readFileSync(new URL("../../query/vocabulary/fields.ts", import.meta.url), "utf8");
   const css = readFileSync(new URL("../../../toolbar/filter/filter-panel.module.css", import.meta.url), "utf8");
   const popup = readFileSync(new URL("../../../toolbar/filter/useFilterPopup.ts", import.meta.url), "utf8");
-  assert.match(popovers, /role="combobox"/);
-  assert.match(popovers, /aria-autocomplete="list"/);
+  assert.match(popovers, /role: "combobox"/);
+  assert.match(popovers, /"aria-autocomplete": "list"/);
   assert.match(popovers, /suggestions: suggestions\.slice\(0, 12\)/);
-  assert.match(popovers, /aria-activedescendant=\{open && result\.suggestions\[active\]/);
+  assert.match(popovers, /"aria-activedescendant": open && result\.suggestions\[active\]/);
   assert.match(popovers, /event\.key === "Enter" && open && result\.suggestions\[active\]/);
   assert.doesNotMatch(popovers, /suggestions\.slice\(0, 10\)\.map/);
-  assert.match(popovers, /\["ArrowDown", "ArrowUp"\]\.includes\(event\.key\)/);
+  assert.match(popovers, /event\.key === "ArrowDown" \|\| event\.key === "ArrowUp"/);
   assert.match(popovers, /"ArrowDown", "ArrowUp", "Home", "End"/);
   assert.match(popovers, /role="tablist" aria-orientation="vertical"/);
   assert.match(popovers, /role="tabpanel"/);

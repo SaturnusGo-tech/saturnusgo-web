@@ -1,6 +1,6 @@
-import { FalconCheckbox } from "../../../common/checkbox/FalconCheckbox";
 "use client";
 
+import { FalconCheckbox } from "../../../common/checkbox/FalconCheckbox";
 import { Plus, Trash2 } from "lucide-react";
 import type {
   TestCaseRevision,
