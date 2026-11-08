@@ -50,7 +50,7 @@ test("New folder opens the structure screen and leaves selection untouched", () 
   const app = browserHarness(); let opened = 0; app.props.onNewFolder = () => { opened++; };
   app.props.selectedCaseId = "profile-case"; app.props.selectedFolderId = "pay";
   const create = elements(app.renderTree(), item => item.props["aria-label"] === "New folder")[0];
-  (create.props.onClick as () => void)();
+  invoke(create, "onPress");
   assert.equal(opened, 1); assert.equal(app.props.selectedCaseId, "profile-case");
   assert.equal(elements(app.renderTree(), item => item.type === "InlineFolderForm").length, 0);
   app.dispose();
