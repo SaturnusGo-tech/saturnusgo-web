@@ -7,7 +7,7 @@ type Request = {
     promise: Promise<WorkspaceActor | null>;
 };
 const requests = new WeakMap<TmsHttpClient, Map<string, Request>>();
-export function requestWorkspaceActor(http: TmsHttpClient, workspaceId: string, identityId: string, signal: AbortSignal): Promise<WorkspaceActor | null> {
+export function requestWorkspaceActor(http: TmsHttpClient, workspaceId: string, identityId: string, signal: AbortSignal, includeSignIn = false): Promise<WorkspaceActor | null> {
     if (signal.aborted)
         return Promise.reject(signal.reason);
     let scoped = requests.get(http);
@@ -16,12 +16,12 @@ export function requestWorkspaceActor(http: TmsHttpClient, workspaceId: string, 
         requests.set(http, scoped);
     }
     const registry = scoped;
-    const key = JSON.stringify([workspaceId, identityId]);
+    const key = JSON.stringify([workspaceId, identityId, includeSignIn]);
     let request = scoped.get(key);
     if (!request || request.controller.signal.aborted) {
         const controller = new AbortController();
         const created: Request = { controller, readers: 0, promise: Promise.resolve(null) };
-        created.promise = listWorkspaceActors(http, workspaceId, { identityId }, controller.signal)
+        created.promise = listWorkspaceActors(http, workspaceId, { identityId, includeSignIn }, controller.signal)
             .then((page) => page.items.find((item) => item.identityId === identityId) ?? null)
             .finally(() => { if (scoped.get(key) === created)
             scoped.delete(key); });

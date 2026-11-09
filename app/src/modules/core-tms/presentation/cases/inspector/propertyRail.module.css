@@ -1,32 +1,76 @@
-.layout > [data-case-property-rail] {
-  container: case-properties / inline-size;
-  gap: 12px;
+.layout:has(> .sideRail) { grid-template-columns: minmax(0, 1fr) clamp(190px, 25%, 232px); }
+@container case-inspector (max-width: 620px) {
+  .layout:has(> .sideRail) { grid-template-columns: minmax(0, 1fr); }
 }
+.layout > .sideRail { grid-template-columns: minmax(0, 1fr); gap: 24px; }
 
-.layout > [data-case-property-rail] > section + section {
-  padding-block-start: 10px;
-  border-block-start: 1px solid var(--falcon-border-subtle);
-}
-
-.layout > [data-case-property-rail] > section > header {
-  padding-block-end: 4px;
-}
-
-.layout .readRows {
+.layout > .sideRail > section > header { min-block-size: 29px; padding-block: 0 4px; }
+.layout > .sideRail > section > header > h3,
+.tags > h4,
+.documentation dt {
   margin: 0;
-  gap: 0;
+  color: var(--falcon-text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 19px;
 }
 
-.layout .additionalRows {
-  row-gap: 6px;
+.layout > .sideRail > [data-rail-details] { position: relative; margin-block-start: -24px; }
+.layout > .sideRail > [data-rail-details] > header {
+  position: absolute;
+  z-index: 1;
+  inset: 0 0 auto auto;
 }
+.rows, .detailsBody { display: grid; grid-template-columns: minmax(0, 1fr); min-inline-size: 0; }
+.rows { gap: 2px; justify-items: start; font-size: 13px; }
+.rows > * { min-inline-size: 0; max-inline-size: 100%; }
+.detailsBody { gap: 24px; }
+.owner { max-inline-size: calc(100% - 52px); }
+.rows > :has([data-case-member-name]) { margin-inline-start: 2px; max-inline-size: calc(100% - 2px); }
+.rows button:has(> [data-case-member-name]) { margin-inline-start: 0; }
+.rows > [data-case-member-name] { margin-inline-start: 7px; max-inline-size: calc(100% - 7px); }
+.rows [data-case-member-name] > :first-child { inline-size: 15px; block-size: 15px; font-size: 7px; }
+.rows [data-case-member-name] > :last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.placeholder { color: var(--falcon-text-muted); }
 
-.additionalRows {
+.tags { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; }
+.tags > h4, .documentation dt { padding-block-end: 5px; }
+.tags > span { padding-inline: 0; }
+.tags > button { color: var(--falcon-text-muted); }
+.documentation { margin: 0; min-inline-size: 0; }
+.documentation:empty { display: none; }
+.documentation [data-documentation-field] { display: block; }
+.documentation [data-documentation-field] > dt { padding-block-start: 0; }
+.documentation [data-documentation-field] > dd { font-size: 13px; min-inline-size: 0; }
+.documentation [data-documentation-field] > dd > button { color: var(--falcon-text-muted); }
+
+.testData, .noteRow {
+  display: grid;
+  grid-template-columns: 15px minmax(0, 1fr);
+  align-items: start;
+  gap: 8px;
+  inline-size: 100%;
+  min-block-size: 29px;
+  padding: 0 7px;
   --case-details-focus-border: color-mix(in srgb, var(--falcon-text-muted) 48%, var(--falcon-border));
-  --case-details-input-inset: 12px;
+  --case-details-input-inset: 8px;
 }
-
-.additionalRows dd.additionalInput [data-editor-shell][data-appearance="plain"] {
+.testData > .dataIcon, .noteRow > svg { margin-block-start: 7px; color: var(--falcon-icon); }
+.testData > button.dataIcon {
+  margin-block-start: 0;
+  margin-inline-start: -5px;
+  min-inline-size: 0;
+  inline-size: 25px;
+  block-size: 29px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+}
+.testData > button.dataIcon:is(:hover, :focus-visible) { background: var(--falcon-hover); }
+.additionalInput { min-inline-size: 0; padding-block-start: 4px; }
+.additionalInput:has([data-editor-shell]) { margin-inline-start: -8px; }
+.testData .additionalInput [data-editor-shell][data-appearance="plain"] {
   --tms-focus-border: var(--case-details-focus-border);
   --tms-focus-ring: transparent;
   --tms-input-hover-border: var(--falcon-border);
@@ -34,67 +78,29 @@
   border-radius: 10px;
 }
 
-.additionalRows dd.additionalInput [data-editor-shell][data-appearance="plain"]:focus-within {
+.testData .additionalInput [data-editor-shell][data-appearance="plain"]:focus-within {
   border-color: var(--case-details-focus-border) !important;
 }
 
-dd.additionalInput [data-editor-shell][data-appearance="plain"] > :global(.mdxeditor) { height: auto; min-height: 0; }
-dd.additionalInput [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-toolbar) { min-height: 26px; padding: 1px 5px; }
-dd.additionalInput [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-root-contenteditable) { height: auto; min-height: 28px; max-height: 180px; padding: 0; }
-dd.additionalInput [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-contenteditable-wrapper > [contenteditable]),
-dd.additionalInput [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-root-contenteditable > div:not(.mdxeditor-contenteditable-wrapper)) {
+.additionalInput [data-editor-shell][data-appearance="plain"] > :global(.mdxeditor) { height: auto; min-height: 0; }
+.additionalInput [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-toolbar) { min-height: 26px; padding: 1px 5px; }
+.additionalInput [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-root-contenteditable) { height: auto; min-height: 28px; max-height: 180px; padding: 0; }
+.additionalInput [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-contenteditable-wrapper > [contenteditable]),
+.additionalInput [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-root-contenteditable > div:not(.mdxeditor-contenteditable-wrapper)) {
   box-sizing: border-box;
   min-height: 28px;
   padding: 4px var(--case-details-input-inset);
 }
-dd.additionalInput [data-editor-shell][data-appearance="plain"] :global([class*="_placeholder_"]) { padding: 4px var(--case-details-input-inset); }
-dd.additionalInput [data-editor-shell][data-appearance="plain"] > div:has(> textarea) { height: 28px; min-height: 28px; }
-dd.additionalInput [data-editor-shell][data-appearance="plain"] > div > textarea { height: 28px; min-height: 28px; padding: 4px var(--case-details-input-inset); }
-dd.additionalInput [data-editor-shell][data-appearance="plain"] > div:has(> button) { min-height: 24px; padding: 0 5px; }
-
-.layout .readRows > div:has(> dt) {
-  box-sizing: border-box;
-  display: grid;
-  grid-template-columns: min(43%, 8.25rem) minmax(0, 1fr);
-  align-items: center;
-  justify-items: stretch;
-  gap: 8px;
-  min-block-size: 34px;
-  min-inline-size: 0;
-  margin: 0;
-  padding-block: 3px;
-}
-
-.layout .readRows > div.wideRow {
-  grid-template-columns: minmax(0, 1fr);
-  gap: 4px;
-  padding-block: 6px;
-}
-
-.layout .readRows > div > dt {
-  color: var(--falcon-text-muted);
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.4;
-  overflow-wrap: anywhere;
-}
-
-.layout .readRows > div > dd {
-  min-inline-size: 0;
-  margin: 0;
-  color: var(--falcon-text);
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.4;
-  overflow-wrap: anywhere;
-}
-
-.layout .readRows > div:not(.wideRow) > dd > button { max-inline-size: 100%; }
+.additionalInput [data-editor-shell][data-appearance="plain"] :global([class*="_placeholder_"]) { padding: 4px var(--case-details-input-inset); }
+.additionalInput [data-editor-shell][data-appearance="plain"] > div:has(> textarea) { height: 28px; min-height: 28px; }
+.additionalInput [data-editor-shell][data-appearance="plain"] > div > textarea { height: 28px; min-height: 28px; padding: 4px var(--case-details-input-inset); }
+.additionalInput [data-editor-shell][data-appearance="plain"] > div:has(> button) { min-height: 24px; padding: 0 5px; }
 
 .noteWrapper {
   height: auto;
   min-height: 29px;
-  padding: 3px 7px;
+  padding: 3px 6px;
+  margin-inline-start: -6px;
   background: var(--falcon-control);
   box-shadow: inset 0 0 0 1px var(--falcon-border);
   border-radius: 8px;
@@ -110,34 +116,7 @@ dd.additionalInput [data-editor-shell][data-appearance="plain"] > div:has(> butt
   font: inherit;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .layout [data-field-editing] > header > div:last-child,
-  .layout [data-field-editing] .readRows > div > dd > input,
-  .layout [data-field-editing] .readRows > div > dd > div > button[aria-haspopup],
-  .layout [data-field-editing] .wideRow [data-editor-shell]:has(:global(.mdxeditor-root-contenteditable), textarea) {
-    animation: fieldEditReveal 180ms cubic-bezier(.16, 1, .3, 1) both;
-  }
-}
-
-@keyframes fieldEditReveal {
-  from { opacity: .55; }
-  to { opacity: 1; }
-}
-
-@container case-properties (max-width: 185px) {
-  .layout .readRows > div:has(> dt) {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 3px;
-  }
-}
-
-.layout .readRows > div[data-documentation-field] {
-  grid-template-columns: minmax(max-content, min(43%, 8.25rem)) minmax(0, 1fr);
-  align-items: start;
-  column-gap: 8px;
-}
 
 @media (pointer: coarse) {
-  .layout .readRows > div:not(.wideRow) > dd > button,
-  .noteWrapper { min-block-size: 34px; }
+  .testData, .noteRow, .noteWrapper { min-block-size: 34px; }
 }

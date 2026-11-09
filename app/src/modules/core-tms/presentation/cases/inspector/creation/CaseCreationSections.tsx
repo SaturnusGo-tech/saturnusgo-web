@@ -12,6 +12,7 @@ import type { CaseInspectorEditor, InspectorSection } from "../model";
 import { InspectorSectionView } from "../section/InspectorSectionView";
 import { InspectorSteps } from "../steps/InspectorSteps";
 import css from "../caseInspector.module.css";
+import rail from "../propertyRail.module.css";
 import type { SharedStep, SharedStepSummary } from "../../../../shared-steps/model/shared-step";
 import { DraftRequirements } from "../../../../product-docs/requirements/draft/DraftRequirements";
 
@@ -19,12 +20,13 @@ type Props = {
   locale: TmsLocale;
   revision: TestCaseRevision;
   editor: CaseInspectorEditor;
+  tagSuggestions?: readonly string[];
   sharedSteps: readonly SharedStepSummary[];
   onResolveSharedStep: (id: string) => Promise<SharedStep | null>;
 };
 
 export function CaseCreationSections({
-  locale, revision, editor, sharedSteps, onResolveSharedStep,
+  locale, revision, editor, tagSuggestions, sharedSteps, onResolveSharedStep,
 }: Props) {
   const ru = locale === "ru";
   const [layout, setLayout] = useScenarioLayout();
@@ -36,7 +38,7 @@ export function CaseCreationSections({
       <dl className={css.compactSummary}>{documentation}</dl>
     </CreationSection>
   </div>;
-  return <div className={`${css.content} ${css.creationContent} ${css.overviewLayout}`}>
+  return <div className={`${css.content} ${css.creationContent} ${css.overviewLayout} ${rail.layout}`}>
     <main className={css.primaryColumn}>
       <CreationNarrativeSection section="description" title={ru ? "Описание" : "Description"}
         value={revision.description} ru={ru} onChange={(description) => patch({ description })} />
@@ -47,7 +49,7 @@ export function CaseCreationSections({
           sharedSteps={sharedSteps} onResolveSharedStep={onResolveSharedStep} onPatch={patch} />
       </CreationSection>
     </main>
-    <aside className={css.sideRail} aria-label={ru ? "Свойства нового тест-кейса" : "New test case properties"}>
+    <aside className={`${css.sideRail} ${rail.sideRail}`} aria-label={ru ? "Свойства нового тест-кейса" : "New test case properties"}>
       <CreationSection title={ru ? "Расположение" : "Placement"}>
         <FolderPathPicker value={editor.folderPath} folders={editor.folders} onChange={editor.onFolderPath} ru={ru} disabled={editor.submitting} />
       </CreationSection>
@@ -56,11 +58,10 @@ export function CaseCreationSections({
           canCreate={editor.canCreateFieldValues} disabled={editor.submitting} ru={ru} onPatch={patch} />
       </CreationSection>
       <CreationSection title={ru ? "Свойства" : "Properties"}>
-        <CaseMetadataControls locale={locale} revision={revision} editing showLabels onChange={editor.onChange} />
+        <CaseMetadataControls locale={locale} revision={revision} editing disabled={editor.submitting} onChange={editor.onChange} />
       </CreationSection>
-      <CreationSection title={ru ? "Дополнительно" : "Additional details"}>
-        <InspectorDetails revision={revision} editing autoFocus={false} ru={ru} onPatch={patch} documentation={documentation} />
-      </CreationSection>
+      <section data-rail-details><InspectorDetails tagSuggestions={tagSuggestions} revision={revision} editing
+        autoFocus={false} disabled={editor.submitting} ru={ru} onPatch={patch} documentation={documentation} /></section>
     </aside>
   </div>;
 }

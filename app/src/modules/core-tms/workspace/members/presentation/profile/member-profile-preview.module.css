@@ -1,0 +1,100 @@
+.anchor {
+  display: inline-flex;
+  align-items: center;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+.anchor .trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 7px;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  min-block-size: 28px;
+  block-size: auto;
+  padding: 2px 5px;
+  margin-inline-start: -5px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+}
+.anchor .trigger > span { min-inline-size: 0; max-inline-size: 100%; }
+.anchor .trigger > span > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.anchor .trigger:is([data-hover="true"], [aria-expanded="true"]) {
+  background: var(--falcon-hover);
+}
+.anchor .trigger[data-focus-visible="true"] {
+  outline: 1px solid var(--falcon-focus);
+  outline-offset: -1px;
+}
+.positioner { z-index: 151; }
+.positioner .surface {
+  inline-size: min(266px, calc(100vw - 20px));
+  padding: 0;
+  border: 1px solid var(--falcon-border-subtle);
+  border-radius: 8px;
+  background: var(--falcon-elevated);
+  color: var(--falcon-text);
+  box-shadow: var(--falcon-shadow-popover);
+}
+:global(.dark) .positioner .surface {
+  background: var(--falcon-doc-popover);
+  border-color: var(--falcon-doc-tooltip-border);
+  color: var(--falcon-doc-text);
+}
+.card {
+  display: grid;
+  inline-size: 100%;
+  padding: 11px 12px;
+}
+.heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-inline-size: 0;
+}
+.avatar {
+  display: inline-flex;
+  flex: none;
+  inline-size: 32px;
+  block-size: 32px;
+}
+.avatar > :first-child {
+  inline-size: 100%;
+  block-size: 100%;
+  font-size: 13px;
+}
+.identity {
+  display: grid;
+  gap: 2px;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+.identity strong { font-size: 14px; font-weight: 550; line-height: 18px; }
+.identity span { color: var(--falcon-text-secondary); font-size: 12px; line-height: 16px; }
+.detail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-block-start: 12px;
+  padding-block-start: 10px;
+  border-block-start: 1px solid var(--falcon-border-subtle);
+  font-size: 13px;
+}
+.detail svg { color: var(--falcon-icon); }
+
+.signIn {
+  display: grid;
+  gap: 2px;
+  min-inline-size: 0;
+}
+.signIn span { color: var(--falcon-text-secondary); font-size: 12px; line-height: 16px; }
+.signIn time { color: inherit; font-size: 13px; line-height: 17px; }

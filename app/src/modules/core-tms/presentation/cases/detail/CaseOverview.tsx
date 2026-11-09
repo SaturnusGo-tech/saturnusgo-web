@@ -9,6 +9,7 @@ import type { SharedStep, SharedStepSummary } from "../../../shared-steps/model/
 export function CaseOverview({
   locale,
   revision,
+  tagSuggestions,
   editor,
   onRequestEdit,
   testCaseId,
@@ -22,6 +23,7 @@ export function CaseOverview({
 }: {
   locale: TmsLocale;
   revision: TestCaseRevision;
+  tagSuggestions?: readonly string[];
   editor?: CaseInspectorEditor;
   onRequestEdit: () => void;
   testCaseId?: string;
@@ -39,6 +41,7 @@ export function CaseOverview({
       projectId={projectId}
       locale={locale}
       revision={revision}
+      tagSuggestions={tagSuggestions}
       archived={archived}
       readOnly={readOnly}
       editor={editor}

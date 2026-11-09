@@ -112,10 +112,10 @@ test("case chrome is quiet until the user asks to edit", () => {
   assert.match(listingStyles, /selectionModeButton\[aria-pressed="true"\][\s\S]*var\(--falcon-on-action\)/);
 });
 
-test("case content and editable custom fields retain the two-column hierarchy", () => {
+test("case content keeps its main column and compact single-column property rail", () => {
   assert.match(content, /overviewLayout/);
   assert.match(content, /<main className=\{css\.primaryColumn\}>[\s\S]*Описание[\s\S]*Предусловия[\s\S]*Сценарий/);
-  assert.match(content, /<aside className=\{css\.sideRail\}[\s\S]*Поля[\s\S]*<CaseCustomFields[\s\S]*<FolderPathPicker[\s\S]*Свойства[\s\S]*Дополнительно/);
+  assert.match(content, /data-case-property-rail[\s\S]*Свойства[\s\S]*<CaseMetadataControls[\s\S]*hideHeading[\s\S]*<InspectorDetails[\s\S]*Поля[\s\S]*<CaseCustomFields[\s\S]*<FolderPathPicker/);
   assert.match(content, /controls\("properties"\)[\s\S]*<CaseMetadataControls/);
 });
 
@@ -168,7 +168,7 @@ test("create mode shares the same calm two-column hierarchy and stable action ba
   assert.match(content, /creating && editor[\s\S]*<CaseCreationSections/);
   assert.match(creation, /css\.overviewLayout/);
   assert.match(creation, /<main className=\{css\.primaryColumn\}>[\s\S]*Описание[\s\S]*Предусловия[\s\S]*Сценарий/);
-  assert.match(creation, /<aside className=\{css\.sideRail\}[\s\S]*Расположение[\s\S]*Свойства[\s\S]*Дополнительно/);
+  assert.match(creation, /<aside className=\{[^\n]*rail\.sideRail[\s\S]*Расположение[\s\S]*Свойства[\s\S]*<InspectorDetails/);
   assert.doesNotMatch(creation, /number=|creationTone_|<details/);
   assert.match(creation, /CreationNarrativeSection[\s\S]*section="description"/);
   assert.match(creation, /onChange=\{editing \? onChange : undefined\}/);

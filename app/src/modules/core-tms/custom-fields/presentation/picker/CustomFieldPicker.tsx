@@ -1,5 +1,5 @@
 import { Button, Listbox, ListboxItem, Spinner } from "@heroui/react";
-import { Check, Layers, Package, Plus, RotateCcw, X } from "lucide-react";
+import { Check, Layers, Package, Plus, RotateCcw, SlidersHorizontal, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { PropertyPopover, PropertySearch } from "../../../presentation/common/properties/select/PropertySelect";
@@ -14,9 +14,9 @@ import css from "./customFieldPicker.module.css";
 
 export type CustomFieldPickerProps = CustomFieldScope & { field: CustomFieldDefinition;
   selected: readonly CustomFieldSelection[]; onChange(values: readonly CustomFieldSelection[]): void;
-  parentValueId?: string | null; allowProductsWithoutGroup?: boolean; canCreate?: boolean; disabled?: boolean; placeholder?: string; invalid?: boolean; errorId?: string; autoOpen?: boolean };
+  parentValueId?: string | null; allowProductsWithoutGroup?: boolean; canCreate?: boolean; disabled?: boolean; placeholder?: string; displayValue?: string; invalid?: boolean; errorId?: string; autoOpen?: boolean };
 export function CustomFieldPicker({ field, selected, onChange, parentValueId, allowProductsWithoutGroup = false, canCreate = false,
-  disabled = false, placeholder, invalid, errorId, autoOpen = false, workspaceId, projectId }: CustomFieldPickerProps) {
+  disabled = false, placeholder, displayValue, invalid, errorId, autoOpen = false, workspaceId, projectId }: CustomFieldPickerProps) {
   const { locale } = useTmsLocale();
   const ru = locale === "ru";
   const [open, setOpen] = useState(false);
@@ -31,8 +31,8 @@ export function CustomFieldPicker({ field, selected, onChange, parentValueId, al
   const exact = page.items.find(value => normalizedFieldLabel(value.label) === normalizedFieldLabel(page.search));
   const parentNeeded = field.systemKey === "product" && !parentValueId && !allowProductsWithoutGroup;
   const selectedKeys = new Set(selected.map(value => value.id));
-  const trigger = <><CustomFieldIcon systemKey={field.systemKey} />
-    <span>{selected.length ? selected.map(value => customValueLabel(value, ru)).join(", ") : placeholder ?? (ru ? "Выберите значение" : "Select a value")}</span></>;
+  const trigger = <><CustomFieldIcon systemKey={field.systemKey} fallback={displayValue !== undefined} />
+    <span>{displayValue ?? (selected.length ? selected.map(value => customValueLabel(value, ru)).join(", ") : placeholder ?? (ru ? "Выберите значение" : "Select a value"))}</span></>;
 
   function setMenu(next: boolean) {
     write.reset();
@@ -99,7 +99,7 @@ export function CustomFieldPicker({ field, selected, onChange, parentValueId, al
   </PropertyPopover>;
 }
 
-export function CustomFieldIcon({ systemKey }: Pick<CustomFieldDefinition, "systemKey">) {
-  const Icon = systemKey === "product_group" ? Layers : systemKey === "product" ? Package : systemKey === "regression" ? RotateCcw : null;
+export function CustomFieldIcon({ systemKey, fallback }: Pick<CustomFieldDefinition, "systemKey"> & { fallback?: boolean }) {
+  const Icon = systemKey === "product_group" ? Layers : systemKey === "product" ? Package : systemKey === "regression" ? RotateCcw : fallback ? SlidersHorizontal : null;
   return Icon ? <Icon size={15} aria-hidden="true" /> : null;
 }

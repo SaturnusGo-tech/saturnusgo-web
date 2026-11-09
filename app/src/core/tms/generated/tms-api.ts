@@ -5168,7 +5168,7 @@ export interface paths {
         };
         /**
          * List typed workspace actors or resolve a historical author
-         * @description Requires workspace:read and current active membership. Bounded discriminated human/agent catalog, ordered by name and identityId. Collections include active identities and memberships only; Codex additionally requires the active company employee record. Exact identityId lookup resolves inactive historical actors within this workspace unless eligible=true. Foreign references return an empty page. eligible is catalog eligibility only; owning assignment commands retain their authorization and lifecycle policy. Search matches name or human email. Cursors bind workspace, search, identityId and eligible; no service credentials, login, MFA or security metadata are exposed. Ordinary REST authentication rejects MCP bearer credentials.
+         * @description Requires workspace:read and current active membership. Bounded discriminated human/agent catalog, ordered by name and identityId. Collections include active identities and memberships only; Codex additionally requires the active company employee record. Exact identityId lookup resolves inactive historical actors within this workspace unless eligible=true. Foreign references return an empty page. eligible is catalog eligibility only; owning assignment commands retain their authorization and lifecycle policy. Search matches name or human email. Cursors bind workspace, search, identityId and eligible. Ordinary REST authentication rejects MCP bearer credentials.
          */
         get: operations["listWorkspaceActors"];
         put?: never;
@@ -11753,6 +11753,11 @@ export interface components {
             kind: "human";
             name: string;
             email: string | null;
+            /**
+             * Format: date-time
+             * @description Returned only on exact human identity lookup with includeSignIn=true. Latest recorded completed authentication in this workspace, or null if unavailable.
+             */
+            lastSignedInAt?: string | null;
         };
         AgentCatalogActor: {
             identityId: components["schemas"]["Identifier"];
@@ -24809,6 +24814,8 @@ export interface operations {
             query?: {
                 /** @description Resolve a workspace actor, including inactive historical records. Use eligible=true to require active selection eligibility. */
                 identityId?: components["schemas"]["Identifier"];
+                /** @description Return the nullable last completed sign-in time for a human profile. Requires an exact identityId when true. */
+                includeSignIn?: boolean;
                 search?: string;
                 /** @description Require active identity, membership and (for Codex) employee, including for an exact identity lookup. Collections always apply this filter. */
                 eligible?: boolean;

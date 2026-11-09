@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Input, Listbox, ListboxItem, Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
+import { Button, Input, Listbox, ListboxItem, Popover, PopoverContent, PopoverTrigger, type PopoverProps } from "@heroui/react";
 import { Check } from "lucide-react";
 import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import type { TmsLocale } from "../../../../localization/model/locale";
@@ -23,6 +23,7 @@ export function PropertyValue({ label, children, compact, disabled, onEdit }: Va
 
 export function PropertyPopover({
   label, triggerLabel, trigger, open, onOpenChange, compact, disabled, autoFocus, invalid, errorId, children, onMenuKeyDown,
+  placement = "bottom-start", narrow,
 }: {
   label: string;
   triggerLabel?: string;
@@ -36,10 +37,12 @@ export function PropertyPopover({
   errorId?: string;
   children: ReactNode;
   onMenuKeyDown?: (event: KeyboardEvent<HTMLElement>) => void;
+  placement?: PopoverProps["placement"];
+  narrow?: boolean;
 }) {
   const button = useRef<HTMLButtonElement>(null);
-  return <Popover placement="bottom-start" offset={4} isOpen={open && !disabled} onOpenChange={onOpenChange}
-    shouldBlockScroll={false} classNames={{ base: styles.positioner, content: styles.popover }}>
+  return <Popover placement={placement} offset={4} isOpen={open && !disabled} onOpenChange={onOpenChange}
+    shouldBlockScroll={false} classNames={{ base: styles.positioner, content: narrow ? `${styles.popover} ${styles.narrowMenu}` : styles.popover }}>
     <PopoverTrigger><Button ref={button} type="button" variant="light" className={styles.trigger}
       autoFocus={autoFocus} isDisabled={disabled} data-compact={compact || undefined} aria-label={triggerLabel ?? label}
       aria-invalid={invalid || undefined} aria-describedby={errorId}>{trigger}</Button></PopoverTrigger>

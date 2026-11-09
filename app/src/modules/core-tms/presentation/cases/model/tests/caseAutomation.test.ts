@@ -52,7 +52,7 @@ test("case details use the docs property controls while case list badges retain 
   const casesCss = readFileSync(new URL("../../cases.module.css", import.meta.url), "utf8");
 
   assert.match(detail, /<LifecycleBadge[\s\S]*<span>\{ru \? "Создан"/);
-  assert.match(metadata, /className=\{styles\.controlLabel\}/);
+  assert.match(metadata, /className=\{rail\.rows\}/);
   assert.match(metadataCss, /\.chip[\s\S]*border-radius: 999px/);
   assert.match(metadataCss, /\.lifecycleReady \{ --metadata-fg: var\(--falcon-success-on-solid\); --metadata-bg: var\(--falcon-success-solid\)/);
   assert.match(metadataCss, /\.lifecycleDeprecated \{ --metadata-fg: var\(--falcon-warning-on-solid\); --metadata-bg: var\(--falcon-warning-solid\)/);

@@ -5,7 +5,7 @@ import { CaseBrowserEmpty } from "./browser/layout/CaseBrowserEmpty";
 import browser from "./browser/layout/browser.module.css";
 import { CasesRepositoryList } from "./workspace/CasesRepositoryList";
 import { RepositoryDragContext } from "../../folders/presentation/dnd/RepositoryDragContext";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { TessiqLoader } from "../common/loading/TessiqLoader";
 import { CaseLocationBreadcrumbs } from "./detail/location/CaseLocationBreadcrumbs";
@@ -21,6 +21,10 @@ import styles from "./cases.module.css";
 export function CasesView(props: CasesViewProps) {
   const { locale, languageTag, t } = useTmsLocale();
   const view = useCasesViewController(props, locale, languageTag);
+  const tagProject = props.editor?.projectId ?? props.testCase?.projectId;
+  const tagSuggestions = useMemo(() => tagProject
+    ? [...new Set(props.testCases.filter(item => item.projectId === tagProject).flatMap(item => item.tags))].sort()
+    : [], [props.testCases, tagProject]);
   const [selectionAction, setSelectionAction] = useState<"move" | "archive" | null>(null);
   const detailPanelRef = useRef<HTMLElement>(null);
   const listPaneRef = useRef<HTMLElement>(null);
@@ -121,6 +125,7 @@ export function CasesView(props: CasesViewProps) {
             </div>
           : <TessiqLoader pane label={t("common.loading")} testId="case-detail-loading" />
         : <CaseDetailPanel
+            tagSuggestions={tagSuggestions}
             key={props.editor?.mode === "create" ? "create" : props.testCase?.id}
             locale={locale}
             languageTag={languageTag}

@@ -2,9 +2,10 @@
 
 import { Button, Listbox, ListboxItem, Spinner } from "@heroui/react";
 import { Check, UserRound } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import type { TmsLocale } from "../../../../localization/model/locale";
 import { MemberAvatar } from "../../../../workspace/members/avatar/MemberAvatar";
+import { MemberProfilePreview } from "../../../../workspace/members/presentation/profile/MemberProfilePreview";
 import { useWorkspaceMembers } from "../../../../workspace/members/state/useWorkspaceMembers";
 import { PropertyPopover, PropertySearch, PropertyValue } from "../select/PropertySelect";
 import styles from "../property-controls.module.css";
@@ -12,7 +13,7 @@ import styles from "../property-controls.module.css";
 type Assignee = { identityId: string; displayName: string } | null;
 
 export function PropertyAssigneeField({
-  workspaceId, locale, value, onChange, disabled, compact, autoOpen, offline, includeAgents, onRequestEdit,
+  workspaceId, locale, value, onChange, disabled, compact, autoOpen, offline, includeAgents, onRequestEdit, profilePreview,
 }: {
   workspaceId: string;
   locale: TmsLocale;
@@ -23,6 +24,7 @@ export function PropertyAssigneeField({
   autoOpen?: boolean;
   offline?: boolean;
   includeAgents?: boolean;
+  profilePreview?: boolean;
   onRequestEdit?(): void;
 }) {
   const [open, setOpen] = useState(false);
@@ -45,28 +47,40 @@ export function PropertyAssigneeField({
     : <UserRound size={15} aria-hidden="true" />;
   const content = <>{current}<span>{value?.displayName ?? (compact ? label : unassigned)}</span></>;
   const name = `${label}, ${value?.displayName ?? unassigned}`;
-  if (!onChange) return <PropertyValue label={name} compact={compact} disabled={disabled || offline} onEdit={onRequestEdit}>{content}</PropertyValue>;
+  const withPreview = (trigger: ReactNode) => value && profilePreview
+    ? <MemberProfilePreview workspaceId={workspaceId} identityId={value.identityId} name={value.displayName}
+      locale={locale} offline={offline} hoverOnly disabled={open}>{trigger}</MemberProfilePreview>
+    : trigger;
+  if (!onChange) return withPreview(<PropertyValue label={name} compact={compact} disabled={disabled || offline} onEdit={onRequestEdit}>{content}</PropertyValue>);
   function setMenu(next: boolean) {
     setOpen(next);
     if (!next) members.setSearch("");
   }
-  return <PropertyPopover label={label} triggerLabel={name} trigger={content} compact={compact}
-    open={open} disabled={disabled || offline} onOpenChange={setMenu}>
+  const choose = (id: string) => {
+    const person = people.find((option) => option.id === id);
+    if (person || id === "unassigned") onChange(person ? { identityId: person.id, displayName: person.name } : null);
+    setMenu(false);
+  };
+  const shortcuts = new Map(members.search ? [] : options.slice(0, 10).map((person, index) => [person.id, String(index)]));
+  return withPreview(<PropertyPopover label={label} triggerLabel={name} trigger={content} compact={compact} narrow
+    open={open} disabled={disabled || offline} onOpenChange={setMenu} onMenuKeyDown={(event) => {
+      if (members.search || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || !/^[0-9]$/.test(event.key)) return;
+      const option = options[Number(event.key)];
+      if (!option) return;
+      event.preventDefault();
+      event.stopPropagation();
+      choose(option.id);
+    }}>
       <PropertySearch label={search} value={members.search} onChange={members.setSearch} />
       <Listbox aria-label={label} classNames={{ base: styles.list, list: styles.options }} items={options}
         itemClasses={{ base: styles.option, title: styles.optionTitle }}
-        selectionMode="single" hideSelectedIcon disallowEmptySelection selectedKeys={[value?.identityId ?? "unassigned"]}
-        onSelectionChange={(keys) => {
-          if (keys === "all") return;
-          const key = keys.values().next().value;
-          if (key === undefined) return;
-          const person = people.find(({ id }) => id === key);
-          if (person || key === "unassigned") onChange(person ? { identityId: person.id, displayName: person.name } : null);
-          setMenu(false);
-        }}>
-        {(person) => <ListboxItem key={person.id}
-          endContent={person.id === (value?.identityId ?? "unassigned") ? <Check className={styles.selectedIcon} size={14} aria-hidden="true" /> : undefined}
-          startContent={person.id === "unassigned" ? <UserRound size={15} aria-hidden="true" />
+        selectionMode="single" hideSelectedIcon disallowEmptySelection selectedKeys={[value?.identityId ?? "unassigned"]}>
+        {(person) => <ListboxItem key={person.id} textValue={person.name} onPress={() => choose(person.id)}
+          endContent={<span className={styles.optionEnd} aria-hidden="true">
+            {person.id === (value?.identityId ?? "unassigned") && <Check className={styles.selectedIcon} size={14} />}
+            {shortcuts.has(person.id) && <span className={styles.menuShortcut}>{shortcuts.get(person.id)}</span>}
+          </span>}
+          startContent={person.id === "unassigned" ? <UserRound size={15} strokeDasharray="2 2" aria-hidden="true" />
             : <span className={styles.member}>
               <MemberAvatar workspaceId={workspaceId} identityId={person.id} name={person.name}
                 actor={person.kind !== "agent" ? { kind: "human", identityId: person.id, name: person.name, email: person.email ?? null } : undefined} />
@@ -77,5 +91,5 @@ export function PropertyAssigneeField({
       {members.loading && <Spinner size="sm" aria-label={ru ? "Загрузка" : "Loading"} />}
       {members.error && <Button type="button" variant="light" size="sm" onPress={members.retry}>{ru ? "Повторить" : "Retry"}</Button>}
       {members.cursor && <Button type="button" variant="light" size="sm" onPress={members.more}>{ru ? "Ещё" : "More"}</Button>}
-  </PropertyPopover>;
+  </PropertyPopover>);
 }

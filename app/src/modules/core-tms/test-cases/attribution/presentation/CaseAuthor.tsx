@@ -6,10 +6,8 @@ export function CaseAuthor({ caseId }: { caseId: string }) {
   const { workspaceId, offline } = useWorkspacePeople();
   const { locale } = useTmsLocale();
   const author = useCaseAuthor(caseId, workspaceId, offline);
-  return <div>
-    <dt>{locale === "ru" ? "Автор тест-кейса" : "Test case author"}</dt>
-    <dd>{author.loading ? <span aria-busy="true" style={{ display: "block", width: 120, height: 20, borderRadius: 8, background: "var(--control-hover)" }} />
-      : author.author ? <ResponsibleName workspaceId={workspaceId} identityId={author.author} offline={offline} /> : <span>—</span>}
-    </dd>
-  </div>;
+  const label = locale === "ru" ? "Автор тест-кейса" : "Test case author";
+  if (author.loading) return <span role="status" aria-label={label}
+    style={{ display: "block", width: 104, height: 16, borderRadius: 5, background: "var(--falcon-hover)" }} />;
+  return author.author ? <ResponsibleName workspaceId={workspaceId} identityId={author.author} offline={offline} profileLabel={label} /> : null;
 }

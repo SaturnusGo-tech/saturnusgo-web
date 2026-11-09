@@ -6,6 +6,7 @@ import * as model from "../../model/caseListModel";
 import * as fields from "../../model/fields/case-field-filters";
 import * as scope from "../../../../folders/model/selection/folder-scope";
 import * as tree from "../../../../folders/model/tree";
+import * as caseRevision from "../../../../helpers/cases/caseRevision";
 import { formatCount } from "../../../../localization/format/count";
 import { formatCaseEstimate } from "../../model/formatCaseEstimate";
 import type { CasesViewProps } from "../../types";
@@ -58,6 +59,7 @@ export function browserHarness(transition = (update: () => void) => update()) {
     if (name.endsWith("useMemberDirectory")) return { useMemberDirectory: () => ({ members: new Map(), items: [], loading: false, error: false }) };
     if (name.endsWith("folder-scope")) return scope;
     if (name.endsWith("caseListModel")) return model;
+    if (name.endsWith("caseRevision")) return caseRevision;
     if (name.endsWith("case-field-filters")) return fields;
     if (name.endsWith("format/count")) return { formatCount };
     if (name.endsWith("formatCaseEstimate")) return { formatCaseEstimate };

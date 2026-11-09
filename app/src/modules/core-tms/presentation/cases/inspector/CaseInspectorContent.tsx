@@ -21,13 +21,14 @@ import { Requirements } from "../../../product-docs/requirements/Requirements";
 type Props = {
   testCaseId?: string;
   projectId?: string;
+  tagSuggestions?: readonly string[];
   locale: TmsLocale; revision: TestCaseRevision; archived?: boolean; readOnly?: boolean; editor?: CaseInspectorEditor;
   sharedSteps: readonly SharedStepSummary[];
   onResolveSharedStep: (id: string) => Promise<SharedStep | null>;
   onRequestEdit: () => void;
 };
 export function CaseInspectorContent({
-  locale, revision, archived, readOnly: previewOnly, editor, sharedSteps, onResolveSharedStep, onRequestEdit, testCaseId, projectId,
+  locale, revision, archived, readOnly: previewOnly, editor, sharedSteps, onResolveSharedStep, onRequestEdit, testCaseId, projectId, tagSuggestions,
 }: Props) {
   const ru = locale === "ru";
   const [layout, setLayout] = useScenarioLayout();
@@ -105,7 +106,7 @@ export function CaseInspectorContent({
     !readOnly && !linksPending && Boolean(editor) && isInspectorSectionEditing(editorMode, editing, section)
   );
   if (creating && editor) return <CaseCreationSections locale={locale} revision={value}
-    editor={editor} sharedSteps={sharedSteps} onResolveSharedStep={onResolveSharedStep} />;
+    editor={editor} tagSuggestions={tagSuggestions} sharedSteps={sharedSteps} onResolveSharedStep={onResolveSharedStep} />;
   return <div className={`${css.content} ${css.overviewLayout} ${rail.layout}`}>
     <main className={css.primaryColumn}>
       <InspectorSectionView title={ru ? "Описание" : "Description"} {...controls("description")}>
@@ -126,19 +127,19 @@ export function CaseInspectorContent({
           ru={ru} sharedSteps={sharedSteps} onResolveSharedStep={onResolveSharedStep} onPatch={patch} />
       </InspectorSectionView>
     </main>
-    <aside className={css.sideRail} data-case-property-rail aria-label={ru ? "Свойства тест-кейса" : "Test case properties"}>
+    <aside className={`${css.sideRail} ${rail.sideRail}`} data-case-property-rail aria-label={ru ? "Свойства тест-кейса" : "Test case properties"}>
+      <InspectorSectionView title={ru ? "Свойства" : "Properties"} editLabel={ru ? "Изменить свойства" : "Edit properties"} actionsInHeader {...controls("properties")}>
+        <CaseMetadataControls onRequestEdit={requestField("properties")} locale={locale} revision={value} archived={archived} editing={sectionEditing("properties")}
+          autoFocus={!creating} disabled={editor?.submitting || editor?.attachmentsPending} onChange={readOnly ? undefined : editor?.onChange} />
+      </InspectorSectionView>
+      <InspectorSectionView title={ru ? "Дополнительно" : "Additional details"} actionsInHeader {...controls("details")} hideHeading hideEdit>
+        <InspectorDetails tagSuggestions={tagSuggestions} onRequestEdit={requestField("details")} disabled={editor?.submitting || editor?.attachmentsPending} testCaseId={testCaseId} revision={value} editing={sectionEditing("details")} autoFocus={!creating} ru={ru} onPatch={patch}
+          documentation={testCaseId && <Requirements projectId={projectId} subject={{caseId: testCaseId, readOnly, disabled: Boolean(editor)}} ru={ru} />} />
+      </InspectorSectionView>
       <InspectorSectionView title={ru ? "Поля" : "Custom fields"} actionsInHeader {...controls("component")}>
         <CaseCustomFields onRequestEdit={requestField("component")} projectId={editor?.projectId} revision={value} editing={sectionEditing("component")}
           requiredFields={editor?.requiredFields} canCreate={editor?.canCreateFieldValues} disabled={editor?.submitting || editor?.attachmentsPending} ru={ru} onPatch={patch} />
         {sectionEditing("component") && !inlineComponent && editor && <FolderPathPicker value={editor.folderPath} folders={editor.folders} onChange={editor.onFolderPath} ru={ru} disabled={editor.submitting} />}
-      </InspectorSectionView>
-      <InspectorSectionView title={ru ? "Свойства" : "Properties"} editLabel={ru ? "Изменить свойства" : "Edit properties"} actionsInHeader {...controls("properties")}>
-        <CaseMetadataControls onRequestEdit={requestField("properties")} locale={locale} revision={value} archived={archived} editing={sectionEditing("properties")}
-          autoFocus={!creating} disabled={editor?.submitting || editor?.attachmentsPending} showLabels onChange={readOnly ? undefined : editor?.onChange} />
-      </InspectorSectionView>
-      <InspectorSectionView title={ru ? "Дополнительно" : "Additional details"} actionsInHeader {...controls("details")}>
-        <InspectorDetails onRequestEdit={requestField("details")} disabled={editor?.submitting || editor?.attachmentsPending} testCaseId={testCaseId} revision={value} editing={sectionEditing("details")} autoFocus={!creating} ru={ru} onPatch={patch}
-          documentation={testCaseId && <Requirements projectId={projectId} subject={{caseId: testCaseId, readOnly, disabled: Boolean(editor)}} ru={ru} />} />
       </InspectorSectionView>
     </aside>
   </div>;

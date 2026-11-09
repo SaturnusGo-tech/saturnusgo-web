@@ -27,8 +27,9 @@ test("tapping tags opens only tags and retains audit authors", () => {
 });
 test("tapping priority opens only its selector, not every property", () => {
   let edits = 0; let view!: ReactTestRenderer;
-  const props = { locale: "en", revision, showLabels: true, editing: false, onChange: () => {}, onRequestEdit: () => { edits++; } };
+  const props = { locale: "en", revision, editing: false, onChange: () => {}, onRequestEdit: () => { edits++; } };
   act(() => { view = create(<Metadata {...props} />); });
+  assert.equal(byType(view, "dt").length, 0, "properties expose labels through the pickers, not duplicate rows");
   const priority = byType(view, "priority-field")[0];
   assert.ok(priority, "saved priority must be directly editable");
   act(() => { priority.props.onRequestEdit(); view.update(<Metadata {...props} editing />); });

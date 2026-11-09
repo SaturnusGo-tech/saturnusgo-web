@@ -19,6 +19,7 @@ export type CaseDetailPanelProps = {
   selectedFolder: string;
   location?: ReactNode;
   editor?: CaseInspectorEditor;
+  tagSuggestions?: readonly string[];
   canAttach?: boolean;
   readOnly?: boolean;
   onNew: (folder?: string) => void;

@@ -13,6 +13,7 @@ type Props = {
   count?: number;
   headingActions?: React.ReactNode;
   actionsInHeader?: boolean;
+  hideHeading?: boolean;
   disabled?: boolean;
   hideEdit?: boolean;
   onEdit: (section: InspectorSection) => void;
@@ -22,10 +23,13 @@ type Props = {
 };
 
 export function InspectorSectionView(props: Props) {
+  const sectionRef = useRef<HTMLElement>(null);
   const editButton = useRef<HTMLButtonElement>(null);
   const active = props.editing;
   function restoreFocus() {
-    requestAnimationFrame(() => editButton.current?.focus());
+    requestAnimationFrame(() => {
+      (editButton.current ?? sectionRef.current?.querySelector<HTMLButtonElement>("button:not(:disabled)"))?.focus({ preventScroll: true });
+    });
   }
   function cancel() {
     if (props.disabled) return;
@@ -49,7 +53,9 @@ export function InspectorSectionView(props: Props) {
       </button>
     </div>
   );
-  return <section
+  return <section ref={sectionRef}
+    aria-label={props.hideHeading ? props.title : undefined}
+    data-rail-details={props.hideHeading || undefined}
     className={`${css.section} ${props.section === "description" || props.section === "preconditions" ? css.narrativeSection : ""}`}
     data-field-editing={props.actionsInHeader && active ? "" : undefined}
     onKeyDown={(event) => {
@@ -59,8 +65,8 @@ export function InspectorSectionView(props: Props) {
       cancel();
     }}
   >
-    <header>
-      <h3>{props.title}</h3>
+    {(!props.hideHeading || actions) && <header>
+      {!props.hideHeading && <h3>{props.title}</h3>}
       {props.count !== undefined && <span className={css.count}>{props.count}</span>}
       {props.headingActions}
       {!props.hideEdit && !props.persistentEditing && !active && <button
@@ -75,7 +81,7 @@ export function InspectorSectionView(props: Props) {
         <Pencil size={14} />
       </button>}
       {props.actionsInHeader && actions}
-    </header>
+    </header>}
     <div className={css.sectionBody}>{props.children}</div>
     {!props.actionsInHeader && actions}
   </section>;

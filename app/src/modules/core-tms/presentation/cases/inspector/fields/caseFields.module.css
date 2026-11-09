@@ -1,20 +1,13 @@
-.fields { display:flex; flex-direction:column; gap:14px; min-width:0; }
-.field { display:grid; gap:6px; min-width:0; }
-.field>span,.facts dt { color:var(--falcon-text-muted); font-size:12px; }
-.field b { color:var(--falcon-text-secondary); font-weight:500; }
-.facts { margin:0; display:grid; gap:12px; }
-.facts>div { display:grid; gap:4px; min-width:0; }
-.facts dd { margin:0; font-size:13px; overflow-wrap:anywhere; }
-.editing { gap:14px; }
-
-:global([data-case-property-rail]) .editing dd > div > button[aria-haspopup="dialog"] {
-  box-sizing: border-box;
-  min-block-size: 28px;
-  padding-block: 3px;
-}
-
-@media (pointer: coarse) {
-  :global([data-case-property-rail]) .editing dd > div > button[aria-haspopup="dialog"] { min-block-size: 34px; }
+.facts { margin: 0; }
+.field { min-inline-size: 0; max-inline-size: 100%; }
+.field dd { margin: 0; overflow-wrap: anywhere; }
+.visuallyHidden {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .loading, .error { margin: 6px 0; font-size: 12px; line-height: 1.45; }

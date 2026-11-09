@@ -73,11 +73,11 @@ export function CaseCustomFields({ projectId = "", revision, editing, creating =
   }
   function readValue(label: string, value: string, systemKey: CustomFieldSystemKey | null | undefined, key?: string) {
     return <PropertyValue label={label} onEdit={canEdit && key ? () => begin(key) : undefined}>
-      <CustomFieldIcon systemKey={systemKey ?? null} /><span>{value || (ru ? "Не указано" : "Not specified")}</span>
+      <CustomFieldIcon systemKey={systemKey ?? null} fallback /><span>{value}</span>
     </PropertyValue>;
   }
   return <>
-    <dl ref={fieldList} className={`${css.facts} ${rail.readRows}${editing ? ` ${css.editing}` : ""}`}>
+    <dl ref={fieldList} className={`${rail.rows} ${css.facts}`}>
       {rows.map(({ key, definition: field, snapshot, legacy }) => {
         const systemKey = field?.systemKey ?? snapshot?.systemKey ?? legacy;
         const selected = snapshot?.values ?? [];
@@ -88,13 +88,17 @@ export function CaseCustomFields({ projectId = "", revision, editing, creating =
         const explicitlyActive = inlineEdit?.key === key;
         const active = !inlineEdit || explicitlyActive || missing;
         const validationId = missing ? `${errorId}-${key}` : undefined;
-        const text = selected.map(value => customValueLabel(value, ru)).join(", ") || placeholder || "";
-        return <div key={key} className={css.field}><dt>{label}{field?.required && <b aria-label={ru ? "Обязательное поле" : "Required"}> *</b>}</dt><dd>
+        const stored = selected.map(value => customValueLabel(value, ru)).join(", ") || placeholder;
+        const text = systemKey === "regression"
+          ? stored === "true" ? label : (ru ? "Без регресса" : "No regression")
+          : !stored ? label : systemKey ? stored : `${label}: ${stored}`;
+        const display = field?.required && !stored ? `${text} *` : text;
+        return <div key={key} className={css.field}><dt className={css.visuallyHidden}>{label}{field?.required && <b aria-label={ru ? "Обязательное поле" : "Required"}> *</b>}</dt><dd>
           {field && active ? <CustomFieldPicker workspaceId={workspaceId} projectId={projectId} field={field} selected={selected}
             autoOpen={explicitlyActive} invalid={missing} errorId={validationId}
-            canCreate={canCreate} disabled={disabled || offline} placeholder={placeholder}
+            canCreate={canCreate} disabled={disabled || offline} placeholder={placeholder} displayValue={display}
             parentValueId={systemKey === "product" ? revision.productGroupId ?? undefined : undefined}
-            onChange={values => onPatch(updateCaseField(revision, field, values))} /> : readValue(label, text, systemKey, !editing || field || catalog.loading ? key : undefined)}
+            onChange={values => onPatch(updateCaseField(revision, field, values))} /> : readValue(label, display, systemKey, !editing || field || catalog.loading ? key : undefined)}
           {missing && <p role="alert" id={validationId} className={css.error}>
             {ru ? `Выберите значение для поля «${label}».` : `Choose a value for ${label}.`}
           </p>}

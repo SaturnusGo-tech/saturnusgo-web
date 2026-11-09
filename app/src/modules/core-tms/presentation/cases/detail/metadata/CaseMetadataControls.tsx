@@ -1,7 +1,7 @@
 import {
   AlertTriangle, Archive, Ban, Bot, CheckCircle2, CircleDashed, Clock3, Hand, ListChecks,
 } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import type { TestCaseRevision } from "../../../../../../core/tms/contracts/legacy-contract";
 import {
   changeRevisionType,
@@ -23,7 +23,6 @@ type Props = {
   editing: boolean;
   disabled?: boolean;
   autoFocus?: boolean;
-  showLabels?: boolean;
   onRequestEdit?: () => void;
   onChange?: (revision: TestCaseRevision) => void;
 };
@@ -71,9 +70,6 @@ export function CaseMetadataControls(props: Props) {
     } : undefined,
   });
   const active = (field: keyof TestCaseRevision) => props.editing && Boolean(props.onChange) && (activeField === null || activeField === field);
-  const labelled = (label: string, control: ReactNode) => props.showLabels
-    ? <div className={styles.labelledControl}><dt className={styles.controlLabel}>{label}</dt><dd className={styles.controlValue}>{control}</dd></div>
-    : control;
   const requestTypeChange = (type: TestCaseRevision["type"]) => {
     if (discardedProcedureCount(props.revision, type) > 0) setPendingType(type);
     else props.onChange?.(changeRevisionType(props.revision, type));
@@ -81,28 +77,27 @@ export function CaseMetadataControls(props: Props) {
   const discardCount = pendingType
     ? discardedProcedureCount(props.revision, pendingType) : 0;
 
-  const List = props.showLabels ? "dl" : "div";
   const labels = { lifecycle: ru ? "Статус" : "Status", priority: ru ? "Приоритет" : "Priority",
     type: ru ? "Тип" : "Type", estimatedMinutes: ru ? "Оценка" : "Estimate" };
   return <>
-    <List className={`${styles.controls} ${props.showLabels ? rail.readRows : ""}`}>
-      {labelled(labels.lifecycle, <PropertySelect {...controls("lifecycle")} label={labels.lifecycle}
+    <div className={rail.rows}>
+      <PropertySelect {...controls("lifecycle")} label={labels.lifecycle}
         searchLabel={ru ? "Изменить статус…" : "Change status to…"} options={lifecycle}
         value={props.archived ? "archived" : props.revision.lifecycle}
         autoFocus={props.autoFocus && props.editing && !activeField}
-        onChange={active("lifecycle") && !props.archived ? (value) => { if (value !== "archived") update("lifecycle", value); } : undefined} />)}
-      {labelled(labels.priority, <PriorityField {...controls("priority")}
+        onChange={active("lifecycle") && !props.archived ? (value) => { if (value !== "archived") update("lifecycle", value); } : undefined} />
+      <PriorityField {...controls("priority")}
         value={props.revision.priorityAssigned === false ? null : props.revision.priority}
         onChange={active("priority") ? (priority) => props.onChange?.({
           ...props.revision, priority: priority ?? "medium", priorityAssigned: priority !== null,
-        }) : undefined} />)}
-      {labelled(labels.type, <PropertySelect {...controls("type")} label={labels.type}
+        }) : undefined} />
+      <PropertySelect {...controls("type")} label={labels.type}
         searchLabel={ru ? "Изменить тип…" : "Change type to…"} options={type} value={props.revision.type}
-        onChange={active("type") ? requestTypeChange : undefined} />)}
-      {labelled(labels.estimatedMinutes, <PropertySelect {...controls("estimatedMinutes")} label={labels.estimatedMinutes}
+        onChange={active("type") ? requestTypeChange : undefined} />
+      <PropertySelect {...controls("estimatedMinutes")} label={labels.estimatedMinutes}
         searchLabel={ru ? "Изменить оценку…" : "Change estimate to…"} options={estimate} value={rawEstimate}
-        onChange={active("estimatedMinutes") ? (value) => update("estimatedMinutes", value === "none" ? null : Number(value)) : undefined} />)}
-    </List>
+        onChange={active("estimatedMinutes") ? (value) => update("estimatedMinutes", value === "none" ? null : Number(value)) : undefined} />
+    </div>
     {pendingType && <ProductDocModal
       title={ru ? "Сменить тип тест-кейса?" : "Change test case type?"}
       subtitle={ru ? "Процедура другого типа несовместима с новым типом." : "The existing procedure is incompatible with the new type."}

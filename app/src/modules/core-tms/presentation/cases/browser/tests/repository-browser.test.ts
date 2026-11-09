@@ -98,6 +98,9 @@ test("the permanent detail pane shows an empty state until selection and uses th
   app.props.revision = { title: "Transfer accounts" } as typeof app.props.revision;
   result = app.renderView();
   const detail = elements(result, (item) => item.type === "CaseDetailPanel")[0];
+  const tags = detail?.props.tagSuggestions;
+  assert.ok(Array.isArray(tags));
+  assert.deepEqual(Array.from(tags), ["profile", "smoke"]);
   assert.equal(detail.props.testCase, app.props.testCase); assert.equal(detail.props.revision, app.props.revision);
   (detail.props.onClose as () => void)();
   assert.equal(elements(app.renderView(), (item) => item.type === "CaseBrowserEmpty").length, 1);

@@ -37,6 +37,7 @@ export function focusHarness(initialVisible = true) {
       removeEventListener: (name: string) => listeners.delete(name) },
     require(name: string) {
       if (name === "react") return { useEffect: (callback: typeof effect) => { effect = callback; },
+        useMemo: (compute: () => unknown) => compute(),
         useState: (initial: unknown) => [initial, () => {}],
         useRef: (initial: unknown) => ({ current: refs++ === 0 ? panel : refs === 2 ? list : initial }) };
       if (name === "react/jsx-runtime") return { jsx, jsxs: jsx };
