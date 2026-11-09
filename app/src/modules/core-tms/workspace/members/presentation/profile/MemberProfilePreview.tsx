@@ -2,7 +2,6 @@
 
 import { FreeSoloPopover } from "@heroui/popover";
 import { Button } from "@heroui/react";
-import { AnimatePresence, useReducedMotion } from "framer-motion";
 import { Bot, Clock3, SquareUserRound } from "lucide-react";
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { FalconTooltip } from "../../../../presentation/common/tooltip/FalconTooltip";
@@ -20,13 +19,11 @@ type Props = {
   offline?: boolean;
   actor?: WorkspaceActor | null;
   children: ReactNode;
-  hoverOnly?: boolean;
-  disabled?: boolean;
   triggerLabel?: string;
 };
 
 export function MemberProfilePreview({
-  workspaceId, identityId, name, locale, offline, actor, children, hoverOnly, disabled, triggerLabel,
+  workspaceId, identityId, name, locale, offline, actor, children, triggerLabel,
 }: Props) {
   const anchor = useRef<HTMLSpanElement>(null!);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -34,17 +31,9 @@ export function MemberProfilePreview({
   const [pinned, setPinned] = useState(false);
   const [placement, setPlacement] = useState<"left" | "right" | "bottom">("left");
   const cardId = useId();
-  const reducedMotion = useReducedMotion();
-  const isOpen = !disabled && (preview || pinned);
+  const isOpen = preview || pinned;
   const label = locale === "ru" ? `Профиль: ${name}` : `Profile: ${name}`;
 
-  useEffect(() => {
-    if (disabled) {
-      clearTimeout(timer.current);
-      setPreview(false);
-      setPinned(false);
-    }
-  }, [disabled]);
   useEffect(() => () => clearTimeout(timer.current), []);
 
   useLayoutEffect(() => {
@@ -76,7 +65,7 @@ export function MemberProfilePreview({
   }
   function schedulePreview(visible: boolean, delay: number) {
     clearTimeout(timer.current);
-    if (disabled || pinned) return;
+    if (pinned) return;
     timer.current = setTimeout(() => setPreview(visible), delay);
   }
   return <>
@@ -90,7 +79,7 @@ export function MemberProfilePreview({
         const target = document.getElementById(cardId)?.querySelector<HTMLElement>("[data-profile-clock]");
         if (target) { event.preventDefault(); target.focus(); }
       }}>
-      {hoverOnly ? children : <Button type="button" variant="light" disableRipple
+      <Button type="button" variant="light" disableRipple
         className={styles.trigger} aria-label={triggerLabel ?? label} aria-haspopup="dialog"
         aria-expanded={isOpen} aria-controls={isOpen ? cardId : undefined}
         onPress={() => {
@@ -101,21 +90,19 @@ export function MemberProfilePreview({
           }
         }}>
         {children}
-      </Button>}
+      </Button>
     </span>
-    <AnimatePresence>
-      {isOpen && <FreeSoloPopover key={identityId} isOpen disableDialogFocus triggerRef={anchor}
-        placement={placement} shouldFlip offset={8} containerPadding={10} shouldBlockScroll={false} disableAnimation={Boolean(reducedMotion)}
-        classNames={{ base: styles.positioner, content: styles.surface }}
-        dialogProps={{ "aria-label": label }} onOpenChange={(next) => { if (!next) close(); }}>
-        <div id={cardId} className={styles.card}
-          onPointerEnter={(event) => { if (event.pointerType !== "touch") schedulePreview(true, 0); }}
-          onPointerLeave={(event) => { if (event.pointerType !== "touch") schedulePreview(false, 140); }}>
-          <MemberProfileContent workspaceId={workspaceId} identityId={identityId} name={name} locale={locale}
-            offline={offline} actor={actor} />
-        </div>
-      </FreeSoloPopover>}
-    </AnimatePresence>
+    {isOpen && <FreeSoloPopover key={identityId} isOpen disableDialogFocus disableAnimation triggerRef={anchor}
+      placement={placement} shouldFlip offset={8} containerPadding={10} shouldBlockScroll={false}
+      classNames={{ base: styles.positioner, content: styles.surface }}
+      dialogProps={{ "aria-label": label }} onOpenChange={(next) => { if (!next) close(); }}>
+      <div id={cardId} className={styles.card}
+        onPointerEnter={(event) => { if (event.pointerType !== "touch") schedulePreview(true, 0); }}
+        onPointerLeave={(event) => { if (event.pointerType !== "touch") schedulePreview(false, 140); }}>
+        <MemberProfileContent workspaceId={workspaceId} identityId={identityId} name={name} locale={locale}
+          offline={offline} actor={actor} />
+      </div>
+    </FreeSoloPopover>}
   </>;
 }
 
@@ -145,7 +132,7 @@ function useMemberLocalTime(locale: TmsLocale, timeZone?: string | null) {
   return formatter?.format(now);
 }
 
-function MemberProfileContent({ workspaceId, identityId, name, locale, offline, actor }: Omit<Props, "children" | "hoverOnly" | "disabled" | "triggerLabel">) {
+function MemberProfileContent({ workspaceId, identityId, name, locale, offline, actor }: Omit<Props, "children" | "triggerLabel">) {
   const { actor: resolved } = useWorkspaceActor(workspaceId, identityId, offline,
     actor?.kind === "agent" ? actor : undefined, { includeSignIn: true });
   const member = resolved ?? actor;

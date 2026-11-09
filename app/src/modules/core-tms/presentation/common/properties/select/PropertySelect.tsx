@@ -41,7 +41,8 @@ export function PropertyPopover({
   narrow?: boolean;
 }) {
   const button = useRef<HTMLButtonElement>(null);
-  return <Popover placement={placement} offset={4} isOpen={open && !disabled} onOpenChange={onOpenChange}
+  // HeroUI’s retained exit can flash at full opacity just before unmounting.
+  return <Popover disableAnimation placement={placement} offset={4} isOpen={open && !disabled} onOpenChange={onOpenChange}
     shouldBlockScroll={false} classNames={{ base: styles.positioner, content: narrow ? `${styles.popover} ${styles.narrowMenu}` : styles.popover }}>
     <PopoverTrigger><Button ref={button} type="button" variant="light" className={styles.trigger}
       autoFocus={autoFocus} isDisabled={disabled} data-compact={compact || undefined} aria-label={triggerLabel ?? label}
@@ -52,7 +53,7 @@ export function PropertyPopover({
         event.preventDefault();
         event.stopPropagation();
         onOpenChange(false);
-        button.current?.focus({ preventScroll: true });
+        requestAnimationFrame(() => button.current?.focus({ preventScroll: true }));
       } else onMenuKeyDown?.(event);
     }}>{children}</PopoverContent>
   </Popover>;

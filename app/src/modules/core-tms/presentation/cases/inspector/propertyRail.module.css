@@ -96,6 +96,11 @@
 .additionalInput [data-editor-shell][data-appearance="plain"] > div > textarea { height: 28px; min-height: 28px; padding: 4px var(--case-details-input-inset); }
 .additionalInput [data-editor-shell][data-appearance="plain"] > div:has(> button) { min-height: 24px; padding: 0 5px; }
 
+.noteTooltip {
+  max-inline-size: min(280px, calc(100vw - 24px));
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
 .noteWrapper {
   height: auto;
   min-height: 29px;

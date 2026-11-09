@@ -13,12 +13,13 @@ export function ResponsibleName({ workspaceId, identityId, offline = false, prof
     : member.loading ? (locale === "ru" ? "Загрузка…" : "Loading…")
     : member.name ?? (locale === "ru" ? "Участник недоступен" : "Member unavailable");
   if (member.loading) return <span role="status" aria-label={label} style={{ display: "inline-block", width: 120, height: 24, borderRadius: 8, background: "var(--control-hover)" }} />;
+  const profileName = profileLabel && identityId ? member.name : null;
   const display = <span data-case-member-name={profileLabel ? "" : undefined} style={{ display: "inline-flex", alignItems: "center", gap: 7, minWidth: 0 }}>
     <MemberAvatar workspaceId={workspaceId} actor={member.actor} identityId={identityId} name={member.name ?? ""} offline={offline} />
-    <span title={label}>{label}</span>
+    <span title={profileName ? undefined : label}>{label}</span>
   </span>;
-  return profileLabel && identityId && member.name
-    ? <MemberProfilePreview workspaceId={workspaceId} identityId={identityId} name={member.name} locale={locale}
-      actor={member.actor} offline={offline} triggerLabel={`${profileLabel}, ${member.name}`}>{display}</MemberProfilePreview>
+  return identityId && profileName
+    ? <MemberProfilePreview workspaceId={workspaceId} identityId={identityId} name={profileName} locale={locale}
+      actor={member.actor} offline={offline} triggerLabel={`${profileLabel}, ${profileName}`}>{display}</MemberProfilePreview>
     : display;
 }
