@@ -310,7 +310,7 @@ export default {
       const verified = await verifyCompanyDocument(request, env, audience);
       if (!verified.ok) return secureResponse(unavailableCompanyDocument(verified.status, request.method === "HEAD"), true);
       if (!verified.authOnly && incoming.hostname !== TMS_HOST && ["/", "/login/", "/login", "/signup/", "/signup", "/cloud-login/", "/cloud-login"].includes(incoming.pathname)) {
-        if (audience === "platform") {
+        if (audience === "platform" && publicAuthEnabled(TMS_HOST, env)) {
           const invitation = redirectLegacyCompanyInvitation(incoming, env);
           if (invitation) return invitation;
         }

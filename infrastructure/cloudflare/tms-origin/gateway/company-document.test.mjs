@@ -58,7 +58,8 @@ test("company root directs to its workspace; the operator root directs to Sandbo
 });
 
 test("verified Sandbox routes legacy employee invitations to central company sign-in", async (t) => {
-  const platform = env.FALCON_PLATFORM_HOSTNAME;
+  const invitationEnv = { ...env, FALCON_PUBLIC_AUTH_ENABLED: "true" };
+  const platform = invitationEnv.FALCON_PLATFORM_HOSTNAME;
   let calls = 0;
   replaceFetch(t, async (request) => {
     calls++;
@@ -73,7 +74,7 @@ test("verified Sandbox routes legacy employee invitations to central company sig
   ]) {
     const result = await worker.fetch(new Request(`https://${platform}${path}?${query}`, {
       method, headers: { cookie: "__Host-falcon_platform_session=fixture" },
-    }), env);
+    }), invitationEnv);
     assert.equal(result.status, 302);
     assert.equal(result.headers.get("location"), `https://tms.saturnusgo.com/cloud-login/?${expected}`);
     assert.equal(result.headers.has("set-cookie"), false);
@@ -84,7 +85,8 @@ test("verified Sandbox routes legacy employee invitations to central company sig
 });
 
 test("unverified hosts, ordinary Sandbox routes and invalid invitation hints keep their original handling", async (t) => {
-  const platform = env.FALCON_PLATFORM_HOSTNAME;
+  const invitationEnv = { ...env, FALCON_PUBLIC_AUTH_ENABLED: "true" };
+  const platform = invitationEnv.FALCON_PLATFORM_HOSTNAME;
   let available = true;
   replaceFetch(t, async (request) => {
     const url = new URL(request.url);
@@ -101,27 +103,29 @@ test("unverified hosts, ordinary Sandbox routes and invalid invitation hints kee
     `company=${host.replace("-falcon", "%0A-falcon")}`, `company=${host}&company=${host}`,
     `company=${host}&lang=de`, `company=${host}&lang=en&lang=ru`,
   ]) {
-    const result = await worker.fetch(new Request(`https://${platform}/cloud-login/?${query}`), env);
+    const result = await worker.fetch(new Request(`https://${platform}/cloud-login/?${query}`), invitationEnv);
     assert.equal(result.headers.get("location"), `https://${platform}/sandbox/?${query}`, query);
   }
   const query = `company=${host}&lang=en`;
+  const isolated = await worker.fetch(new Request(`https://${platform}/cloud-login/?${query}`), env);
+  assert.equal(isolated.headers.get("location"), `https://${platform}/sandbox/?${query}`);
   for (const path of ["/", "/login/", "/signup/"]) {
-    const result = await worker.fetch(new Request(`https://${platform}${path}?${query}`), env);
+    const result = await worker.fetch(new Request(`https://${platform}${path}?${query}`), invitationEnv);
     assert.equal(result.headers.get("location"), `https://${platform}/sandbox/?${query}`, path);
   }
   for (const path of [`/sandbox/?${query}`, "/admin/?lang=en"]) {
-    const result = await worker.fetch(new Request(`https://${platform}${path}`), env);
+    const result = await worker.fetch(new Request(`https://${platform}${path}`), invitationEnv);
     assert.equal(result.status, 200, path);
     assert.equal(result.headers.has("location"), false, path);
   }
-  const tenant = await worker.fetch(new Request(`https://${host}/cloud-login/?${query}`), env);
+  const tenant = await worker.fetch(new Request(`https://${host}/cloud-login/?${query}`), invitationEnv);
   assert.equal(tenant.headers.get("location"), `https://${host}/work/?${query}`);
-  const post = await worker.fetch(new Request(`https://${platform}/cloud-login/?${query}`, { method: "POST" }), env);
+  const post = await worker.fetch(new Request(`https://${platform}/cloud-login/?${query}`, { method: "POST" }), invitationEnv);
   assert.equal(post.status, 404);
-  const lookalike = await worker.fetch(new Request(`https://${platform}.outside.example/cloud-login/?${query}`), env);
+  const lookalike = await worker.fetch(new Request(`https://${platform}.outside.example/cloud-login/?${query}`), invitationEnv);
   assert.equal(lookalike.status, 404);
   available = false;
-  const unavailable = await worker.fetch(new Request(`https://${platform}/cloud-login/?${query}`), env);
+  const unavailable = await worker.fetch(new Request(`https://${platform}/cloud-login/?${query}`), invitationEnv);
   assert.equal(unavailable.status, 404);
   assert.equal(unavailable.headers.has("location"), false);
 });
