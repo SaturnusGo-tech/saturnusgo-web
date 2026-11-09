@@ -23,10 +23,8 @@
 .actions .primary { color: var(--falcon-on-action); background: var(--falcon-action); border-color: var(--falcon-action); }
 .actions .primary:hover { background: var(--falcon-action-hover); border-color: var(--falcon-action-hover); }
 .actions button:disabled { cursor: default; opacity: .5; }
-.spin { animation: project-saving 800ms linear infinite; }
-@keyframes project-saving { to { transform: rotate(360deg); } }
 @media (max-width: 520px) { .panel.panel { border-radius: 20px; width: calc(100vw - 24px); } .body { padding-inline: 18px; } .identityFields { grid-template-columns: 1fr; gap: 18px; } .actions { padding-inline: 18px; } }
-@media (prefers-reduced-motion: reduce) { .field input, .field textarea { transition: none; } .spin { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .field input, .field textarea { transition: none; } }
 
 .note { display: flex; gap: 9px; align-items: center; margin: 0; color: var(--falcon-text-muted); font-size: 12px; line-height: 1.6; }
 .note svg { flex-shrink: 0; }

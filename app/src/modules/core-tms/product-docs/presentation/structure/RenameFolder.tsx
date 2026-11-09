@@ -1,13 +1,13 @@
 "use client";
 
+import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { Button, Input } from "@heroui/react";
 import { ProductDocTooltip } from "../overlay/ProductDocTooltip";
-import { Check, LoaderCircle, X } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { useRef, useState, type FormEvent } from "react";
 import repository from "../../../folders/presentation/structure/structure.module.css";
 import type { ProductDocNode, ProductDocsApi, ProductDocScope } from "../../domain/product-docs";
 import type { ProductDocsCopy } from "../../localization/copy";
-import shared from "../product-docs.module.css";
 import styles from "./structure.module.css";
 
 export function RenameFolder({ api, scope, copy, node, onSaved, onClose }: {
@@ -57,7 +57,7 @@ export function RenameFolder({ api, scope, copy, node, onSaved, onClose }: {
       autoFocus onFocus={(event) => event.currentTarget.select()} onValueChange={setTitle} />
     <ProductDocTooltip label={copy.saveName}><Button size="sm" isIconOnly type="submit" className={repository.add} aria-label={copy.saveName}
       isDisabled={saving || !title.trim() || title.trim() === node.title}>
-      {saving ? <LoaderCircle size={15} className={shared.loadingIcon} aria-hidden="true" /> : <Check size={15} aria-hidden="true" />}
+      {saving ? <LoadingOrb /> : <Check size={15} aria-hidden="true" />}
     </Button></ProductDocTooltip>
     <ProductDocTooltip label={copy.cancel}><Button size="sm" isIconOnly type="button" className={repository.add} aria-label={copy.cancel} isDisabled={saving} onPress={onClose}>
       <X size={15} aria-hidden="true" />

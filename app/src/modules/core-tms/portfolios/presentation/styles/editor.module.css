@@ -32,10 +32,8 @@
 .headerActions button { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 1px solid var(--line-strong); border-radius: 50%; background: transparent; color: var(--ink); cursor: pointer; }
 .headerActions button[data-save-organization] { background: var(--falcon-action); color: var(--falcon-on-action); border-color: var(--falcon-border); }
 .headerActions svg { width: 19px; height: 19px; }
-.spin { animation: editor-spin 900ms linear infinite; }
-@keyframes editor-spin { to { transform: rotate(360deg); } }
 @media (max-width:600px) { .property { grid-template-columns: 110px minmax(0, 1fr); } }
-@media (prefers-reduced-motion:reduce) { .spin { animation: none; } .markdownFrame, .titleField input { transition: none; } }
+@media (prefers-reduced-motion:reduce) { .markdownFrame, .titleField input { transition: none; } }
 .note { margin: -7px 0 23px; color: var(--muted); font-size: 11px; line-height: 1.7; }
 .note code { font: inherit; white-space: nowrap; }
 @media(max-width:700px) { .titleField { min-width: 0; } .mainFields { gap: 20px; } }

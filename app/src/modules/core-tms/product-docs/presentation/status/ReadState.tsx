@@ -1,4 +1,4 @@
-import { LoaderCircle } from "lucide-react";
+import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import type { ProductDocsCopy } from "../../localization/copy";
 import styles from "../product-docs.module.css";
 
@@ -8,7 +8,7 @@ export function ReadState({ copy, status, retry }: {
   retry(): void;
 }) {
   if (status === "loading") return <div className={styles.readState} role="status">
-    <LoaderCircle size={18} className={styles.loadingIcon} aria-hidden="true" />
+    <LoadingOrb size="md" />
     <span>{copy.loading}</span>
   </div>;
 

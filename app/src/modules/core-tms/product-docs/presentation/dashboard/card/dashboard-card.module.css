@@ -62,12 +62,8 @@
 }
 .state[data-overlay="false"] { inset: 50% auto auto 50%; transform: translate(-50%, -50%); }
 .state button { color: var(--falcon-text); text-decoration: underline; text-underline-offset: 3px; }
-.spinner { display: inline-grid; flex: none; }
-.spinner svg { width: 14px; height: 14px; animation: spin .85s linear infinite; }
-.spinner svg circle { opacity: .25; }
-@keyframes spin { to { transform: rotate(1turn); } }
 @media (prefers-reduced-motion: reduce) {
-  .spinner svg, .skeleton { animation: none; }
+  .skeleton { animation: none; }
   .segments .segment { transition: none; }
 }
 @media (max-width: 440px) {

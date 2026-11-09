@@ -1,4 +1,5 @@
-import { FileUp, Folder, LoaderCircle } from "lucide-react";
+import { LoadingOrb } from "../../../../../../../shared/components/loading/LoadingOrb";
+import { FileUp, Folder } from "lucide-react";
 import { useRef, useState } from "react";
 import type { Project } from "../../../../../../../core/tms/contracts/legacy-contract";
 import { AnimatedSelect } from "../../../../../presentation/common/select/AnimatedSelect";
@@ -44,7 +45,7 @@ export function ImportComposer({ state, projects, projectId, onProjectChange, ru
       </div>
       {showImportAction && <div className={css.importAction}>{state.busy && <button type="button" className={css.link} onClick={state.stop}>{copy.stop}</button>}
         <button type="button" className={css.primary} disabled={!canStart} onClick={() => void state.start()}>
-          {state.busy && <LoaderCircle size={16} className={css.spin} />}{state.locked && !state.busy ? copy.retry : copy.start}</button></div>}
+          {state.busy && <LoadingOrb />}{state.locked && !state.busy ? copy.retry : copy.start}</button></div>}
     </div>
   </div>;
 }

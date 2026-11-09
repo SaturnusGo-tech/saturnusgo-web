@@ -154,7 +154,6 @@
 .pickerListItems .pickerOption[aria-disabled="true"] { opacity: .5; }
 .pickerMessage { display: flex; align-items: center; gap: 8px; margin: 0; padding: 8px 9px; color: var(--falcon-text-secondary); font-size: 13px; }
 .pickerMessage[role="alert"] { color: var(--falcon-danger); }
-.pickerSpinner { width: 14px; height: 14px; color: var(--falcon-icon); }
 .pickerStep .pickerAction {
   justify-self: start;
   display: inline-flex;

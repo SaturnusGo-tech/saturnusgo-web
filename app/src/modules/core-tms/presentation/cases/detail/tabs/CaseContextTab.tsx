@@ -1,4 +1,5 @@
-import { Button, Link, Spinner } from "@heroui/react";
+import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
+import { Button, Link } from "@heroui/react";
 import { ExternalLink } from "lucide-react";
 import type {
   Activity,
@@ -85,7 +86,7 @@ export function CaseContextTab(props: Props) {
       </Link>)}
     </div>}
     {(comments.status === "loading" || comments.refreshing) && <p role="status" className={styles.status}>
-      <Spinner size="sm" className={styles.spinner} aria-hidden="true" />
+      <LoadingOrb />
       {ru ? "Загружаем вложения из комментариев…" : "Loading attachments from comments…"}
     </p>}
     {(comments.status === "error" || comments.refreshFailed) && <div className={styles.status}>

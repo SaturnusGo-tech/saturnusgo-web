@@ -30,8 +30,5 @@
 .choice small { color: var(--muted); font-size: 11px; }
 .choice input { accent-color: var(--action); width: 15px; height: 15px; }
 .loadMore { align-self: center; }
-.spin { animation: portfolio-saving 900ms linear infinite; }
 .srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-@keyframes portfolio-saving { to { transform: rotate(360deg); } }
 @media (max-width: 520px) { .panel.panel { width: calc(100vw - 24px); } .body { padding-inline: 19px; } .footer { padding-inline: 19px; } }
-@media (prefers-reduced-motion: reduce) { .spin { animation: none; } }

@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingOrb } from "../../../../../../../shared/components/loading/LoadingOrb";
 import { Button, Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
 import { useReducedMotion } from "framer-motion";
 import { ExternalLink, X } from "lucide-react";
@@ -137,7 +138,7 @@ export function ProductDocCodexAction({ scope, locale, disabled }: { scope: Prod
           {ru ? "Проверить снова" : "Retry"}
         </Button>}
       </div>
-      <Button className={styles.primary} isDisabled={disabled || status === "checking"} isLoading={opening}
+      <Button className={styles.primary} isDisabled={disabled || status === "checking"} isLoading={opening} spinner={<LoadingOrb />}
         onPress={status === "unknown" ? openSetup : openCodex}>
         {status === "unknown" ? (ru ? "Плагин Falcon" : "Falcon plugin") : label}
       </Button>

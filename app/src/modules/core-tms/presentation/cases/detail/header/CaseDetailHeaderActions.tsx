@@ -1,3 +1,4 @@
+import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
 import {
   Archive, Bug, Check, Copy, Files, Link2, Maximize2, Minimize2,
@@ -167,7 +168,7 @@ export function CaseDetailHeaderActions(props: Props) {
           <div className={overlays.confirmActions}>
             <Button type="button" size="sm" variant="light" disableRipple autoFocus isDisabled={archivePending}
               onPress={dismiss}>{ru ? "Отмена" : "Cancel"}</Button>
-            <Button type="button" size="sm" disableRipple isLoading={archivePending} className={overlays.confirm}
+            <Button type="button" size="sm" disableRipple isLoading={archivePending} spinner={<LoadingOrb />} className={overlays.confirm}
               onPress={() => void confirmArchive(dismiss)}>{restoring ? (ru ? "Восстановить" : "Restore") : (ru ? "В карантин" : "Move to quarantine")}</Button>
           </div>
         </>}

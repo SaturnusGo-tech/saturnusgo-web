@@ -26,8 +26,6 @@
 .microphoneHint { position: absolute; right: -38px; bottom: calc(100% + 10px); width: max-content; max-width: min(260px, calc(100vw - 70px)); padding: 9px 11px; z-index: 1; background: var(--writing-bg); color: var(--writing-ink); border: 1px solid var(--writing-line); border-radius: 9px; box-shadow: var(--falcon-shadow); font-size: 11px; line-height: 1.5; pointer-events: none; visibility: hidden; opacity: 0; transition: opacity .15s ease; }
 .microphoneWrap:hover .microphone:not([data-active]) + .microphoneHint, .microphone:focus-visible:not([data-active]) + .microphoneHint { visibility: visible; opacity: 1; }
 .dictationStatus { color: var(--writing-muted); font-size: 12px; line-height: 1.5; margin: 9px 0 0; }
-.spinner { animation: microphoneSpin 1s linear infinite; }
-@keyframes microphoneSpin { to { transform: rotate(360deg); } }
 .prompt .send { width: 30px; min-height: 30px; padding: 5px; color: var(--falcon-on-action); background: var(--falcon-action); border-radius: 50%; }
 .prompt .send:hover:not(:disabled), .footer .apply:hover { background: var(--falcon-action-hover); }
 .shortcuts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
@@ -42,4 +40,4 @@
 .loadingFooter { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; color: var(--writing-muted); }
 .loadingFooter button { background: transparent; }
 @keyframes shimmer { to { background-position: -250% 0; } }
-@media (prefers-reduced-motion: reduce) { .loading > span, .spinner { animation: none; }.panel button, .prompt, .microphoneHint { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .loading > span { animation: none; } .panel button, .prompt, .microphoneHint { transition: none; } }

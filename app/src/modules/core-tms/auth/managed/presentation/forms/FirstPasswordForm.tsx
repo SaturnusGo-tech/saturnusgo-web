@@ -1,7 +1,8 @@
 "use client";
 
+import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
 import { useState } from "react";
-import { LockKeyhole, LoaderCircle } from "lucide-react";
+import { LockKeyhole } from "lucide-react";
 import type { AccessCopy } from "../copy/access-copy";
 import { AccessField } from "../fields/AccessField";
 import styles from "../screen/access.module.css";
@@ -28,6 +29,6 @@ export function FirstPasswordForm({ copy, pending, onSubmit }: {
     {mismatch && <p className={styles.error} role="alert">{copy.passwordMismatch}</p>}
     <span className={styles.passwordHint}>{copy.passwordHint}</span>
     <button type="submit" className={styles.primary} disabled={pending}>{copy.savePassword}
-      {pending && <LoaderCircle size={17} className={styles.spinner} />}</button>
+      {pending && <LoadingOrb />}</button>
   </form>;
 }

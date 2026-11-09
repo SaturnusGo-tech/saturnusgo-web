@@ -1,4 +1,5 @@
-import { CheckCircle2, ChevronRight, LoaderCircle } from "lucide-react";
+import { LoadingOrb } from "../../../../../../../shared/components/loading/LoadingOrb";
+import { CheckCircle2, ChevronRight } from "lucide-react";
 import type { useImportCases } from "../../../state/import/use-import-cases";
 import { importCopy } from "../../../localization/import-copy";
 import { ImportPreviewTree } from "../../../presentation/ImportPreviewTree";
@@ -12,7 +13,7 @@ export function ImportProgress({ state, ru }: { state: ReturnType<typeof useImpo
     : state.phase === "success" ? copy.complete : state.phase === "partial" ? copy.partial : state.phase === "stopped" ? copy.stopped
     : state.phase === "loading" ? copy.loading : state.phase === "reading" ? copy.reading : "";
   return <div className={css.progressArea}>
-    {status && <p className={css.message} role="status">{state.phase === "success" ? <CheckCircle2 className={css.success} size={18} /> : (state.busy || state.phase === "loading" || state.phase === "reading") && <LoaderCircle size={18} className={css.spin} />}
+    {status && <p className={css.message} role="status">{state.phase === "success" ? <CheckCircle2 className={css.success} size={18} /> : (state.busy || state.phase === "loading" || state.phase === "reading") && <LoadingOrb size="md" />}
       <span>{status}{["importing", "partial", "success", "stopped"].includes(state.phase) && ` · ${state.completed} / ${state.document?.testCases.length ?? 0}`}</span></p>}
     {state.phase === "importing" && <progress value={state.attempted} max={state.document?.testCases.length || 1} aria-label={copy.processed} />}
     {state.error && <p className={css.error} role="alert">{state.error}</p>}

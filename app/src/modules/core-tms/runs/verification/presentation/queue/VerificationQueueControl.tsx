@@ -1,4 +1,5 @@
-import { ChevronLeft, Loader2, Play, RotateCcw, X } from "lucide-react";
+import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
+import { ChevronLeft, Play, RotateCcw, X } from "lucide-react";
 import { useLayoutEffect, useRef } from "react";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import type { WorkspaceVerification } from "../../state/workspace/useWorkspaceVerification";
@@ -38,7 +39,7 @@ export function VerificationQueueControl({ state, workspaceId }: { state: Worksp
         disabled={Boolean(state.disabledReason) || state.pendingStart || (state.pending && !state.unresolved)}
         title={state.disabledReason || startTitle}
         aria-busy={state.pendingStart || undefined} onClick={() => { void state.start(); }}>
-        {state.pendingStart ? <Loader2 size={14} className={css.spinner} aria-hidden="true" />
+        {state.pendingStart ? <LoadingOrb />
           : state.unresolved ? <RotateCcw size={14} aria-hidden="true" /> : <Play size={14} aria-hidden="true" />}
         <span>{label}</span>
       </button>

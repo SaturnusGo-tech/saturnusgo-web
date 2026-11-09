@@ -1,6 +1,7 @@
 "use client";
 
-import { Button, Spinner } from "@heroui/react";
+import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
+import { Button } from "@heroui/react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { PDFDocumentProxy } from "pdfjs-dist";
 import { useEffect, useRef, useState } from "react";
@@ -65,7 +66,7 @@ export function ProductDocPdfPreview({ url, filename, ru, expanded, onDocument }
   return <div className={styles.pdf} data-expanded={expanded || undefined}>
     <div className={styles.pdfViewport} ref={viewport} aria-busy={ready !== number || undefined}>
       <div className={styles.paper} ref={paper} role="img" aria-label={`${filename}, ${pageLabel}`} />
-      {ready !== number && <span className={styles.pdfLoading} role="status"><Spinner size="sm" aria-label={ru ? "Загрузка страницы" : "Loading page"} /></span>}
+      {ready !== number && <span className={styles.pdfLoading} role="status" aria-label={ru ? "Загрузка страницы" : "Loading page"}><LoadingOrb size="md" /></span>}
     </div>
     {pdf && pdf.numPages > 1 && <div className={styles.pager}>
       <Button size="sm" isIconOnly variant="light" isDisabled={number === 1} onPress={() => changePage(-1)}

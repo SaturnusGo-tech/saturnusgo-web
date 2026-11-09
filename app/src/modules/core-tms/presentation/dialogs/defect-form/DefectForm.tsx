@@ -1,5 +1,5 @@
+import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { Input } from "@heroui/react";
-import { LoaderCircle } from "lucide-react";
 import { useEffect, useId, useRef, useState, type FormEvent, type MutableRefObject } from "react";
 import { DefectPageHost } from "./page/DefectPageHost";
 import { FormError } from "../../common/error/FormError";
@@ -45,7 +45,7 @@ export function DefectForm(props: Props) {
       <header><div><h1 id={`${id}-heading`}>{copy.title}</h1>{props.context && <p>{props.context}</p>}</div>
         <div className={css.actions}><button type="button" className={css.cancel} disabled={submitting || closing} onClick={props.onClose}>{copy.cancel}</button>
           <button className={css.save} type="submit" form={id} disabled={submitting || closing}
-            data-testid="create-defect">{submitting && <LoaderCircle className={css.spinner} size={16}/>} {submitting ? copy.creating : copy.create}</button></div>
+            data-testid="create-defect">{submitting && <LoadingOrb />} {submitting ? copy.creating : copy.create}</button></div>
       </header>
     <form id={id} className={css.form} onSubmit={submit} noValidate aria-busy={submitting}
       data-testid={value.reproduction !== undefined ? "inline-defect-composer" : "defect-composer"}

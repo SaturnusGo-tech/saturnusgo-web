@@ -1,6 +1,7 @@
 "use client";
 
-import { addToast, Button, Modal, ModalContent, ModalHeader, Spinner } from "@heroui/react";
+import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
+import { addToast, Button, Modal, ModalContent, ModalHeader } from "@heroui/react";
 import { X } from "lucide-react";
 import { useContext, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import type { WidgetDefinition } from "../../../../dashboards/layout/model/widget-catalog";
@@ -100,7 +101,7 @@ function DashboardPickerContent({ capture, onChoose, onClose, onExited }: Picker
           onSelect={setPeriodKey} />
       </div>
       <div className={styles.status} role="status" aria-label={status} data-refreshing={previews.refreshing && !busy || undefined}>
-        {status && <Spinner size="sm" color="current" variant="simple" aria-hidden="true" />}
+        {status && <LoadingOrb />}
       </div>
       <Button disableRipple isIconOnly variant="light" size="sm" className={styles.close} aria-label={close} title={close} onPress={onClose}>
         <X size={17} aria-hidden="true" />

@@ -1,4 +1,5 @@
-import { ArrowRotateCw, Plus, Settings } from "@openai/apps-sdk-ui/components/Icon";
+import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
+import { Plus, Settings } from "@openai/apps-sdk-ui/components/Icon";
 import { useEffect, useRef } from "react";
 import css from "./plugin-install.module.css";
 
@@ -29,7 +30,7 @@ export function PluginInstallAction({ installed, installing, disabled, ru, onIns
       <button type="button" ref={install} className={css.action} data-hidden={installed} aria-hidden={installed}
         aria-busy={installing} tabIndex={installed ? -1 : 0} disabled={disabled || installing || installed}
         onFocus={() => { handoff.current = true; }} onClick={() => { if (!disabled && !installing && !installed) onInstall(); }}>
-        {installing ? <ArrowRotateCw className={css.spinner} width={17} height={17} aria-hidden="true" /> : <Plus width={17} height={17} aria-hidden="true" />}
+        {installing ? <LoadingOrb /> : <Plus width={17} height={17} aria-hidden="true" />}
         {installing ? (ru ? "Установка…" : "Installing…") : (ru ? "Установить плагин" : "Install plugin")}
       </button>
       <button type="button" ref={manage} className={css.action} data-hidden={!installed} aria-hidden={!installed}

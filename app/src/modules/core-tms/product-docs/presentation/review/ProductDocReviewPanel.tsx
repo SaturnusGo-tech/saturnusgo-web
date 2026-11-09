@@ -1,4 +1,5 @@
-import { addToast, Alert, Button, Spinner } from "@heroui/react";
+import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
+import { addToast, Alert, Button } from "@heroui/react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowLeft, X } from "lucide-react";
 import { useLayoutEffect, useRef, useState, type RefObject } from "react";
@@ -74,8 +75,7 @@ export function ProductDocReviewPanel({ reviews, target, source, copy, locale, p
       </header>
       {reviews.error && <Alert color="danger" isVisible description={productDocReviewError(copy, reviews.error)}
         classNames={{ base: styles.error, iconWrapper: styles.alertIcon }} />}
-      {loading && <Spinner role="status" variant="simple" label={copy.loading}
-        classNames={{ base: styles.loading, wrapper: styles.spinner, circle1: styles.spinnerTrack }} />}
+      {loading && <div className={styles.loading} role="status"><LoadingOrb />{copy.loading}</div>}
       {reviews.resource.status === "error" && <Alert color="danger" isVisible description={copy.loadError}
         classNames={{ base: styles.error, iconWrapper: styles.alertIcon }}
         endContent={<Button className={styles.textButton} onPress={reviews.resource.retry}>{copy.retry}</Button>} />}

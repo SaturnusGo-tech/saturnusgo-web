@@ -21,15 +21,6 @@
   box-shadow: 0 34px 100px rgba(0, 0, 0, 0.34);
 }
 
-.spinner {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: 4px solid rgba(17, 21, 15, 0.12);
-  border-top-color: #11150f;
-  animation: spin 860ms linear infinite;
-}
-
 .title {
   margin: 0;
   font-size: 24px;
@@ -64,14 +55,4 @@
 .buttonSecondary {
   background: transparent;
   color: #11150f;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .spinner {
-    animation: none;
-  }
 }

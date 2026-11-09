@@ -1,4 +1,5 @@
-import { Download, ExternalLink, LoaderCircle, Smartphone } from "lucide-react";
+import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
+import { Download, ExternalLink, Smartphone } from "lucide-react";
 import type { RunPlatformBuild } from "../../model/platform-build";
 import { useRunBuildDownload } from "../../state/download/useRunBuildDownload";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
@@ -19,7 +20,7 @@ function AndroidBuild({ build, ru, disabled }: { build: Extract<RunPlatformBuild
   return <div className={css.download}>
     <button type="button" className={css.build} onClick={() => void download()} disabled={disabled || pending}
       title={label} aria-label={`${ru ? "Скачать сборку" : "Download build"}: ${label}`} aria-busy={pending}>
-      {pending ? <LoaderCircle className={css.spinner} size={15} aria-hidden="true" /> : <Download size={15} aria-hidden="true" />}
+      {pending ? <LoadingOrb /> : <Download size={15} aria-hidden="true" />}
       <span>{label}</span>
     </button>
     {error && <span className={css.error} role="alert">{error}</span>}

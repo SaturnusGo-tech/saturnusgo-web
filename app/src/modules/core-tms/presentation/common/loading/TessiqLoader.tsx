@@ -1,16 +1,19 @@
+import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { ContentSkeleton } from "../skeleton/ContentSkeleton";
 import styles from "../../../tms.module.css";
 
 export function TessiqLoader({
   label,
   pane = false,
+  branded = false,
   testId = "tessiq-loading",
 }: {
   label: string;
   pane?: boolean;
+  branded?: boolean;
   testId?: string;
 }) {
-  if (pane) return <ContentSkeleton label={label} testId={testId} />;
+  if (pane && !branded) return <ContentSkeleton label={label} testId={testId} />;
   return (
     <section
       className={`${styles.tessiqLoader} ${pane ? styles.tessiqLoaderPane : ""}`}
@@ -21,7 +24,7 @@ export function TessiqLoader({
       <span className={styles.srOnly}>{label}</span>
       <div className={styles.workspaceLoaderBrand} aria-hidden="true">
         <span className={styles.workspaceLoaderMark} />
-        <span className={styles.workspaceLoaderProgress} />
+        <LoadingOrb size="brand" />
       </div>
     </section>
   );

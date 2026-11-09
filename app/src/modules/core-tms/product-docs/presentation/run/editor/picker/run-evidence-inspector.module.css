@@ -130,10 +130,6 @@
 .pending > div { display: grid; gap: 5px; }
 .pending .skeleton { inline-size: 75%; block-size: 9px; border-radius: 5px; background: var(--falcon-hover); }
 .pending .skeleton:last-child { inline-size: 48%; block-size: 7px; }
-.spinner { display: inline-flex; }
-.spinnerWheel { inline-size: 15px; block-size: 15px; animation: spinner 850ms linear infinite; }
-.spinnerTrack { opacity: .25; }
-@keyframes spinner { to { transform: rotate(360deg); } }
 @keyframes show-pending { from { opacity: 0; } to { opacity: 1; } }
 @container (max-width: 460px) {
   .option .runLabel {
@@ -152,6 +148,6 @@
   .submit { min-block-size: 40px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .spinnerWheel, .pending { animation: none; }
+  .pending { animation: none; }
   .searchTool, .list .option, .listFrame { transition: none; }
 }

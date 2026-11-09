@@ -1,6 +1,7 @@
 "use client";
 
-import { Button, Listbox, ListboxItem, Spinner } from "@heroui/react";
+import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
+import { Button, Listbox, ListboxItem } from "@heroui/react";
 import { Check, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { TmsLocale } from "../../../../localization/model/locale";
@@ -83,7 +84,7 @@ export function PropertyAssigneeField({
           {person.name}
         </ListboxItem>}
       </Listbox>
-      {members.loading && <Spinner size="sm" aria-label={ru ? "Загрузка" : "Loading"} />}
+      {members.loading && <LoadingOrb label={ru ? "Загрузка" : "Loading"} />}
       {members.error && <Button type="button" variant="light" size="sm" onPress={members.retry}>{ru ? "Повторить" : "Retry"}</Button>}
       {members.cursor && <Button type="button" variant="light" size="sm" onPress={members.more}>{ru ? "Ещё" : "More"}</Button>}
   </PropertyPopover>;

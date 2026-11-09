@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 
+import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import styles from "../styles/styles.module.css";
 
 type PdfDemoDialogProps = {
@@ -31,7 +32,7 @@ export default function PdfDemoDialog({ open, onClose, onConfirm }: PdfDemoDialo
   return (
     <div role="dialog" aria-modal="true" aria-label="Opening deck" className={styles.dialog}>
       <div className={styles.card}>
-        <div className={styles.spinner} aria-hidden />
+        <LoadingOrb size="brand" />
         <h2 className={styles.title}>Opening deck</h2>
         <p className={styles.text}>Preparing the SaturnusGo investor deck in a separate tab.</p>
         <div className={styles.actions}>

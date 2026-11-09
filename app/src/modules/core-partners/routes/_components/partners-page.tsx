@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import type { Metadata } from "next"
+import { LoadingOrb } from "../../../../shared/components/loading/LoadingOrb"
 import PartnersSection from "./partners-showcase"
 
 export const metadata: Metadata = {
@@ -86,18 +87,12 @@ const partners = [
   },
 ]
 
-function LoadingSpinner() {
+function PartnersLoading() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-secondary/20 to-background">
-      <div className="flex flex-col items-center gap-4">
-        <div className="relative">
-          <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-          <div
-            className="absolute inset-0 w-12 h-12 border-4 border-transparent border-r-accent rounded-full animate-spin animate-reverse"
-            style={{ animationDuration: "1.5s" }}
-          />
-        </div>
-        <p className="text-sm text-muted-foreground animate-pulse">Loading partners...</p>
+      <div className="flex flex-col items-center gap-4" role="status">
+        <LoadingOrb size="brand" />
+        <p className="text-sm text-muted-foreground">Loading partners...</p>
       </div>
     </div>
   )
@@ -106,7 +101,7 @@ function LoadingSpinner() {
 export default function PartnersPage() {
   return (
     <div className="min-h-screen">
-      <Suspense fallback={<LoadingSpinner />}>
+      <Suspense fallback={<PartnersLoading />}>
         <PartnersSection partners={partners} />
       </Suspense>
     </div>

@@ -1,8 +1,9 @@
 "use client";
 
+import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
 import { ProductDocTooltip } from "../../overlay/ProductDocTooltip";
 
-import { Button, Spinner } from "@heroui/react";
+import { Button } from "@heroui/react";
 import { Trash2 } from "lucide-react";
 import { useContext, useEffect, useId, useState } from "react";
 import { widgetByKey } from "../../../../dashboards/layout/model/widget-catalog";
@@ -83,7 +84,7 @@ function DashboardEmbedCard({ snapshotId, onRemove, scope }: CardProps & { scope
       {ru ? "Повторить" : "Retry"}
     </Button>}
   </div> : pending ? <div className={styles.state} data-overlay={Boolean(value)} role="status">
-    {value && <Spinner size="sm" color="current" variant="simple" className={styles.spinner} aria-hidden="true" />}
+    {value && <LoadingOrb />}
     {ru ? "Загружаем данные…" : "Loading dashboard data…"}
   </div> : undefined;
 

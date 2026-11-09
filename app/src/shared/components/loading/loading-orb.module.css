@@ -1,0 +1,22 @@
+.orb {
+  --orb-size: 16px;
+  display: inline-block;
+  flex: none;
+  inline-size: var(--loading-orb-size, var(--orb-size));
+  block-size: var(--loading-orb-size, var(--orb-size));
+  vertical-align: middle;
+}
+
+.orb[data-size="xs"] { --orb-size: 12px; }
+.orb[data-size="md"] { --orb-size: 20px; }
+.orb[data-size="lg"] { --orb-size: 28px; }
+.orb[data-size="brand"] { --orb-size: 40px; }
+
+@media (forced-colors: active) {
+  .orb {
+    border: 2px dotted CanvasText;
+    border-radius: 50%;
+  }
+
+  .orb > canvas { visibility: hidden; }
+}

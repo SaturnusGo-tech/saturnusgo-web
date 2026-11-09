@@ -1,4 +1,5 @@
-import { FileJson, Inbox, LoaderCircle } from "lucide-react";
+import { LoadingOrb } from "../../../../../../../shared/components/loading/LoadingOrb";
+import { FileJson, Inbox } from "lucide-react";
 import { useRef } from "react";
 import { AnimatedSearch } from "../../../../../presentation/common/search/AnimatedSearch";
 import { useTmsLocale } from "../../../../../localization/context/useTmsLocale";
@@ -45,7 +46,7 @@ export function ImportHistory({ scope, revision, canManage }: { scope: ImportSco
         })}</ul>
       </section>)}
     </div>
-    {(history.loading || history.searching) && <p className={css.message} role="status"><LoaderCircle size={18} className={css.spin} />{ru ? "Загружаем файлы…" : "Loading files…"}</p>}
+    {(history.loading || history.searching) && <p className={css.message} role="status"><LoadingOrb size="md" />{ru ? "Загружаем файлы…" : "Loading files…"}</p>}
     {!history.loading && !history.searching && !history.error && !history.items.length && <div className={css.empty} role="status"><Inbox size={36} strokeWidth={1.2} aria-hidden="true" />
       <h3>{history.query ? (ru ? "Файлы не найдены" : "No matching files") : (ru ? "Пока нет импортов" : "No imports yet")}</h3>
       <p>{history.query ? (ru ? "Попробуйте изменить поисковый запрос." : "Try a different search.") : (ru ? "Здесь появятся исходные файлы новых импортов." : "Original files from new imports will appear here.")}</p></div>}

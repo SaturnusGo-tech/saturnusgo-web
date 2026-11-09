@@ -50,7 +50,7 @@
 .builds { padding-top: 14px; border-top: 1px solid var(--falcon-border); }
 .hint { margin: 0; color: var(--falcon-text-muted); font-size: 12px; line-height: 1.45; }
 .error { margin: 0; color: var(--falcon-danger); font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
-.loading { justify-self: start; }
+.loading { display: flex; align-items: center; gap: 8px; justify-self: start; color: var(--falcon-text-muted); font-size: 13px; }
 .footer { display: flex; justify-content: flex-end; align-items: center; gap: 6px; padding: 12px 20px; margin-top: auto; border-top: 1px solid var(--falcon-border); }
 .footer button, .confirm button { min-height: 32px; padding: 0 12px; border: 0; border-radius: 999px; font: inherit; font-size: 12px; cursor: pointer; }
 .footer .cancel, .confirm button, .content .textButton { background: transparent; color: var(--falcon-text-secondary); }

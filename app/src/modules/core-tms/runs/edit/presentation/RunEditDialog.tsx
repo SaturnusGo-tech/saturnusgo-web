@@ -1,4 +1,5 @@
-import { Button, Drawer, DrawerContent, DrawerHeader, Input, Spinner, Textarea } from "@heroui/react";
+import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
+import { Button, Drawer, DrawerContent, DrawerHeader, Input, Textarea } from "@heroui/react";
 import { X } from "lucide-react";
 import { useState } from "react";
 import type { TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
@@ -59,7 +60,7 @@ export function RunEditDialog({ run, workspaceId, onClose, onSaved }: {
         if (updated) dismiss(() => onSaved(updated));
       }}>
         <div className={css.content} aria-busy={state.phase === "loading" || state.busy}>
-          {state.phase === "loading" && <Spinner size="sm" color="default" label={ru ? "Загружаем настройки…" : "Loading settings…"} className={css.loading} />}
+          {state.phase === "loading" && <div className={css.loading} role="status"><LoadingOrb />{ru ? "Загружаем настройки…" : "Loading settings…"}</div>}
           {state.phase === "ready" && <>
             {!state.editable && <p role="status" className={css.hint}>{ru ? "Этот прогон завершён или находится в архиве. Его настройки нельзя изменить." : "This run is finished or archived. Its settings cannot be edited."}</p>}
             <Input label={ru ? "Название" : "Name"} labelPlacement="outside-top" size="sm" variant="flat" classNames={fieldClasses}

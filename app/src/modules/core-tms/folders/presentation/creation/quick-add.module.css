@@ -23,9 +23,7 @@
 .fields .cancel { background: transparent; color: var(--falcon-text-muted); }
 .fields .cancel:hover:not(:disabled) { background: var(--falcon-hover); color: var(--falcon-text); }
 .error { font-size: 11px; line-height: 1.45; color: var(--falcon-danger); margin: 5px 0 0; overflow-wrap: anywhere; }
-.spin { animation: spin 700ms linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
 @media (hover: none) { .anchor > .reveal:not([data-disabled]) { grid-template-rows: 1fr; opacity: 1; visibility: visible; } }
-@media (prefers-reduced-motion: reduce) { .reveal { transition: none; } .spin { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .reveal { transition: none; } }
 
 .folderIcon { color: var(--falcon-folder); flex: none; }

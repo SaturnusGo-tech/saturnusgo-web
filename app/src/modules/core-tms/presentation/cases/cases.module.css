@@ -665,18 +665,6 @@
 .detailTabs .detailTabActive::after { position: absolute; right: 6px; bottom: -1px; left: 6px; height: 2px; background: var(--falcon-action); content: ""; }
 
 .detailScroll { min-height: 0; flex: 1; overflow: auto; scrollbar-color: var(--falcon-border-strong) transparent; }
-.detailLoading {
-  min-height: 220px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 8px;
-  color: var(--falcon-text-muted);
-  font-size: 12px;
-}
-.detailLoading svg { color: var(--falcon-action); animation: casesSpin .8s linear infinite; }
-@keyframes casesSpin { to { transform: rotate(360deg); } }
 .overview { padding-bottom: 30px; }
 .badgeLine { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 12px 14px 4px; }
 .revisionLabel { color: var(--falcon-text-muted); font-size: 11px; }

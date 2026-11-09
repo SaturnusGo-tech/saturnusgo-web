@@ -1,3 +1,4 @@
+import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
 import { ExternalLink, Eye, EyeOff, HelpCircle, RefreshCw, Unplug } from "lucide-react";
 import { useState } from "react";
 
@@ -105,7 +106,7 @@ export function ConnectionSection({
             <Unplug size={14} aria-hidden="true" />{copy.changeConnection}
           </button> : null}
           <button type="button" className={surface.secondaryButton} onClick={onConnect} disabled={action !== "idle"}>
-            <RefreshCw size={15} aria-hidden="true" data-spin={action === "connecting"} />
+            {action === "connecting" ? <LoadingOrb /> : <RefreshCw size={15} aria-hidden="true" />}
             {action === "connecting" ? copy.connecting : tokenConfigured ? copy.reconnect : copy.connect}
           </button>
         </span>

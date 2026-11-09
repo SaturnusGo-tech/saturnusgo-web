@@ -1,8 +1,9 @@
 "use client";
+import { LoadingOrb } from "../../../../shared/components/loading/LoadingOrb";
 import { ContentSkeleton } from "../../presentation/common/skeleton/ContentSkeleton";
 import { transitionContent } from "../../presentation/workspace/motion/transition/content-transition";
 import { useState } from "react";
-import { LoaderCircle, Save, RefreshCw } from "lucide-react";
+import { Save, RefreshCw } from "lucide-react";
 import type { Provider } from "../model/connector-types";
 import { useConnector } from "../application/useConnector";
 import { ConnectorChrome, type ConnectorTab } from "./chrome/ConnectorChrome";
@@ -56,7 +57,7 @@ export function ConnectorSettings({ workspaceId, projectId, provider, ru, canMan
             <small>{state.draft.enabled ? (ru ? "Изменения применятся после сохранения." : "Changes take effect after saving.") :
               (ru ? "Подключение сохранится без запуска автоматизации." : "The connection will be saved without starting automation.")}</small>
             <button type="submit" className={styles.primary} disabled={Boolean(state.pending) || !snapshot.etag}>
-              {state.pending === "save" ? <LoaderCircle size={16} /> : <Save size={16} />}{state.pending === "save" ? (ru ? "Сохраняем…" : "Saving…") :
+              {state.pending === "save" ? <LoadingOrb /> : <Save size={16} />}{state.pending === "save" ? (ru ? "Сохраняем…" : "Saving…") :
                 !snapshot.connection ? (ru ? "Сохранить подключение" : "Save connection") : (ru ? "Сохранить" : "Save changes")}</button></footer>}
           {tab === "connection" && snapshot.connection && canManage && <DisconnectPanel ru={ru}
             pending={Boolean(state.pending)} onDisconnect={() => void state.disconnect()} />}

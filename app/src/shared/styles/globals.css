@@ -223,21 +223,8 @@ html.light {
   }
 }
 
-@keyframes animate-reverse {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(-360deg);
-  }
-}
-
 .animate-marquee {
   animation: marquee 30s linear infinite;
-}
-
-.animate-reverse {
-  animation: animate-reverse 2s linear infinite;
 }
 
 .dark {

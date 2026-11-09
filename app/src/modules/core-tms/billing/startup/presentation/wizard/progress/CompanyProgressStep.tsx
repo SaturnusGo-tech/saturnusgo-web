@@ -1,13 +1,15 @@
+import { LoadingOrb } from "../../../../../../../shared/components/loading/LoadingOrb";
 import { CircleCheck } from "lucide-react";
 import css from "../../startup.module.css";
 export function CompanyProgressOrb({ ready = false }: { ready?: boolean }) {
-  return <div className={css.orb} data-ready={ready} aria-hidden="true"><div className={css.orbRing} /><i /><i /><i /></div>;
+  return ready ? <div className={css.readyOrb} aria-hidden="true"><i /><i /><i /></div>
+    : <div className={css.progressOrb}><LoadingOrb className={css.loadingOrb} size="brand" /></div>;
 }
 export function CompanyProgressStep({ name, ru, kind, busy, canContinue, onContinue, onRefresh, notice }: { name: string; ru: boolean; kind: "loading" | "preparing" | "finishing" | "opening" | "success" | "failed"; busy: boolean; canContinue?: boolean; notice?: string; onContinue?(): void; onRefresh?(): void }) {
   const success = kind === "success";
   const label = kind === "loading" ? (ru ? "Загружаем данные…" : "Loading your details…") : kind === "preparing" ? (ru ? "Готовим компанию. Ещё немного." : "Preparing your company. Just a moment.") : kind === "finishing" ? (ru ? "Завершаем настройку…" : "Finishing up…") : kind === "opening" ? (ru ? "Открываем вашу компанию…" : "Opening your company…") : kind === "failed" ? (ru ? "Не удалось подготовить компанию" : "We couldn’t prepare your company") : "";
   return <div className={css.progress} role="status" aria-live="polite">
-    <CompanyProgressOrb ready={success || canContinue} />
+    <CompanyProgressOrb ready={success || canContinue || kind === "failed"} />
     {!success && <h1>{canContinue ? (ru ? "Адрес компании готов" : "Your company address is ready") : label}</h1>}
     <p className={css.companyName}>{name}</p>
     {notice && <p className={css.preparationNotice}>{notice}</p>}

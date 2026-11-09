@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingOrb } from "../../../../../../../shared/components/loading/LoadingOrb";
 import { addToast, Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Textarea } from "@heroui/react";
 import { $isCodeBlockNode, readOnly$, useCellValue, useCodeBlockEditorContext, type CodeBlockEditorProps } from "@mdxeditor/editor";
 import { $createParagraphNode, $getNodeByKey, $setSelection } from "lexical";
@@ -162,7 +163,7 @@ export function ProductDocStructuredBlock({ language, code, nodeKey, focusEmitte
       {diagram && !isSource && !readOnly && <div className={styles.footer}>
         {error && <p role="alert">{error}</p>}
         {mayGenerate && <Button type="button" size="sm" variant="light" radius="full" disableRipple className={styles.generate}
-          isLoading={generating} onPress={() => void generate()}
+          isLoading={generating} spinner={<LoadingOrb />} onPress={() => void generate()}
           startContent={!generating && <Send size={13} aria-hidden="true" />}>{ru ? "Сгенерировать" : "Generate"}</Button>}
       </div>}
     </div>

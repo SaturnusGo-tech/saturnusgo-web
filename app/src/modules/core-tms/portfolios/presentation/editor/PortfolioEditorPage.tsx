@@ -6,7 +6,6 @@ import { organizationCopy } from "../../management/model/copy";
 import { organizationErrors, focusOrganizationError } from "./validation/validate";
 import { EditorActions } from "./actions/EditorActions";
 import { useId, useState } from "react";
-import { PiCheck, PiPlus, PiSpinnerGap } from "react-icons/pi";
 import type { TmsMutationFailure } from "../../../../../core/tms/errors/mutation-failure";
 import { formatTmsMutationFailure } from "../../../../../core/tms/errors/mutation-failure";
 import { FormError } from "../../../presentation/common/error/FormError";

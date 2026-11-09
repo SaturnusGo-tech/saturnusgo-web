@@ -1,4 +1,5 @@
-import { Button, Input, Listbox, ListboxItem, Spinner } from "@heroui/react";
+import { LoadingOrb } from "../../../../shared/components/loading/LoadingOrb";
+import { Button, Input, Listbox, ListboxItem } from "@heroui/react";
 import { ArrowLeft, ChevronRight, Search } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { DraftProductDocRequirement, ProductDocDetail, ProductDocScope, ProductDocsApi } from "../domain/product-docs";
@@ -116,7 +117,7 @@ export function RequirementPicker({ api, scope, ru, disabled, linkFailed, onLink
               onPress={() => { setError(false); setRetry(value => value + 1); }}>{ru ? "Повторить" : "Retry"}</Button>
           </div>}
           {showLoading && <div role="status" className={styles.pickerMessage}>
-            <Spinner size="sm" variant="simple" aria-hidden="true" classNames={{ wrapper: styles.pickerSpinner }} />
+            <LoadingOrb />
             {ru ? "Загрузка…" : "Loading…"}
           </div>}
           {!page && visiblePages && (visiblePages.length ? <Listbox aria-label={listLabel} items={visiblePages}

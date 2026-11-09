@@ -116,6 +116,7 @@
     "remark-directive": "3.0.1",
     "remark-gfm": "4.0.1",
     "swagger-ui-react": "5.32.15",
+    "thinking-orbs": "0.3.2",
     "turndown": "7.2.4",
     "tw-animate-css": "^1.3.7",
     "zod": "3.25.76"

@@ -13,7 +13,7 @@ export function WorkspaceLoadState({
 }) {
   const { t } = useTmsLocale();
   if (!failure) {
-    return <TessiqLoader pane label={t("workspace.loading")} testId="workspace-loading" />;
+    return <TessiqLoader pane branded label={t("workspace.loading")} testId="workspace-loading" />;
   }
 
   return (

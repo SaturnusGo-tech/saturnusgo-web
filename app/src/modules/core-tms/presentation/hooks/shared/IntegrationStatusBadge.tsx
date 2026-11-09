@@ -1,3 +1,4 @@
+import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { Check, CircleDashed } from "lucide-react";
 
 import surface from "../hooks.module.css";
@@ -21,7 +22,9 @@ export function IntegrationStatusBadge({
     <span className={surface.statusBadge} data-status={status}>
       {status === "connected"
         ? <Check size={12} aria-hidden="true" />
-        : <CircleDashed size={12} aria-hidden="true" />}
+        : status === "checking"
+          ? <LoadingOrb size="xs" />
+          : <CircleDashed size={12} aria-hidden="true" />}
       {copy.statuses[status]}
     </span>
   );

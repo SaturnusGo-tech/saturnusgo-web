@@ -232,8 +232,6 @@
 .visuallyHidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
 
 
-.spin { animation: dashboardSpin .8s linear infinite; }
-@keyframes dashboardSpin { to { transform: rotate(360deg); } }
 @container (max-width: 1020px) {
   .secondaryGrid { grid-template-columns: minmax(0, 1fr); }
   .metricIcon { width: 54px; flex-basis: 54px; }
@@ -272,7 +270,7 @@
   .resultsToolbar { align-items: flex-start; flex-direction: column; padding-block: 9px; }
   .resultsToolbar > div { width: 100%; justify-content: space-between; }
 }
-@media (prefers-reduced-motion: reduce) { .spin { animation: none; } .metric { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .metric { transition: none; } }
 
 
 

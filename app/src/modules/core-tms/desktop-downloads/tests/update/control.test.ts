@@ -62,7 +62,7 @@ test("the control stays absent in web and on current desktop builds", async () =
   }
 });
 
-test("opening a desktop installer displays the ring and blocks duplicate browser handoffs", async () => {
+test("opening a desktop installer displays the loading orb and blocks duplicate browser handoffs", async () => {
   const h = setup("Mozilla/5.0 (Windows NT 10.0; Win64; x64) FalconDesktop/0.1.0");
   const render = () => h.render().find(node => node.props["data-testid"] === "desktop-update")!;
   render();
@@ -77,10 +77,11 @@ test("opening a desktop installer displays the ring and blocks duplicate browser
   assert.deepEqual(h.opened.map(href => href.split("#")[0]), [action.props.href]);
   assert.equal(render().props["aria-label"], "Opening download");
   assert.equal(render().props["aria-busy"], true);
-  assert.ok(h.render().some(node => node.props.className === "updateRing"));
+  assert.ok(h.render().some(node => node.type === "LoadingOrb"));
   h.finishHandoff();
   assert.equal(render().props["aria-busy"], undefined);
   assert.equal(render().props["aria-label"], action.props["aria-label"]);
+  assert.equal(h.render().some(node => node.type === "LoadingOrb"), false);
   h.dispose();
 });
 

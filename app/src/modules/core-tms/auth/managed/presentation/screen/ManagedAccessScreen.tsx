@@ -1,5 +1,6 @@
 "use client";
-import { ArrowLeft, LoaderCircle } from "lucide-react";
+import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
+import { ArrowLeft } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { useManagedAccess } from "../../application/useManagedAccess";
 import type { useSignIn } from "../../../sign-in/application/useSignIn";
@@ -48,7 +49,7 @@ export function ManagedAccessScreen({ access, signIn }: { readonly access: Retur
     </div></header>
     <section className={styles.content} aria-busy={state.loading || state.pending || signIn?.state.pending}>
       <a href={`/?lang=${locale}`} className={styles.brand} aria-label="Falcon"><span className={styles.brandMark} aria-hidden="true" /></a>
-      {state.loading ? <div className={styles.loading} role="status" aria-label={copy.loading}><LoaderCircle size={24} className={styles.spinner} /></div>
+      {state.loading ? <div className={styles.loading} role="status" aria-label={copy.loading}><LoadingOrb size="lg" /></div>
         : state.recoveryCodes.length > 0 ? <RecoveryCodes copy={copy} codes={state.recoveryCodes} onContinue={access.acknowledgeCodes} />
         : !state.entrypoint?.available ? <>
           <h1>{state.entrypoint ? copy.unavailable : copy.unknown}</h1>

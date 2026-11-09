@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { Button, Textarea } from "@heroui/react";
 import { ArrowUp } from "lucide-react";
 import { useCallback, useId, useRef, useState } from "react";
@@ -119,7 +120,7 @@ export function ProductDocActivity({ api, scope, document, locale, copy }: {
       <div className={styles.composerActions}>
         {postError && <p className={styles.error} role="alert">{copy.commentError}</p>}
         <Button type="submit" isIconOnly size="sm" radius="full" disableRipple className={styles.send}
-          aria-label={posting ? copy.postingComment : copy.postComment} title={copy.postComment} isLoading={posting} isDisabled={posting || !body.trim()}>
+          aria-label={posting ? copy.postingComment : copy.postComment} title={copy.postComment} isLoading={posting} spinner={<LoadingOrb />} isDisabled={posting || !body.trim()}>
           <ArrowUp size={15} aria-hidden="true" />
         </Button>
       </div>

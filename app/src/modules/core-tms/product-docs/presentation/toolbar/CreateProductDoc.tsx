@@ -1,7 +1,8 @@
 "use client";
 
+import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { addToast, Button, Input, Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
-import { Check, ListPlus, LoaderCircle, Plus, X } from "lucide-react";
+import { Check, ListPlus, Plus, X } from "lucide-react";
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import type { ProductDocNode, ProductDocsApi, ProductDocScope } from "../../domain/product-docs";
 import type { ProductDocsCopy } from "../../localization/copy";
@@ -87,7 +88,7 @@ export function CreateProductDoc({ api, scope, parentId, kind, copy, onCreated, 
         if (onCreatePage) onCreatePage(createPage);
         else createPage();
       }}>
-      {saving ? <LoaderCircle className={styles.loadingIcon} size={15} aria-hidden="true" /> : <Plus size={15} aria-hidden="true" />}
+      {saving ? <LoadingOrb /> : <Plus size={15} aria-hidden="true" />}
       {!iconOnly && <span>{pageLabel}</span>}
     </Button>
     {inline && folderOpen && <ProductDocSubpageComposer id={formId} scope={scope} projectName={projectName} copy={copy}
@@ -115,7 +116,7 @@ export function CreateProductDoc({ api, scope, parentId, kind, copy, onCreated, 
           <Input autoFocus type="text" aria-label={copy.name} value={title} placeholder={copy.name} isDisabled={saving} maxLength={200}
             classNames={{ base: creation.input, inputWrapper: creation.inputWrapper, input: creation.inputElement }} onValueChange={setTitle} />
           <Button size="sm" isIconOnly type="submit" className={styles.iconButton} aria-label={copy.createFolder} isDisabled={saving || !title.trim()}>
-            {saving ? <LoaderCircle className={styles.loadingIcon} size={15} aria-hidden="true" /> : <Check size={16} aria-hidden="true" />}
+            {saving ? <LoadingOrb /> : <Check size={16} aria-hidden="true" />}
           </Button>
           <Button size="sm" isIconOnly type="button" className={styles.iconButton} aria-label={copy.cancel} isDisabled={saving}
             onPress={dismiss}><X size={16} aria-hidden="true" /></Button>

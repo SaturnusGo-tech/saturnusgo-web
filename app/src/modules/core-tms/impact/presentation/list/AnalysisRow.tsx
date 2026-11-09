@@ -1,4 +1,5 @@
-import { Check, ChevronRight, Circle, CircleCheck, CircleX, Clock3, GitPullRequest, LoaderCircle } from "lucide-react";
+import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
+import { Check, ChevronRight, Circle, CircleCheck, CircleX, Clock3, GitPullRequest } from "lucide-react";
 import type { ImpactAnalysis } from "../../model/impact-types";
 import { analysisNeedsAttention, openCoverageGapCount } from "../../model/catalog/analysis-catalog";
 import { impactLabel } from "../../model/impact-copy";
@@ -11,13 +12,15 @@ export function AnalysisRow({ item, ru, onSelect }: { item: ImpactAnalysis; ru: 
   const Status = attention ? CircleX : item.approved ? CircleCheck : active ? Clock3 : Circle;
   const status = attention ? (ru ? "Внимание" : "Attention") : item.approved ? (ru ? "Подтверждён" : "Approved")
     : active ? impactLabel(item.status, ru) : (ru ? "На проверку" : "To review");
-  const Build = item.buildStatus === "success" ? Check : item.buildStatus === "pending" ? LoaderCircle : CircleX;
+  const Build = item.buildStatus === "success" ? Check : CircleX;
   const count = item.scope.filter(test => test.included).length, gaps = openCoverageGapCount(item);
   return <li className={css.row} data-analysis-id={item.id}>
     <button type="button" className={css.open} onClick={() => onSelect(item.id)} aria-label={`${ru ? "Открыть анализ" : "Review analysis"}: ${title}`}>
       <span className={css.change}><GitPullRequest size={17} strokeWidth={1.6} aria-hidden="true" /><span className={css.copy}>
         <strong title={title}>{title}</strong><span className={css.meta} title={`${item.change.repository} · ${item.change.branch} · ${item.change.sha}`}>
-          <Build size={12} data-build={item.buildStatus} aria-label={impactLabel(`build_${item.buildStatus}`, ru)} />
+          {item.buildStatus === "pending"
+            ? <LoadingOrb size="xs" label={impactLabel("build_pending", ru)} />
+            : <Build size={12} data-build={item.buildStatus} aria-label={impactLabel(`build_${item.buildStatus}`, ru)} />}
           <span>{item.change.repository} · {item.change.prNumber ? `#${item.change.prNumber}` : item.change.sha.slice(0, 7)} · {item.change.branch}</span>
         </span></span></span>
       <span className={css.status} data-tone={tone} title={item.errorCode || status}><Status size={13} aria-hidden="true" />{status}</span>

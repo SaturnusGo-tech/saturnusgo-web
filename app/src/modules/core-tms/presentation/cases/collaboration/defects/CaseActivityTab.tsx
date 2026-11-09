@@ -1,3 +1,4 @@
+import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
 import { useCaseHistory } from "../../../../test-cases/history/state/useCaseHistory";
 import { MemberAvatar } from "../../../../workspace/members/avatar/MemberAvatar";
 import { AlertCircle, Bug, FileClock, RotateCw } from "lucide-react";
@@ -44,11 +45,11 @@ export function CaseActivityTab(props: Props) {
           <b>{props.model.defects.items.length}{props.model.defects.hasMore ? "+" : ""}</b>
           <button
             type="button"
-            data-loading={props.model.defects.refreshing || undefined}
+            aria-busy={props.model.defects.refreshing || undefined}
             disabled={props.model.defects.refreshing}
             aria-label={ru ? "Обновить историю багов" : "Refresh bug history"}
             onClick={props.model.refreshDefects}
-          ><RotateCw size={13} /></button>
+          >{props.model.defects.refreshing ? <LoadingOrb size="xs" /> : <RotateCw size={13} />}</button>
         </div>}
       </header>
       {props.model.defects.status === "ready" && props.model.defects.refreshFailed && <div

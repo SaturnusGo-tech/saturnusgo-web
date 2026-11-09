@@ -27,12 +27,10 @@
 .layout { min-width:0; }
 .content { display:flex; flex-direction:column; min-width:0; gap:24px; }
 .validation { color:var(--falcon-danger); font-size:12px; }
-.spinner { animation:spin 900ms linear infinite; }
-@keyframes spin { to { transform:rotate(360deg); } }
 @keyframes page-enter { from { opacity:.6; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
 @media(max-width:760px) { .panel > header { padding:18px 20px; align-items:flex-start; flex-wrap:wrap; gap:16px; } .panel > header h1 { font-size:22px; } .body { padding:22px 20px 36px; } .titleField { margin-bottom:24px; } }
 @media(max-width:480px) { .actions { width:100%; } .actions > .save { flex:1; } }
-@media(prefers-reduced-motion:reduce) { .panel,.spinner { animation:none; } }
+@media(prefers-reduced-motion:reduce) { .panel { animation:none; } }
 .panel.panel .form.form :is(input,textarea,select):is(:focus,:focus-visible) { box-shadow:none !important; }
 
 :global([data-testid="tms-workspace"]):has(.panel) :global([data-verification-dock]) { display:none !important; }

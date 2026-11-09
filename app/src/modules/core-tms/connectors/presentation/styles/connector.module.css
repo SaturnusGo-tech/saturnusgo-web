@@ -133,7 +133,6 @@
 .error p { margin: 0 0 10px; }
 .notice { background: var(--c-highlight); color: var(--c-accent); }
 .loading { display: flex; gap: 12px; align-items: center; padding: 50px 0; color: var(--c-muted); }
-.loading svg { animation: spin 1s linear infinite; }
 .srOnly { position: absolute; height: 1px; width: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .repoHeader { display: flex; align-items: center; gap: 8px; padding: 24px 32px 16px; color: var(--c-accent); background: var(--c-soft); }
 .repoLabel { font-size: 10px; border-radius: 20px; border: 1px solid var(--c-line); padding: 2px 8px; color: var(--c-muted); margin-left: 8px; }
@@ -206,7 +205,6 @@
 .root[data-provider="confluence"] .setupGrid .panel > p { max-width: 650px; }
 .root[data-provider="confluence"] .setupGrid label { max-width: 580px; }
 .root[data-provider="confluence"] .step { color: var(--c-muted); background: transparent; width: auto; }
-@keyframes spin { to { transform: rotate(360deg); } }
 @media (max-width: 1200px) {
   .content { padding-left: 24px; padding-right: 24px; }
   .layout { grid-template-columns: 180px minmax(0, 1fr); }

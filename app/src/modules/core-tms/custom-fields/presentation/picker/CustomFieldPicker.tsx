@@ -1,4 +1,5 @@
-import { Button, Listbox, ListboxItem, Spinner } from "@heroui/react";
+import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
+import { Button, Listbox, ListboxItem } from "@heroui/react";
 import { Check, Layers, Package, Plus, RotateCcw, SlidersHorizontal, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -69,7 +70,7 @@ export function CustomFieldPicker({ field, selected, onChange, parentValueId, al
       </ListboxItem>)}
     </Listbox>
     {parentNeeded && <p className={css.hint}>{ru ? "Выберите группу для выбора её продуктов. Прежние значения без группы доступны ниже." : "Choose a group to select its products. Existing unclassified values remain available."}</p>}
-    {page.loading && <Spinner size="sm" aria-label={ru ? "Загрузка…" : "Loading…"} />}
+    {page.loading && <LoadingOrb label={ru ? "Загрузка…" : "Loading…"} />}
     {!!page.failure && <div role="alert" className={css.hint}>{customFieldError(page.failure, ru)}
       <Button type="button" size="sm" variant="light" onPress={page.refresh}>{ru ? "Повторить" : "Retry"}</Button>
     </div>}

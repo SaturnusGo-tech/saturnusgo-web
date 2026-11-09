@@ -1,6 +1,7 @@
 "use client";
 
-import { Accordion, AccordionItem, Alert, Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner } from "@heroui/react";
+import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
+import { Accordion, AccordionItem, Alert, Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@heroui/react";
 import { useReducedMotion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, X } from "lucide-react";
@@ -91,8 +92,7 @@ export function ProductDocPublishPreview({ api, scope, docId, version, locale, i
         </>}
         {current?.nextCursor && <Button className={chrome.action}
           onPress={() => setHistory({ cases, cursor: current.nextCursor ?? undefined })}>{ru ? "Показать ещё" : "Show more"}</Button>}
-        {resource.status === "loading" && <Spinner role="status" variant="simple" label={ru ? "Проверяем связи…" : "Checking links…"}
-          classNames={{ base: styles.loading, wrapper: styles.spinner, circle1: styles.spinnerTrack }} />}
+        {resource.status === "loading" && <div className={styles.loading} role="status"><LoadingOrb />{ru ? "Проверяем связи…" : "Checking links…"}</div>}
         {resource.status === "error" && <Alert color="danger" isVisible description={stale
             ? (ru ? "Черновик изменился. Откройте его актуальную версию." : "The draft changed. Reopen the latest version.")
             : (ru ? "Не удалось проверить этот черновик." : "Could not check this draft.")}

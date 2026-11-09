@@ -1,6 +1,7 @@
+import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { PiCheck, PiSpinnerGap, PiX } from "react-icons/pi";
+import { PiCheck, PiX } from "react-icons/pi";
 import css from "../../styles/editor.module.css";
 
 export function EditorActions({ targetId, formId, pending, saveLabel, cancelLabel, onCancel }: {
@@ -11,7 +12,7 @@ export function EditorActions({ targetId, formId, pending, saveLabel, cancelLabe
   const buttons = <div className={css.headerActions}>
     <button type="button" disabled={pending} onClick={onCancel} aria-label={cancelLabel} title={cancelLabel}><PiX /></button>
     <button type="submit" form={formId} disabled={pending} aria-label={saveLabel} title={saveLabel} data-save-organization>
-      {pending ? <PiSpinnerGap className={css.spin} /> : <PiCheck />}
+      {pending ? <LoadingOrb /> : <PiCheck />}
     </button>
   </div>;
   return target ? createPortal(buttons, target) : buttons;

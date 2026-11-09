@@ -1,3 +1,4 @@
+import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { ArrowUpRight, Plus, ArrowRotateCcw, CloseBold } from "@openai/apps-sdk-ui/components/Icon";
 import { useEffect, type KeyboardEvent } from "react";
 import type { useGuideConversation } from "../state/useGuideConversation";
@@ -58,7 +59,7 @@ export function DocumentationChat({ chat, navigation, onSource, history }: {
         {chat.messages.map((message, index) => <GuideMessage key={message.id ?? `${chat.conversationId}:${index}`} message={message} navigation={navigation} onSource={onSource}
           sharing={!chat.readonly && chat.api && chat.chatId ? { api: chat.api, chatId: chat.chatId, locale: chat.locale } : undefined} />)}
         {chat.busy && chat.partialText && <GuideMessage message={{ role: "assistant", content: chat.partialText, locale: chat.contentLocale }} navigation={navigation} onSource={onSource} streaming />}
-        {chat.busy && !chat.partialText && <div className={css.preparing} role="status"><span className={css.pulse} />{copy.preparing}</div>}
+        {chat.busy && !chat.partialText && <div className={css.preparing} role="status"><LoadingOrb size="xs" />{copy.preparing}</div>}
       </div>}
     </div>
     {chat.notice && <div className={css.notice} role="status"><span>{historyCopy[chat.notice]}</span>

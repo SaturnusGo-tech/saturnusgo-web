@@ -1,4 +1,5 @@
-import { ChevronUp, Link2, LoaderCircle } from "lucide-react";
+import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
+import { ChevronUp, Link2 } from "lucide-react";
 import type { DefectRetest } from "../../../../runs/verification/state/defect/useDefectRetest";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import { useDisclosureMotion } from "../../../common/disclosure/useDisclosureMotion";
@@ -40,7 +41,7 @@ export function DefectRetestPanel({ retest }: { retest: DefectRetest }) {
               : (ru ? "В прогон войдут только кейсы этого дефекта." : "Only cases linked to this bug report will be included.")}</p>
           </div>
           <button type="submit" className={`${styles.start} ${styles.submit}`} disabled={retest.pending || !retest.canStart}>
-            {retest.pending && <LoaderCircle className={styles.spinner} size={15} aria-hidden="true"/>}
+            {retest.pending && <LoadingOrb />}
             {retest.pending ? (ru ? "Создаём…" : "Creating…") : retest.unresolved ? (ru ? "Повторить запуск" : "Retry start") : (ru ? "Создать прогон" : "Create run")}
           </button>
         </footer>

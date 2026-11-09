@@ -1,4 +1,5 @@
-import { ChevronLeft, LoaderCircle } from "lucide-react";
+import { LoadingOrb } from "../../../../../../../shared/components/loading/LoadingOrb";
+import { ChevronLeft } from "lucide-react";
 import { useState } from "react";
 import type { Project } from "../../../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../../../localization/context/useTmsLocale";
@@ -24,7 +25,7 @@ export function ImportCasesPage(props: ImportCasesPageProps) {
         {catalog.project && <ExportCasesAction key={catalog.project.id} project={catalog.project} enabled={props.exportEnabled} />}
       </header>
       {!catalog.catalog ? catalog.error ? <p className={css.error} role="alert">{ru ? "Не удалось загрузить проекты." : "Could not load projects."} <button type="button" onClick={catalog.retry}>{ru ? "Повторить" : "Retry"}</button></p>
-        : <p className={css.message} role="status"><LoaderCircle size={18} className={css.spin} />{ru ? "Загружаем проекты…" : "Loading projects…"}</p>
+        : <p className={css.message} role="status"><LoadingOrb size="md" />{ru ? "Загружаем проекты…" : "Loading projects…"}</p>
         : !catalog.project ? <p className={css.empty}>{ru ? "Нет доступных проектов для импорта." : "No projects available for import."}</p>
         : <div className={css.session}><ImportSession key={`${props.workspaceId}:${catalog.project.id}:${session}`} {...props} project={catalog.project}
           projects={catalog.catalog.projects} onRestart={() => setSession(value => value + 1)} /></div>}

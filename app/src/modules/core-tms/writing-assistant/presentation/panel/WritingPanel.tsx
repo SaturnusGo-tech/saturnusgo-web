@@ -1,7 +1,8 @@
+import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { useEffect, useId, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { motion, useIsPresent, useReducedMotion } from "framer-motion";
-import { ArrowUp, Check, GripVertical, LoaderCircle, Mic, RotateCcw, Square, X } from "lucide-react";
+import { ArrowUp, Check, GripVertical, Mic, RotateCcw, Square, X } from "lucide-react";
 import { useColorMode } from "../../../../../shared/_hooks/useColorMode";
 import { MarkdownField } from "../../../presentation/cases/inspector/markdown/MarkdownField";
 import { stripRawHtml } from "../../../presentation/cases/inspector/markdown/code/stripRawHtml";
@@ -80,7 +81,7 @@ export function WritingPanel({ target, workspaceId, ru, anchor, onClose }: {
         <button type="button" className={css.microphone} data-active={dictation.active || undefined}
           disabled={request.busy || tooLong} aria-label={microphoneLabel}
           aria-pressed={dictation.active} aria-describedby={`${dictationId}-hint`} onClick={() => dictation.active ? dictation.stop() : dictation.start()}>
-          {dictation.state === "starting" || dictation.state === "transcribing" ? <LoaderCircle className={css.spinner} size={16} /> : dictation.active ? <Square size={13} fill="currentColor" /> : <Mic size={17} />}
+          {dictation.state === "starting" || dictation.state === "transcribing" ? <LoadingOrb /> : dictation.active ? <Square size={13} fill="currentColor" /> : <Mic size={17} />}
         </button>
         <span id={`${dictationId}-hint`} className={css.microphoneHint} role="tooltip">{microphoneLabel}</span>
       </span>

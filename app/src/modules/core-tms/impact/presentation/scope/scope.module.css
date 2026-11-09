@@ -15,8 +15,7 @@
 .selection > input[aria-disabled=true] { cursor: wait; }
 .selection[data-saving] > input { opacity: 0; }
 .selection[data-saving]:focus-within { outline: 2px solid var(--falcon-focus); outline-offset: 3px; border-radius: 3px; }
-.saving { position: absolute; inset: 0; margin: auto; color: var(--falcon-text-muted); pointer-events: none; animation: savingSpin 800ms linear infinite; }
-@keyframes savingSpin { to { transform: rotate(360deg); } }
+.saving { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
 .copy { display: grid; gap: 4px; min-width: 0; }
 .copy strong { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--falcon-text); font-size: 14px; line-height: 20px; font-weight: 500; }
 .row[data-included=false] .copy strong { color: var(--falcon-text-muted); }
@@ -53,4 +52,4 @@
 .scope :is(input, button):focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 3px; }
 @container scope-evidence (max-width: 560px) { .explanationBody[data-files] { grid-template-columns: minmax(0, 1fr); gap: 14px; } }
 @media(max-width: 560px) { .rowMain { gap: 8px; } .metadata { gap: 3px 8px; } .detailsToggle > span { display: none; } .explanation { margin-left: 24px; padding: 12px 14px; } .explanationBody[data-files] { grid-template-columns: minmax(0, 1fr); gap: 14px; } }
-@media(prefers-reduced-motion: reduce) { .detailsToggle > svg, .reveal { transition: none; } .saving { animation: none; } }
+@media(prefers-reduced-motion: reduce) { .detailsToggle > svg, .reveal { transition: none; } }

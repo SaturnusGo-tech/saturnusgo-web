@@ -128,10 +128,6 @@
   color: var(--falcon-text-secondary);
   font-size: 12px;
 }
-.previewLoading .previewSpinner { inline-size: 14px; block-size: 14px; flex: none; animation: previewSpin 850ms linear infinite; }
-.previewSpinnerTrack { opacity: .2; }
-@keyframes previewSpin { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .previewLoading .previewSpinner { animation: none; } }
 .formula { min-inline-size: 0; overflow: auto; color: var(--falcon-text); text-align: center; }
 .formula math { font-size: 1.12em; }
 .invalid { min-inline-size: 0; }

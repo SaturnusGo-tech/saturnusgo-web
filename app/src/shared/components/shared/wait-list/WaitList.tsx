@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useTheme } from 'next-themes';
+import { LoadingOrb } from '../../loading/LoadingOrb';
 
 export const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://saturnusgo-backend-production.up.railway.app';
 type State = 'idle'|'loading'|'ok'|'err';
@@ -175,10 +176,16 @@ export default function BeFirstToTrySaturnsGo(){
       {/* CTA + статус справа */}
       <div className="wf-actions">
         <button
-          className={`btn btn-primary ${state==='loading'?'btn-loading':''}`}
+          className="btn btn-primary"
           disabled={!valid || state==='loading'}
+          aria-busy={state==='loading' || undefined}
         >
-          {state==='loading' ? 'Sending…' : 'Get early access'}
+          {state==='loading' ? (
+            <>
+              <LoadingOrb size="sm" />
+              <span className="sr-only">Sending…</span>
+            </>
+          ) : 'Get early access'}
         </button>
 
         <div id="wl-note" className={`wf-note ${state==='err'?'err':state==='ok'?'ok':''}`} aria-live="polite">
@@ -289,16 +296,6 @@ export default function BeFirstToTrySaturnsGo(){
         }
         .btn-primary:hover{ filter: brightness(1.02); }
         .btn-primary:active{ transform: translateY(1px); }
-        .btn-loading{ position:relative; color: transparent !important; }
-        .btn-loading::after{
-          content:''; position:absolute; inset:0; margin:auto; width:18px; height:18px; border-radius:50%;
-          border:2px solid rgba(0,0,0,0.2); border-top-color: rgba(0,0,0,0.8); animation: spin .8s linear infinite;
-        }
-        .waitform[data-tone="dark"] .btn-loading::after{
-          border-color: rgba(255,255,255,0.35); border-top-color: rgba(255,255,255,0.95);
-        }
-        @keyframes spin{ to { transform: rotate(360deg); } }
-
         .wf-note{
           min-height: 0; font-size: 13px;
           color: var(--fg-dim);

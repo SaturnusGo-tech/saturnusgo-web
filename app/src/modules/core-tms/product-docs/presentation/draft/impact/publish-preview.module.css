@@ -61,10 +61,6 @@
 .failure, .loading { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 13px; }
 .failure { color: var(--falcon-danger); }
 .alertIcon { display: none; }
-.loading { color: var(--falcon-text-secondary); }
-.spinner { width: 15px; height: 15px; animation: spin 800ms linear infinite; }
-.spinnerTrack { opacity: .2; }
-
-@keyframes spin { to { transform: rotate(360deg); } }
+.loading { display: flex; align-items: center; gap: 7px; color: var(--falcon-text-secondary); }
 @media (max-width: 460px) { .comparison { grid-template-columns: minmax(0, 1fr); } }
-@media (prefers-reduced-motion: reduce) { .spinner { animation: none; } .changeIndicator { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .changeIndicator { transition: none; } }

@@ -57,6 +57,7 @@ test("an unresolved start presents an enabled retry while the current queue is e
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2021, jsx: ts.JsxEmit.ReactJSX },
   }).outputText, { module, exports: module.exports, require(name: string) {
     if (name.endsWith(".css")) return { default: new Proxy({}, { get: (_target, key) => String(key) }) };
+    if (name.endsWith("/LoadingOrb")) return { LoadingOrb: () => null };
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en" }) };
     if (name.endsWith("useVerificationLauncher")) return { useVerificationLauncher: () => ({ ready: true, collapsed: false }) };
     if (name === "./visibility") return { showVerificationControl };

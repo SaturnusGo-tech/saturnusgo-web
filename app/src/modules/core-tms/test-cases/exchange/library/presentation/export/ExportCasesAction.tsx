@@ -1,4 +1,5 @@
-import { Download, LoaderCircle } from "lucide-react";
+import { LoadingOrb } from "../../../../../../../shared/components/loading/LoadingOrb";
+import { Download } from "lucide-react";
 import type { Project } from "../../../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../../../localization/context/useTmsLocale";
 import { useExportCases } from "../../../state/export/use-export-cases";
@@ -11,7 +12,7 @@ export function ExportCasesAction({ project, enabled }: { project: Project; enab
     ? t("config.exchangeExported", { count: exported.completed }) : !enabled ? t("config.exchangeConnectedOnly") : "");
   return <div className={css.exportAction}>
     <button type="button" className={css.primary} disabled={!enabled || exported.busy} title={project.name} onClick={() => void exported.start()}>
-      {exported.busy ? <LoaderCircle className={css.spin} size={16} aria-hidden="true" /> : <Download size={16} aria-hidden="true" />}
+      {exported.busy ? <LoadingOrb /> : <Download size={16} aria-hidden="true" />}
       {locale === "ru" ? "Экспортировать кейсы" : "Export test cases"}
     </button>
     {message && <p className={exported.error ? css.error : css.hint} role="status">{message}</p>}

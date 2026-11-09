@@ -17,10 +17,11 @@ test("workspace loading keeps copy screen-reader-only", () => {
   );
 
   assert.match(loadingBranch, /testId="workspace-loading"/);
-  assert.match(loadingBranch, /TessiqLoader/);
+  assert.match(loadingBranch, /<TessiqLoader pane branded/);
   assert.match(loaderSource, /aria-busy="true"/);
   assert.match(loaderSource, /styles\.srOnly/);
-  assert.match(loaderSource, /workspaceLoaderBrand/);
+  assert.match(loaderSource, /workspaceLoaderMark[^\n]*\n\s*<LoadingOrb size="brand"/);
+  assert.match(loaderSource, /if \(pane && !branded\) return <ContentSkeleton/);
   assert.doesNotMatch(loaderSource, /workspaceLoaderPulse/);
   assert.doesNotMatch(loadingBranch, /workspace\.loadingDescription|<h1|<p/);
 });

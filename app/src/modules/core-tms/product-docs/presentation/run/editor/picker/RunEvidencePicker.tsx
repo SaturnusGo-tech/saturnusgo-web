@@ -1,6 +1,7 @@
 "use client";
 
-import { Button, DrawerBody, DrawerFooter, Input, Listbox, ListboxItem, ListboxSection, Skeleton, Spinner } from "@heroui/react";
+import { LoadingOrb } from "../../../../../../../shared/components/loading/LoadingOrb";
+import { Button, DrawerBody, DrawerFooter, Input, Listbox, ListboxItem, ListboxSection, Skeleton } from "@heroui/react";
 import { Check, ChevronDown, ChevronRight, Search } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFieldPage } from "../../../../../custom-fields/state/list/useFieldPage";
@@ -17,8 +18,6 @@ import { RunEvidenceQuery as RunEvidenceQueryControl } from "./query/RunEvidence
 import { RunEvidenceFilters, runEvidenceFilterCount } from "./RunEvidenceFilters";
 import { RunEvidenceRow } from "./rows/RunEvidenceRow";
 import styles from "./run-evidence-inspector.module.css";
-
-const spinnerSlots = { base: styles.spinner, wrapper: styles.spinnerWheel, circle1: styles.spinnerTrack };
 
 type Props = {
   scope: ProductDocScope;
@@ -176,7 +175,7 @@ export function RunEvidencePicker({ scope, load, capture, onChoose }: Props) {
           ? <div className={styles.pending} role="status" aria-label={loadingLabel}>
             {[0, 1].map((row) => <div key={row}><Skeleton className={styles.skeleton} disableAnimation /><Skeleton className={styles.skeleton} disableAnimation /></div>)}
           </div>
-          : !replacingRuns && <div className={styles.empty} role="status"><Spinner variant="simple" classNames={spinnerSlots} aria-hidden="true" />{loadingLabel}</div>)}
+          : !replacingRuns && <div className={styles.empty} role="status"><LoadingOrb />{loadingLabel}</div>)}
         {Boolean(page.failure) && <div className={styles.empty} role="alert">
           {ru ? "Не удалось загрузить прогоны." : "Couldn’t load runs."}
           <Button disableRipple variant="light" size="sm" isDisabled={capturePending} onPress={() => page.cursor ? void page.more() : page.refresh()}>{ru ? "Повторить" : "Retry"}</Button>
@@ -190,7 +189,7 @@ export function RunEvidencePicker({ scope, load, capture, onChoose }: Props) {
     </div>
     <DrawerFooter as="footer" className={styles.footer}>
       <Button disableRipple className={styles.submit} size="sm" isDisabled={!selected || capturePending || loading || (qlOpen && invalidQl)} onPress={() => void submit()}
-        startContent={capturePending ? <Spinner variant="simple" classNames={spinnerSlots} aria-hidden="true" /> : undefined}>
+        startContent={capturePending ? <LoadingOrb /> : undefined}>
         {capturePending ? ru ? "Сохраняем…" : "Capturing…" : ru ? "Вставить снимок" : "Insert snapshot"}
       </Button>
     </DrawerFooter>

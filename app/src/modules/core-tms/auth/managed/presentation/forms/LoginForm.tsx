@@ -1,7 +1,8 @@
 "use client";
 
+import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
 import { useState } from "react";
-import { LockKeyhole, Mail, LoaderCircle } from "lucide-react";
+import { LockKeyhole, Mail } from "lucide-react";
 import type { AccessCopy } from "../copy/access-copy";
 import { AccessField } from "../fields/AccessField";
 import styles from "../screen/access.module.css";
@@ -23,7 +24,7 @@ export function LoginForm({ copy, pending, onSubmit }: {
       autoComplete="current-password" required value={password} disabled={pending}
       onChange={(event) => setPassword(event.target.value)} maxLength={256} />
     <button className={styles.primary} type="submit" disabled={pending}>
-      {copy.signIn}{pending && <LoaderCircle size={17} className={styles.spinner} />}
+      {copy.signIn}{pending && <LoadingOrb />}
     </button>
   </form>;
 }

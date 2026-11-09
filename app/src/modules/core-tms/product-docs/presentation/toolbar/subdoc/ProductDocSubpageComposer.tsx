@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
 import { Button, Input, Textarea } from "@heroui/react";
 import { Box, Circle } from "lucide-react";
 import { useState } from "react";
@@ -76,7 +77,7 @@ export function ProductDocSubpageComposer({ id, scope, projectName, copy, disabl
           {copy.cancel}
         </Button>
         <Button type="submit" variant="light" size="sm" disableRipple className={styles.create} isDisabled={disabled || !title.trim()}
-          isLoading={disabled}>{copy.new}</Button>
+          isLoading={disabled} spinner={<LoadingOrb />}>{copy.new}</Button>
       </div>
     </div>
   </form>;

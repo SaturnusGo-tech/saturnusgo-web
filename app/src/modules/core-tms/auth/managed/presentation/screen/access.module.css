@@ -51,7 +51,6 @@
 .linkButton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; color: #fff; }
 .linkButton:disabled { cursor: default; opacity: .6; }
 .error { color: #ffa4aa; margin: 0 0 18px; font-size: 13px; }
-.spinner { animation: spin 900ms linear infinite; }
 .loading { display: grid; place-items: center; min-height: 220px; color: var(--access-muted); }
 .qr { display: grid; gap: 14px; justify-items: center; padding: 15px 0; }
 .qr img { width: 184px; height: 184px; border-radius: 12px; }
@@ -68,7 +67,6 @@
 .help div { margin-top: 12px; font-size: 13px; }
 .help p { margin: 0 0 6px; }
 .srOnly { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-@keyframes spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .page *, .page *::before { animation: none; transition: none; } }
 @media (max-width: 480px) { .page { padding: 120px 24px 48px; } .content h1 { font-size: 24px; } }
 @media (max-height: 660px) { .page { padding-top: 82px; } }

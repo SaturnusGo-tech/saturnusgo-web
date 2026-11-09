@@ -79,15 +79,12 @@
 .period button:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: -2px; }
 .period button:disabled { cursor: default; }
 .status { display: grid; place-items: center; flex: 0 0 18px; block-size: 18px; color: var(--falcon-text-secondary); }
-.status svg { width: 15px; height: 15px; animation: spin .85s linear infinite; }
-.status svg circle { opacity: .25; }
-.status[data-refreshing] > * { animation: show-progress 120ms ease-out 180ms both; }
+.status[data-refreshing] { animation: show-progress 120ms ease-out 180ms both; }
 .body [data-compact][data-example="false"] { transition: opacity 140ms ease; }
 .body[data-preview-refreshing] [data-compact][data-example="false"] { opacity: .65; }
-@keyframes spin { to { transform: rotate(1turn); } }
 @keyframes show-progress { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) {
-  .status svg, .status[data-refreshing] > * { animation: none; }
+  .status[data-refreshing] { animation: none; }
   .body [data-compact][data-example="false"] { transition: none; }
   .picker, .picker.closing, .backdrop, .backdrop.closing { transition: opacity .06s linear; }
   .picker, .picker.closing { transform: none; }

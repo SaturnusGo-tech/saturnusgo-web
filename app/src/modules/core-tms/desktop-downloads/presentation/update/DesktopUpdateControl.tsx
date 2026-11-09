@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { Download } from "lucide-react";
 import { useEffect, useRef, useState, type ReactElement } from "react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -74,8 +75,7 @@ export function DesktopUpdateControl({ renderTooltip }: {
   const openingLabel = ru ? "Открываем загрузку" : "Opening download";
   const label = busy ? openingLabel : ru ? `Скачать обновление Falcon ${update.version}` : `Download Falcon ${update.version} update`;
   const icon = <span className={css.updateBadge} aria-hidden="true">
-    <Download size={15} strokeWidth={1.8} />
-    <span className={css.updateRing} data-active={busy || undefined} />
+    {busy ? <LoadingOrb size="md" /> : <Download size={15} strokeWidth={1.8} />}
   </span>;
   const attributes = { className: css.update, "aria-label": label, "aria-busy": busy || undefined,
     "aria-disabled": busy || undefined, "data-testid": "desktop-update", title: renderTooltip ? undefined : label };

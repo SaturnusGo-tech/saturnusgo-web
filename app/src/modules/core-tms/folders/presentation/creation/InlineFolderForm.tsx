@@ -1,5 +1,6 @@
+import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { useEffect, useId, useRef } from "react";
-import { PiCheckBold, PiSpinnerGap, PiX, PiFolderSimpleDuotone } from "react-icons/pi";
+import { PiCheckBold, PiX, PiFolderSimpleDuotone } from "react-icons/pi";
 import type { RepositoryCreation } from "../../model/creation/repository-creation";
 import { useInlineFolderDraft } from "../../state/creation/useInlineFolderDraft";
 import css from "./quick-add.module.css";
@@ -28,7 +29,7 @@ export function InlineFolderForm({ parentId, parentName, creation, disabled, ru,
         aria-invalid={Boolean(draft.error)} aria-describedby={draft.error ? errorId : undefined}
         onChange={event => draft.setName(event.target.value)} />
       <button className={css.confirm} type="submit" disabled={!draft.canSave} aria-label={ru ? "Создать папку" : "Create folder"}
-        title={ru ? "Создать папку" : "Create folder"}>{draft.saving ? <PiSpinnerGap className={css.spin} size={15} /> : <PiCheckBold size={14} />}</button>
+        title={ru ? "Создать папку" : "Create folder"}>{draft.saving ? <LoadingOrb /> : <PiCheckBold size={14} />}</button>
       <button className={css.cancel} type="button" disabled={draft.saving} onClick={cancel}
         aria-label={ru ? "Отменить создание папки" : "Cancel folder creation"} title={ru ? "Отменить" : "Cancel"}><PiX size={15} /></button>
     </div>

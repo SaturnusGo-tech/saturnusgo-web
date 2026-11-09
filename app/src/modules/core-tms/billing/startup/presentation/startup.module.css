@@ -67,15 +67,13 @@
 .progress { display: flex; min-height: 48vh; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 20px; }
 .progress h1 { max-width: 40ch; margin-top: 30px; font-size: clamp(20px, 1.25vw, 32px); line-height: 1.5; letter-spacing: -.01em; font-weight: 400; }
 .companyName { margin-top: 8px !important; color: var(--falcon-text-secondary); font-size: clamp(16px, 1vw, 24px); overflow-wrap: anywhere; }
-.orb { position: relative; width: clamp(108px, 8vw, 210px); aspect-ratio: 1; border-radius: 50%; background: var(--falcon-action, #ededed); overflow: hidden; }
-.orbRing { position: absolute; inset: 7%; border: 15px solid transparent; border-top-color: var(--wizard-blue); border-right-color: var(--wizard-violet); border-radius: 50%; animation: wizard-orbit 1.5s cubic-bezier(.65,.05,.36,1) infinite; }
-.orb i { position: absolute; width: 27%; height: 27%; top: 36%; left: 36%; border-radius: 50%; background: var(--wizard-blue); animation: wizard-bubble-a 2.6s ease-in-out infinite; }
-.orb i:nth-of-type(2) { background: var(--wizard-violet); animation-name: wizard-bubble-b; animation-delay: -.8s; }
-.orb i:nth-of-type(3) { background: #735cf5; animation-name: wizard-bubble-c; animation-delay: -1.6s; }
-.orb[data-ready="true"] .orbRing { opacity: 0; }
-.orb[data-ready="true"] i { animation-play-state: paused; transform: translate(-38%,-62%); }
-.orb[data-ready="true"] i:nth-of-type(2) { transform: translate(65%, 5%); }
-.orb[data-ready="true"] i:nth-of-type(3) { transform: translate(-35%, 80%); }
+.progressOrb, .readyOrb { width: clamp(108px, 8vw, 210px); aspect-ratio: 1; }
+.progressOrb { display: grid; place-items: center; }
+.loadingOrb { --loading-orb-size: 64px; }
+.readyOrb { position: relative; border-radius: 50%; background: var(--falcon-action, #ededed); overflow: hidden; }
+.readyOrb i { position: absolute; width: 27%; height: 27%; top: 36%; left: 36%; border-radius: 50%; background: var(--wizard-blue); transform: translate(-38%, -62%); }
+.readyOrb i:nth-of-type(2) { background: var(--wizard-violet); transform: translate(65%, 5%); }
+.readyOrb i:nth-of-type(3) { background: #735cf5; transform: translate(-35%, 80%); }
 .progress .primary { min-width: 160px; min-height: 50px; margin-top: 28px; }
 .success { display: flex; align-items: center; gap: 12px; color: var(--falcon-success); margin-top: 34px !important; font-size: clamp(18px, 1.3vw, 30px); }
 .progress .subtleLink { margin-top: 28px; }
@@ -88,10 +86,6 @@
 .checkoutNotice [role="alert"] { color: var(--falcon-danger); }
 .srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 @keyframes wizard-step-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes wizard-orbit { to { transform: rotate(360deg); } }
-@keyframes wizard-bubble-a { 0%,100% { transform: translate(-64%, -62%) scale(.82); } 35% { transform: translate(72%, -12%) scale(1); } 70% { transform: translate(-12%, 83%) scale(.9); } }
-@keyframes wizard-bubble-b { 0%,100% { transform: translate(60%, 45%) scale(1); } 35% { transform: translate(-70%, 32%) scale(.82); } 70% { transform: translate(18%, -77%) scale(.92); } }
-@keyframes wizard-bubble-c { 0%,100% { transform: translate(5%, 80%) scale(.92); } 35% { transform: translate(-55%, -65%) scale(1); } 70% { transform: translate(78%, 6%) scale(.82); } }
 @media (max-width: 1000px) { .body { width: 65vw; margin-left: 7vw; } .art { width: 28vw; opacity: .8; } .art img { right: -170px; } .body h1 { font-size: 36px; } .body { padding-top: 80px; } }
 @media (max-width: 700px) { .header { padding: 24px 24px 0; gap: 10px; font-size: 21px; } .footer { padding: 0 24px 24px; } .body { width: auto; margin: 0; padding: 65px 24px 48px; } .body h1 { max-width: 22ch; font-size: 34px; line-height: 1.35; } .art { display: none; } .largeField { max-width: 100%; margin-top: 34px; } .screen .headlineInput { font-size: 30px; min-height: 70px; } .actions { gap: 14px; margin-top: 44px; } .screen .primary { min-width: 150px; min-height: 50px; padding: 14px 22px; font-size: 16px; } .legalFields { grid-template-columns: 1fr; } .benefits { gap: 24px; } .benefits li { gap: 14px; } .planLine { flex-wrap: wrap; font-size: 18px; } .checkoutTotals > div { font-size: 15px; } .progress { min-height: 55vh; } }
 @media (prefers-reduced-motion: reduce) { .screen *, .screen *::before, .screen *::after { animation: none !important; transition: none !important; } }

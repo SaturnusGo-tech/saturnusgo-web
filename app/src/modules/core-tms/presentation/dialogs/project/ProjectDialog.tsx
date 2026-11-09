@@ -1,5 +1,6 @@
+import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { PortfolioIcon } from "../../../portfolios/presentation/icon/PortfolioIcon";
-import { PiInfo, PiLockKey, PiPlus, PiSpinnerGap } from "react-icons/pi";
+import { PiInfo, PiLockKey, PiPlus } from "react-icons/pi";
 import { useId } from "react";
 import type { Project } from "../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -66,7 +67,7 @@ export function ProjectDialog({ workspaceId, project, projectEtag, portfolioId, 
       <footer className={styles.actions}>
         <button type="button" onClick={onClose}>{copy.cancel}</button>
         <button className={styles.primary} disabled={offline || form.pending || !form.name.trim() || form.key.trim().length < 2 || (!form.modified && !form.error)}>
-          {form.pending ? <PiSpinnerGap size={17} className={styles.spin} aria-hidden="true" /> : !project ? <PiPlus size={17} aria-hidden="true" /> : null}
+          {form.pending ? <LoadingOrb /> : !project ? <PiPlus size={17} aria-hidden="true" /> : null}
           {form.pending ? project ? copy.saving : copy.creating : project ? copy.save : copy.create}
         </button>
       </footer>

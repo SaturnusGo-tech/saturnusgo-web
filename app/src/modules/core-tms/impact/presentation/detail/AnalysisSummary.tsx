@@ -1,3 +1,4 @@
+import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { useState } from "react";
 import { Check, CircleX, ExternalLink, GitBranch, GitCommitHorizontal, RefreshCw } from "lucide-react";
 import type { ImpactAnalysis } from "../../model/impact-types";
@@ -16,7 +17,7 @@ export function AnalysisSummary({ data, ru, pending, canRetry, onRetry }: {
   const runHref = data.runId && typeof window !== "undefined" ? buildWorkspaceDeepLink(window.location.href, { workspaceId: data.workspaceId, projectId: data.projectId, view: "runs", runId: data.runId }) : null;
   const failed = data.status === "failed" || data.result?.ai.status === "failed" || data.result?.ai.status === "unavailable";
   const status = data.approved ? (ru ? "Состав подтверждён" : "Scope approved") : impactLabel(data.status, ru);
-  const Build = data.buildStatus === "success" ? Check : data.buildStatus === "pending" ? RefreshCw : CircleX;
+  const Build = data.buildStatus === "success" ? Check : CircleX;
   const created = new Date(data.createdAt).toLocaleString(ru ? "ru-RU" : "en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
   const repositoryParts = data.change.repository.split("/"), repositoryName = repositoryParts[repositoryParts.length - 1];
   return <header className={css.summary}>
@@ -26,7 +27,7 @@ export function AnalysisSummary({ data, ru, pending, canRetry, onRetry }: {
     </div>
     <div className={css.metadata}>
       <span className={css.badge} data-tone={data.approved ? "success" : data.status === "failed" ? "danger" : "neutral"}>{status}</span>
-      <span className={css.build} data-build={data.buildStatus}><Build size={13} />{impactLabel(`build_${data.buildStatus}`, ru)}</span>
+      <span className={css.build} data-build={data.buildStatus}>{data.buildStatus === "pending" ? <LoadingOrb size="xs" /> : <Build size={13} />}{impactLabel(`build_${data.buildStatus}`, ru)}</span>
       {data.result && <span className={css.risk} data-risk={data.result.riskLevel}>{ru ? "Риск" : "Risk"}: {impactLabel(data.result.riskLevel, ru)}</span>}
     </div>
     <div className={css.source}>

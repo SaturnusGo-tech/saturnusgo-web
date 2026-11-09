@@ -1,5 +1,6 @@
+import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { ContentSkeleton } from "../../common/skeleton/ContentSkeleton";
-import { ArrowUpRight, ListChecks, SearchX, LoaderCircle, RefreshCw } from "lucide-react";
+import { ArrowUpRight, ListChecks, SearchX, RefreshCw } from "lucide-react";
 import { useEffect, useRef, type ReactNode } from "react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import surface from "../dashboard.module.css";
@@ -47,6 +48,6 @@ export function DetailFooter({ shown, total, more, loading, onMore }: {
   if (!more && (total === undefined || shown === total)) return null;
   return <footer className={styles.footer}>
     <span>{locale === "ru" ? "Показано" : "Showing"} {shown}{total !== undefined && <> {locale === "ru" ? "из" : "of"} {total}</>}</span>
-    {more && <button type="button" className={styles.quiet} onClick={onMore} disabled={loading}>{loading && <LoaderCircle className={surface.spin} size={14} />}{t("dashboard.loadMore")}</button>}
+    {more && <button type="button" className={styles.quiet} onClick={onMore} disabled={loading}>{loading && <LoadingOrb />}{t("dashboard.loadMore")}</button>}
   </footer>;
 }

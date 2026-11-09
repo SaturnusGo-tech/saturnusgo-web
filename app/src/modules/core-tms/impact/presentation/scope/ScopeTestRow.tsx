@@ -1,5 +1,6 @@
+import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { useId, useState } from "react";
-import { ChevronRight, FileCode2, LoaderCircle } from "lucide-react";
+import { ChevronRight, FileCode2 } from "lucide-react";
 import type { ImpactAnalysis } from "../../model/impact-types";
 import css from "./scope.module.css";
 
@@ -18,7 +19,9 @@ export function ScopeTestRow({ caseId, caseKey, title, origin, revision, include
         <input type="checkbox" checked={included} disabled={!editable} aria-disabled={pending || undefined}
           aria-label={`${ru ? "Включить" : "Include"} ${caseKey || caseId} · ${label}`}
           onChange={() => { if (editable && !pending) onToggle?.(); }} />
-        {saving && <LoaderCircle className={css.saving} size={15} role="status" aria-label={ru ? "Сохраняем выбор" : "Saving selection"} />}
+        {saving && <span className={css.saving} role="status" aria-label={ru ? "Сохраняем выбор" : "Saving selection"}>
+          <LoadingOrb />
+        </span>}
       </span>}
       <div className={css.copy}>
         <strong title={label}>{label}</strong>

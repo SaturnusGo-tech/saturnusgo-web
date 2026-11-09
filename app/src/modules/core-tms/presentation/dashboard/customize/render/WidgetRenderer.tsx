@@ -1,7 +1,7 @@
 "use client";
 
+import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
 import { useState } from "react";
-import { LoaderCircle } from "lucide-react";
 import { widgetByKey } from "../../../../dashboards/layout/model/widget-catalog";
 import type { DashboardSnapshot } from "../../../../dashboards/model/dashboard-analytics";
 import type { WorkbenchSnapshot } from "../../../../dashboards/workbench/model/workbench";
@@ -45,7 +45,7 @@ export function WidgetRenderer(props: Props) {
   if (widget === "queue") return <WorkbenchPanel model={workbench} onOpenRow={"onOpenRow" in props ? props.onOpenRow : undefined} />;
   if (widget === "freshness") return <FreshnessPanel model={workbench} page={model?.preferences.value.freshnessPage}
     onPageChange={model && (freshnessPage => model.preferences.update({ freshnessPage: freshnessPage === 1 ? 1 : 0 }))} />;
-  if (!snapshot) return <div className={styles.unavailable} role="status"><LoaderCircle size={18} />{t("dashboard.summaryLoading")}</div>;
+  if (!snapshot) return <div className={styles.unavailable} role="status"><LoadingOrb size="md" />{t("dashboard.summaryLoading")}</div>;
   if (widget === "trend") return <DashboardTrendChart snapshot={snapshot} onOpenDrill={openDrill} />;
   if (widget === "portfolio") return <DashboardPortfolio snapshot={snapshot} onOpenDrill={openDrill} />;
   if (widget === "defects") return <DashboardOperations snapshot={snapshot} onOpenDrill={openDrill} />;

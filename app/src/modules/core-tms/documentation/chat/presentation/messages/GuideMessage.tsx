@@ -1,3 +1,4 @@
+import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
 import { ArrowUpRight } from "@openai/apps-sdk-ui/components/Icon";
 import { useDocumentationCatalog } from "../../../access/useDocumentationCatalog";
 import type { useDocumentationNavigation } from "../../../navigation/useDocumentationNavigation";
@@ -28,7 +29,7 @@ export function GuideMessage({ message, navigation, onSource, streaming = false,
     id={message.id ? `guide-message-${message.id}` : undefined} data-guide-message={message.turnId} tabIndex={-1}>
     <span className={css.assistantName}>Falcon AI</span>
     <GuideMarkdown content={message.content} streaming={streaming} />
-    {streaming && <span className={css.streamingStatus} role="status" aria-label={copy.responding}><span className={css.pulse} /></span>}
+    {streaming && <span className={css.streamingStatus} role="status" aria-label={copy.responding}><LoadingOrb size="xs" /></span>}
     {visuals.map((visual, index) => <GuideVisuals key={visual.key} visual={visual} copy={copy} screenshots={screenshots}
       startIndex={visuals.slice(0, index).reduce((total, group) => total + group.steps.length, 0)} />)}
     {sources.length > 0 && <nav className={css.sources} aria-label={copy.sources}>

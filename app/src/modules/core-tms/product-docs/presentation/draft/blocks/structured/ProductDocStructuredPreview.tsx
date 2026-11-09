@@ -1,6 +1,6 @@
 "use client";
 
-import { Spinner } from "@heroui/react";
+import { LoadingOrb } from "../../../../../../../shared/components/loading/LoadingOrb";
 import { useTmsLocale } from "../../../../../localization/context/useTmsLocale";
 import type { useProductDocStructuredRender } from "./render/useProductDocStructuredRender";
 import { ProductDocDiagramViewer } from "./viewer/ProductDocDiagramViewer";
@@ -13,8 +13,7 @@ export function ProductDocStructuredPreview({ kind, source, result, expanded }: 
   const ru = locale === "ru";
   const label = kind === "diagram" ? (ru ? "Диаграмма Mermaid" : "Mermaid diagram") : (ru ? "Формула LaTeX" : "LaTeX formula");
   if (!source.trim()) return null;
-  if (!result) return <Spinner size="sm" variant="simple" label={ru ? "Загрузка предпросмотра" : "Loading preview"}
-    classNames={{ base: styles.previewLoading, wrapper: styles.previewSpinner, circle1: styles.previewSpinnerTrack }} />;
+  if (!result) return <div className={styles.previewLoading} role="status"><LoadingOrb />{ru ? "Загрузка предпросмотра" : "Loading preview"}</div>;
   if ("invalid" in result) {
     const error = kind === "diagram"
       ? (ru ? "Проверьте синтаксис Mermaid." : "Check the Mermaid syntax.")

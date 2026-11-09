@@ -19,8 +19,5 @@
 .scope { min-width:0; display:grid; gap:5px; }
 .scope > span { display:inline-flex; align-items:center; gap:6px; color:var(--falcon-action); font-size:12px; }
 .form .error { color:var(--falcon-danger); }
-.spinner { animation:spin .8s linear infinite; }
-@keyframes spin { to { transform:rotate(360deg); } }
 @container report-detail (max-width:520px) { .start:not(.submit) > span { display:none; } .panel { margin-inline:18px; } }
 @container report-detail (max-width:380px) { .fields { grid-template-columns:1fr; } .form footer { flex-wrap:wrap; } .submit { margin-left:auto; } }
-@media (prefers-reduced-motion:reduce) { .spinner { animation:none; } }

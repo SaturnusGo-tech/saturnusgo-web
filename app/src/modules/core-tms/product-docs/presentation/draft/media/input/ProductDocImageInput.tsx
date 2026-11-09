@@ -1,6 +1,7 @@
 "use client";
 
-import { Button, Spinner } from "@heroui/react";
+import { LoadingOrb } from "../../../../../../../shared/components/loading/LoadingOrb";
+import { Button } from "@heroui/react";
 import { activeEditor$, currentSelection$, readOnly$, rootEditor$ } from "@mdxeditor/editor";
 import { Cell, Signal, useCellValues, useRealm } from "@mdxeditor/gurx";
 import { getNearestEditorFromDOMNode, type RangeSelection } from "lexical";
@@ -156,8 +157,7 @@ export function ProductDocImageInput() {
             <span>{formatAttachmentSize(pending.size, languageTag, ru)}</span>
           </div>
           <div className={attachmentStyles.uploadStatus}>
-            <Spinner size="sm" variant="dots" color="current" aria-hidden="true"
-              classNames={{ wrapper: attachmentStyles.uploadSpinner, dots: attachmentStyles.uploadDot }} />
+            <LoadingOrb size="xs" />
             {ru ? "Загрузка…" : "Uploading…"}
           </div>
         </div>

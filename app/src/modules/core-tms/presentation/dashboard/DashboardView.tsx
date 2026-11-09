@@ -1,8 +1,9 @@
 "use client";
+import { LoadingOrb } from "../../../../shared/components/loading/LoadingOrb";
 import { transitionContent } from "../workspace/motion/transition/content-transition";
 import { useTmsSession } from "../../auth/presentation/session/TmsSessionContext";
 import { useEffect, useRef, useState } from "react";
-import { LoaderCircle, Plus, Pencil } from "lucide-react";
+import { Plus, Pencil } from "lucide-react";
 import { usePersonalDashboardBoard } from "../../dashboards/layout/personal/board/usePersonalDashboardBoard";
 import { usePersonalDashboardLayout } from "../../dashboards/layout/personal/usePersonalDashboardLayout";
 import { useDashboardLayout } from "../../dashboards/layout/application/useDashboardLayout";
@@ -99,7 +100,7 @@ function DashboardWorkspace(props: DashboardViewProps) {
           <button type="button" className={styles.quiet} disabled={disabled} onClick={() => { setCatalogScope(null); layout.controller.cancel(); }}>{t("dashboardLayout.cancel")}</button>
           <button type="button" ref={addButton} className={styles.secondary} disabled={disabled || layout.failure === "conflict"} onClick={openCatalog}><Plus size={15} />{t("dashboardLayout.add")}</button>
           <button type="button" className={styles.primary} disabled={layout.saving || !layout.draft?.name.trim() || layout.failure === "conflict"}
-            onClick={() => void layout.controller.save()}>{layout.saving && <LoaderCircle size={15} className={surface.spin} />}{t(layout.saving ? "dashboardLayout.saving" : layout.retryPending ? "dashboardLayout.retry" : "dashboardLayout.save")}</button>
+            onClick={() => void layout.controller.save()}>{layout.saving && <LoadingOrb />}{t(layout.saving ? "dashboardLayout.saving" : layout.retryPending ? "dashboardLayout.retry" : "dashboardLayout.save")}</button>
         </div>
         <div className={styles.actionGroup} data-active={!editing} inert={editing} aria-hidden={editing || undefined}>
           {canComposePersonal && canManageTeam && !teamLayout.loading && !teamLayout.failure &&
@@ -116,7 +117,7 @@ function DashboardWorkspace(props: DashboardViewProps) {
         void failed?.controller.load();
       }}>{t(layout.draft ? "dashboardLayout.reload" : "dashboardLayout.retry")}</button>}
     </div>}
-    {loading ? <div className={styles.loading} role="status"><LoaderCircle size={20} className={surface.spin} />{t("dashboardLayout.loading")}</div>
+    {loading ? <div className={styles.loading} role="status"><LoadingOrb size="md" />{t("dashboardLayout.loading")}</div>
       : !board ? !layoutFailure && !personalBoard?.failure && <DashboardEmpty editing={false} personal={canComposePersonal}
         canEdit={canEdit} onAdd={openCatalog} />
       : !board.widgets.length ? <DashboardEmpty editing={editing} personal={personalEditing || (!editing && canComposePersonal)}

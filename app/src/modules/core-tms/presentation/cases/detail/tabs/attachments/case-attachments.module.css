@@ -27,5 +27,3 @@ a.fileRecord:hover { color: var(--falcon-text); }
   color: var(--falcon-text-muted);
   font-size: 12px;
 }
-
-.spinner { scale: .68; margin-inline-start: -3px; }

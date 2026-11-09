@@ -10,6 +10,3 @@
 .rename button { display: grid; place-items: center; flex: 0 0 25px; width: 25px; height: 26px; padding: 0; border: 0; border-radius: 5px; background: transparent; color: var(--falcon-icon); cursor: pointer; }
 .rename button:hover:not(:disabled) { color: var(--falcon-text); background: var(--falcon-hover); }
 .renameError { position: absolute; top: calc(100% + 4px); inset-inline-start: 0; z-index: 2; width: max-content; max-width: 100%; padding: 5px 8px; border-radius: 6px; background: var(--falcon-surface); color: var(--falcon-danger); font-size: 11px; }
-.spin { animation: folderRenameSpin .8s linear infinite; }
-@keyframes folderRenameSpin { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .spin { animation: none; } }

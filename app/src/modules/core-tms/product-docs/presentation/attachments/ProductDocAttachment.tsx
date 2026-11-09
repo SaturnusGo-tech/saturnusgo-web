@@ -1,6 +1,7 @@
 "use client";
 
-import { addToast, Button, Modal, ModalBody, ModalContent, ModalHeader, Spinner } from "@heroui/react";
+import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
+import { addToast, Button, Modal, ModalBody, ModalContent, ModalHeader } from "@heroui/react";
 import { useReducedMotion } from "framer-motion";
 import { Download, FileAudio, FileImage, FileSpreadsheet, FileText, FileVideo, Link2, Maximize2, Printer, X } from "lucide-react";
 import type { PDFDocumentProxy } from "pdfjs-dist";
@@ -106,7 +107,7 @@ export function ProductDocAttachment({ attachment, width, onWidthChange, onRemov
             <AttachmentAction label={ru ? "Скопировать ссылку на файл" : "Copy file link"} onPress={() => void copyLink()}><Link2 size={16} /></AttachmentAction>
             {file.kind === "pdf"
               ? <AttachmentAction label={printLabel} disabled={!pdfReady || printing} onPress={() => void print()}>
-                {printing ? <Spinner size="sm" aria-label={printLabel} /> : <Printer size={16} />}</AttachmentAction>
+                {printing ? <LoadingOrb /> : <Printer size={16} />}</AttachmentAction>
               : <AttachmentAction label={downloadLabel} onPress={() => void download()}><Download size={16} /></AttachmentAction>}
             <AttachmentAction label={expandLabel} onPress={() => setExpanded(true)}><Maximize2 size={16} /></AttachmentAction>
           </>}
@@ -117,7 +118,7 @@ export function ProductDocAttachment({ attachment, width, onWidthChange, onRemov
         : !request || resource.status === "error" ? <div role="status" className={styles.message}>
           {ru ? "Вложение недоступно" : "Attachment unavailable"}
           {request && <Button type="button" size="sm" variant="light" onPress={resource.retry}>{ru ? "Повторить" : "Retry"}</Button>}
-        </div> : <div role="status" className={styles.message}><Spinner size="sm" aria-label={ru ? "Загрузка вложения" : "Loading attachment"} /></div>}
+        </div> : <div role="status" className={styles.message} aria-label={ru ? "Загрузка вложения" : "Loading attachment"}><LoadingOrb size="md" /></div>}
       {canResize && onWidthChange && <ProductDocMediaResize media={card} className={styles.resize} canvasSelector="[data-doc-resize-canvas]"
         centered minWidth={file?.kind === "image" ? 120 : 180} label={ru ? "Изменить размер вложения" : "Resize attachment"} onResize={setResized} onCommit={onWidthChange} />}
     </figure>

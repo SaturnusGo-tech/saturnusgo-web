@@ -2193,16 +2193,10 @@
   width: 82px;
   height: 82px;
   display: block;
-  background: #fff;
+  background: var(--falcon-text, #fff);
   -webkit-mask: url("./assets/falcon/falcon-line-mark.svg") center / contain no-repeat;
   mask: url("./assets/falcon/falcon-line-mark.svg") center / contain no-repeat;
   mask-mode: alpha;
-}
-.workspaceLoaderProgress { width: 64px; height: 2px; border-radius: 999px; background: #10203a; overflow: hidden; }
-.workspaceLoaderProgress::after { content: ""; display: block; width: 24px; height: 100%; background: #3b82f6; animation: workspace-loader-progress 1200ms ease-in-out infinite; }
-@keyframes workspace-loader-progress {
-  from { transform: translateX(-24px); }
-  to { transform: translateX(64px); }
 }
 
 /* Restrained shape hierarchy: rounded shells, structured rows, and true pills only. */
@@ -4021,7 +4015,6 @@
   .caseWorkbench { transition: none; }
   .caseInspector { animation: none; }
   .caseInspectorScrim { animation: none; }
-  .workspaceLoaderProgress::after { animation: none; transform: none; width: 100%; }
 }
 
 @media (min-width: 681px) {

@@ -114,7 +114,6 @@
 .headingActions { display: flex; align-items: center; gap: 5px; }
 .headingActions button { width: 25px; height: 25px; display: grid; place-items: center; padding: 0; color: var(--falcon-text-muted); background: var(--falcon-control); border: 1px solid var(--falcon-border-strong); border-radius: 3px; cursor: pointer; }
 .headingActions button:disabled { cursor: wait; opacity: .6; }
-.headingActions button[data-loading="true"] svg { animation: collaboration-spin .8s linear infinite; }
 .refreshError { display: flex; align-items: center; gap: 5px; padding: 7px 10px; color: var(--falcon-danger); background: var(--falcon-danger-bg); border-bottom: 1px solid var(--falcon-border); font-size: 10px; }
 .defectList { display: grid; gap: 8px; padding: 10px 12px 14px; border-bottom: 1px solid var(--falcon-border); container: case-defects / inline-size; }
 .defectCard { overflow: hidden; background: var(--falcon-panel); border: 1px solid var(--falcon-border); border-radius: 5px; }
@@ -166,7 +165,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .headingActions button[data-loading="true"] svg { animation: none; }
 }
 
 @container case-defects (max-width: 420px) {
@@ -178,7 +176,6 @@
   .statusHistory time { grid-column: 2; }
 }
 
-@keyframes collaboration-spin { to { transform: rotate(360deg); } }
 
 .historySkeleton { display:grid; gap:10px; padding:12px 0; }
 .historySkeleton i { height:32px; border-radius:8px; background:var(--falcon-control); animation:history-pulse 1.4s ease-in-out infinite; }
