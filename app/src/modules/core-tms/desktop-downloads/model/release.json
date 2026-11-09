@@ -1,9 +1,9 @@
 {
-  "version": "0.2.8",
+  "version": "0.2.9",
   "channel": "beta",
-  "baseUrl": "https://saturnusgo.com/falcon/desktop/beta/0.2.8/",
+  "baseUrl": "https://saturnusgo.com/falcon/desktop/beta/0.2.9/",
   "bucket": "cdn-saturnusgo",
-  "prefix": "falcon/desktop/beta/0.2.8/",
+  "prefix": "falcon/desktop/beta/0.2.9/",
   "checksums": "SHA256SUMS.txt",
   "artifacts": [
     {
@@ -11,9 +11,9 @@
       "platform": "mac",
       "label": "Mac · Apple Silicon",
       "minimum": "macOS 13+",
-      "file": "Falcon-0.2.8-mac-arm64-beta.dmg",
-      "bytes": 110146789,
-      "sha256": "f7eadf7bca474e1a823b39b8b163d8757785012b59eeb426b481afe925350081",
+      "file": "Falcon-0.2.9-mac-arm64-beta.dmg",
+      "bytes": 110259637,
+      "sha256": "e564afe38ebfa291bca01290cca2a6e373f51b8b79c7b0e7059e1c08566d5d8a",
       "contentType": "application/x-apple-diskimage"
     },
     {
@@ -21,9 +21,9 @@
       "platform": "mac",
       "label": "Mac · Intel",
       "minimum": "macOS 13+",
-      "file": "Falcon-0.2.8-mac-x64-beta.dmg",
-      "bytes": 116220153,
-      "sha256": "7d0115d49f4c493c83fc1f69708e6ae7569ba61a7c953f58d855ff76324521bf",
+      "file": "Falcon-0.2.9-mac-x64-beta.dmg",
+      "bytes": 116220736,
+      "sha256": "01f7801f4b6c578b3811e189bae4865374db267125a183a17138c33a15aeffe3",
       "contentType": "application/x-apple-diskimage"
     },
     {
@@ -31,9 +31,9 @@
       "platform": "windows",
       "label": "Windows · x64",
       "minimum": "Windows 10 / 11",
-      "file": "Falcon-0.2.8-win-x64-beta-setup.exe",
-      "bytes": 121172864,
-      "sha256": "fe9e700c73c9c9d53f3b19199f0df5aa4d4486f602061d1d4cee052918a9e7c4",
+      "file": "Falcon-0.2.9-win-x64-beta-setup.exe",
+      "bytes": 121123649,
+      "sha256": "8f229db5615f0b82c16b25f46a45b3e5b285d720ca706f3d4fbcb35da7b41616",
       "contentType": "application/vnd.microsoft.portable-executable"
     }
   ]
