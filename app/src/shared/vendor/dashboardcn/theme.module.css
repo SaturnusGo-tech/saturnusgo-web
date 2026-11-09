@@ -51,11 +51,11 @@
 }
 
 /* Keep chart ink and labels available in the static export as well as the preview. */
-.theme :global([data-slot="chart"] .recharts-cartesian-grid line[stroke="#ccc"]) {
+.theme :global(.recharts-cartesian-grid line[stroke="#ccc"]) {
   stroke: color-mix(in oklab, var(--border) 50%, transparent);
 }
 
-.theme :global([data-slot="chart"] .recharts-cartesian-axis-tick text) {
+.theme :global(.recharts-cartesian-axis-tick text) {
   fill: var(--muted-foreground);
 }
 
