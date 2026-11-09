@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test, type TestContext } from "node:test";
 import { componentHarness, invoke, nodes } from "../../../../../portfolios/tests/support/component-harness";
 import type { DashboardDrillRow } from "../../../../../dashboards/model/dashboard-analytics";
-import type { DashboardDrillTable } from "../DashboardDrillTable";
+import type { DashboardDrillList } from "../DashboardDrillList";
 import type { DefectDrillList } from "../defects/DefectDrillList";
 const row = (id: string, entity: DashboardDrillRow["entity"] = "defect"): DashboardDrillRow => ({ id, entity, projectId: "p", key: `HOST-${id}`,
   title: "A very long defect title ".repeat(15), project: "Project", component: "A very long product name ".repeat(15),
@@ -17,7 +17,7 @@ function setup(t: TestContext) {
     if (name.endsWith("DefectDrillList")) return { DefectDrillList: "DefectDrillList" };
     if (name.endsWith("RecordSignals")) return { DetailStatus: "DetailStatus", DetailProgress: "DetailProgress" };
   }
-  const View = h.load<{ DashboardDrillTable: typeof DashboardDrillTable }>(new URL("../DashboardDrillTable.tsx", import.meta.url), resolve).DashboardDrillTable;
+  const View = h.load<{ DashboardDrillList: typeof DashboardDrillList }>(new URL("../DashboardDrillList.tsx", import.meta.url), resolve).DashboardDrillList;
   const Defects = h.load<{ DefectDrillList: typeof DefectDrillList }>(new URL("../defects/DefectDrillList.tsx", import.meta.url), resolve).DefectDrillList;
   return { h, View, Defects };
 }
@@ -33,7 +33,7 @@ test("active and archived defect rows have one action and use the test case prio
   const opened: DashboardDrillRow[] = [];
   archived.links = [{ label: "Tracker", url: "https://tracker.example/issue/2" }];
   const props = { rows: [active, archived], onOpenRow: (value: DashboardDrillRow) => opened.push(value) };
-  const shell = nodes(h.render(() => View({ ...props, prioritySort: null, onPrioritySort() {} })));
+  const shell = nodes(h.render(() => View({ ...props })));
   assert.equal(shell[0].type, "DefectDrillList");
   const tree = nodes(h.render(() => Defects(props)));
   assert.equal(tree.filter(node => node.type === "PriorityIcon" && node.props.level === "high").length, 2);
@@ -44,27 +44,31 @@ test("active and archived defect rows have one action and use the test case prio
   buttons.forEach(button => invoke(button, "onClick"));
   assert.equal(opened[0], active); assert.equal(opened[1], archived);
 });
-test("row and arrow navigation retain the precise record; unsafe external URLs are never rendered", t => {
+test("compact run rows preserve progress, status, precise navigation and safe links", t => {
   const { h, View } = setup(t), item = row("1", "run"), opened: DashboardDrillRow[] = [];
   item.links = [{ label: "Unsafe", url: "javascript:alert(1)" }, { label: "Tracker", url: "https://tracker.example/issue/1" }];
-  const tree = nodes(h.render(() => View({ rows: [item], prioritySort: null, onPrioritySort() {}, onOpenRow: value => opened.push(value) })));
-  const links = tree.filter(node => node.type === "a"); assert.equal(links.length, 1); assert.equal(links[0].props.href, item.links[1].url);
-  invoke(tree.find(node => node.type === "button" && node.props.title === item.title)!, "onClick");
-  invoke(tree.find(node => node.type === "button" && node.props["aria-label"] === `dashboard.openRecord: ${item.title}`)!, "onClick");
-  assert.equal(opened[0], item); assert.equal(opened[1], item);
+  const render = () => nodes(h.render(() => View({ rows: [item], onOpenRow: value => opened.push(value) })));
+  const tree = render();
+  const links = tree.filter(node => node.type === "a");
+  assert.equal(links.length, 1); assert.equal(links[0].props.href, item.links[1].url);
+  const buttons = tree.filter(node => node.type === "button");
+  assert.equal(buttons.length, 1);
+  invoke(buttons[0], "onClick");
+  assert.equal(opened[0], item);
+  assert.ok(tree.some(node => node.type === "DetailStatus" && node.props.status === item.status));
+  assert.equal(tree.some(node => node.type === "DetailProgress"), false);
+  item.progress = { total: 2, notRun: 1, inProgress: 0, passed: 1, failed: 0, blocked: 0, skipped: 0 };
+  assert.ok(render().some(node => node.type === "DetailProgress" && node.props.progress === item.progress));
 });
-test("visible-case selection preserves selected cases outside the loaded rows", t => {
-  const { h, View } = setup(t); let selected = new Set(["outside"]); const rows = [row("a", "test_case"), row("b", "test_case")];
-  const render = () => nodes(h.render(() => View({ rows, prioritySort: null, onPrioritySort() {}, onOpenRow() {}, selection: selected, onSelection: value => { selected = value; } })));
-  const all = () => render().find(node => node.type === "input" && node.props["aria-label"] === "Select visible test cases")!;
-  invoke(all(), "onChange", { target: { checked: true } }); assert.deepEqual([...selected], ["outside", "a", "b"]);
-  invoke(all(), "onChange", { target: { checked: false } }); assert.deepEqual([...selected], ["outside"]);
-});
-test("priority sorting stays accessible and run progress is not replaced by invented values", t => {
-  const { h, View } = setup(t); let sorted = 0;
-  const tree = nodes(h.render(() => View({ rows: [row("a", "test_case")], prioritySort: "desc", onPrioritySort: () => { sorted++; }, onOpenRow() {} })));
-  assert.ok(tree.some(node => node.type === "th" && node.props["aria-sort"] === "descending"));
-  invoke(tree.find(node => node.type === "button" && node.props.className === "prioritySortButton")!, "onClick"); assert.equal(sorted, 1);
-  const run = nodes(h.render(() => View({ rows: [row("b", "run")], prioritySort: null, onPrioritySort() {}, onOpenRow() {} })));
-  assert.equal(run.some(node => node.type === "DetailProgress"), false);
+
+test("embedded defect rows retain the active and archived click targets", t => {
+  const { h, Defects } = setup(t);
+  const archived = { ...row("1"), archivedAt: "2026-11-04T00:00:00Z" };
+  const opened: DashboardDrillRow[] = [];
+  const tree = nodes(h.render(() => Defects({ compact: true, rows: [archived], onOpenRow: item => opened.push(item) })));
+  assert.equal(tree.some(node => node.props.className === "product" || node.props.children === archived.key), false);
+  const button = tree.find(node => node.type === "button")!;
+  assert.equal(button.props.disabled, false);
+  invoke(button, "onClick");
+  assert.equal(opened[0], archived);
 });

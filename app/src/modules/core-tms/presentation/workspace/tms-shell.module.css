@@ -948,7 +948,13 @@ button.headerMetaItem:disabled { cursor: default; opacity: .55; }
 .headerActions:empty { display: none; }
 .headerActions[data-workspace-dashboard-actions] { flex: 0 1 auto; min-inline-size: 0; }
 .importShortcut:disabled { opacity: .4; cursor: default; }
-.importShortcut { min-width: 0; display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; border: 0; border-radius: 999px; color: var(--falcon-on-action); background: var(--falcon-action); font: inherit; font-size: 12px; font-weight: 550; white-space: nowrap; cursor: pointer; transition: background-color 140ms ease; }
+.importShortcut {
+  min-width: 0; display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px;
+  border: 0; border-radius: 999px; background: var(--falcon-action);
+  /* The packaged desktop chrome inherits toolbar colors on all header buttons. */
+  color: var(--falcon-on-action) !important;
+  font: inherit; font-size: 12px; font-weight: 550; white-space: nowrap; cursor: pointer; transition: background-color 140ms ease;
+}
 .importShortcut:hover:not(:disabled) { background: var(--falcon-action-hover); }
 .importShortcut:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 2px; }
 .shell[data-appearance="glass"] :is(.header, .navigation) { --sidebar-frame: var(--falcon-chrome); background: var(--falcon-chrome); }

@@ -25,3 +25,12 @@ test("catalog offers each work surface once and preserves saved widths of config
   assert.equal(workflowCatalog.filter(item => item.key === "defects").length, 1);
   assert.ok(workflowCatalog.every(item => item.key !== "currentDefects" && item.key !== "freshness" && !item.key.startsWith("type:")));
 });
+
+test("keeps the configured widget in its saved position when removing a preceding legacy sibling", () => {
+  const configured = { ...widget("defects"), title: "Custom defect map",
+    position: { x: 6, y: 3, width: 6, height: 4 } };
+  const unrelated = widget("tags");
+  const after = collapseWorkflowWidgets([widget("defect:triaged"), unrelated, configured]);
+
+  assert.deepEqual(after, [unrelated, configured]);
+});

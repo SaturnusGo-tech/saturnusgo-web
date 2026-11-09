@@ -32,20 +32,18 @@ export const workflowDefinition = (key: string) => workflowDefinitions.get(key) 
 
 export function collapseWorkflowWidgets(widgets: BoardWidget[]): BoardWidget[] {
   const exact = new Map(widgets.map(widget => [widgetKey(widget), widget]));
-  const upgraded = new Set(widgets.filter(widget => family(widgetKey(widget)) !== widgetKey(widget))
-    .map(widget => family(widgetKey(widget))));
   const seen = new Set<string>();
   return widgets.flatMap(widget => {
     const key = widgetKey(widget);
     const canonical = family(key);
-    if (seen.has(canonical)) return [];
+    const configured = exact.get(canonical);
+    if (seen.has(canonical) || (configured && configured !== widget)) return [];
     seen.add(canonical);
-    const representative = exact.get(canonical) ?? widget;
     const definition = workflowDefinitions.get(canonical);
-    const compactTimeline = canonical === "completedRuns" && representative.position.height === 1;
-    if (!definition || (!upgraded.has(canonical) && !compactTimeline)) return [representative];
-    return [{ ...representative, title: definition.en, type: definition.type,
-      position: { ...representative.position, width: definition.width, height: Math.max(representative.position.height, 3) },
-      settings: { ...representative.settings, presentation: canonical } }];
+    const compactTimeline = canonical === "completedRuns" && widget.position.height === 1;
+    if (!definition || (key === canonical && !compactTimeline)) return [widget];
+    return [{ ...widget, title: definition.en, type: definition.type,
+      position: { ...widget.position, width: definition.width, height: Math.max(widget.position.height, 3) },
+      settings: { ...widget.settings, presentation: canonical } }];
   });
 }

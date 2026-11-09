@@ -57,7 +57,7 @@
 .kpi [data-slot="card-title"] { color: var(--ink); font-size: clamp(20px, 12cqi, 30px); font-weight: 600; line-height: 1.08; letter-spacing: -.035em; }
 .kpi [data-slot="card-content"] { min-width: 0; color: var(--falcon-text-secondary); font-size: 10px; line-height: 1.35; }
 .kpi [data-slot="card-content"]:has(.kpiMeter) { display: grid; gap: 8px; }
-.kpiMeter { max-width: 100%; height: 10px; }
+.kpiMeter { --tick-bar-height: 10px; }
 .kpi [data-slot="sparkline"] { height: 24px; }
 .metricAction { position: absolute; inset: 0; color: var(--muted); background: none; border: 0; border-radius: inherit; cursor: pointer; }
 .metricAction svg { position: absolute; inset-block-start: 12px; inset-inline-end: 11px; }
@@ -133,8 +133,7 @@
 .coverage > li { display: grid; gap: 6px; }
 .coverageLabel { width: 100%; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 12px; overflow-wrap: anywhere; }
 .coverageLabel strong { flex: none; font-variant-numeric: tabular-nums; }
-.coverageMeter, .riskMeter { min-width: 0; }
-.coverageMeter { height: 10px; }
+.coverageMeter { --tick-bar-height: 10px; min-width: 0; }
 .coverageMeta { display: flex; align-items: baseline; justify-content: space-between; gap: 5px; color: var(--muted); font-size: 10px; }
 .coverageMeta button { padding: 1px 3px; }
 
@@ -146,8 +145,9 @@
 .table th:first-child { text-align: start; }
 .riskName { display: grid; gap: 2px; align-items: start; font-weight: 540; }
 .riskName small { color: var(--muted); font-weight: 400; }
-.riskCoverage { display: flex; width: 100%; justify-content: flex-end; align-items: center; gap: 6px; }
-.riskMeter { width: 42px; height: 12px; }
+.riskRate { display: flex; width: 100%; justify-content: flex-end; align-items: center; gap: 6px; }
+.riskRate > [data-slot="metric-value"] { min-inline-size: 6ch; text-align: end; font-variant-numeric: tabular-nums; }
+.riskMeter { --tick-bar-width: 42px; --tick-bar-height: 7px; flex: none; }
 .riskDefects { display: flex; justify-content: flex-end; align-items: center; gap: 4px; }
 .critical { color: var(--dash-danger); }
 .note { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.45; }

@@ -37,8 +37,8 @@ export function RepositoryCaseLeaf({ item, depth, selected, active, loading, loc
       </span>
       {inline ? <span className={css.caseTitle}>{item.title}</span>
         : <span className={css.caseCopy}>{titleMode === "marquee" ? <RepositoryCaseTitle title={item.title} /> : item.title}<small>{item.key}</small></span>}
-      {inline && <small className={css.caseKey}>{item.key}</small>}
       {trailing}
+      {inline && <small className={css.caseKey}>{item.key}</small>}
     </button>
     {quickCreate && <CaseQuickAdd folderPath={item.folderPath || "/"} onCreate={creation.createCase} disabled={locked} ru={ru} />}
   </li>;

@@ -2,6 +2,8 @@ import * as React from "react"
 
 import { cn } from "@heroui/react"
 
+import styles from "./tick-bar.module.css"
+
 export interface TickBarProps extends React.ComponentProps<"div"> {
   /** Current value, from 0 to max. */
   value: number
@@ -47,11 +49,7 @@ function TickBar({
       aria-valuemin={0}
       aria-valuemax={max}
       aria-valuenow={value}
-      className={cn(
-        "flex w-full",
-        shape === "tick" ? "h-6" : "h-4",
-        className
-      )}
+      className={cn(styles.bar, className)}
       style={{ columnGap: gap, ...style }}
       {...props}
     >
@@ -61,19 +59,13 @@ function TickBar({
           <span
             key={index}
             data-filled={fill > 0}
-            className={cn(
-              "bg-muted relative h-full min-w-0 flex-1 overflow-hidden transition-colors",
-              shape === "tick" ? "rounded-[1.5px]" : "rounded-full"
-            )}
+            className={styles.segment}
             style={{ backgroundColor: trackColor }}
           >
             {fill > 0 ? (
               <span
-                className={cn(
-                  "absolute inset-0",
-                  shape === "tick" ? "rounded-[1.5px]" : "rounded-full",
-                  animate && "motion-safe:animate-in motion-safe:fade-in"
-                )}
+                className={styles.fill}
+                data-animate={animate || undefined}
                 style={{
                   backgroundColor: color,
                   insetInlineEnd: fill === 1 ? undefined : `${(1 - fill) * 100}%`,

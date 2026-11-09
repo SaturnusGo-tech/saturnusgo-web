@@ -34,7 +34,8 @@ const breakdowns = readFileSync(new URL("../charts/DashboardBreakdowns.tsx", imp
 const dashboard = readFileSync(new URL("../DashboardView.tsx", import.meta.url), "utf8");
 const trend = readFileSync(new URL("../charts/DashboardTrendChart.tsx", import.meta.url), "utf8");
 const tooltip = readFileSync(new URL("../common/DashboardChartTooltip.tsx", import.meta.url), "utf8");
-const drillTable = readFileSync(new URL("../inspector/table/DashboardDrillTable.tsx", import.meta.url), "utf8");
+const drillList = readFileSync(new URL("../inspector/table/DashboardDrillList.tsx", import.meta.url), "utf8");
+const defectDrill = readFileSync(new URL("../inspector/table/defects/DefectDrillList.tsx", import.meta.url), "utf8");
 
 test("Recharts scales render with frozen runtime intrinsics", () => {
   const script = String.raw`
@@ -142,11 +143,9 @@ test("dashboard drill-downs use full pages and retain contextual navigation", ()
 });
 
 test("analytics listings retain the priority signal and accessible navigation", () => {
-  assert.match(drillTable, /<PrioritySignal priority=\{row\.priority\}/);
-  assert.match(drillTable, /className=\{styles\.prioritySortButton\}/);
-  assert.match(drillTable, /<DetailStatus status=\{row\.status\}/);
-  assert.match(drillTable, /aria-sort/);
-  assert.match(drillTable, /onOpenRow\(row\)/);
+  assert.match(defectDrill, /<PriorityIcon level=\{level\}/);
+  assert.match(drillList, /<DetailStatus status=\{row\.status\}/);
+  assert.match(drillList, /onOpenRow\(row\)/);
 });
 
 test("dashboard uses custom menus and theme-safe chart tooltips", () => {

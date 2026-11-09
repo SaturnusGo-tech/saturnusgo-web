@@ -112,6 +112,7 @@ if (process.env.INCLUDE_LOGIN === "1") write("out/login/index.html", "FALCON LOG
 write("out/work/index.html", "CURRENT TMS\\n");
 write("out/work/index.txt", "CURRENT TMS DATA\\n");
 write("out/_next/static/chunks/app.js", "static chunk\\n");
+write("out/_next/static/css/app.css", process.env.UNCOMPILED_TAILWIND === "1" ? "@tailwind utilities;" : ".w-full { width: 100%; }");
 for (const weight of ["Regular", "RegularItalic", "Medium", "Semibold", "Bold"]) if (process.env.OMIT_DOCS_FONT !== weight) write("out/falcon/docs/fonts/OpenAISans-" + weight + ".woff2", "font asset");
 for (const theme of ["light", "dark"]) if (process.env.OMIT_CODEX_ASSET !== theme) write("out/assets/integrations/codex/codex-" + theme + ".png", "reviewed " + theme);
 write("out/assets/integrations/codex/private.json", "private fixture");
@@ -340,4 +341,13 @@ test("a missing localized product overlay prevents publication before Pages is m
   assert.match(result.stderr, /Required public asset is missing.*ru\/product-codex\.webp/);
   assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), before);
   assert.equal(git(fixture.pages, "status", "--porcelain").stdout, "");
+});
+
+test("rejects an export with uncompiled Tailwind CSS before changing Pages", (context) => {
+  const fixture = createFixture(context);
+  const pagesHead = git(fixture.pages, "rev-parse", "HEAD").stdout;
+  const result = deploy(fixture, "--publish", { UNCOMPILED_TAILWIND: "1" });
+  assert.equal(result.status, 17, result.stderr);
+  assert.match(result.stderr, /Uncompiled Tailwind directives.*app\.css/s);
+  assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout, pagesHead);
 });

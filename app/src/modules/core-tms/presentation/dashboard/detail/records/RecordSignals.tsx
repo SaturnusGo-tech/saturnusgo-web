@@ -10,10 +10,10 @@ export function DetailStatus({ status }: { status?: string }) {
 export function DetailProgress({ progress }: { progress: NonNullable<DashboardDrillRow["progress"]> }) {
   const { locale } = useTmsLocale(); const value = runProgress(progress);
   const description = locale === "ru" ? `${value.completed} из ${value.total} проверок с результатом` : `${value.completed} of ${value.total} checks with a result`;
-  return <div className={styles.progress} title={description}>
-    <div className={styles.track} role="progressbar" aria-label={locale === "ru" ? "Проверки с результатом" : "Checks with a result"}
+  return <span className={styles.progress} title={description}>
+    <span className={styles.track} role="progressbar" aria-label={locale === "ru" ? "Проверки с результатом" : "Checks with a result"}
       aria-valuetext={description} aria-valuemin={0} aria-valuemax={value.total || 1} aria-valuenow={value.completed}>
       {value.segments.map(segment => <span key={segment.kind} data-kind={segment.kind} style={{ width: `${segment.percent}%` }} />)}
-    </div><span>{value.completed}<i>/</i>{value.total}</span>
-  </div>;
+    </span><span>{value.completed}<i>/</i>{value.total}</span>
+  </span>;
 }

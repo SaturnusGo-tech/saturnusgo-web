@@ -1,5 +1,5 @@
-@font-face { font-family: "Falcon Detail Sans"; src: url("/fonts/falcon-docs/OpenAISans-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
-@font-face { font-family: "Falcon Detail Sans"; src: url("/fonts/falcon-docs/OpenAISans-Medium.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+@font-face { font-family: "Falcon Detail Sans"; src: url("/falcon/docs/fonts/OpenAISans-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Falcon Detail Sans"; src: url("/falcon/docs/fonts/OpenAISans-Medium.woff2") format("woff2"); font-weight: 500; font-display: swap; }
 .page.page.page { padding: 0; gap: 0; display: block; overflow: auto; background: var(--falcon-surface); font: 400 14px/1.45 "Falcon Detail Sans", system-ui, sans-serif; scrollbar-color: var(--falcon-border-subtle) transparent; }
 .page *, .page *::before, .page *::after { box-sizing: border-box; }
 .main { width: min(100%, 1220px); min-width: 0; margin-inline: auto; padding: 24px 36px 64px; container: dashboard-detail / inline-size; }

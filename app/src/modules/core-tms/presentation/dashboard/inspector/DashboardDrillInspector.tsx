@@ -6,9 +6,9 @@ import type { Bootstrap } from "../../../../../core/tms/contracts/legacy-contrac
 import type { DashboardAnalyticsQuery, DashboardDrill, DashboardDrillPage, DashboardDrillRow, DashboardProductFilters } from "../../../dashboards/model/dashboard-analytics";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedLabel } from "../../../localization/format/labels";
-import { DashboardDrillTable } from "./table/DashboardDrillTable";
+import { DashboardDrillList } from "./table/DashboardDrillList";
 import { activeDrillTab, dashboardProductScope, filterDashboardRows, relatedDashboardDrill, type DashboardDrillTab } from "./dashboard-drill-navigation";
-import { DetailPage, DetailState, DetailFooter } from "../detail/DetailPage";
+import { DetailPage, DetailResults, DetailState, DetailFooter } from "../detail/DetailPage";
 import { DetailToolbar, emptyDetailFilters, type DetailSort } from "../detail/toolbar/DetailToolbar";
 import { sortDetailRows } from "../detail/toolbar/sort-rows";
 import { scopedDashboardDrill } from "./scope/product-scope";
@@ -74,15 +74,13 @@ export function DashboardDrillInspector(props: Props) {
       {statuses.map(status => <button type="button" key={status} aria-current={filters.status[0] === status ? "page" : undefined}
         onClick={() => setFilters({ ...filters, status: [status] })}>{localizedLabel(locale, status)}</button>)}
     </nav>}
-    <div aria-busy={props.loading}>
-      <DetailState loading={props.loading && !props.page} error={props.error ? t("dashboard.drillError") : null} empty={Boolean(props.page) && !rows.length} filtered={filtered} onRetry={props.onRetry} />
+    <DetailResults loading={props.loading} pending={props.loading && !props.page && !props.error}>
+      <DetailState error={props.error ? t("dashboard.drillError") : null} empty={Boolean(props.page) && !rows.length} filtered={filtered} onRetry={props.onRetry} />
       {props.selected.filter.entity === "run_item" ? <GroupedChecks groups={groupRunRecords(rows, props.data)} onOpenRow={props.onOpenRow} />
         : props.selected.filter.entity === "test_case" ? <DrillCaseTree rows={rows} workspaceId={props.data.workspace.id}
           selection={selectable ? selection : undefined} onSelection={setSelection} onOpenRow={props.onOpenRow} />
-        : <DashboardDrillTable rows={rows} onOpenRow={props.onOpenRow} selection={selectable ? selection : undefined} onSelection={setSelection}
-          prioritySort={sort === "priority_desc" ? "desc" : sort === "priority_asc" ? "asc" : null}
-          onPrioritySort={() => setSort(value => value === "priority_desc" ? "priority_asc" : "priority_desc")} />}
-    </div>
+        : <DashboardDrillList rows={rows} onOpenRow={props.onOpenRow} />}
+    </DetailResults>
     {props.page && <DetailFooter shown={rows.length} total={total} more={Boolean(props.page.nextCursor) && !props.error} loading={props.loading} onMore={props.onLoadMore} />}
   </DetailPage>;
 }

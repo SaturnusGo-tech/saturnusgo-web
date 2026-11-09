@@ -6,7 +6,7 @@ type Reader = DashboardAnalyticsSource["drill"];
 type Result = { key: string; read: Reader; rows: DashboardDrillRow[] | null };
 
 export function canOpenInsightRecord(row: DashboardDrillRow) {
-  return !row.archivedAt;
+  return row.entity === "defect" || !row.archivedAt;
 }
 
 export function useInsightRecords(query: DashboardAnalyticsQuery, drill?: DashboardDrill, read?: Reader, revision?: string) {

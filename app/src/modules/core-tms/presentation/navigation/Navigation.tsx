@@ -54,7 +54,8 @@ export function Navigation({ view, onChange, disabled, connected, collapsed, onC
     className={`${shellStyles.navigation} ${compact ? shellStyles.navigationCollapsed : ""} ${css.system}`} aria-label={t("nav.ariaLabel")}>
     <div className={css.header}>
       <NavigationTooltip enabled={tooltips} label={homeLabel}>
-        <button type="button" className={css.brand} onClick={() => navigate(available("dashboard") ? "dashboard" : "cases")} aria-label={homeLabel}>
+        <button type="button" className={css.brand} onClick={() => navigate(available("dashboard") ? "dashboard" : "cases")}
+          aria-label={homeLabel} data-nav-label={homeLabel}>
           <span className={css.mark} aria-hidden="true"/><span className={css.wordmark} aria-hidden="true">FALCON</span>
         </button>
       </NavigationTooltip>

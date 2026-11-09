@@ -1,4 +1,4 @@
-import { ArrowUpRight, ChevronDown } from "lucide-react";
+import { ArrowUpRight, ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import type { DashboardDrillRow } from "../../../../dashboards/model/dashboard-analytics";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
@@ -17,7 +17,11 @@ export function GroupedChecks({ groups, onOpenRow }: { groups: RunGroup[]; onOpe
         <button type="button" className={styles.open} onClick={() => onOpenRow(group.run)}>{ru ? "Открыть прогон" : "Open run"}<ArrowUpRight size={14} /></button>
       </header>
       {!closed && <div className={styles.rows}>{group.rows.map(row => <button type="button" key={row.id} className={styles.row} onClick={() => onOpenRow(row)}>
-        <span className={styles.key} title={row.caseKey ?? row.key}>{row.caseKey ?? row.key}</span><strong title={row.title}>{row.title}</strong><span className={styles.component} title={row.component}>{row.component || "—"}</span><DetailStatus status={row.status} />
+        <strong title={row.title}>{row.title}</strong>
+        <span className={styles.component} title={row.component}>{row.component || "—"}</span>
+        <span className={styles.status}><DetailStatus status={row.status} /></span>
+        <span className={styles.key} title={row.caseKey ?? row.key}>{row.caseKey ?? row.key}</span>
+        <ChevronRight size={14} className={styles.arrow} aria-hidden="true" />
       </button>)}</div>}
     </section>;
   })}</div>;

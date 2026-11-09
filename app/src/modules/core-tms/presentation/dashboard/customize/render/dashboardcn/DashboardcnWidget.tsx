@@ -95,8 +95,8 @@ function DashboardcnMetric({ widget, title, snapshot, workbench, valueContext, o
   return <div className={styles.metric} data-interactive={value != null && Boolean(action)}>
     <KpiCard label={title} value={formatted} trend={trend} icon={<Icon size={14} aria-hidden="true" />}
       deltaLabel={context} aria-busy={Boolean(kind && workbench.loading)} className={styles.kpi}>
-      {metric.percent && value != null && <TickBar value={value} segments={20} animate={false}
-        color="var(--dash-success)" className={styles.kpiMeter} aria-hidden="true" />}
+      {metric.percent && value != null && <TickBar value={value} segments={1} shape="pill" color="var(--dash-success)"
+        trackColor="var(--falcon-border-strong)" className={styles.kpiMeter} aria-hidden="true" />}
     </KpiCard>
     {value != null && action && <button className={styles.metricAction} type="button" title={`${title} · ${full}`}
       aria-label={`${title}: ${full}. ${context}`} onClick={action}><ArrowUpRight size={15} aria-hidden="true" /></button>}

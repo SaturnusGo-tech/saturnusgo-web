@@ -15,14 +15,9 @@
 .title { min-width: 0; }
 .row { display: flex; gap: 7px; align-items: center; width: 100%; font-size: 12px; }
 .row strong { flex: 1; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
-.priority, .status { flex: none; display: inline-flex; align-items: center; gap: 5px; color: var(--insight-muted); }
-.status { max-inline-size: 31%; }
-.status svg { flex: none; }
-.status small, .key { color: var(--insight-muted); font-size: 11px; }
-.status small { min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; }
-.key { flex: none; max-inline-size: 31%; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
-@container (max-width: 400px) {
-  .status:has(svg) small { display: none; }
-}
+.priority { flex: none; display: inline-flex; color: var(--insight-muted); }
+.status, .key { flex: none; max-inline-size: 31%; overflow: hidden; text-overflow: ellipsis; color: var(--insight-muted); font-size: 11px; }
+.key { font-variant-numeric: tabular-nums; }
+@container (max-width: 400px) { .status { display: none; } }
 @keyframes appear { from { opacity: 0; transform: translateY(-2px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .records .listItems { animation: none; } }

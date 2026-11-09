@@ -1,0 +1,12 @@
+.breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-inline-size: 0;
+  max-inline-size: 34%;
+  color: var(--falcon-text-muted);
+  font-size: 11px;
+}
+.breadcrumb svg { flex: none; }
+.breadcrumb span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@container dashboard-detail (max-width: 470px) { .breadcrumb { display: none; } }

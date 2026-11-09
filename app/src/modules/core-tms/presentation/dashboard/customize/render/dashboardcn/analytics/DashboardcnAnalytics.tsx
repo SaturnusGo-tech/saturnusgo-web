@@ -80,8 +80,14 @@ export function DashboardcnPortfolio({ title, snapshot, openDrill }: Props) {
   const column = snapshot.query.projectId ? t("dashboard.component") : t("dashboard.project");
   const headers = [column, t("dashboard.passRateShort"), t("dashboard.coverageRateShort"),
     t("dashboard.failedItemsShort"), t("dashboard.blockedItemsShort"), t("dashboard.defectsShort")];
-  const renderValue = (value: number | null, drill?: DashboardDrill, suffix = "") => value == null ? "—" : <WidgetAction
-    onClick={openDrill && drill && (() => openDrill(drill))}><MetricValue value={`${format.format(value)}${suffix}`} /></WidgetAction>;
+  const renderValue = (value: number | null, drill?: DashboardDrill) => value == null ? "—" : <WidgetAction
+    onClick={openDrill && drill && (() => openDrill(drill))}><MetricValue value={format.format(value)} /></WidgetAction>;
+  const renderRate = (value: number | null, drill?: DashboardDrill) => value == null ? "—" : <WidgetAction
+    className={styles.riskRate} onClick={openDrill && drill && (() => openDrill(drill))}>
+    <TickBar className={styles.riskMeter} value={value} segments={1} shape="pill" color="var(--dash-success)"
+      trackColor="var(--falcon-border-strong)" aria-hidden="true" />
+    <MetricValue value={`${format.format(value)}%`} />
+  </WidgetAction>;
   return <WidgetCard heading={title} subtitle={t("dashboard.riskHint")}>
     {snapshot.hotspots.length ? <div className={styles.tableScroll} role="region" tabIndex={0} aria-label={title}>
       <table className={styles.table}>
@@ -90,12 +96,8 @@ export function DashboardcnPortfolio({ title, snapshot, openDrill }: Props) {
           <th scope="row"><WidgetAction className={styles.riskName} onClick={openDrill && (() => openDrill(row.drills.cases))}>
             <span>{row.label}</span>{row.projectLabel && row.kind === "component" && <small>{row.projectLabel}</small>}
           </WidgetAction></th>
-          <td>{renderValue(row.passRate, row.drills.passed, "%")}</td>
-          <td>{row.coverageRate == null ? "—" : <WidgetAction className={styles.riskCoverage}
-            onClick={openDrill && row.drills.covered && (() => openDrill(row.drills.covered!))}>
-            <TickBar className={styles.riskMeter} value={row.coverageRate} segments={12} animate={false} color="var(--dash-success)" aria-hidden="true" />
-            <MetricValue value={`${format.format(row.coverageRate)}%`} />
-          </WidgetAction>}</td>
+          <td>{renderRate(row.passRate, row.drills.passed)}</td>
+          <td>{renderRate(row.coverageRate, row.drills.covered)}</td>
           <td>{renderValue(row.failedItems, row.drills.failures)}</td>
           <td>{renderValue(row.blockedItems, row.drills.blocked)}</td>
           <td><div className={styles.riskDefects}>{renderValue(row.openDefects, row.drills.defects)}

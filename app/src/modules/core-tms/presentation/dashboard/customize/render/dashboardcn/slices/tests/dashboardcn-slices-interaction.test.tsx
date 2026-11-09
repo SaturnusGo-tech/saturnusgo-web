@@ -84,7 +84,7 @@ void test("preview replaces its records on selection and keeps the full drill al
   await act(async () => { calls[1]?.resolve(row("Closed result", "2026-11-08T00:00:00.000Z")); calls[0]?.resolve(row("Stale open result")); });
   assert.match(JSON.stringify(view.toJSON()), /Closed result/);
   assert.doesNotMatch(JSON.stringify(view.toJSON()), /Stale open result/);
-  assert.equal(view.root.findAllByType("button").some(button => textContent(button).includes("Closed result")), false);
+  assert.equal(view.root.findAllByType("button").some(button => textContent(button).includes("Closed result")), true);
   await click("dashboard.openAll");
   assert.deepEqual(opened[0]?.filter, calls[1]?.request.drill.filter);
 

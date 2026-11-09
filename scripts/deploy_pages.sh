@@ -86,6 +86,13 @@ trap - EXIT
 
 out_dir="$source_repo/out"
 for application_route in "${route_paths[@]}"; do test -f "$out_dir/$application_route/index.html"; done
+
+uncompiled_css=$(find "$out_dir/_next/static/css" -type f -name '*.css' \
+  -exec grep -lE '@(tailwind|theme|custom-variant|utility)([^[:alnum:]_-]|$)' {} \;)
+if [[ -n "$uncompiled_css" ]]; then
+  printf 'Uncompiled Tailwind directives in the export:\n%s\n' "$uncompiled_css" >&2
+  exit 17
+fi
 if find "$out_dir/testcases" -type d | grep -Eq 'UmbrellaHome|/Work$'; then
   echo "Mixed-case TMS route was emitted." >&2
   exit 12

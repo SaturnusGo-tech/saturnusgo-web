@@ -1,4 +1,4 @@
-import { Archive, ExternalLink, Plug, Repeat2, Shapes, TriangleAlert, UserRound } from "lucide-react";
+import { ExternalLink, Plug, Repeat2, Shapes, TriangleAlert, UserRound } from "lucide-react";
 import type { ReactNode } from "react";
 import type { Defect } from "../../../../../../core/tms/contracts/legacy-contract";
 import { ConnectorTargetLinks } from "../../../../connectors/presentation/links/ConnectorTargetLinks";
@@ -14,7 +14,6 @@ import detail from "../defect-detail.module.css";
 
 export function DefectReportProperties({ defect, workspaceId }: { defect: Defect; workspaceId?: string }) {
   const { locale, t } = useTmsLocale();
-  const archived = locale === "ru" ? "В архиве" : "Archived";
   const status = localizedLabel(locale, defect.status);
   const severity = localizedLabel(locale, defect.severity);
   const priority = priorityLabel(locale, defect.priority);
@@ -26,10 +25,9 @@ export function DefectReportProperties({ defect, workspaceId }: { defect: Defect
       <h3>{t("reports.properties")}</h3>
       <dl className={`${rail.rows} ${detail.propertiesList}`}>
         <PropertyRow label={t("reports.status")} value={status} icon={<DefectStatusIcon status={defect.status} />} />
-        {defect.archivedAt && <PropertyRow label={locale === "ru" ? "Архивный статус" : "Archive status"} icon={<Archive size={15} aria-hidden="true" />} value={archived} />}
         <PropertyRow label={t("reports.severity")} value={severity}
           icon={<TriangleAlert size={15} aria-hidden="true" className={detail.severity} data-level={defect.severity} />} />
-        <PropertyRow label={t("reports.priority")} value={priority} icon={<PriorityIcon level={defect.priority} />} />
+        <PropertyRow label={t("reports.priority")} value={priority} icon={<PriorityIcon level={defect.priority} empty="circle" />} />
         <PropertyRow label={t("reports.reproducibility")} value={defect.reproducibility || "—"} icon={<Repeat2 size={15} aria-hidden="true" />} />
         <PropertyRow label={t("reports.component")} value={component || "—"} icon={<Shapes size={15} aria-hidden="true" />} />
         {workspaceId && defect.assigneeIdentityId ? <div className={detail.assignee}>

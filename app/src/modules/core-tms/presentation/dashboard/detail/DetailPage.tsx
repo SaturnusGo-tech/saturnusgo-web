@@ -1,5 +1,5 @@
 import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
-import { ContentSkeleton } from "../../common/skeleton/ContentSkeleton";
+import { DeferredPane } from "../../common/loading/feedback/DeferredPane";
 import { ArrowUpRight, ListChecks, SearchX, RefreshCw } from "lucide-react";
 import { useEffect, useRef, type ReactNode } from "react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -26,13 +26,21 @@ export function DetailPage({ title, context, count, action, onBack, children }: 
   </div>;
 }
 
-export function DetailState({ loading, error, empty, filtered, onRetry }: {
-  loading: boolean; error?: string | null; empty: boolean; filtered?: boolean; onRetry: () => void;
+export function DetailResults({ loading, pending, children }: {
+  loading: boolean; pending: boolean; children: ReactNode;
+}) {
+  const { t } = useTmsLocale();
+  return <div aria-busy={loading}>
+    <DeferredPane pending={pending} variant="list" label={t("dashboard.drillLoading")}>{children}</DeferredPane>
+  </div>;
+}
+
+export function DetailState({ error, empty, filtered, onRetry }: {
+  error?: string | null; empty: boolean; filtered?: boolean; onRetry: () => void;
 }) {
   const { locale, t } = useTmsLocale();
   if (error) return <div className={styles.failure} role="alert"><span>{error}</span>
     <button type="button" className={styles.quiet} onClick={onRetry}><RefreshCw size={14} />{t("dashboard.retry")}</button></div>;
-  if (loading) return <ContentSkeleton variant="list" label={t("dashboard.drillLoading")} />;
   if (!empty) return null;
   return <div className={styles.state}>{filtered ? <SearchX size={27} strokeWidth={1.25} /> : <ListChecks size={27} strokeWidth={1.25} />}
     <strong>{locale === "ru" ? filtered ? "Совпадений нет" : "Здесь пока нет записей" : filtered ? "No matches" : "No records yet"}</strong>

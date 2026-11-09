@@ -1,0 +1,36 @@
+.bar {
+  display: flex;
+  inline-size: var(--tick-bar-width, 100%);
+  block-size: var(--tick-bar-height, var(--tick-bar-default-height, 24px));
+}
+
+.bar[data-shape="pill"] {
+  --tick-bar-default-height: 16px;
+  --tick-bar-radius: 999px;
+}
+
+.segment {
+  position: relative;
+  flex: 1;
+  min-inline-size: 0;
+  block-size: 100%;
+  overflow: hidden;
+  border-radius: var(--tick-bar-radius, 1.5px);
+  background-color: var(--muted, var(--falcon-selected));
+  transition: background-color 150ms ease;
+}
+
+.fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fill[data-animate="true"] { animation-name: reveal; }
+}
+
+@keyframes reveal {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
