@@ -23,8 +23,17 @@ export async function listWorkspaceActors(http: TmsHttpClient, workspaceId: stri
     const page = await http.get<components["schemas"]["ActorCatalogEnvelope"]>(`/workspaces/${encodeURIComponent(workspaceId)}/actors?${query}`, signal);
     const items: WorkspaceActor[] = page.data.map(actor => actor.kind === "human"
         ? { identityId: actor.identityId, kind: "human", name: actor.name, email: actor.email,
-            ...(options.includeSignIn && options.identityId === actor.identityId && actor.lastSignedInAt !== undefined
-                ? { lastSignedInAt: actor.lastSignedInAt } : {}) }
+            ...(options.includeSignIn && options.identityId === actor.identityId ? profileDetails(actor) : {}) }
         : { identityId: actor.identityId, kind: "agent", provider: actor.provider, name: actor.name, status: actor.status });
     return { items, nextCursor: page.meta.hasMore ? page.meta.nextCursor : null };
+}
+
+function profileDetails(actor: Readonly<components["schemas"]["HumanCatalogActor"]>) {
+    const { lastSignedInAt, presence, timeZone, workspaceName } = actor;
+    return {
+        ...(lastSignedInAt === undefined ? {} : { lastSignedInAt }),
+        ...(presence === undefined ? {} : { presence }),
+        ...(timeZone === undefined ? {} : { timeZone }),
+        ...(workspaceName === undefined ? {} : { workspaceName }),
+    };
 }

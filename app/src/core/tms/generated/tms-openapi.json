@@ -21095,7 +21095,7 @@
           {
             "name": "includeSignIn",
             "in": "query",
-            "description": "Return the nullable last completed sign-in time for a human profile. Requires an exact identityId when true.",
+            "description": "Include the member profile with nullable sign-in, presence, time zone and workspace name. Requires an exact identityId when true.",
             "schema": {
               "type": "boolean",
               "default": false
@@ -21148,6 +21148,74 @@
                 "schema": {
                   "$ref": "#/components/schemas/ActorCatalogEnvelope"
                 }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/workspaces/{workspaceId}/actors/me/presence": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workspaceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "Workspaces"
+        ],
+        "operationId": "recordWorkspaceActorPresence",
+        "summary": "Record presence for the current Falcon session",
+        "description": "Records recent foreground activity and the time zone of the authenticated member in this workspace. Requires workspace:read and an active managed or cloud session. Other valid authentication methods are acknowledged without recording a heartbeat. Writes are throttled per session.",
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "timeZone"
+                ],
+                "properties": {
+                  "timeZone": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100,
+                    "description": "IANA time zone of the active client."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Presence acknowledged.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
               }
             }
           },
@@ -54103,6 +54171,33 @@
             ],
             "format": "date-time",
             "description": "Returned only on exact human identity lookup with includeSignIn=true. Latest recorded completed authentication in this workspace, or null if unavailable."
+          },
+          "presence": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "online",
+              "offline",
+              null
+            ],
+            "description": "Profile-only. Online means a live session reported foreground activity in the past two minutes. Null means no presence signal is available."
+          },
+          "timeZone": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 100,
+            "description": "Profile-only. IANA time zone reported by the latest online client, or the last known time zone when offline."
+          },
+          "workspaceName": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Profile-only. The actual name of the authorized workspace where the human has active membership."
           }
         }
       },

@@ -5179,6 +5179,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/workspaces/{workspaceId}/actors/me/presence": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Record presence for the current Falcon session
+         * @description Records recent foreground activity and the time zone of the authenticated member in this workspace. Requires workspace:read and an active managed or cloud session. Other valid authentication methods are acknowledged without recording a heartbeat. Writes are throttled per session.
+         */
+        post: operations["recordWorkspaceActorPresence"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/execution-history": {
         parameters: {
             query?: never;
@@ -11758,6 +11783,15 @@ export interface components {
              * @description Returned only on exact human identity lookup with includeSignIn=true. Latest recorded completed authentication in this workspace, or null if unavailable.
              */
             lastSignedInAt?: string | null;
+            /**
+             * @description Profile-only. Online means a live session reported foreground activity in the past two minutes. Null means no presence signal is available.
+             * @enum {string|null}
+             */
+            presence?: "online" | "offline" | null;
+            /** @description Profile-only. IANA time zone reported by the latest online client, or the last known time zone when offline. */
+            timeZone?: string | null;
+            /** @description Profile-only. The actual name of the authorized workspace where the human has active membership. */
+            workspaceName?: string | null;
         };
         AgentCatalogActor: {
             identityId: components["schemas"]["Identifier"];
@@ -24814,7 +24848,7 @@ export interface operations {
             query?: {
                 /** @description Resolve a workspace actor, including inactive historical records. Use eligible=true to require active selection eligibility. */
                 identityId?: components["schemas"]["Identifier"];
-                /** @description Return the nullable last completed sign-in time for a human profile. Requires an exact identityId when true. */
+                /** @description Include the member profile with nullable sign-in, presence, time zone and workspace name. Requires an exact identityId when true. */
                 includeSignIn?: boolean;
                 search?: string;
                 /** @description Require active identity, membership and (for Codex) employee, including for an exact identity lookup. Collections always apply this filter. */
@@ -24844,6 +24878,41 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ActorCatalogEnvelope"];
                 };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    recordWorkspaceActorPresence: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description IANA time zone of the active client. */
+                    timeZone: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Presence acknowledged. */
+            204: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];

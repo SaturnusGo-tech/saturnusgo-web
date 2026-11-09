@@ -25,21 +25,23 @@ test("selected member names resolve by identity without listing the workspace", 
   assert.equal(new URL(url).searchParams.get("identityId"), "member-1"); assert.deepEqual(page.items, []);
 });
 
-test("last sign-in remains scoped to an exact human actor lookup", async () => {
+test("profile details remain scoped to an exact human actor lookup", async () => {
   const signedIn = "2026-11-09T04:58:00.000Z";
-  const human = { identityId: "member-1", kind: "human", name: "QA Admin", email: null, lastSignedInAt: signedIn };
-  const agent = { identityId: "agent-1", kind: "agent", name: "Codex", provider: "codex", status: "active", lastSignedInAt: signedIn };
+  const profile = { lastSignedInAt: signedIn, presence: "online", timeZone: "Asia/Almaty", workspaceName: "Umbrella Host" };
+  const human = { identityId: "member-1", kind: "human", name: "QA Admin", email: null, ...profile };
+  const agent = { identityId: "agent-1", kind: "agent", name: "Codex", provider: "codex", status: "active", ...profile };
+  const other = { ...human, identityId: "member-2" };
   const queries: URLSearchParams[] = [];
   const http = createTmsHttpClient({ apiBase: "https://api.example.test/api/v1", accessToken: async () => "test.token.value",
     fetch: async input => {
       queries.push(new URL(String(input)).searchParams);
-      return Response.json({ data: [human, agent], meta: { limit: 100, hasMore: false, nextCursor: null } });
+      return Response.json({ data: [human, agent, other], meta: { limit: 100, hasMore: false, nextCursor: null } });
     } });
   const exact = await listWorkspaceActors(http, "workspace-1", { identityId: "member-1", includeSignIn: true });
   const avatar = await listWorkspaceActors(http, "workspace-1", { identityId: "member-1" });
   const search = await listWorkspaceActors(http, "workspace-1", { search: "QA", includeSignIn: true });
   assert.deepEqual(queries.map(query => query.get("includeSignIn")), ["true", null, null]);
   assert.deepEqual(exact.items[0], human);
-  assert.ok(!("lastSignedInAt" in exact.items[1]));
-  assert.ok([...avatar.items, ...search.items].every(item => !("lastSignedInAt" in item)));
+  assert.ok([...exact.items.slice(1), ...avatar.items, ...search.items].every(item =>
+    Object.keys(profile).every(field => !(field in item))));
 });

@@ -3,6 +3,8 @@
 import { FolderAppearanceProvider } from "../../folders/presentation/appearance/context/FolderAppearanceProvider";
 import { WorkspaceConnectorProvider } from "../../connectors/application/context/WorkspaceConnectorContext";
 import { WorkspacePeopleProvider } from "../../workspace/members/context/WorkspacePeopleContext";
+import { useOptionalTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
+import { useMemberPresence } from "../../workspace/members/state/presence/useMemberPresence";
 import { useEffect, useState } from "react";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { useWorkspaceModel } from "../../state/model/useWorkspaceModel";
@@ -31,6 +33,8 @@ const glassEnabled = process.env.NEXT_PUBLIC_FALCON_GLASS_EXPERIMENT !== "false"
 
 export function LocalizedWorkspace() {
   const model = useWorkspaceModel();
+  const http = useOptionalTmsHttpClient();
+  useMemberPresence(http, model.data.workspace.id, model.connection === "connected");
   const pageRef = usePageAppearance([model.view, model.project?.id, model.repositoryScope.key, model.connection].join(":"));
   useHistoryScroll(pageRef);
   const { locale, languageTag, t } = useTmsLocale();
