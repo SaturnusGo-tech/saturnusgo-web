@@ -22,7 +22,14 @@
 }
 .documentationLinks svg { flex: none; }
 .chapter > .documentationScene { margin-top: clamp(28px, 5vw, 64px); }
-.documentationScene picture {
+.documentationScene {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 52%);
+  align-items: center;
+  gap: 18px clamp(24px, 5vw, 72px);
+}
+.documentationMain,
+.documentationInset {
   display: block;
   overflow: hidden;
   border: 1px solid var(--landing-line);
@@ -33,19 +40,31 @@
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 2000 / 900;
+}
+.documentationMain { grid-column: 1 / -1; }
+.documentationInset {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: end;
+  width: min(100%, 600px);
+  box-shadow: 0 14px 36px #0008;
 }
 .documentationScene figcaption {
-  margin-top: 12px;
+  grid-column: 1;
+  grid-row: 2;
+  max-width: 36ch;
   color: var(--landing-muted);
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.55;
 }
 @media (max-width: 760px) {
   .chapter:has(.documentationScene) .chapterHeading { grid-template-columns: minmax(0, 1fr); }
   .chapter:has(.documentationScene) h2 { white-space: normal; }
   .documentationLinks { margin-top: 6px; gap: 0 20px; }
-  .documentationScene img { aspect-ratio: 1152 / 856; }
+  .documentationScene { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .documentationInset, .documentationScene figcaption { grid-column: 1; grid-row: auto; }
+  .documentationInset { width: 94%; }
+  .documentationScene figcaption { font-size: 13px; }
 }
 .footer {
   border-top: 1px solid var(--landing-line);

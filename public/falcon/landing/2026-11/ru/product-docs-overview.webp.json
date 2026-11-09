@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "origin": "isolated-local-fixture",
+  "sourceComponent": "app/src/modules/core-tms/product-docs/presentation/tree/ProductDocsOverview.tsx",
+  "fixture": "Synthetic Booking QA workspace in the Falcon application shell, documentation overview with four expanded folder branches, twenty synthetic articles, and recent and starred pages",
+  "capturedAt": "2026-11-09T21:03:06.436816Z",
+  "releaseSha": "8588dc67ba1aeb7e672d8daeadee502786f522b2",
+  "locale": "ru",
+  "uiLocale": "ru",
+  "contentLanguage": "ru",
+  "viewport": {
+    "width": 1728,
+    "height": 1117,
+    "deviceScaleFactor": 2
+  },
+  "image": {
+    "width": 1728,
+    "height": 1117
+  },
+  "rawSha256": "e173620d261d7aed68a6d2e06d64a8be0573a3acbccbbe6f04eb5ead9315b99c",
+  "finalSha256": "9f4936e2e42422e0696e31c12fe2b8dd42fab369395af416cf9095c5d4e985a8",
+  "encoding": {
+    "format": "webp",
+    "encoder": "cwebp",
+    "quality": 91,
+    "method": 6,
+    "resized": true,
+    "cropped": false
+  }
+}

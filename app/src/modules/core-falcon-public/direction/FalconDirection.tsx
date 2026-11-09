@@ -103,17 +103,27 @@ export function FalconDirection() {
           </div>
         </div>
         <figure className={styles.documentationScene}>
-          <picture>
-            <source media="(max-width: 760px)" srcSet={`/falcon/landing/2026-11/${locale}/product-docs-1152.webp`} />
+          <picture className={styles.documentationMain}>
+            <source media="(max-width: 760px)" srcSet={`/falcon/landing/2026-11/${locale}/product-docs-1152.webp`} width={1152} height={1024} />
             <img
               src={`/falcon/landing/2026-11/${locale}/product-docs.webp`}
               width={2000}
-              height={900}
+              height={1293}
               alt={c.documentation.alt}
               loading="lazy"
               decoding="async"
             />
           </picture>
+          <div className={styles.documentationInset}>
+            <img
+              src={`/falcon/landing/2026-11/${locale}/product-docs-overview.webp`}
+              width={1728}
+              height={1117}
+              alt={c.documentation.overviewAlt}
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
           <figcaption>{c.documentation.caption}</figcaption>
         </figure>
       </section>

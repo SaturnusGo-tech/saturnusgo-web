@@ -2,27 +2,27 @@
   "schemaVersion": 1,
   "origin": "isolated-local-fixture",
   "sourceComponent": "app/src/modules/core-tms/product-docs/presentation/ProductDocsView.tsx",
-  "fixture": "Synthetic Booking QA workspace, release readiness article, Mermaid diagram and linked cases",
-  "capturedAt": "2026-11-09T20:05:46.377254Z",
-  "releaseSha": "c10c59397e2e46c846ab8015bfc008a92d904479",
+  "fixture": "Synthetic Booking QA workspace in the Falcon application shell, release readiness guide with highlighted acceptance criteria, Mermaid workflow, table, callout, and linked cases",
+  "capturedAt": "2026-11-09T21:02:51.642571Z",
+  "releaseSha": "8588dc67ba1aeb7e672d8daeadee502786f522b2",
   "locale": "en",
   "uiLocale": "en",
   "contentLanguage": "en",
   "viewport": {
-    "width": 1320,
-    "height": 594,
+    "width": 1728,
+    "height": 1117,
     "deviceScaleFactor": 2
   },
   "image": {
     "width": 2000,
-    "height": 900
+    "height": 1293
   },
-  "rawSha256": "099e982f5597c6476ba71538b8bd9d7a6f57416f1f90177508f7672d9da1b0f7",
-  "finalSha256": "7e1d90164b4a592634a91ca149f1c4708ed08eed68bdb7aa6697f6e145badb3f",
+  "rawSha256": "4cf230876f742d50b882bb637b522b322b9ecf5f77162a6090df223910e668b1",
+  "finalSha256": "6a4ced6f0e6158112a7ea28dbc89eef19b4ae010a25241cacae7d63d96d3cda9",
   "encoding": {
     "format": "webp",
     "encoder": "cwebp",
-    "quality": 90,
+    "quality": 91,
     "method": 6,
     "resized": true,
     "cropped": false
