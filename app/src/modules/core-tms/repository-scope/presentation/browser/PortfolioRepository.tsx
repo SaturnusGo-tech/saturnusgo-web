@@ -34,6 +34,7 @@ export function PortfolioRepository({ model }: { model: WorkspaceModel }) {
   const filtered = Boolean(selectedProjects.length || filters.query || filters.qlQuery || filters.facets.owners?.length || filters.facets.folders.length
     || filters.facets.components.length || filters.filters.tag || filters.filters.type !== "all" || filters.filters.priority !== "all" || filters.filters.lifecycle !== "all" || (filters.filters.maintenanceStatus && filters.filters.maintenanceStatus !== "all"));
   const locked = Boolean(opening || model.dialog === "case");
+  const loadingCaseId = opening ?? (!model.selectedRevision && !model.selectedCaseDetailError && model.dialog !== "case" ? model.selectedCase?.id : undefined);
   async function openCase(item: TestCaseSummary) {
     if (locked) return;
     setOpening(item.id); setError(false);
@@ -75,7 +76,7 @@ export function PortfolioRepository({ model }: { model: WorkspaceModel }) {
           {expanded && <div className={css.contents}>
             {branch === null ? <div className={shared.loadError} role="alert"><span>{ru ? "Кейсы проекта не загружены" : "Project cases could not be loaded"}</span><button type="button" onClick={resource.retry}>{ru ? "Повторить" : "Retry"}</button></div>
               : !branch ? null : cases.length ? <PortfolioCaseTree cases={cases} folders={branch.folders} workspaceId={model.data.workspace.id} ru={ru} disabled={locked}
-                activeId={model.selectedCaseId} includeArchived={filters.filters.includeArchived} onOpen={item => void openCase(item)} />
+                activeId={model.selectedCaseId} loadingCaseId={loadingCaseId} includeArchived={filters.filters.includeArchived} onOpen={item => void openCase(item)} />
                 : <p className={css.message}>{ru ? "В проекте пока нет кейсов" : "This project has no cases yet"}</p>}
           </div>}
         </section>;

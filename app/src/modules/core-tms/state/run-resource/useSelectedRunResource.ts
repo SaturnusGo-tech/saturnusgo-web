@@ -15,13 +15,17 @@ export function useSelectedRunResource({ http, connection, projectId, selectedRu
   const [selectedRunItemDetail, setSelectedRunItemDetail] = useState<RunItem | null>(null);
   const [selectedRunItemEtag, setSelectedRunItemEtag] = useState<string | null>(null);
   const [runResourceError, setError] = useState(false);
+  const [failedItemScope, setFailedItemScope] = useState<string | null>(null);
+  const [itemGeneration, setItemGeneration] = useState(0);
   const [runResourceLoading, setLoading] = useState(false);
   const [generation, setGeneration] = useState(0);
   const scope = JSON.stringify([projectId, selectedRunId, generation]);
+  const itemScope = JSON.stringify([scope, selectedRunItemId, itemGeneration]);
   const [requestScope, setRequestScope] = useState("");
   const [loadedScope, setLoadedScope] = useState<string | null>(null);
   const selectedItemAvailable = runItems.some((item) => item.id === selectedRunItemId);
   const retryRunResource = useCallback(() => setGeneration((current) => current + 1), []);
+  const retryRunItem = useCallback(() => setItemGeneration((current) => current + 1), []);
   useEffect(() => {
     setRunItems([]); setSelectedRunEtag(null); setSelectedRunItemDetail(null); setSelectedRunItemEtag(null);
     setError(false); setLoading(false); setRequestScope(scope); setLoadedScope(null);
@@ -39,7 +43,7 @@ export function useSelectedRunResource({ http, connection, projectId, selectedRu
     return () => controller.abort();
   }, [connection, http, selectedRunId, projectId, scope, generation, setData, setSelectedRunItemId]);
   useEffect(() => {
-    setSelectedRunItemDetail(null); setSelectedRunItemEtag(null);
+    setSelectedRunItemDetail(null); setSelectedRunItemEtag(null); setFailedItemScope(null);
     if (connection !== "connected" || !selectedRunId || !selectedRunItemId || loadedScope !== scope
       || !selectedItemAvailable || runResourceLoading || runResourceError) return;
     const controller = new AbortController();
@@ -47,15 +51,16 @@ export function useSelectedRunResource({ http, connection, projectId, selectedRu
       controller.signal.throwIfAborted();
       if (resource.data.id !== selectedRunItemId) throw new Error("Run item selection mismatch");
       setSelectedRunItemDetail(resource.data); setSelectedRunItemEtag(resource.etag);
-    }).catch(() => { if (!controller.signal.aborted) setError(true); });
+    }).catch(() => { if (!controller.signal.aborted) setFailedItemScope(itemScope); });
     return () => controller.abort();
   }, [connection, http, selectedRunId, selectedRunItemId, loadedScope, scope, selectedItemAvailable,
-    runResourceLoading, runResourceError, generation]);
+    runResourceLoading, runResourceError, itemScope]);
   const ready = connection === "connected" && loadedScope === scope;
   const failed = connection === "connected" && requestScope === scope && runResourceError;
   return { runItems: ready ? runItems : [], setRunItems, selectedRunEtag: ready ? selectedRunEtag : null,
     setSelectedRunEtag, selectedRunItemDetail: ready ? selectedRunItemDetail : null,
     setSelectedRunItemDetail, selectedRunItemEtag: ready ? selectedRunItemEtag : null, setSelectedRunItemEtag,
+    runItemResourceError: ready && failedItemScope === itemScope, retryRunItem,
     runResourceReady: ready, runResourceError: failed, runResourceLoading: connection === "connected" && Boolean(selectedRunId)
       && (!ready || runResourceLoading) && !failed, retryRunResource };
 }

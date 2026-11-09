@@ -17,6 +17,7 @@ import { WidgetCatalog } from "./customize/catalog/WidgetCatalog";
 import type { DashboardViewProps } from "./dashboard-view";
 import { DashboardDetail } from "./detail/route/DashboardDetail";
 import { useDrillNavigation } from "./navigation/useDrillNavigation";
+import { DeferredPane } from "../common/loading/feedback/DeferredPane";
 import surface from "./dashboard.module.css";
 import styles from "./customize/layout.module.css";
 import shell from "../../tms.module.css";
@@ -117,11 +118,12 @@ function DashboardWorkspace(props: DashboardViewProps) {
         void failed?.controller.load();
       }}>{t(layout.draft ? "dashboardLayout.reload" : "dashboardLayout.retry")}</button>}
     </div>}
-    {loading ? <div className={styles.loading} role="status"><LoadingOrb size="md" />{t("dashboardLayout.loading")}</div>
-      : !board ? !layoutFailure && !personalBoard?.failure && <DashboardEmpty editing={false} personal={canComposePersonal}
+    <DeferredPane pending={loading} variant="dashboard" label={t("dashboardLayout.loading")}>
+      {!board ? !layoutFailure && !personalBoard?.failure && <DashboardEmpty editing={false} personal={canComposePersonal}
         canEdit={canEdit} onAdd={openCatalog} />
-      : !board.widgets.length ? <DashboardEmpty editing={editing} personal={personalEditing || (!editing && canComposePersonal)}
-        canEdit={canEdit && !disabled && layout.failure !== "conflict"} onAdd={openCatalog} />
-      : <DashboardContent key={scope} {...props} layout={layout} model={model} />}
+        : !board.widgets.length ? <DashboardEmpty editing={editing} personal={personalEditing || (!editing && canComposePersonal)}
+          canEdit={canEdit && !disabled && layout.failure !== "conflict"} onAdd={openCatalog} />
+        : <DashboardContent key={scope} {...props} layout={layout} model={model} />}
+    </DeferredPane>
   </div>;
 }

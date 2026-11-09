@@ -14,14 +14,14 @@ async function harness() {
   let nav!: ReturnType<typeof useRunExecutionNavigation>; let renderer!: ReactTestRenderer;
   let selected = { id: "outside", run: "run-p", project: "p" };
   let values = [a,b,c], dirty = false, ready = true, scope = "batch", stale = false, writes = 0;
-  let loading = false, busy = false, missing = false, error = "", workspace = "w", connection = "connected";
+  let loading = false, busy = false, missing = false, error = "", workspace = "w", connection = "connected", itemError = false;
   const committed: string[] = [];
   let write: () => Promise<boolean> = async () => true;
   function Probe() {
     const [id, setId] = useState(selected.id); const [run, setRun] = useState(selected.run);
     const [project, setProject] = useState(selected.project); selected = {id,run,project};
     const model = { data:{workspace:{id:workspace}},projectId:project,connection,selectedRunId:run,selectedRunItemId:id,
-      selectedRunItem: missing ? null : {id:stale?"old-detail":id}, setSelectedRunItemId:setId, setSelectedRunId:setRun, setProjectId:setProject,
+      runItemResourceError: itemError, selectedRunItem: missing ? null : {id:stale?"old-detail":id}, setSelectedRunItemId:setId, setSelectedRunId:setRun, setProjectId:setProject,
       unblockItem:async(onCommitted:(item:unknown)=>void)=>{writes++;const saved=await write();if(saved)onCommitted?.({id});return saved;},
       setItemStatus:async(_status:unknown, onCommitted:(item:unknown)=>void)=>{writes++;const saved=await write();if(saved)onCommitted?.({id});return saved;},setStepStatus:async()=>{writes++;return write();} } as unknown as WorkspaceModel;
     nav = useRunExecutionNavigation(model, { entries:values,rememberItem:(item:{id:string})=>committed.push(item.id),browser:{ready,loading,busy,error,batch:{id:scope}} } as unknown as RunRepositoryModel,dirty);
@@ -31,10 +31,10 @@ async function harness() {
   return { get nav(){return nav;}, get selected(){return selected;}, get writes(){return writes;}, committed,
     write(fn:()=>Promise<boolean>){write=fn;},
     async update(opts:{entries?:RunRepositoryEntry[];dirty?:boolean;ready?:boolean;scope?:string;stale?:boolean;
-      loading?:boolean;busy?:boolean;missing?:boolean;error?:string;workspace?:string;connection?:string}) {
+      loading?:boolean;busy?:boolean;missing?:boolean;error?:string;workspace?:string;connection?:string;itemError?:boolean}) {
       values=opts.entries??values;dirty=opts.dirty??dirty;ready=opts.ready??ready;scope=opts.scope??scope;stale=opts.stale??stale;
       loading=opts.loading??loading;busy=opts.busy??busy;missing=opts.missing??missing;error=opts.error??error;
-      workspace=opts.workspace??workspace;connection=opts.connection??connection;
+      workspace=opts.workspace??workspace;connection=opts.connection??connection;itemError=opts.itemError??itemError;
       await act(async()=>renderer.update(<Probe/>));
     },async close(){await act(async()=>renderer.unmount());} };
 }
@@ -131,5 +131,21 @@ test("retained presentation never crosses owners, errors, hidden rows or stale d
   const h = await harness(); try {
     await h.update({ stale: true }); assert.equal(h.nav.selectedItem, null);
     await h.update({ stale: false, missing: true }); assert.equal(h.nav.selectedItem, null);
+  } finally { await h.close(); }
+});
+
+test("a case detail error drops confirmed content but still permits another run row to open", async () => {
+  const h = await harness(); try {
+    assert.equal(h.nav.selectedItem?.id, "a");
+    assert.equal(h.nav.openingItem, false, "the automatically selected case is not an explicit opening");
+    await h.update({ itemError: true });
+    assert.equal(Boolean(h.nav.selectedItem), false);
+    await act(async () => { assert.equal(await h.nav.mark("passed"), false); h.nav.select("b"); });
+    assert.equal(h.selected.id, "b");
+    assert.equal(h.nav.openingItem, true);
+    await h.update({ itemError: false });
+    assert.equal(h.nav.selectedItem?.id, "b");
+    await h.update({ entries: [c] });
+    assert.equal(h.nav.openingItem, false, "selection reconciliation does not reuse the explicit opening");
   } finally { await h.close(); }
 });

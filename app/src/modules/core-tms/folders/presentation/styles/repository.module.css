@@ -58,7 +58,11 @@
 .leaf > input { margin-top: 10px; }
 .caseButton { grid-column: 3 / -1; display: flex; align-items: flex-start; gap: 7px; padding: 8px 3px 8px 4px; min-width: 0; width: 100%; text-align: left; touch-action: pan-y; }
 .caseButton svg { color: var(--falcon-case-icon); flex-shrink: 0; margin-top: 0; }
-.caseAccessory { display: inline-flex; flex: none; overflow: visible; }
+.caseAccessory { position: relative; display: inline-flex; flex: none; overflow: visible; }
+.caseAccessory > :not(.caseOrb) { transition: opacity 140ms ease; }
+.caseAccessory[data-case-loading] > :not(.caseOrb) { opacity: 0; }
+.caseOrb { --loading-orb-size: 15px; position: absolute; inset: 0; margin: auto; }
+@media (prefers-reduced-motion: reduce) { .caseAccessory > :not(.caseOrb) { transition: none; } }
 .caseCopy, .caseTitle { flex: 1; min-width: 0; font-size: 12px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.5; }
 .caseButton small { font-size: 10px; display: block; color: var(--falcon-text-muted); }
 .leaf[data-title-mode="inline"] { min-height: 34px; align-items: center; }

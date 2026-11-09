@@ -1,7 +1,7 @@
 "use client";
 
 import { transitionContent } from "../workspace/motion/transition/content-transition";
-import { ContentSkeleton } from "../common/skeleton/ContentSkeleton";
+import { DeferredPane } from "../common/loading/feedback/DeferredPane";
 import { Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
@@ -53,13 +53,14 @@ export function SharedStepsView({ resource }: { resource: Resource }) {
           <button type="button" className={styles.primaryButton} onClick={create}><Plus size={16} />{ru ? "Общий шаг" : "Shared step"}</button>
         </div>
       </header>
-      {resource.status === "loading" && !resource.items.length && <ContentSkeleton variant="list" label={ru ? "Загрузка общих шагов" : "Loading shared steps"} />}
-      {resource.status === "error" && <div className={styles.state} role="alert"><strong>{ru ? "Не удалось загрузить общие шаги" : "Could not load shared steps"}</strong>
-        <button type="button" className={styles.secondaryButton} onClick={() => void resource.refresh()}>{ru ? "Повторить" : "Retry"}</button></div>}
-      {resource.status !== "error" && rows.length > 0 && <SharedStepList items={rows} ru={ru} locale={locale} archiveEnabled={resource.archiveEnabled}
-        openingId={openingId} onOpen={id => void beginEdit(id)} onRemove={setRemoving} />}
-      {resource.status !== "loading" && resource.status !== "error" && rows.length === 0 &&
-        <SharedStepEmpty searching={Boolean(query.trim())} ru={ru} onReset={() => setQuery("")} />}
+      {resource.status === "error" ? <div className={styles.state} role="alert"><strong>{ru ? "Не удалось загрузить общие шаги" : "Could not load shared steps"}</strong>
+        <button type="button" className={styles.secondaryButton} onClick={() => void resource.refresh()}>{ru ? "Повторить" : "Retry"}</button></div>
+        : <DeferredPane pending={resource.status === "loading" && !resource.items.length} variant="list" label={ru ? "Загрузка общих шагов" : "Loading shared steps"}>
+          {rows.length > 0 && <SharedStepList items={rows} ru={ru} locale={locale} archiveEnabled={resource.archiveEnabled}
+            openingId={openingId} onOpen={id => void beginEdit(id)} onRemove={setRemoving} />}
+          {resource.status !== "loading" && rows.length === 0 &&
+            <SharedStepEmpty searching={Boolean(query.trim())} ru={ru} onReset={() => setQuery("")} />}
+        </DeferredPane>}
     </div>
     {removing && <ArchiveSharedStepDialog item={removing} resource={resource} ru={ru} onClose={() => setRemoving(null)} />}
   </section>;

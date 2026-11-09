@@ -10,17 +10,23 @@ export function useRunExecutionNavigation(model: WorkspaceModel, repository: Run
   const scope = `${model.data.workspace.id}:${browser.batch?.id ?? model.selectedRunId ?? ""}`;
   const ready = browser.ready && !browser.loading && !browser.busy && !browser.error;
   const [pending, setPending] = useState(false);
+  const [requestedItem, setRequestedItem] = useState<string | null>(null);
   const locked = useRef(false);
   const latest = useRef({ entries, scope, selectedId: model.selectedRunItemId, model });
   latest.current = { entries, scope, selectedId: model.selectedRunItemId, model };
   const previous = useRef({ scope, entries });
   const visible = entries.some(row => row.runId === model.selectedRunId && row.item.id === model.selectedRunItemId);
   const selected = ready && visible;
-  const detailReady = selected && !model.runResourceError && model.selectedRunItem?.id === model.selectedRunItemId;
+  const openingItem = requestedItem !== null && requestedItem === model.selectedRunItemId;
+  useEffect(() => {
+    if (requestedItem && !openingItem) setRequestedItem(null);
+  }, [openingItem, requestedItem]);
+  const loadError = model.runResourceError || model.runItemResourceError;
+  const detailReady = selected && !loadError && model.selectedRunItem?.id === model.selectedRunItemId;
   // Preserve only the confirmed presentation during a same-owner refresh. Writes still require detailReady.
   const owner = JSON.stringify([scope, model.projectId, model.selectedRunId, model.selectedRunItemId, model.connection]);
   const shown = useRef<{ owner: string; item: WorkspaceModel["selectedRunItem"] }>({ owner, item: null });
-  if (shown.current.owner !== owner || !visible || browser.error || model.runResourceError
+  if (shown.current.owner !== owner || !visible || browser.error || loadError
     || (model.selectedRunItem && model.selectedRunItem.id !== model.selectedRunItemId)) shown.current = { owner, item: null };
   if (detailReady) shown.current = { owner, item: model.selectedRunItem };
   function choose(row?: RunRepositoryEntry) {
@@ -39,7 +45,11 @@ export function useRunExecutionNavigation(model: WorkspaceModel, repository: Run
   function select(id: string) {
     if (!ready || dirty || locked.current) return;
     const row = entries.find(entry => entry.item.id === id);
-    if (row) choose(row);
+    if (row) { choose(row); setRequestedItem(id); }
+  }
+  function retryItem() {
+    setRequestedItem(model.selectedRunItemId);
+    model.retryRunItem();
   }
   async function mutate(write: () => Promise<boolean>, advance: boolean) {
     if (!detailReady || dirty || locked.current) return false;
@@ -62,7 +72,7 @@ export function useRunExecutionNavigation(model: WorkspaceModel, repository: Run
     try { return await model.setStepStatus(stepId, status, value); }
     finally { locked.current = false; setPending(false); }
   }
-  return { entries, pending, ready, selected, detailReady,
+  return { entries, pending, ready, selected, detailReady, openingItem, retryItem,
     selectedItem: shown.current.item,
     unblock: () => mutate(() => model.unblockItem(repository.rememberItem), false),
     select, step, mark: (status: ExecutionStatus) => mutate(() => model.setItemStatus(status, repository.rememberItem), status !== "failed"),

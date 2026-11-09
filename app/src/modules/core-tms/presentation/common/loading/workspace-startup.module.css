@@ -1,0 +1,48 @@
+.content {
+  display: contents;
+}
+
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  background: var(--falcon-surface);
+  opacity: 1;
+  transition: opacity 240ms ease-in-out;
+}
+
+.intro[data-phase="leaving"] {
+  opacity: 0;
+}
+
+.artwork {
+  position: relative;
+  display: grid;
+  place-items: center;
+  animation: arrive 320ms cubic-bezier(.2, .8, .2, 1) both;
+}
+
+.mark {
+  position: absolute;
+  inset-block-end: calc(100% + 18px);
+  inline-size: 76px;
+  block-size: 76px;
+  background: var(--falcon-text);
+  mask: url("../../../assets/falcon/falcon-line-mark.svg") center / contain no-repeat;
+}
+
+.orb {
+  --loading-orb-size: 64px;
+}
+
+@keyframes arrive {
+  from { opacity: 0; transform: translateY(4px) scale(.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro { transition: none; }
+  .artwork { animation: none; }
+}

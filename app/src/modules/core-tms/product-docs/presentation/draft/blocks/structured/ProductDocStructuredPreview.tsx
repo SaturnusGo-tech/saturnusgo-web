@@ -1,6 +1,5 @@
 "use client";
 
-import { LoadingOrb } from "../../../../../../../shared/components/loading/LoadingOrb";
 import { useTmsLocale } from "../../../../../localization/context/useTmsLocale";
 import type { useProductDocStructuredRender } from "./render/useProductDocStructuredRender";
 import { ProductDocDiagramViewer } from "./viewer/ProductDocDiagramViewer";
@@ -12,8 +11,7 @@ export function ProductDocStructuredPreview({ kind, source, result, expanded }: 
   const { locale } = useTmsLocale();
   const ru = locale === "ru";
   const label = kind === "diagram" ? (ru ? "Диаграмма Mermaid" : "Mermaid diagram") : (ru ? "Формула LaTeX" : "LaTeX formula");
-  if (!source.trim()) return null;
-  if (!result) return <div className={styles.previewLoading} role="status"><LoadingOrb />{ru ? "Загрузка предпросмотра" : "Loading preview"}</div>;
+  if (!source.trim() || !result) return null;
   if ("invalid" in result) {
     const error = kind === "diagram"
       ? (ru ? "Проверьте синтаксис Mermaid." : "Check the Mermaid syntax.")

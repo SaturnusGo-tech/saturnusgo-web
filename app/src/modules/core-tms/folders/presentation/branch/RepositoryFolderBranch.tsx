@@ -21,7 +21,7 @@ export type FolderBranchProps = {
   trailing?: (item: TestCaseSummary) => ReactNode;
   canSelect?: boolean; allowArchivedSelection?: boolean; accessory?: (item: TestCaseSummary) => ReactNode;
   node: FolderNode; depth: number; expanded: ReadonlySet<string>; selected: ReadonlySet<string>;
-  selectedFolder: string; selectedFolderId?: string; activeCaseId: string; ru: boolean; locked: boolean; canManage: boolean;
+  selectedFolder: string; selectedFolderId?: string; activeCaseId: string; loadingCaseId?: string; ru: boolean; locked: boolean; canManage: boolean;
   onExpand: (id: string) => void; onFolder: (path: string, id?: string) => void; onCase: (item: TestCaseSummary) => void;
   onReveal?: (id: string) => void;
   activeMenuFolderId?: string; menuId?: string;
@@ -73,7 +73,7 @@ export function RepositoryFolderBranch(props: FolderBranchProps) {
         title={`${ru ? "Свернуть ветку" : "Collapse branch"} ${folder.name}`} onClick={() => { disclosure.current?.focus(); props.onExpand(folder.id); }} />
       <ul id={childrenId} className={css.children}>
       {node.children.map((child) => <RepositoryFolderBranch key={child.folder.id} {...props} node={child} depth={depth + 1} />)}
-      {node.cases.map((item) => <RepositoryCaseLeaf key={item.id} item={item} depth={depth + 1} selected={props.selected.has(item.id)} active={props.activeCaseId === item.id}
+      {node.cases.map((item) => <RepositoryCaseLeaf key={item.id} item={item} depth={depth + 1} selected={props.selected.has(item.id)} active={props.activeCaseId === item.id} loading={props.loadingCaseId === item.id}
         titleMode={props.titleMode} creation={folder.archivedAt ? undefined : props.creation} trailing={props.trailing?.(item)} accessory={props.accessory?.(item)} locked={props.locked} canSelect={props.canSelect} allowArchivedSelection={props.allowArchivedSelection} canManage={props.canManage} ru={ru} onToggle={props.onToggle} onOpen={props.onCase} />)}
       {!node.caseIds.length && !node.children.length && <li className={css.emptyFolder}>{ru ? "Папка пуста" : "Empty folder"}</li>}
       </ul>

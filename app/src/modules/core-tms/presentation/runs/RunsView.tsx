@@ -1,3 +1,4 @@
+import { LoadingOrb } from "../../../../shared/components/loading/LoadingOrb";
 import { Requirements } from "../../product-docs/requirements/Requirements";
 import { CaseMaintenanceFeature } from "../../test-cases/maintenance/composition/CaseMaintenanceFeature";
 import { ExecutionHistoryFeature } from "../../codex-employee/execution-history/composition/ExecutionHistoryFeature";
@@ -15,7 +16,7 @@ import { casePriority, executableSteps } from "../../helpers/cases/caseRevision"
 import { localizedLabel } from "../../localization/format/labels";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { FormError } from "../common/error/FormError";
-import { TessiqLoader } from "../common/loading/TessiqLoader";
+import { useLoadingFeedback } from "../common/loading/feedback/useLoadingFeedback";
 import { statusIcon } from "../status/executionStatus";
 import { InlineDefectComposer } from "./defect/InlineDefectComposer";
 import { AttachmentLink } from "../../attachments/presentation/link/AttachmentLink";
@@ -42,6 +43,9 @@ type RunsViewProps = {
   selectedRun: TestRunSummary | null;
   items: RunItemSummary[];
   scopeLoading: boolean;
+  openingItem: boolean;
+  itemLoadError: boolean;
+  onRetryItem: () => void;
   selectedItem: RunItem | null;
   onSelectItem: (id: string) => void;
   onStepStatus: (stepId: string, status: ExecutionStatus) => void;
@@ -55,7 +59,7 @@ type RunsViewProps = {
   onArchive: (run: TestRunSummary) => void;
   onDefectCreated: (defect: Defect) => void;
 };
-export function RunsView({ embedded = false, executionPending = false, emptyFiltered = false, navigation, verificationContext, onCreate, onDirtyChange, workspaceId, offline, cases, selectedRun, items, scopeLoading, selectedItem, onSelectItem, onStepStatus, onStepActual, onSaveStepActual, onItemStatus, onUnblock, canExecute, startPending, startError, onStart, archivePending, onDefectCreated }: RunsViewProps) {
+export function RunsView({ embedded = false, executionPending = false, emptyFiltered = false, navigation, verificationContext, onCreate, onDirtyChange, workspaceId, offline, cases, selectedRun, items, scopeLoading, openingItem, itemLoadError, onRetryItem, selectedItem, onSelectItem, onStepStatus, onStepActual, onSaveStepActual, onItemStatus, onUnblock, canExecute, startPending, startError, onStart, archivePending, onDefectCreated }: RunsViewProps) {
   const { locale, t } = useTmsLocale();
   const [reporting, setReporting] = useState(false);
   const [layout, setLayout] = useScenarioLayout();
@@ -81,8 +85,13 @@ export function RunsView({ embedded = false, executionPending = false, emptyFilt
   const currentEditScope = useRef(editScope); currentEditScope.current = editScope;
   const actionWritable = runWritable && canExecute;
   const attemptWritable = actionWritable && !selectedItem?.archivedAt && canEditRunAttempt(selectedRun, selectedItem);
+  const loadingCase = !itemLoadError && (!selectedRun || !selectedItem)
+    && runScopeState(scopeLoading, selectedRun ? items.length : 0) !== "empty";
+  const caseLoaderVisible = useLoadingFeedback(loadingCase && openingItem);
+  const showCaseLoader = openingItem && caseLoaderVisible;
+  const loadingPane = loadingCase || (!itemLoadError && Boolean(selectedRun && selectedItem && showCaseLoader));
   useRunKeyboardShortcuts({
-    items, selectedItem, selectedRun, runWritable: attemptWritable && !executionPending && dirtySteps.length === 0, navigationBlocked: scopeLoading || executionPending || dirtySteps.length > 0, onItemStatus, onSelectItem,
+    items, selectedItem, selectedRun, runWritable: attemptWritable && !loadingPane && !executionPending && dirtySteps.length === 0, navigationBlocked: scopeLoading || loadingPane || executionPending || dirtySteps.length > 0, onItemStatus, onSelectItem,
     setReporting, embeddedScope: embedded ? shell : undefined,
   });
   const runNavigator = <div id={navigationId} className={`${runStyles.navigator} ${focusStyles.navigator}`} aria-hidden={focused} ref={element => { if (element) element.inert = focused; }}><div className={focusStyles.navigationContent}>{navigation}</div></div>;
@@ -92,9 +101,20 @@ export function RunsView({ embedded = false, executionPending = false, emptyFilt
     aria-expanded={!focused} aria-controls={navigationId} aria-label={panelLabel} title={panelLabel} data-run-panel-handle>
     <ChevronLeft size={10} aria-hidden="true" />
   </button>;
-  if (selectedRun && !selectedItem && runScopeState(scopeLoading, items.length) === "empty") return <div {...shellProps}>{runNavigator}{panelHandle}<div className={runStyles.emptyPane} data-has-run><RunSelectionContext run={selectedRun} /><RunScopeEmpty filtered={emptyFiltered} /></div></div>;
-  if (selectedRun && !selectedItem) return <div {...shellProps}>{runNavigator}{panelHandle}<div className={runStyles.emptyPane} data-has-run><RunSelectionContext run={selectedRun} /><TessiqLoader pane label={t("common.loading")} testId="run-item-loading" /></div></div>;
-  if (!selectedRun || !selectedItem) return <div {...shellProps}>{runNavigator}<div className={runStyles.emptyPane}><RunScopeEmpty noRun={!selectedRun} onCreate={onCreate} filtered={emptyFiltered} /></div></div>;
+  if (!selectedRun || !selectedItem || loadingPane || itemLoadError) {
+    return <div {...shellProps}>
+      {runNavigator}{panelHandle}
+      <div className={runStyles.emptyPane} data-has-run={Boolean(selectedRun) || undefined}>
+        {selectedRun && <RunSelectionContext run={selectedRun} />}
+        {itemLoadError ? <div className={runStyles.itemLoadError} role="alert" data-testid="run-item-error">
+          <p>{locale === "ru" ? "Не удалось открыть тест-кейс прогона." : "Could not open the test case in this run."}</p>
+          <button type="button" className={styles.secondaryButton} onClick={onRetryItem}>{t("common.retry")}</button>
+        </div> : loadingPane ? <div className={runStyles.itemLoading} role="status" aria-label={t("common.loading")} data-testid="run-item-loading">
+          {showCaseLoader && <LoadingOrb size="lg" />}
+        </div> : <RunScopeEmpty noRun={!selectedRun} onCreate={onCreate} filtered={emptyFiltered} />}
+      </div>
+    </div>;
+  }
   const attempt = selectedItem.attempts.find((item) => item.attemptNo === selectedItem.activeAttemptNo) ?? selectedItem.attempts[0];
   const executionEntries = executableSteps(selectedItem.snapshot, locale);
   const failed = selectedItem.status === "failed" || attempt.stepResults.some((result) => result.status === "failed");

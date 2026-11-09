@@ -10,7 +10,7 @@ import local from "./selection-tree.module.css";
 type Props = {
   titleMode?: "marquee";
   cases: TestCaseSummary[]; folders: readonly RepositoryFolder[]; selected: ReadonlySet<string>;
-  hideRedundantRootCount?: boolean; preserveCaseOrder?: boolean; ru: boolean; disabled?: boolean; selectable?: boolean; includeArchived?: boolean; activeId?: string;
+  hideRedundantRootCount?: boolean; preserveCaseOrder?: boolean; ru: boolean; disabled?: boolean; selectable?: boolean; includeArchived?: boolean; activeId?: string; loadingCaseId?: string;
   onToggle: (id: string) => void; onScope: (ids: readonly string[]) => void;
   trailing?: (item: TestCaseSummary) => ReactNode;
   onOpen?: (item: TestCaseSummary) => void; heading?: ReactNode; accessory?: (item: TestCaseSummary) => ReactNode;
@@ -34,12 +34,12 @@ export function SelectionTree(props: Props) {
     {props.heading && <div className={local.heading}>{props.heading}</div>}
     <div className={css.treeScroll}><ul className={css.tree}>
       {tree.roots.map((node) => <RepositoryFolderBranch key={node.folder.id} node={node} depth={0} hideRootCount={props.hideRedundantRootCount && node.caseIds.length === props.cases.length}
-        expanded={expanded} selected={props.selected} selectedFolder="" activeCaseId={props.activeId ?? ""}
+        expanded={expanded} selected={props.selected} selectedFolder="" activeCaseId={props.activeId ?? ""} loadingCaseId={props.loadingCaseId}
         ru={props.ru} locked={Boolean(props.disabled)} canManage={false} canSelect={props.selectable} allowArchivedSelection={props.includeArchived}
         titleMode={props.titleMode} trailing={props.trailing} accessory={props.accessory} onExpand={(id) => setCollapsed((current) => { const next = new Set(current); if (next.has(id)) next.delete(id); else next.add(id); return next; })}
         onFolder={() => {}} onCase={open} onToggle={props.onToggle} onScope={props.onScope} onMenu={() => {}} />)}
       {tree.unfiled.map((item) => <RepositoryCaseLeaf key={item.id} item={item} depth={0}
-        selected={props.selected.has(item.id)} active={props.activeId === item.id} ru={props.ru}
+        selected={props.selected.has(item.id)} active={props.activeId === item.id} loading={props.loadingCaseId === item.id} ru={props.ru}
         titleMode={props.titleMode} trailing={props.trailing?.(item)} accessory={props.accessory?.(item)} locked={Boolean(props.disabled)} canManage={false} canSelect={props.selectable} allowArchivedSelection={props.includeArchived} onOpen={open} onToggle={props.onToggle} />)}
     </ul></div>
   </div>;

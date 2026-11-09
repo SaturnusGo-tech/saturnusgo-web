@@ -8,6 +8,7 @@ import { TmsHttpClientProvider } from "../../auth/http/TmsHttpClientContext";
 import { TmsSessionProvider, type TmsSessionIdentity } from "../../auth/presentation/session/TmsSessionContext";
 import { TmsLocaleProvider } from "../../localization/context/TmsLocaleProvider";
 import { LocalizedWorkspace } from "../../presentation/workspace/LocalizedWorkspace";
+import { WorkspaceStartup } from "../../presentation/common/loading/WorkspaceStartup";
 
 import { WelcomeDevelopmentPreview } from "./WelcomeDevelopmentPreview";
 
@@ -37,7 +38,7 @@ export function PluginsDevelopmentPreview() {
   if (process.env.NODE_ENV === "production" || !ready) return null;
   return <TmsSessionProvider value={identity}>
     <TmsHttpClientProvider client={http}><AttachmentClientProvider client={attachments}>
-      <TmsLocaleProvider><LocalizedWorkspace /><WelcomeDevelopmentPreview enabled={welcome} /></TmsLocaleProvider>
+      <TmsLocaleProvider><WorkspaceStartup><LocalizedWorkspace /><WelcomeDevelopmentPreview enabled={welcome} /></WorkspaceStartup></TmsLocaleProvider>
     </AttachmentClientProvider></TmsHttpClientProvider>
   </TmsSessionProvider>;
 }

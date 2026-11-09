@@ -38,6 +38,7 @@ export function treeControl(path: string, exportName: string) {
       if (name.endsWith("RepositoryQuickAdd")) return { RepositoryQuickAdd: "RepositoryQuickAdd" };
       if (name.endsWith("RepositoryCaseTitle")) return { RepositoryCaseTitle: "RepositoryCaseTitle" };
       if (name.endsWith("PriorityIcon")) return { PriorityIcon: "PriorityIcon", priorityLabel: (_locale: string, level: string | null) => level ?? "No priority" };
+      if (name.endsWith("/LoadingOrb")) return { LoadingOrb: "LoadingOrb" };
       if (name.endsWith("CaseQuickAdd")) return { CaseQuickAdd: "CaseQuickAdd" };
       if (name.endsWith("drag-click")) return { DragClickContext: {}, RepositoryDragSelectionContext: {} };
       if (name.endsWith(".css")) return { default: new Proxy({}, { get: (_target, key) => key }) };

@@ -3,6 +3,7 @@
 import { AlertTriangle, LogIn } from "lucide-react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { TessiqLoader } from "../../../presentation/common/loading/TessiqLoader";
+import { useWorkspaceStartupPending } from "../../../presentation/common/loading/WorkspaceStartup";
 import styles from "../../../tms.module.css";
 import authStyles from "./auth-state.module.css";
 
@@ -21,7 +22,9 @@ export function TmsAuthState({
   readonly onAction?: () => void;
 }) {
   const { t } = useTmsLocale();
+  const startupCovered = useWorkspaceStartupPending(kind === "loading");
   if (kind === "loading") {
+    if (startupCovered) return null;
     return (
       <main className={authStyles.viewport}>
         <TessiqLoader label={t("auth.loadingTitle")} testId="auth-session-loading" />

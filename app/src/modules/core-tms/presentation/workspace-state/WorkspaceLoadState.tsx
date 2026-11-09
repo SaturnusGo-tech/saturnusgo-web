@@ -2,6 +2,7 @@ import { RefreshCw, Unplug } from "lucide-react";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { WorkspaceFailure } from "../../state/workspace/useWorkspaceBootstrap";
 import { TessiqLoader } from "../common/loading/TessiqLoader";
+import { useWorkspaceStartupCovered } from "../common/loading/WorkspaceStartup";
 import styles from "./workspace-state.module.css";
 
 export function WorkspaceLoadState({
@@ -12,7 +13,9 @@ export function WorkspaceLoadState({
   onRetry: () => void;
 }) {
   const { t } = useTmsLocale();
+  const startupCovered = useWorkspaceStartupCovered();
   if (!failure) {
+    if (startupCovered) return null;
     return <TessiqLoader pane branded label={t("workspace.loading")} testId="workspace-loading" />;
   }
 

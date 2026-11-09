@@ -10,15 +10,15 @@ import type { CasesViewProps } from "../types";
 import type { TmsLocale } from "../../../localization/model/locale";
 import styles from "../cases.module.css";
 
-export function CasesRepositoryList({ props, view, locale, listPaneRef, move }: {
-  props: CasesViewProps; view: ReturnType<typeof useCasesViewController>; locale: TmsLocale; listPaneRef: RefObject<HTMLElement | null>; move?: { ids: readonly string[]; onClose: () => void; onMoved: () => void };
+export function CasesRepositoryList({ props, view, locale, listPaneRef, loadingCaseId, move }: {
+  props: CasesViewProps; view: ReturnType<typeof useCasesViewController>; locale: TmsLocale; listPaneRef: RefObject<HTMLElement | null>; loadingCaseId?: string; move?: { ids: readonly string[]; onClose: () => void; onMoved: () => void };
 }) {
   const focusEditorActions = () => document.getElementById("case-editor-actions")?.focus();
   return <>
     {props.folders && <RepositoryFolders task={move ? <MoveCasesDialog resource={props.folders} ids={move.ids} ru={locale === "ru"} onClose={move.onClose} onMoved={move.onMoved} /> : undefined} resource={props.folders} cases={view.matchingRows.map(({ testCase }) => testCase)} filtered={view.treeFiltered} selectionMode={view.selectionMode} includeArchived={props.filters.includeArchived} hasArchivedCases={props.testCases.some(item => Boolean(item.archivedAt))} onArchiveChange={view.setRepositoryArchived}
       selectionActions={<RepositorySelectionCommands props={props} view={view} ru={locale === "ru"} />}
       controls={<RepositoryControls props={props} view={view} locale={locale} />} selected={view.bulkSelection.selected}
-      selectedFolder={props.selectedFolder} selectedFolderId={props.selectedFolderId} activeCaseId={props.selectedCaseId} ru={locale === "ru"} locked={Boolean(props.editor)}
+      selectedFolder={props.selectedFolder} selectedFolderId={props.selectedFolderId} activeCaseId={props.selectedCaseId} loadingCaseId={loadingCaseId} ru={locale === "ru"} locked={Boolean(props.editor)}
       onToggle={view.bulkSelection.toggleOne} onScope={view.bulkSelection.toggleScope} onFolder={props.onSelectFolder}
       onCase={(item) => view.selectRow({ testCase: item, folderPath: item.folderPath })} onCreate={view.createCase}
       onNewFolder={props.onNewFolder} onManageFolder={props.onManageFolder} onSelectionMode={view.toggleSelectionMode} />}
@@ -60,6 +60,7 @@ export function CasesRepositoryList({ props, view, locale, listPaneRef, move }: 
         rows={view.rows}
         dragEnabled={false}
         selectedCaseId={props.selectedCaseId}
+        loadingCaseId={loadingCaseId}
         sort={view.sort}
         viewMode={view.viewMode}
         groupBy={view.groupBy}

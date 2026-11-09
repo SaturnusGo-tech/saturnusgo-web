@@ -14,6 +14,7 @@ import { useProductDocsAccess } from "../../product-docs/composition/useProductD
 import { ProductDocsWorkspace } from "../../product-docs/composition/ProductDocsWorkspace";
 import { CompanyFeatureUnavailable } from "../../auth/managed/presentation/permissions/CompanyFeatureUnavailable";
 import { TessiqLoader } from "../common/loading/TessiqLoader";
+import { useWorkspaceStartupPending } from "../common/loading/WorkspaceStartup";
 import { WorkspaceStage } from "../workspace-stage/WorkspaceStage";
 import { GuidePanelProvider } from "../../documentation/panel/GuidePanelProvider";
 import guideStyles from "../../documentation/panel/guide-panel.module.css";
@@ -33,6 +34,7 @@ const glassEnabled = process.env.NEXT_PUBLIC_FALCON_GLASS_EXPERIMENT !== "false"
 
 export function LocalizedWorkspace() {
   const model = useWorkspaceModel();
+  useWorkspaceStartupPending(model.connection === "loading");
   const http = useOptionalTmsHttpClient();
   useMemberPresence(http, model.data.workspace.id, model.connection === "connected");
   const pageRef = usePageAppearance([model.view, model.project?.id, model.repositoryScope.key, model.connection].join(":"));

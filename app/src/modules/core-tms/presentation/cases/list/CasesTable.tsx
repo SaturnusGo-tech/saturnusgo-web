@@ -1,3 +1,4 @@
+import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { DraggableCaseRow } from "../../../folders/presentation/table/DraggableCaseRow";
 import { Fragment, useMemo, useState } from "react";
 import { ArrowDown, ArrowUp, ChevronDown, ChevronRight, ListChecks, Search } from "lucide-react";
@@ -16,6 +17,7 @@ type Props = {
   locale: TmsLocale;
   rows: CaseListRow[];
   selectedCaseId: string;
+  loadingCaseId?: string;
   sort: CaseSort;
   onSort: (key: CaseSortKey) => void;
   onSelect: (row: CaseListRow) => void;
@@ -142,9 +144,10 @@ export function CasesTable(props: Props) {
             const item = row.testCase;
             const priority = item.priorityAssigned === false ? null : item.priority;
             const selected = item.id === props.selectedCaseId;
+            const loading = item.id === props.loadingCaseId;
             const bulkSelected = props.selectedIds.has(item.id);
             const selectable = props.selectableIds.has(item.id);
-            return <DraggableCaseRow caseId={item.id} dragEnabled={Boolean(props.dragEnabled && !props.interactionLocked && selectable)} key={item.id} data-case-row data-case-id={item.id} data-interaction-locked={props.interactionLocked || undefined} data-bulk-selected={bulkSelected || undefined} className={selected ? styles.selectedRow : ""} aria-selected={selected} aria-disabled={props.interactionLocked || undefined} title={props.interactionLocked ? lockedTitle : undefined} tabIndex={tabStopId === item.id ? 0 : -1}
+            return <DraggableCaseRow caseId={item.id} dragEnabled={Boolean(props.dragEnabled && !props.interactionLocked && selectable)} key={item.id} data-case-row data-case-id={item.id} data-interaction-locked={props.interactionLocked || undefined} data-bulk-selected={bulkSelected || undefined} className={selected ? styles.selectedRow : ""} aria-selected={selected} aria-busy={loading || undefined} aria-disabled={props.interactionLocked || undefined} title={props.interactionLocked ? lockedTitle : undefined} tabIndex={tabStopId === item.id ? 0 : -1}
               onClick={() => props.interactionLocked ? props.onLockedInteraction?.() : props.onSelect(row)} onKeyDown={(event) => {
                 if (event.target instanceof Element && event.target.closest("input, button, a, select, textarea")) return;
                 if (props.interactionLocked && ["Enter", " ", "ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
@@ -154,7 +157,10 @@ export function CasesTable(props: Props) {
                 else moveFocus(event);
               }}>
               <td className={styles.selectionCell}>{props.selectionMode && <CaseSelectionCheckbox coverage={bulkSelected ? "all" : "none"} disabled={props.interactionLocked || !selectable} label={selectable ? (ru ? `Выбрать ${item.key}` : `Select ${item.key}`) : (ru ? `${item.key} недоступен для массовых действий` : `${item.key} is unavailable for bulk actions`)} onToggle={() => props.onToggleCase(item.id)} />}</td>
-              <td className={styles.flagCell} aria-label={priorityLabel(props.locale, priority)}><PriorityIcon level={priority} empty="circle" size={14} /></td>
+              <td className={styles.flagCell} data-case-loading={loading || undefined} aria-label={priorityLabel(props.locale, priority)}>
+                <PriorityIcon level={priority} empty="circle" size={14} />
+                {loading && <LoadingOrb size="xs" className={styles.caseOrb} />}
+              </td>
               <td className={styles.typeCell}><CaseTypeIcon locale={props.locale} type={item.type} /></td>
               <td><LifecycleBadge locale={props.locale} lifecycle={item.lifecycle} archived={Boolean(item.archivedAt)} /></td>
               <td className={styles.titleCell}><strong title={`${item.title}\n${row.folderPath}`}>{item.title}</strong></td>

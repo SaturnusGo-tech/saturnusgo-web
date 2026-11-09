@@ -19,7 +19,7 @@ import { ResponsibleName } from "../../../workspace/members/presentation/Respons
 import css from "./run-repository.module.css";
 import selection from "../../cases/browser/selection/repository-selection.module.css";
 
-export function RunRepositoryBrowser({ model, repository, onEditRun, draftDirty = false, lifecycleBlocked = false, startBlocked = false, fixedRun = false }: { model: WorkspaceModel; repository: RunRepositoryModel; onEditRun?: () => void; draftDirty?: boolean; lifecycleBlocked?: boolean; startBlocked?: boolean; fixedRun?: boolean }) {
+export function RunRepositoryBrowser({ model, repository, onSelectItem, onEditRun, draftDirty = false, lifecycleBlocked = false, startBlocked = false, fixedRun = false }: { model: WorkspaceModel; repository: RunRepositoryModel; onSelectItem: (id: string) => void; onEditRun?: () => void; draftDirty?: boolean; lifecycleBlocked?: boolean; startBlocked?: boolean; fixedRun?: boolean }) {
   const { locale } = useTmsLocale(); const ru = locale === "ru";
   const [filterOpen, setFilterOpen] = useState(false);
   const [filterPortal, setFilterPortal] = useState<HTMLElement>();
@@ -30,9 +30,9 @@ export function RunRepositoryBrowser({ model, repository, onEditRun, draftDirty 
   const { browser, rows, run, assignments, runFilters, cases, filters, visible, groups, lookup } = repository;
   const navigationLocked = browser.busy || assignments.busy || lifecycleBlocked;
   const controlsLocked = navigationLocked || !browser.ready || browser.loading || Boolean(browser.error);
-  const choose = (runId: string, projectId: string, itemId: string | null = null) => {
+  const choose = (runId: string, projectId: string) => {
     if (navigationLocked) return;
-    model.setProjectId(projectId); model.setSelectedRunId(runId); model.setSelectedRunItemId(itemId);
+    model.setProjectId(projectId); model.setSelectedRunId(runId); model.setSelectedRunItemId(null);
   };
   const canManage = model.connection === "connected" && model.data.meta.authorization.capabilities.includes("run:manage");
   const canAssign = canManage && Boolean(run && !run.archivedAt && ["draft","active","paused"].includes(run.status));
@@ -75,7 +75,7 @@ export function RunRepositoryBrowser({ model, repository, onEditRun, draftDirty 
           trailing={(item) => <span className={css.assignee}><ResponsibleName workspaceId={model.data.workspace.id}
             identityId={lookup.get(item.id)?.item.assigneeIdentityId ?? null} offline={model.connection !== "connected"} /></span>}
           accessory={(item) => <span title={localizedLabel(locale, lookup.get(item.id)?.item.status ?? "not_run")} className={css.status} data-status={lookup.get(item.id)?.item.status}>{statusIcon[lookup.get(item.id)?.item.status ?? "not_run"]}</span>}
-          onOpen={(item) => { const entry = lookup.get(item.id); if (entry) choose(entry.runId, entry.projectId, entry.item.id); }} />;
+          onOpen={(item) => onSelectItem(item.id)} />;
       })}
       {!browser.loading && groups.length === 0 && assignments.selecting && <div className={css.selectionFallback}>{selectionToggle}</div>}
       {!browser.loading && !visible.length && <p className={css.empty}>{run ? (ru ? "Нет подходящих кейсов" : "No matching cases") : (ru ? "Выберите или создайте прогон" : "Choose or create a run")}</p>}

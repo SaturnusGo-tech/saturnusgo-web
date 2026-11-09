@@ -1,5 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import React, { useState } from "react";
+import { act, create, type ReactTestRenderer } from "react-test-renderer";
+import type { Bootstrap } from "../../../../../core/tms/contracts/legacy-contract";
+import { createTmsHttpClient } from "../../../../../core/tms/transport/http";
+import { useSelectedRunResource } from "../../run-resource/useSelectedRunResource";
 import { openRunNavigation } from "../open-run-navigation";
 import { readWorkspaceDeepLink } from "../../navigation/workspace-deep-link";
 import { WorkspaceNavigationRestoration } from "../../navigation/restoration/workspace-navigation-restoration";
@@ -44,4 +49,53 @@ test("run item restoration requires a valid run and never overrides an explicit 
     assert.equal(readWorkspaceDeepLink(`https://tms.example/work/?${query}`).runItemId, undefined);
   }
   assert.deepEqual(readWorkspaceDeepLink("https://tms.example/work/?view=config&runId=r&runItemId=i"), { view: "config", runId: null });
+});
+
+test("late run item failures cannot replace the newer case and retry reloads only the failed item", async () => {
+  const requests: { id: string; signal: AbortSignal | null | undefined; reply: (response: Response) => void }[] = [];
+  let lists = 0;
+  const http = createTmsHttpClient({ apiBase: "https://tms.example/api/v1", credentials: "include", production: false,
+    fetch: async (input, init) => {
+      const path = new URL(String(input)).pathname;
+      if (path.endsWith("/runs/run-p")) return Response.json({ data: { id: "run-p", projectId: "p", environment: {}, progress: {} } });
+      if (path.endsWith("/items")) {
+        lists++;
+        return Response.json({ data: [{ id: "a" }, { id: "b" }], meta: { hasMore: false, nextCursor: null, limit: 100 } });
+      }
+      return new Promise(resolve => requests.push({ id: path.slice(path.lastIndexOf("/") + 1), signal: init?.signal, reply: resolve }));
+    },
+  });
+  let resource!: ReturnType<typeof useSelectedRunResource>;
+  let select!: (id: string) => void;
+  function Probe() {
+    const [selectedRunItemId, setSelectedRunItemId] = useState<string | null>("a");
+    const [, setData] = useState({ runs: [] } as unknown as Bootstrap);
+    select = setSelectedRunItemId;
+    resource = useSelectedRunResource({ http, connection: "connected", projectId: "p", selectedRunId: "run-p",
+      selectedRunItemId, setSelectedRunItemId, setData });
+    return null;
+  }
+  let renderer!: ReactTestRenderer;
+  await act(async () => { renderer = create(React.createElement(Probe) as Parameters<typeof create>[0]); });
+  const unavailable = () => Response.json({}, { status: 503 });
+  try {
+    assert.deepEqual(requests.map(request => request.id), ["a"]);
+    await act(async () => { select("b"); });
+    assert.equal(requests[0].signal?.aborted, true);
+    assert.deepEqual(requests.map(request => request.id), ["a", "b"]);
+    await act(async () => { requests[0].reply(unavailable()); });
+    assert.equal(resource.runItemResourceError, false);
+    await act(async () => { requests[1].reply(unavailable()); });
+    assert.equal(resource.runItemResourceError, true);
+    assert.equal(resource.runResourceError, false);
+    await act(async () => { resource.retryRunItem(); });
+    assert.deepEqual(requests.map(request => request.id), ["a", "b", "b"]);
+    assert.equal(resource.runItemResourceError, false);
+    assert.equal(lists, 1);
+    await act(async () => { requests[2].reply(Response.json({ data: {
+      id: "b", snapshot: { tags: [], steps: [], checklist: [], attachmentIds: [] },
+      activeAttempt: { attachmentIds: [], stepResults: [] },
+    } })); });
+    assert.equal(resource.selectedRunItemDetail?.id, "b");
+  } finally { await act(async () => renderer.unmount()); }
 });

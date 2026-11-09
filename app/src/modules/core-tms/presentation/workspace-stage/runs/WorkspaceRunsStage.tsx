@@ -13,7 +13,6 @@ import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { RunsView } from "../../runs/RunsView";
 import { useRunImpact } from "../../../impact/application/run/useRunImpact";
 import { RunImpactSummary } from "../../../impact/presentation/run/RunImpactSummary";
-import { TessiqLoader } from "../../common/loading/TessiqLoader";
 import runLayout from "./workspace-runs-stage.module.css";
 
 export function WorkspaceRunsStage({ model, fixedRun = false, onCloseLockedChange }: {
@@ -38,7 +37,6 @@ export function WorkspaceRunsStage({ model, fixedRun = false, onCloseLockedChang
   </div>;
   const scopeLoading = model.connection === "connected" && Boolean(model.selectedRun || model.selectedRunId)
     && !model.runResourceReady;
-  if (scopeLoading && !model.selectedRun) return <TessiqLoader pane label={t("common.loading")} testId="run-resource-loading" />;
   const onEditRun = model.selectedRun && canEditRunMetadata(model.selectedRun) && model.connection === "connected"
     && !executionDirty && !execution.pending && model.data.meta.authorization.capabilities.includes("run:manage")
     ? () => setEditingRun(model.selectedRun) : undefined;
@@ -54,14 +52,17 @@ export function WorkspaceRunsStage({ model, fixedRun = false, onCloseLockedChang
           onOpenCaseActivity={(caseId) => visitWorkspace(buildCaseDeepLink(window.location.href, {
             workspaceId: model.data.workspace.id, projectId: model.projectId, caseId,
           }, { activity: true }))} />}
-        navigation={<RunRepositoryBrowser model={model} repository={repository} onEditRun={onEditRun} draftDirty={executionDirty} lifecycleBlocked={executionDirty || execution.pending} startBlocked={startBlocked} fixedRun={fixedRun} />}
+        navigation={<RunRepositoryBrowser model={model} repository={repository} onSelectItem={execution.select} onEditRun={onEditRun} draftDirty={executionDirty} lifecycleBlocked={executionDirty || execution.pending} startBlocked={startBlocked} fixedRun={fixedRun} />}
         onDirtyChange={setExecutionDirty}
         workspaceId={model.data.workspace.id}
         offline={model.connection === "demo"}
         cases={model.projectCases}
         selectedRun={model.selectedRun}
         items={execution.entries.map(row => row.item)}
-        scopeLoading={scopeLoading || !execution.ready}
+        scopeLoading={scopeLoading || Boolean(model.selectedRun && !execution.ready)}
+        openingItem={execution.openingItem}
+        itemLoadError={model.runItemResourceError}
+        onRetryItem={execution.retryItem}
         selectedItem={execution.selectedItem}
         onSelectItem={execution.select}
         onStepStatus={execution.step}

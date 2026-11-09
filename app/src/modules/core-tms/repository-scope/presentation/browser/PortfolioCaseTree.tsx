@@ -6,8 +6,8 @@ import { ResponsibleName } from "../../../workspace/members/presentation/Respons
 import css from "./portfolio-repository.module.css";
 
 const none = new Set<string>();
-export function PortfolioCaseTree({ cases, folders, workspaceId, activeId, disabled, ru, includeArchived, onOpen }: {
-  cases: TestCaseSummary[]; folders: readonly RepositoryFolder[]; workspaceId: string; activeId: string;
+export function PortfolioCaseTree({ cases, folders, workspaceId, activeId, loadingCaseId, disabled, ru, includeArchived, onOpen }: {
+  cases: TestCaseSummary[]; folders: readonly RepositoryFolder[]; workspaceId: string; activeId: string; loadingCaseId?: string;
   disabled: boolean; ru: boolean; includeArchived: boolean; onOpen: (item: TestCaseSummary) => void;
 }) {
   const [limit, setLimit] = useState(200);
@@ -15,7 +15,7 @@ export function PortfolioCaseTree({ cases, folders, workspaceId, activeId, disab
   useEffect(() => setLimit(200), [signature]);
   return <>
     <SelectionTree cases={cases.slice(0, limit)} folders={folders} selected={none} ru={ru} disabled={disabled}
-      activeId={activeId} includeArchived={includeArchived} onToggle={() => {}} onScope={() => {}} onOpen={onOpen}
+      activeId={activeId} loadingCaseId={loadingCaseId} includeArchived={includeArchived} onToggle={() => {}} onScope={() => {}} onOpen={onOpen}
       trailing={item => <span className={css.owner}><ResponsibleName workspaceId={workspaceId} identityId={item.ownerIdentityId} /></span>} />
     {cases.length > limit && <button className={css.more} type="button" onClick={() => setLimit(value => value + 200)}>
       {ru ? `Показать ещё · ${limit} из ${cases.length}` : `Show more · ${limit} of ${cases.length}`}</button>}

@@ -1,16 +1,19 @@
 "use client";
 
-import { LoadingOrb } from "../../../../../../../shared/components/loading/LoadingOrb";
-import { addToast, Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Textarea } from "@heroui/react";
+import { addToast, Button, Textarea } from "@heroui/react";
 import { $isCodeBlockNode, readOnly$, useCellValue, useCodeBlockEditorContext, type CodeBlockEditorProps } from "@mdxeditor/editor";
 import { $createParagraphNode, $getNodeByKey, $setSelection } from "lexical";
-import { Braces, Copy, EllipsisVertical, Maximize2, MousePointer2, Send, SquareFunction, Trash2, Workflow } from "lucide-react";
-import { useContext, useEffect, useRef, useState, type ClipboardEvent } from "react";
+import { Braces, Copy, Maximize2, Send, SquareFunction, Workflow } from "lucide-react";
+import { useContext, useEffect, useLayoutEffect, useRef, useState, type ClipboardEvent } from "react";
 import { writeClipboardText } from "../../../../../../../shared/lib/clipboard";
 import { useTmsLocale } from "../../../../../localization/context/useTmsLocale";
 import { productDocDiagramErrorStatus, useProductDocDiagram } from "../../../../state/diagrams/useProductDocDiagram";
 import { ProductDocEmbedContext } from "../../../embeds/context/productDocEmbedContext";
 import { StructuredAction } from "./controls/StructuredAction";
+import { StructuredBlockActions } from "./controls/StructuredBlockActions";
+import { StructuredBlockMenu } from "./controls/menu/StructuredBlockMenu";
+import { useStructuredBlockActivity } from "./motion/useStructuredBlockActivity";
+import { useStructuredBlockFootprint } from "./motion/useStructuredBlockFootprint";
 import { useProductDocStructuredRender } from "./render/useProductDocStructuredRender";
 import { ProductDocStructuredDialog } from "./viewer/ProductDocStructuredDialog";
 import { ProductDocStructuredPreview } from "./ProductDocStructuredPreview";
@@ -34,18 +37,28 @@ export function ProductDocStructuredBlock({ language, code, nodeKey, focusEmitte
   const readOnly = useCellValue(readOnly$);
   const { parentEditor, setCode } = useCodeBlockEditorContext();
   const input = useRef<HTMLTextAreaElement>(null);
-  const activeRequest = useRef<AbortController>(null);
-  const blockSource = useRef(code);
-  blockSource.current = code;
+  const generateButton = useRef<HTMLButtonElement>(null);
+  const activeRequest = useRef<{ source: string; controller: AbortController }>(null);
+  const generationKey = diagram && !readOnly ? code : null;
+  const blockSource = useRef(generationKey);
+  blockSource.current = generationKey;
   const [showSource, setShowSource] = useState(false);
   const [editingSource, setEditingSource] = useState(false);
   const [expanded, setExpanded] = useState(false);
-  const [generating, setGenerating] = useState(false);
+  const [generationSource, setGenerationSource] = useState<string | null>(null);
   const [error, setError] = useState("");
   const isSource = diagram ? isDiagramSource(code) : Boolean(code.trim());
-  const preview = isSource && !showSource && !editingSource;
+  const committingDiagram = diagram && generationSource !== null && generationSource !== code;
+  const preview = isSource && !showSource && (!editingSource || committingDiagram);
   const rendered = useProductDocStructuredRender(kind, code, isSource && (preview || expanded));
+  const generating = generationSource !== null && generationSource === generationKey;
+  const pending = generating || (preview && !rendered);
   const mayGenerate = diagram && !readOnly && !isSource && Boolean(code.trim() && generateDiagram && scope);
+  const activity = useStructuredBlockActivity(pending, generating || preview || (mayGenerate && !showSource));
+  const surface = useStructuredBlockFootprint(!activity.reveal);
+  // Keep the generating prompt and its button until the saved source has a preview to reveal.
+  const keepPrompt = preview && generationSource !== null;
+  const showPreview = preview && activity.reveal && !keepPrompt;
   const title = diagram ? (ru ? "Диаграмма Mermaid" : "Mermaid diagram") : (ru ? "Формула LaTeX" : "LaTeX formula");
   const placeholder = diagram ? (ru ? "Опишите диаграмму…" : "Describe your diagram…")
     : (ru ? "Введите LaTeX, чтобы вставить формулу" : "Type LaTeX to insert a formula");
@@ -53,14 +66,31 @@ export function ProductDocStructuredBlock({ language, code, nodeKey, focusEmitte
   const previewLabel = preview ? (ru ? "Показать исходник" : "Show source") : (ru ? "Предпросмотр" : "Preview");
   const expandLabel = ru ? "Развернуть" : "Expand";
   const closeLabel = ru ? "Закрыть предпросмотр" : "Close preview";
-  const selectLabel = ru ? "Выделить исходник" : "Select source";
-  const removeLabel = ru ? "Удалить" : "Delete";
   const PreviewIcon = diagram ? Workflow : SquareFunction;
 
   useEffect(() => { focusEmitter.subscribe(() => input.current?.focus({ preventScroll: true })); }, [focusEmitter]);
-  useEffect(() => () => activeRequest.current?.abort(), []);
+  useEffect(() => () => activeRequest.current?.controller.abort(), []);
+  useEffect(() => {
+    const request = activeRequest.current;
+    if (request && request.source !== generationKey) cancelGeneration();
+  }, [generationKey]);
+
+  useLayoutEffect(() => {
+    if (generationSource === null || generating || (preview && !activity.reveal)) return;
+    if (preview && generateButton.current === document.activeElement) surface.current?.focus({ preventScroll: true });
+    setGenerationSource(null);
+  }, [activity.reveal, generating, generationSource, preview, surface]);
+
+  function cancelGeneration() {
+    const request = activeRequest.current;
+    if (!request) return;
+    activeRequest.current = null;
+    request.controller.abort();
+    setGenerationSource(null);
+  }
 
   function change(next: string) {
+    cancelGeneration();
     setCode(next);
     setError("");
   }
@@ -88,28 +118,31 @@ export function ProductDocStructuredBlock({ language, code, nodeKey, focusEmitte
   }
 
   async function generate() {
-    if (!mayGenerate || !scope || !generateDiagram || activeRequest.current) return;
+    if (!mayGenerate || !scope || !generateDiagram || generating || activeRequest.current) return;
     const prompt = code.trim();
     if (prompt.length > maximumDiagramPrompt) {
       setError(ru ? "Описание должно содержать не больше 2 000 символов." : "Describe the diagram in 2,000 characters or less.");
       return;
     }
     const controller = new AbortController();
-    activeRequest.current = controller;
-    setGenerating(true);
+    const request = { source: code, controller };
+    activeRequest.current = request;
+    setGenerationSource(code);
+    setShowSource(false);
     setError("");
     try {
       const source = await generateDiagram(scope, prompt, controller.signal);
       if (controller.signal.aborted || blockSource.current !== code) return;
       if (!canRenderDiagram(source)) throw new Error("Unexpected diagram result");
-      setCode(source);
       setEditingSource(false);
-      setShowSource(false);
+      setCode(source);
     } catch (failure) {
-      if (!controller.signal.aborted) setError(generationError(failure, ru));
+      if (!controller.signal.aborted && blockSource.current === code) {
+        setError(generationError(failure, ru));
+        setGenerationSource(null);
+      }
     } finally {
-      activeRequest.current = null;
-      if (!controller.signal.aborted) setGenerating(false);
+      if (activeRequest.current === request) activeRequest.current = null;
     }
   }
 
@@ -123,48 +156,41 @@ export function ProductDocStructuredBlock({ language, code, nodeKey, focusEmitte
     });
   }
 
-  const toolbar = <div className={styles.controls}>
-    <StructuredAction label={copyLabel} disabled={!code} onPress={() => void copy()}><Copy size={14} aria-hidden="true" /></StructuredAction>
-    <StructuredAction label={previewLabel} disabled={!isSource} pressed={preview}
+  const toolbar = <StructuredBlockActions phase={activity.phase} label={generating
+    ? (ru ? "Создаём диаграмму" : "Generating diagram")
+    : (ru ? "Готовим предпросмотр" : "Preparing preview")}>
+    <StructuredAction label={copyLabel} disabled={!code} inactive={Boolean(activity.phase)} onPress={() => void copy()}><Copy size={14} aria-hidden="true" /></StructuredAction>
+    <StructuredAction label={previewLabel} disabled={!isSource} inactive={Boolean(activity.phase)} pressed={preview}
       onPress={() => { setShowSource(preview); setEditingSource(false); }}>{preview ? <Braces size={14} aria-hidden="true" /> : <PreviewIcon size={14} aria-hidden="true" />}</StructuredAction>
-    <StructuredAction label={expandLabel} disabled={!code} onPress={() => setExpanded(true)}><Maximize2 size={14} aria-hidden="true" /></StructuredAction>
-  </div>;
+    <StructuredAction label={expandLabel} disabled={!code} inactive={Boolean(activity.phase)} onPress={() => setExpanded(true)}><Maximize2 size={14} aria-hidden="true" /></StructuredAction>
+  </StructuredBlockActions>;
   return <div className={styles.block} data-structured-block={kind} data-editor-dialog contentEditable={false}
     onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setEditingSource(false); }}>
-    {!readOnly && <Dropdown placement="bottom-start" classNames={{ content: styles.menu }}>
-      <DropdownTrigger>
-        <Button type="button" variant="light" size="sm" disableRipple isIconOnly className={styles.handle}
-          aria-label={ru ? "Действия блока" : "Block actions"}><EllipsisVertical size={15} aria-hidden="true" /></Button>
-      </DropdownTrigger>
-      <DropdownMenu aria-label={ru ? "Действия блока" : "Block actions"} itemClasses={{ base: styles.menuItem }}
-        onAction={(key) => {
-          if (key === "copy") void copy();
-          if (key === "select") {
-            setShowSource(true);
-            requestAnimationFrame(() => { input.current?.focus(); input.current?.select(); });
-          }
-          if (key === "delete") remove();
-        }}>
-        <DropdownItem key="copy" startContent={<Copy size={14} aria-hidden="true" />}>{copyLabel}</DropdownItem>
-        <DropdownItem key="select" startContent={<MousePointer2 size={14} aria-hidden="true" />}>{selectLabel}</DropdownItem>
-        <DropdownItem key="delete" startContent={<Trash2 size={14} aria-hidden="true" />}>{removeLabel}</DropdownItem>
-      </DropdownMenu>
-    </Dropdown>}
-    <div className={styles.surface} data-kind={kind} data-preview={preview || undefined}>
+    {!readOnly && <StructuredBlockMenu ru={ru} onCopy={() => void copy()} onRemove={remove} onSelect={() => {
+      cancelGeneration();
+      setShowSource(true);
+      requestAnimationFrame(() => { input.current?.focus(); input.current?.select(); });
+    }} />}
+    <div ref={surface} tabIndex={-1} className={styles.surface} data-kind={kind}
+      data-preview={preview && !keepPrompt || undefined}>
       {toolbar}
-      {preview ? <ProductDocStructuredPreview kind={kind} source={code} result={rendered} /> :
-        <div className={styles.fieldShell} data-input-shell><Textarea ref={input} aria-label={title} placeholder={placeholder} value={code}
+      {showPreview && <div className={styles.previewReveal}>
+        <ProductDocStructuredPreview kind={kind} source={code} result={rendered} />
+      </div>}
+      {(!preview || keepPrompt) &&
+        <div className={styles.fieldShell} data-input-shell><Textarea ref={input} aria-label={title} placeholder={placeholder}
+          value={keepPrompt ? generationSource : code}
           minRows={diagram ? 3 : 1} maxRows={14} maxLength={diagram ? maximumDiagramSource : maximumFormulaSource}
-          spellCheck="false" isReadOnly={readOnly} isDisabled={generating}
+          spellCheck="false" isReadOnly={readOnly} isDisabled={generating || keepPrompt}
           classNames={{ base: styles.field, inputWrapper: styles.inputWrapper, input: styles.input }}
           onValueChange={change} onKeyDown={(event) => event.stopPropagation()}
           onPaste={pasteSource}
           onFocus={() => { setEditingSource(true); parentEditor.update(() => $setSelection(null)); }} /></div>}
-      {diagram && !isSource && !readOnly && <div className={styles.footer}>
-        {error && <p role="alert">{error}</p>}
-        {mayGenerate && <Button type="button" size="sm" variant="light" radius="full" disableRipple className={styles.generate}
-          isLoading={generating} spinner={<LoadingOrb />} onPress={() => void generate()}
-          startContent={!generating && <Send size={13} aria-hidden="true" />}>{ru ? "Сгенерировать" : "Generate"}</Button>}
+      {(diagram && !isSource && !readOnly || keepPrompt) && <div className={styles.footer}>
+        {activity.reveal && error && <p role="alert">{error}</p>}
+        {(mayGenerate || keepPrompt) && <Button ref={generateButton} type="button" size="sm" variant="light" radius="full" disableRipple className={styles.generate}
+          aria-disabled={generating || keepPrompt || undefined} onPress={() => void generate()}
+          startContent={<Send size={13} aria-hidden="true" />}>{ru ? "Сгенерировать" : "Generate"}</Button>}
       </div>}
     </div>
     <ProductDocStructuredDialog isOpen={expanded} onClose={() => setExpanded(false)} title={title}

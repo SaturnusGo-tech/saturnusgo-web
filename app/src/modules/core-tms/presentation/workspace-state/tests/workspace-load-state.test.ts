@@ -26,7 +26,7 @@ test("workspace loading keeps copy screen-reader-only", () => {
   assert.doesNotMatch(loadingBranch, /workspace\.loadingDescription|<h1|<p/);
 });
 
-test("resource hydration uses the branded loader instead of a false empty state", () => {
+test("case and run hydration use their own pending presentations", () => {
   const casesSource = readFileSync(
     new URL("../../cases/CasesView.tsx", import.meta.url),
     "utf8",
@@ -37,12 +37,13 @@ test("resource hydration uses the branded loader instead of a false empty state"
   );
 
   assert.match(casesSource, /!props\.editor && props\.testCase && !props\.revision/);
-  assert.match(casesSource, /<TessiqLoader[^>]*testId="case-detail-loading"/);
+  assert.match(casesSource, /role="status" data-testid="case-detail-loading"/);
+  assert.doesNotMatch(casesSource, /<TessiqLoader/);
   assert.match(casesSource, /props\.detailLoadError/);
   assert.match(casesSource, /data-testid="case-detail-error"/);
   assert.match(casesSource, /onClick=\{props\.onRetryDetail\}/);
-  assert.match(runsSource, /selectedRun && !selectedItem/);
-  assert.match(runsSource, /testId="run-item-loading"/);
+  assert.match(runsSource, /!selectedRun \|\| !selectedItem/);
+  assert.match(runsSource, /data-testid="run-item-loading"[\s\S]*?<LoadingOrb size="lg"/);
 });
 
 test("run preparation preserves the production test-case list", () => {
@@ -74,7 +75,8 @@ test("case detail hydration exposes a retryable failure state", () => {
     "utf8",
   );
 
-  assert.match(resourceSource, /setFailed\(true\)/);
+  assert.match(resourceSource, /setFailedCaseId\(caseId\)/);
+  assert.match(resourceSource, /failed: failedCaseId === caseId/);
   assert.match(resourceSource, /setRequestVersion\(\(current\) => current \+ 1\)/);
   assert.match(resourceSource, /if \(!controller\.signal\.aborted\)/);
   assert.doesNotMatch(resourceSource, /catch\(\(\) => \{\}\)/);

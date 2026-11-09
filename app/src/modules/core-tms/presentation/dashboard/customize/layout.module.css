@@ -36,7 +36,6 @@
 .empty h2 { font-size: 23px; font-weight: 520; letter-spacing: -.65px; margin: 0 0 13px; }
 .empty p { max-width: 405px; margin: 0 0 24px; color: var(--muted); font-size: 13px; line-height: 1.75; }
 .empty small { color: var(--muted); max-width: 400px; line-height: 1.6; }
-.loading { display: flex; align-items: center; justify-content: center; flex: 1; min-height: 300px; gap: 12px; color: var(--muted); }
 .failure { padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid color-mix(in srgb, var(--dash-warning) 35%, var(--line)); border-radius: 8px; color: var(--ink); background: var(--paper); }
 .failure p { margin: 0; line-height: 1.6; }
 .failure button { border: 0; background: none; color: var(--action); cursor: pointer; flex-shrink: 0; }

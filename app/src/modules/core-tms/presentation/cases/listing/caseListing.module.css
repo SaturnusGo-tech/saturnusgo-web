@@ -249,8 +249,12 @@
 .selectionMode .selectionCell { padding-inline: 9px 4px !important; }
 .selectionMode :is(.selectionCell, th:first-child, .groupHeading) input[type="checkbox"],
 .selectionMode th:first-child button { animation: selectionControlIn 180ms cubic-bezier(.2, .72, .3, 1) both; }
-.flagCell { padding-inline: 0 !important; text-align: center; }
+.flagCell { position: relative; padding-inline: 0 !important; text-align: center; }
 .flagCell > svg { margin-inline: auto; color: var(--falcon-icon); }
+.flagCell > svg { transition: opacity 140ms ease; }
+.flagCell[data-case-loading] > svg { opacity: 0; }
+.caseOrb { --loading-orb-size: 14px; position: absolute; inset: 0; margin: auto; }
+@media (prefers-reduced-motion: reduce) { .flagCell > svg { transition: none; } }
 .typeCell { padding-inline: 0 !important; color: var(--falcon-icon) !important; text-align: center; }
 .keyCell { overflow: hidden; color: var(--falcon-text-muted) !important; font-variant-numeric: tabular-nums; text-overflow: ellipsis; white-space: nowrap; }
 .keyCell strong { font-size: 11px; font-weight: 500; letter-spacing: .01em; }

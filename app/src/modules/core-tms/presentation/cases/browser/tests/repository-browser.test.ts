@@ -156,3 +156,34 @@ test("the archive control remains mounted while selection actions replace it wit
   assert.equal(archive().props.disabled, false); assert.equal(archive().props["aria-hidden"], undefined);
   app.dispose();
 });
+
+test("loading stays with the latest case row and clears when detail fails or arrives", () => {
+  const app = browserHarness();
+  const loadingRow = () => elements(app.renderView(), (item) => item.type === "CasesRepositoryList")[0].props.loadingCaseId;
+  const leaf = treeControl("case/RepositoryCaseLeaf.tsx", "RepositoryCaseLeaf");
+  const row = (id: string) => leaf.render({ item: app.items.find(item => item.id === id)!, titleMode: "inline", loading: loadingRow() === id });
+  const open = (id: string) => app.render().selectRow({ testCase: app.items.find(item => item.id === id)!, folderPath: "" });
+  try {
+    open("transfer-case");
+    assert.equal(loadingRow(), "transfer-case");
+    assert.equal(controls(row("transfer-case"), "LoadingOrb").length, 1);
+    assert.equal(controls(row("transfer-case"), "PriorityIcon").length, 1);
+    assert.equal(controls(row("profile-case"), "LoadingOrb").length, 0);
+    const pane = elements(app.renderView(), item => item.props["data-testid"] === "case-detail-loading")[0];
+    assert.equal(pane.props.role, "status");
+    assert.equal(elements(pane, item => item.type === "LoadingOrb" || item.type === "TessiqLoader").length, 0);
+
+    open("profile-case");
+    assert.equal(loadingRow(), "profile-case");
+    assert.equal(controls(row("transfer-case"), "LoadingOrb").length, 0);
+    assert.equal(controls(row("profile-case"), "LoadingOrb").length, 1);
+    app.props.detailLoadError = true;
+    assert.equal(loadingRow(), undefined);
+    assert.equal(elements(app.renderView(), item => item.props["data-testid"] === "case-detail-error").length, 1);
+
+    app.props.detailLoadError = false;
+    assert.equal(loadingRow(), "profile-case");
+    app.props.revision = { title: "Update profile" } as typeof app.props.revision;
+    assert.equal(loadingRow(), undefined);
+  } finally { app.dispose(); }
+});

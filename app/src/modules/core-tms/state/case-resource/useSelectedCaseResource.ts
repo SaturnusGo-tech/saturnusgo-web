@@ -16,7 +16,7 @@ export function useSelectedCaseResource(
 ) {
   const [detail, setDetail] = useState<TestCase | null>(null);
   const [etag, setEtag] = useState<string | null>(null);
-  const [failed, setFailed] = useState(false);
+  const [failedCaseId, setFailedCaseId] = useState<string | null>(null);
   const [requestVersion, setRequestVersion] = useState(0);
 
   const resource = useRef({ detail, etag });
@@ -31,7 +31,7 @@ export function useSelectedCaseResource(
   useEffect(() => {
     const previous = requestScope.current;
     requestScope.current = { http, connection, requestVersion };
-    setFailed(false);
+    setFailedCaseId(null);
     if (connection === "demo") {
       setDetail(selected && "current" in selected && "linkIds" in selected
         ? selected as unknown as TestCase
@@ -55,15 +55,15 @@ export function useSelectedCaseResource(
       setDetail(current => reconcileMaintenance(reconcileMaintenance(resource.data, current), selectedRef.current));
       setEtag(resource.etag);
     }).catch(() => {
-      if (!controller.signal.aborted) setFailed(true);
+      if (!controller.signal.aborted) setFailedCaseId(caseId);
     });
     return () => controller.abort();
   }, [caseId, connection, http, requestVersion, contentKey]);
 
   const retry = useCallback(() => {
-    setFailed(false);
+    setFailedCaseId(null);
     setRequestVersion((current) => current + 1);
   }, []);
 
-  return { detail, setDetail, etag, setEtag, failed, retry };
+  return { detail, setDetail, etag, setEtag, failed: failedCaseId === caseId, retry };
 }

@@ -19,7 +19,7 @@ import css from "../styles/repository.module.css";
 
 export function RepositoryFolders(props: {
   resource: FolderResource; cases: readonly TestCaseSummary[]; selected: ReadonlySet<string>; selectedFolder: string; selectedFolderId?: string;
-  activeCaseId: string; ru: boolean; locked: boolean; onToggle: (id: string) => void; onScope: (ids: readonly string[]) => void;
+  activeCaseId: string; loadingCaseId?: string; ru: boolean; locked: boolean; onToggle: (id: string) => void; onScope: (ids: readonly string[]) => void;
   onFolder: (path: string, id?: string) => void; onCase: (item: TestCaseSummary) => void; onCreate: (path?: string) => void;
   onNewFolder: () => void; onSelectionMode: () => void; onManageFolder?: (folderId: string) => void;
   controls?: ReactNode; selectionActions?: ReactNode; task?: ReactNode; filtered?: boolean; selectionMode?: boolean; includeArchived?: boolean; hasArchivedCases?: boolean; onArchiveChange?: (archived: boolean) => void;
@@ -129,11 +129,11 @@ export function RepositoryFolders(props: {
       {resource.error && <div className={css.loadError} role="alert"><span>{resource.error}</span><button onClick={resource.reload}>{ru ? "Обновить" : "Refresh"}</button></div>}
       {resource.loading && !resource.items.length ? <div className={css.skeleton} role="status" aria-label={ru ? "Загрузка папок" : "Loading folders"}><i /><i /><i /><i /></div> : <ul className={css.tree}>
         {roots.map((node) => <RepositoryFolderBranch key={node.folder.id} node={node} depth={0} expanded={expanded} selected={props.selected} titleMode="inline"
-          customize={!props.selectionMode} creation={creation} selectedFolder={props.selectedFolder} selectedFolderId={props.selectedFolderId} activeCaseId={props.activeCaseId} ru={ru} locked={props.locked || resource.busy || resource.loading}
+          customize={!props.selectionMode} creation={creation} selectedFolder={props.selectedFolder} selectedFolderId={props.selectedFolderId} activeCaseId={props.activeCaseId} loadingCaseId={props.loadingCaseId} ru={ru} locked={props.locked || resource.busy || resource.loading}
           canManage={resource.canManage} canSelect={Boolean(props.selectionMode) && resource.canManage} onExpand={toggle} onReveal={reveal} onFolder={props.onFolder} onCase={props.onCase} onToggle={props.onToggle} onScope={props.onScope}
           activeMenuFolderId={menu?.folder.id} menuId={menuId}
           onMenu={(folder, trigger) => setMenu(current => current?.trigger === trigger ? null : { folder, trigger })} />)}
-        {tree.unfiled.map((item) => <RepositoryCaseLeaf key={item.id} item={item} depth={0} selected={props.selected.has(item.id)} active={props.activeCaseId === item.id} titleMode="inline"
+        {tree.unfiled.map((item) => <RepositoryCaseLeaf key={item.id} item={item} depth={0} selected={props.selected.has(item.id)} active={props.activeCaseId === item.id} loading={props.loadingCaseId === item.id} titleMode="inline"
           creation={creation} locked={props.locked || resource.busy || resource.loading} canManage={resource.canManage} canSelect={Boolean(props.selectionMode) && resource.canManage} ru={ru} onToggle={props.onToggle} onOpen={props.onCase} />)}
         {!roots.length && !tree.unfiled.length && !resource.error && (props.filtered || archive
           ? <li className={css.empty}>{props.filtered ? (ru ? "Тест-кейсы не найдены. Измените поиск или фильтры." : "No matching test cases. Adjust the search or filters.") : (ru ? "В архиве пока пусто" : "The archive is empty")}</li>

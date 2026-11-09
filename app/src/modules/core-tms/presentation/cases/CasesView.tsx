@@ -7,7 +7,6 @@ import { CasesRepositoryList } from "./workspace/CasesRepositoryList";
 import { RepositoryDragContext } from "../../folders/presentation/dnd/RepositoryDragContext";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
-import { TessiqLoader } from "../common/loading/TessiqLoader";
 import { CaseLocationBreadcrumbs } from "./detail/location/CaseLocationBreadcrumbs";
 import { CaseDetailPanel } from "./detail/CaseDetailPanel";
 import { useCasePanelExit } from "./detail/motion/useCasePanelExit";
@@ -18,10 +17,12 @@ import {
 import type { CasesViewProps } from "./types";
 import { useCasesViewController } from "./view/useCasesViewController";
 import styles from "./cases.module.css";
+import shell from "../../tms.module.css";
 
 export function CasesView(props: CasesViewProps) {
   const { locale, languageTag, t } = useTmsLocale();
   const view = useCasesViewController(props, locale, languageTag);
+  const loadingCaseId = !props.editor && !props.revision && !props.detailLoadError ? props.testCase?.id : undefined;
   const tagProject = props.editor?.projectId ?? props.testCase?.projectId;
   const tagSuggestions = useMemo(() => tagProject
     ? [...new Set(props.testCases.filter(item => item.projectId === tagProject).flatMap(item => item.tags))].sort()
@@ -97,7 +98,7 @@ export function CasesView(props: CasesViewProps) {
     data-testid="cases-view"
   >
     <div className={props.folders ? browser.panes : undefined} style={props.folders ? undefined : { display: "contents" }} data-open={view.inspectorOpen || undefined} data-fullscreen={view.detailFullscreen || undefined} data-task={selectionAction === "move" ? "move" : undefined}>
-    {props.repository ?? <CasesRepositoryList props={props} view={view} locale={locale} listPaneRef={listPaneRef} move={selectionAction === "move" ? { ids: view.bulkSelection.selectedIds, onClose: () => setSelectionAction(null), onMoved: view.bulkSelection.clear } : undefined} />}
+    {props.repository ?? <CasesRepositoryList props={props} view={view} locale={locale} listPaneRef={listPaneRef} loadingCaseId={loadingCaseId} move={selectionAction === "move" ? { ids: view.bulkSelection.selectedIds, onClose: () => setSelectionAction(null), onMoved: view.bulkSelection.clear } : undefined} />}
     {!props.folders && view.inspectorOpen && !view.detailFullscreen && <div
       {...view.inspectorResize.handleProps}
       className={styles.detailResizeHandle}
@@ -128,7 +129,7 @@ export function CasesView(props: CasesViewProps) {
                 {locale === "ru" ? "Повторить" : "Retry"}
               </button>
             </div>
-          : <TessiqLoader pane label={t("common.loading")} testId="case-detail-loading" />
+          : <div role="status" data-testid="case-detail-loading"><span className={shell.srOnly}>{t("common.loading")}</span></div>
         : <CaseDetailPanel
             tagSuggestions={tagSuggestions}
             key={props.editor?.mode === "create" ? "create" : props.testCase?.id}

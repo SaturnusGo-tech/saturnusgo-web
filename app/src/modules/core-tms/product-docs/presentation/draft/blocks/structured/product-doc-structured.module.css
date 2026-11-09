@@ -45,6 +45,7 @@
 .surface .field :is(.inputWrapper, textarea.input):is(:focus, :focus-within, :focus-visible) { outline: 0; box-shadow: none; }
 .surface .field .input::placeholder { color: var(--falcon-text-secondary); }
 .controls {
+  --action-visibility: 0;
   position: absolute;
   z-index: 1;
   inset: 9px 9px auto auto;
@@ -60,7 +61,23 @@
 }
 .block:focus-within .controls,
 .block:hover .controls,
-.surface:is(:hover, :focus-within) .controls { opacity: 1; }
+.surface:is(:hover, :focus-within) .controls { --action-visibility: 1; opacity: 1; }
+.controls[data-solving] { min-inline-size: 30px; min-block-size: 28px; opacity: 1; }
+.actions { display: flex; align-items: center; gap: 1px; opacity: var(--action-visibility); }
+.controls[data-solving] .actions { opacity: 0; pointer-events: none; }
+.controls[data-solving]:focus-within { outline: 1px solid var(--falcon-focus); outline-offset: 1px; }
+.solving {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  opacity: 1;
+  transform: scale(1);
+  transition-property: opacity, transform;
+  transition-timing-function: ease;
+}
+.controls[data-solving="leaving"] .solving { opacity: 0; transform: scale(.86); }
 .action, .handle {
   display: grid;
   place-items: center;
@@ -116,17 +133,16 @@
   color: var(--falcon-text);
   font-size: 11px;
 }
-.generate:hover:not(:disabled) { background: var(--falcon-hover); }
+.generate:hover:not([aria-disabled="true"]) { background: var(--falcon-hover); }
+.generate[aria-disabled="true"] { cursor: default; opacity: .55; }
 .surface[data-kind="diagram"][data-preview] { padding-block-start: 40px; }
-.previewLoading {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  min-block-size: 36px;
-  color: var(--falcon-text-secondary);
-  font-size: 12px;
+.previewReveal {
+  min-inline-size: 0;
+  animation: reveal-structured-preview 160ms ease-out both;
+}
+@keyframes reveal-structured-preview {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 .formula { min-inline-size: 0; overflow: auto; color: var(--falcon-text); text-align: center; }
 .formula math { font-size: 1.12em; }
@@ -145,6 +161,7 @@
 .expandedBody { min-height: 0; padding: 0 16px 14px; }
 .expanded .expandedContent { display: flex; flex: 1; min-block-size: 0; overflow: hidden; }
 .expanded .expandedBody { display: flex; flex: 1; flex-direction: column; min-inline-size: 0; }
+.expandedPreview { position: relative; display: flex; flex: 1; flex-direction: column; min-inline-size: 0; min-block-size: 56px; }
 .expanded .invalid { overflow: auto; }
 :global(html:not(.dark)) .expandedBody > :not(pre) {
   padding: 8px;
@@ -153,7 +170,11 @@
   background: var(--falcon-selected);
 }
 @media (hover: none) {
-  .controls, .handle { opacity: 1; }
+  .controls { --action-visibility: 1; opacity: 1; }
+  .handle { opacity: 1; }
   .handle { inset-inline-start: 0; transform: translateX(-100%); }
 }
-@media (prefers-reduced-motion: reduce) { .controls, .handle { transition: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .controls, .handle, .solving { transition: none; }
+  .previewReveal { animation: none; }
+}

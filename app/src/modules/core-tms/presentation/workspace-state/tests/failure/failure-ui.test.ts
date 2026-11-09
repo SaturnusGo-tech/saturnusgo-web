@@ -7,6 +7,7 @@ test("workspace failure offers recovery without exposing diagnostics or developm
   const h = componentHarness(); let retried = 0;
   const { WorkspaceLoadState: View } = h.load<{ WorkspaceLoadState: typeof WorkspaceLoadState }>(new URL("../../WorkspaceLoadState.tsx", import.meta.url), name => {
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ t: (key: string) => key }) };
+    if (name.endsWith("WorkspaceStartup")) return { useWorkspaceStartupCovered: () => false };
   });
   for (const detail of ["status 500", "status 403", "unreachable"]) {
     const tree = h.render(() => View({ failure: { detail, requestId: "private-request-123" }, onRetry: () => retried++ }));

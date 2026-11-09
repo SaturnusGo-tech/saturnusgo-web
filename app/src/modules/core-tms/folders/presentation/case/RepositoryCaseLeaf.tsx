@@ -1,3 +1,4 @@
+import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { useDraggable } from "@dnd-kit/core";
 import { useContext, type ReactNode } from "react";
 import { PiListChecks } from "react-icons/pi";
@@ -9,9 +10,9 @@ import { CaseQuickAdd } from "./CaseQuickAdd";
 import { PriorityIcon, priorityLabel } from "../../../presentation/common/properties/PriorityIcon";
 import css from "../styles/repository.module.css";
 
-export function RepositoryCaseLeaf({ item, depth, selected, active, locked, canManage, canSelect, allowArchivedSelection, accessory, trailing, ru, onToggle, onOpen, creation, titleMode }: {
+export function RepositoryCaseLeaf({ item, depth, selected, active, loading, locked, canManage, canSelect, allowArchivedSelection, accessory, trailing, ru, onToggle, onOpen, creation, titleMode }: {
   creation?: RepositoryCreation; titleMode?: "marquee" | "inline";
-  canSelect?: boolean; allowArchivedSelection?: boolean; accessory?: ReactNode; trailing?: ReactNode;
+  loading?: boolean; canSelect?: boolean; allowArchivedSelection?: boolean; accessory?: ReactNode; trailing?: ReactNode;
   item: TestCaseSummary; depth: number; selected: boolean; active: boolean; locked: boolean; canManage: boolean;
   ru: boolean; onToggle: (id: string) => void; onOpen: (item: TestCaseSummary) => void;
 }) {
@@ -27,10 +28,13 @@ export function RepositoryCaseLeaf({ item, depth, selected, active, locked, canM
       aria-label={`${ru ? "Выбрать" : "Select"} ${item.key}`} onChange={() => onToggle(item.id)} />
     <button ref={drag.setNodeRef} {...drag.listeners} {...drag.attributes} type="button" className={css.caseButton}
       disabled={locked} aria-disabled={locked || undefined}
-      aria-label={`${item.key} · ${item.title}`} aria-current={active ? "page" : undefined}
+      aria-label={`${item.key} · ${item.title}`} aria-current={active ? "page" : undefined} aria-busy={loading || undefined}
       aria-description={inline ? priorityLabel(ru ? "ru" : "en", priority) : undefined}
       onClick={() => { if (!locked && Date.now() > suppress.current) onOpen(item); }} title={titleMode === "marquee" ? undefined : `${item.key} · ${item.title}`}>
-      <span className={css.caseAccessory}>{accessory ?? (inline ? <PriorityIcon level={priority} empty="circle" /> : <PiListChecks size={17} />)}</span>
+      <span className={css.caseAccessory} data-case-loading={loading || undefined}>
+        {accessory ?? (inline ? <PriorityIcon level={priority} empty="circle" /> : <PiListChecks size={17} />)}
+        {loading && <LoadingOrb size="sm" className={css.caseOrb} />}
+      </span>
       {inline ? <span className={css.caseTitle}>{item.title}</span>
         : <span className={css.caseCopy}>{titleMode === "marquee" ? <RepositoryCaseTitle title={item.title} /> : item.title}<small>{item.key}</small></span>}
       {inline && <small className={css.caseKey}>{item.key}</small>}

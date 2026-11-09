@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button, Tooltip } from "@heroui/react";
 import { Pencil, Plus, Search } from "lucide-react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
+import { DeferredPane } from "../../../presentation/common/loading/feedback/DeferredPane";
 import { customFieldError } from "../../application/field-errors";
 import { customFieldLabel } from "../../application/field-labels";
 import type { CustomFieldDefinition, CustomFieldScope } from "../../model/custom-field";
@@ -34,7 +35,7 @@ export function CustomFieldsPage({ workspaceId, projectId, canManageFields, canM
     {write.error && <p className={css.error} role="alert">{write.error}</p>}
     {!!page.failure && <p className={css.error} role="alert">{customFieldError(page.failure, ru)} <button type="button" className={css.secondary} onClick={page.refresh}>{ru ? "Повторить" : "Retry"}</button></p>}
     <div className={css.scroll} aria-busy={page.loading}>
-      {page.loading ? <p className={css.status} role="status">{ru ? "Загрузка полей…" : "Loading fields…"}</p> : <>
+      <DeferredPane pending={page.loading} variant="list" label={ru ? "Загрузка полей…" : "Loading fields…"}>
         <table className={css.table}><thead><tr>{[ru ? "Поле" : "Custom field", ru ? "Идентификатор" : "Identifier", ru ? "Тип" : "Type",
           ru ? "Несколько" : "Multiple", ru ? "Обязательное" : "Required", ru ? "Обновлено" : "Updated at", ru ? "Автор изменения" : "Updated by"].map(title => <th scope="col" key={title}>{title}</th>)}<th scope="col"><span aria-label={ru ? "Действия" : "Actions"} /></th></tr></thead>
           <tbody>{page.items.map(field => <tr key={field.id} className={field.archivedAt ? css.archived : undefined}>
@@ -55,7 +56,7 @@ export function CustomFieldsPage({ workspaceId, projectId, canManageFields, canM
         {!page.items.length && !page.failure && <p className={css.empty}>{!connected ? (ru ? "Для справочника требуется подключение." : "Connect to manage custom fields.")
           : page.search ? (ru ? "Поля не найдены." : "No fields found.") : (ru ? "Полей пока нет." : "No fields yet.")}</p>}
         {page.cursor && <div className={css.more}><button type="button" className={css.secondary} disabled={page.pending} onClick={() => void page.more()}>{ru ? "Показать ещё" : "Load more"}</button></div>}
-      </>}
+      </DeferredPane>
     </div>
   </section>;
 }
