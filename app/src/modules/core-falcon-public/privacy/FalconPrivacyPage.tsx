@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { FalconBrandMark } from "../../../shared/components/brand/FalconBrandMark";
 import { en, ru } from "./content/en-ru";
 import { es, pt } from "./content/es-pt";
 import styles from "./privacy.module.css";
@@ -25,7 +26,10 @@ export function FalconPrivacyPage() {
   const copy = copies[locale];
   return <div className={styles.page} lang={locale}>
     <header className={styles.header}>
-      <a className={styles.brand} href={`/?lang=${locale}`} aria-label={copy.back}>falcon<span aria-hidden="true">↗</span></a>
+      <a className={styles.brand} href={`/?lang=${locale}`} aria-label={copy.back}>
+        <FalconBrandMark className={styles.brandMark} />
+        falcon<span className={styles.brandArrow} aria-hidden="true">↗</span>
+      </a>
       <nav className={styles.languages} aria-label={copy.language}>
         {languages.map(item => <a key={item.locale} href={`?lang=${item.locale}`} lang={item.locale}
           aria-current={locale === item.locale ? "page" : undefined}>{item.label}</a>)}

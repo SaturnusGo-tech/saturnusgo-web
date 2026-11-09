@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { englishCopy, russianCopy } from '../localization/content/copy';
 import type { LandingLocale } from '../localization/model/locale';
 import { falconProductImage } from '../../shared/product-images';
+import { falconBrandIcons } from '../../shared/brand-metadata';
 
 export const FALCON_ORIGIN = 'https://tms.saturnusgo.com';
 export function falconLandingMetadata(locale: LandingLocale): Metadata {
@@ -17,7 +18,7 @@ export function falconLandingMetadata(locale: LandingLocale): Metadata {
       locale:locale === 'ru' ? 'ru_RU' : 'en_US', alternateLocale:locale === 'ru' ? 'en_US' : 'ru_RU',
       images:[{url:image,width:capture.width,height:capture.height,alt:'Falcon TMS test case repository and scenario'}]},
     twitter:{card:'summary_large_image',title:copy.title,description:copy.description,images:[image]},
-    icons:{icon:'/falcon/falcon-mark-dark.png',apple:'/falcon/falcon-mark-dark.png'},
+    icons:falconBrandIcons,
   };
 }
 export function falconStructuredData(locale: LandingLocale) {

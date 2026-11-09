@@ -9,7 +9,6 @@
   --docs-body: #b7b8be;
   --docs-muted: #96979f;
   --docs-line: #25262a;
-  --docs-mark: invert(1);
   --docs-panel: var(--docs-raised);
   --docs-control: var(--docs-hover);
   --docs-copy: var(--docs-body);
@@ -26,7 +25,7 @@
   isolation: isolate;
   container: falcon-docs / inline-size;
 }
-.page[data-theme="light"] { --docs-bg: #ffffff; --docs-raised: #f8f8f9; --docs-hover: #f0f0f2; --docs-text: #1d1e22; --docs-body: #52535c; --docs-muted: #666873; --docs-line: #e7e7eb; --docs-mark: none; color-scheme: light; }
+.page[data-theme="light"] { --docs-bg: #ffffff; --docs-raised: #f8f8f9; --docs-hover: #f0f0f2; --docs-text: #1d1e22; --docs-body: #52535c; --docs-muted: #666873; --docs-line: #e7e7eb; color-scheme: light; }
 .page * { box-sizing: border-box; }
 .page ::selection { color: var(--docs-bg); background: var(--docs-text); }
 .page a { color: inherit; text-decoration: none; }
@@ -34,13 +33,12 @@
 .page button { cursor: pointer; }
 .page svg { flex: none; }
 .page :is(a, button, input):focus-visible { outline: 2px solid var(--docs-muted); outline-offset: 3px; }
-.brand img, .aiPill img { filter: var(--docs-mark); }
 .skipLink { position: fixed; top: -64px; left: 24px; z-index: 20; padding: 8px 16px; background: var(--docs-text); color: var(--docs-bg) !important; border-radius: 6px; }
 .skipLink:focus { top: 12px; }
 .sidebar { position: fixed; z-index: 6; inset: 0 auto 0 0; display: flex; flex-direction: column; width: 280px; background: var(--docs-bg); border-right: 1px solid var(--docs-line); }
 .sidebarBrand { display: flex; align-items: center; flex: none; gap: 12px; height: 64px; padding: 0 22px; }
 .brand { display: inline-flex; align-items: center; gap: 7px; font-size: 17px; font-weight: 600; letter-spacing: -.03em; }
-.brand img { width: 23px; height: 23px; object-fit: contain; }
+.brandMark { --falcon-brand-mark-size: 23px; }
 .brandDivider { width: 1px; height: 17px; background: var(--docs-line); }
 .docLabel { font-size: 14px; color: var(--docs-body) !important; }
 .searchButton, .iconButton { display: grid; place-items: center; flex: none; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 50%; color: var(--docs-muted); background: transparent; transition: color 160ms ease, background 160ms ease; }
@@ -99,7 +97,7 @@
 .outline a[aria-current="location"]::before { content: ""; position: absolute; left: -1px; top: 3px; bottom: 3px; width: 1px; background: var(--docs-text); }
 .aiPill { position: fixed; z-index: 7; bottom: 24px; right: 26px; display: inline-flex; align-items: center; gap: 9px; min-height: 39px; padding: 8px 15px 8px 12px; border: 1px solid var(--docs-line); border-radius: 100px; background: var(--docs-raised); color: var(--docs-text); font-size: 12px; font-weight: 500; box-shadow: 0 4px 16px #00000026; transition: background 160ms ease; }
 .aiPill:hover { background: var(--docs-hover); }
-.aiPill img { width: 20px; height: 20px; }
+.aiMark { --falcon-brand-mark-size: 20px; }
 .searchDialog { position: fixed; inset: 0; width: min(660px, calc(100vw - 32px)); max-width: none; max-height: min(620px, calc(100dvh - 100px)); margin: 13vh auto auto; padding: 0; overflow: hidden; border: 1px solid var(--docs-line); border-radius: 12px; background: var(--docs-raised); color: var(--docs-text); box-shadow: 0 20px 70px #00000055; }
 .searchDialog::backdrop { background: #000000b3; }
 .searchSurface { display: flex; flex-direction: column; max-height: min(620px, calc(100dvh - 100px)); }
@@ -172,12 +170,10 @@
   --docs-line: var(--falcon-border);
   --docs-prompt-surface: var(--falcon-chrome);
   --docs-prompt-border: var(--falcon-border-strong);
-  --docs-mark: none;
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: 52px minmax(0, 1fr);
   color-scheme: inherit;
 }
-:global(.dark) .page[data-guide-panel="true"] { --docs-mark: invert(1); }
 .page[data-guide-panel="true"] :is(.header, .sidebarBrand) { height: 52px; }
 .page[data-guide-panel="true"] :is(.header, .layout) { grid-column: 1; }
 .page[data-guide-panel="true"] .header { padding: 0 92px 0 17px; gap: 10px; }

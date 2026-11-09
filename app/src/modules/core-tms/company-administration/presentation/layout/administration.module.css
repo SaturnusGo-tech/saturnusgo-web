@@ -12,9 +12,7 @@
 .page *, .page *::before { box-sizing:border-box; }
 .sidebar { width:276px; flex-shrink:0; padding:28px 16px 34px; background:var(--falcon-sidebar); color:var(--falcon-text-secondary); display:flex; flex-direction:column; gap:20px; position:sticky; top:0; height:100dvh; border-right:1px solid var(--falcon-border); }
 .brand { display:flex; align-items:center; gap:10px; color:var(--falcon-text); font-size:20px; letter-spacing:-.7px; font-weight:550; padding:0 12px; text-decoration:none; }
-.brand img { width:32px; height:32px; }
-.brand img { content:url("/falcon/falcon-mark-dark.png"); }
-:global(.dark) .brand img { content:url("/falcon/falcon-mark-light.png"); }
+.brandMark { --falcon-brand-mark-size: 32px; }
 .nav { display:grid; gap:7px; }
 .nav a, .nav button { display:flex; gap:10px; align-items:center; padding:14px 16px; border-radius:8px; color:inherit; text-decoration:none; font:inherit; background:transparent; border:0; cursor:pointer; }
 .nav a:hover, .nav button:hover { background:var(--falcon-hover); color:var(--falcon-text); }
@@ -178,13 +176,7 @@
 }
 
 .topBar .brand { padding: 0; gap: 7px; font-size: 15px; letter-spacing: -.3px; flex-shrink: 0; -webkit-app-region: no-drag; }
-.brandMark {
-  flex: none;
-  width: 24px;
-  height: 24px;
-  background-color: currentColor;
-  mask: url("../../../assets/falcon/falcon-line-mark.svg") center / contain no-repeat;
-}
+.topBar .brandMark { --falcon-brand-mark-size: 24px; }
 .workspaceName { min-width: 0; color: var(--admin-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .workspaceName:not(:empty) { border-inline-start: 1px solid var(--admin-line); padding-inline-start: 12px; }
 

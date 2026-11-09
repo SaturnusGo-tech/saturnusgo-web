@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { FalconBrandMark } from "../../../shared/components/brand/FalconBrandMark";
 import { trialTermsCopy } from "./copy";
 import styles from "../privacy/privacy.module.css";
 export function FalconTrialTermsPage() {
@@ -10,7 +11,11 @@ export function FalconTrialTermsPage() {
   }, []);
   const copy = trialTermsCopy(locale);
   return <div className={styles.page} lang={locale}>
-    <header className={styles.header}><a className={styles.brand} href={`/?lang=${locale}`} aria-label={copy.back}>falcon<span aria-hidden="true">↗</span></a>
+    <header className={styles.header}>
+      <a className={styles.brand} href={`/?lang=${locale}`} aria-label={copy.back}>
+        <FalconBrandMark className={styles.brandMark} />
+        falcon<span className={styles.brandArrow} aria-hidden="true">↗</span>
+      </a>
       <nav className={styles.languages} aria-label={copy.language}><a href="?lang=en" lang="en" aria-current={locale === "en" ? "page" : undefined}>English</a>
         <a href="?lang=ru" lang="ru" aria-current={locale === "ru" ? "page" : undefined}>Русский</a></nav></header>
     <main className={styles.content}><p className={styles.updated}>{copy.updated}</p><h1>{copy.title}</h1><p className={styles.intro}>{copy.intro}</p>

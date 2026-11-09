@@ -1,21 +1,8 @@
 # Falcon production assets
 
-The active Carbon / Warm Titanium identity uses surface-aware RGBA assets:
+The Falcon web mark is `public/falcon/falcon-brand-mark.svg`, the approved wordless SVG. The browser favicons use transparent dark and light PNGs rasterized from that path. The Apple touch, notification and social preview icon uses the same path in light ink on a dark tile. The ICO fallback contains 16, 32 and 48 px tile renders.
 
-- `falcon-loader-on-dark.png` — detailed loading bird for dark surfaces;
-- `falcon-loader-on-light.png` — detailed loading bird for light surfaces;
-- `falcon-mark-on-dark.png` — compact master mark on dark chrome;
-- `falcon-mark-on-light.png` — compact master mark on light chrome;
-- `falcon-favicon-on-dark.png` — 256 px favicon derived from the dark-surface mark;
-- `falcon-favicon-on-light.png` — 256 px favicon derived from the light-surface mark.
-
-All six files are square PNGs with real transparent padding. The sidebar is
-always graphite, so it uses the `on-dark` master mark. The route favicon
-publishes both compact derivatives with `prefers-color-scheme` media queries.
-
-The three approved color explorations are preserved in
-`../brand-exploration/falcon/`. Runtime randomization is intentionally not
-enabled yet; Carbon / Warm Titanium remains the single production identity.
+The Carbon / Warm Titanium PNGs in this directory and the color explorations in `../brand-exploration/falcon/` record the previous identity.
 
 Falcon is a working product name. Formal trademark, company-name, and domain
 clearance is still required before a commercial launch.

@@ -1,4 +1,5 @@
 "use client";
+import { FalconBrandMark } from "../../../../../../shared/components/brand/FalconBrandMark";
 import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
 import { ArrowLeft } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -48,7 +49,7 @@ export function ManagedAccessScreen({ access, signIn }: { readonly access: Retur
       <button onClick={() => setLocale("en")} aria-pressed={locale === "en"}>EN</button>
     </div></header>
     <section className={styles.content} aria-busy={state.loading || state.pending || signIn?.state.pending}>
-      <a href={`/?lang=${locale}`} className={styles.brand} aria-label="Falcon"><span className={styles.brandMark} aria-hidden="true" /></a>
+      <a href={`/?lang=${locale}`} className={styles.brand} aria-label="Falcon"><FalconBrandMark className={styles.brandMark} /></a>
       {state.loading ? <div className={styles.loading} role="status" aria-label={copy.loading}><LoadingOrb size="lg" /></div>
         : state.recoveryCodes.length > 0 ? <RecoveryCodes copy={copy} codes={state.recoveryCodes} onContinue={access.acknowledgeCodes} />
         : !state.entrypoint?.available ? <>

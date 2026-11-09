@@ -10,10 +10,10 @@ test("Falcon is the active user-facing TMS brand", () => {
   const shellSource = source(
     "app/src/modules/core-tms/presentation/workspace/tms-shell.module.css",
   );
+  const navigationSource = source("app/src/modules/core-tms/presentation/navigation/Navigation.tsx");
   const activeSources = [
     source("app/(falcon)/work/page.tsx"),
-    source("app/(falcon)/work/TmsFavicon.tsx"),
-    source("app/src/modules/core-tms/presentation/navigation/Navigation.tsx"),
+    navigationSource,
     shellSource,
     source("app/src/modules/core-tms/tms.module.css"),
     source("app/src/modules/core-tms/localization/catalog/shell/en.ts"),
@@ -24,15 +24,9 @@ test("Falcon is the active user-facing TMS brand", () => {
   assert.match(activeSources, /Falcon test management workspace/);
   assert.match(activeSources, /siteName: "Falcon"/);
   assert.match(activeSources, /https:\/\/tms\.saturnusgo\.com\/work\//);
-  assert.match(activeSources, /assets\/falcon\/falcon-mark-on-dark\.png/);
-  assert.match(activeSources, /assets\/falcon\/falcon-favicon-on-dark\.png/);
-  assert.match(activeSources, /assets\/falcon\/falcon-favicon-on-light\.png/);
-  assert.match(activeSources, /assets\/falcon\/falcon-line-mark\.svg/);
-  assert.match(activeSources, /prefers-color-scheme: light/);
-  assert.match(activeSources, /prefers-color-scheme: dark/);
+  assert.match(navigationSource, /<FalconBrandMark /);
   assert.match(shellSource, /\.header\s*\{[\s\S]*?background: var\(--paper\)/);
   assert.match(shellSource, /\.navigation\s*\{[\s\S]*?--sidebar-text: var\(--falcon-text\);[\s\S]*?background: var\(--falcon-sidebar\)/);
-  assert.match(shellSource, /\.tessiqMark\s*\{[\s\S]*?falcon-mark-on-dark\.png/);
   const darkNavigation = shellSource.match(/:global\(\.dark\) \.navigation\s*\{([^}]+)\}/)?.[1] ?? "";
   assert.match(darkNavigation, /--sidebar-text: var\(--tms-text\)/);
   assert.match(darkNavigation, /background: var\(--tms-bg-sidebar\)/);

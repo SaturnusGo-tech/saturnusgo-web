@@ -1,5 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
+import { FalconBrandMark } from "../../../../../shared/components/brand/FalconBrandMark";
 import { DesktopUpdateControl } from "../../../desktop-downloads/presentation/update/DesktopUpdateControl";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { administrationCopy } from "../copy/administration-copy";
@@ -18,7 +19,7 @@ export function CompanyAdminFrame({ back, companyName, page, navigation, account
   const returnLabel = locale === "ru" ? "Вернуться в Falcon" : "Back to Falcon";
   return <div className={styles.page} data-falcon-shell data-company-admin data-section="admin" data-directory={!page}>
     <header className={styles.topBar}>
-      <a className={styles.brand} href={back}><span className={styles.brandMark} aria-hidden="true" />Falcon</a>
+      <a className={styles.brand} href={back}><FalconBrandMark className={styles.brandMark} />Falcon</a>
       <span className={styles.workspaceName}>{companyName}</span>
     </header>
     <aside className={styles.sidebar}>

@@ -1,4 +1,4 @@
-import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
+import { FalconBrandMark } from "../../../../../shared/components/brand/FalconBrandMark";
 import { ContentSkeleton } from "../skeleton/ContentSkeleton";
 import styles from "../../../tms.module.css";
 
@@ -22,10 +22,7 @@ export function TessiqLoader({
       data-testid={testId}
     >
       <span className={styles.srOnly}>{label}</span>
-      <div className={styles.workspaceLoaderBrand} aria-hidden="true">
-        <span className={styles.workspaceLoaderMark} />
-        <LoadingOrb size="brand" />
-      </div>
+      <FalconBrandMark className={styles.workspaceLoaderBrand} intro />
     </section>
   );
 }

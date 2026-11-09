@@ -1,10 +1,12 @@
 import { useWorkspaceCapabilities } from "../../auth/spaces/capabilities/composition/useWorkspaceCapabilities";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { FalconBrandMark } from "../../../../shared/components/brand/FalconBrandMark";
 import { workspaceViewAllowed } from "../../auth/managed/domain/features/workspace-view-access";
 import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
 import { companyViewAvailable } from "../../auth/managed/domain/features/company-features";
 import { navigateWorkspace } from "../../state/navigation/browser/workspace-history";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
+import { installedDesktopVersion } from "../../desktop-downloads/model/update";
 import { DesktopUpdateControl } from "../../desktop-downloads/presentation/update/DesktopUpdateControl";
 import type { View } from "../../state/types/workspace";
 import shellStyles from "../workspace/tms-shell.module.css";
@@ -29,6 +31,10 @@ export function Navigation({ view, onChange, disabled, connected, collapsed, onC
   const metadata = useWorkspaceCapabilities(workspaceId, !!session);
   const codexAvailable = !!metadata.value;
   const root = useRef<HTMLElement>(null);
+  const [desktop, setDesktop] = useState(false);
+  useEffect(() => {
+    setDesktop(typeof navigator !== "undefined" && !!installedDesktopVersion(navigator.userAgent));
+  }, []);
   const reveal = useSidebarReveal(root, collapsed, onCollapsedChange);
   const compact = !reveal.revealed;
   const tooltips = collapsed && compact;
@@ -56,7 +62,8 @@ export function Navigation({ view, onChange, disabled, connected, collapsed, onC
       <NavigationTooltip enabled={tooltips} label={homeLabel}>
         <button type="button" className={css.brand} onClick={() => navigate(available("dashboard") ? "dashboard" : "cases")}
           aria-label={homeLabel} data-nav-label={homeLabel}>
-          <span className={css.mark} aria-hidden="true"/><span className={css.wordmark} aria-hidden="true">FALCON</span>
+          <FalconBrandMark className={css.mark} intervalMs={desktop ? undefined : 180_000} />
+          <span className={css.wordmark} aria-hidden="true">FALCON</span>
         </button>
       </NavigationTooltip>
     </div>

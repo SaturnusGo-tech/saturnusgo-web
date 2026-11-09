@@ -20,7 +20,7 @@
 .header { position: absolute; top: 24px; right: 24px; }
 .content { width: min(100%, 390px); margin: 0 auto; }
 .brand { display: flex; justify-content: center; width: fit-content; margin: 0 auto 28px; }
-.brandMark { display: block; width: 56px; height: 56px; background: #fff; -webkit-mask: url("../../../../assets/falcon/falcon-line-mark.svg") center / contain no-repeat; mask: url("../../../../assets/falcon/falcon-line-mark.svg") center / contain no-repeat; mask-mode: alpha; }
+.brandMark { --falcon-brand-mark-size: 56px; color: #fff; }
 .language { display: flex; gap: 4px; }
 .language button, .linkButton { color: var(--access-muted); background: transparent; border: 0; border-radius: 8px; padding: 6px 8px; font: inherit; cursor: pointer; }
 .language button { font-size: 12px; }

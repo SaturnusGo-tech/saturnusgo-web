@@ -40,7 +40,7 @@
   border-radius: 13px;
   background: rgb(40 18 75 / 22%);
 }
-.markTile img { filter: invert(1); }
+.brandMark { --falcon-brand-mark-size: 26px; }
 .dots { display: flex; align-items: center; gap: 4px; }
 .dots i { width: 4px; height: 4px; border-radius: 50%; background: rgb(255 255 255 / 84%); }
 .dots i:nth-child(2) { opacity: .7; }

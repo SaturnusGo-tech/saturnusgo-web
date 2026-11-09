@@ -39,6 +39,9 @@ test("verifies reviewed Pages evidence, required routes and their runtime assets
   assert.deepEqual(result.checkedRoutes, ["/privacy/", "/trial-terms/", "/sandbox/", "/admin/", "/profile/", "/", "/ru/", "/docs/", "/ru/docs/", "/signup/", "/cloud-login/"]);
   assert.ok(result.checkedAssets.includes("/_next/static/chunks/app.js"));
   assert.ok(result.checkedAssets.includes("/falcon/falcon-mark-dark.png"));
+  assert.ok(result.checkedAssets.includes("/falcon/falcon-brand-mark.svg"));
+  assert.ok(result.checkedAssets.includes("/falcon/falcon-icon.png"));
+  assert.ok(result.checkedAssets.includes("/falcon/favicon.ico"));
   for (const weight of ["Regular", "RegularItalic", "Medium", "Semibold", "Bold"]) {
     assert.ok(result.checkedAssets.includes(`/falcon/docs/fonts/OpenAISans-${weight}.woff2`));
   }

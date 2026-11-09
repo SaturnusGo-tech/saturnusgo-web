@@ -118,6 +118,9 @@ for (const theme of ["light", "dark"]) if (process.env.OMIT_CODEX_ASSET !== them
 write("out/assets/integrations/codex/private.json", "private fixture");
 write("out/assets/private.txt", "private fixture");
 if (process.env.OMIT_FALCON_ASSET !== "1") write("out/falcon/falcon-mark-dark.png", "falcon mark\\n");
+write("out/falcon/falcon-brand-mark.svg", "Falcon master mark");
+write("out/falcon/falcon-icon.png", "Falcon icon");
+write("out/falcon/favicon.ico", "Falcon favicon");
 for (const id of ["hero-preview", "hero-velvet", "repository-stage", "run-stage", "ai-stage"]) write("out/falcon/landing/2026-10/" + id + ".png", "Figma asset");
 if (process.env.OMIT_LINE_MARK !== "1") write("out/falcon/landing/2026-11/falcon-line-mark.svg", "Falcon line mark");
 for (const path of ${JSON.stringify(requiredPublicAssets.filter(path => path.startsWith("/falcon/achievements/")))}) if (process.env.OMIT_ACHIEVEMENT !== path) write("out" + path, "Approved achievement");
@@ -189,6 +192,9 @@ test("publishes Falcon routes into an isolated namespace without replacing Pages
     readFileSync(join(fixture.pages, "falcon/falcon-mark-dark.png"), "utf8"),
     "falcon mark\n",
   );
+  assert.equal(readFileSync(join(fixture.pages, "falcon/falcon-brand-mark.svg"), "utf8"), "Falcon master mark");
+  assert.equal(readFileSync(join(fixture.pages, "falcon/falcon-icon.png"), "utf8"), "Falcon icon");
+  assert.equal(readFileSync(join(fixture.pages, "falcon/favicon.ico"), "utf8"), "Falcon favicon");
   assert.equal(readFileSync(join(fixture.pages, "falcon/landing/hero.webp"), "utf8"), "falcon hero\n");
   assert.equal(readFileSync(join(fixture.pages, "falcon/landing/2026-11/falcon-line-mark.svg"), "utf8"), "Falcon line mark");
   for (const id of ["individual", "startup", "enterprise"]) assert.equal(readFileSync(join(fixture.pages, `falcon/billing/${id}.webp`), "utf8"), "Billing artwork");

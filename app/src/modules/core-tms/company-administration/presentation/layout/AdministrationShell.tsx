@@ -1,6 +1,7 @@
 "use client";
 
 import { History, Building2, Inbox, UsersRound, Bot, Shield } from "lucide-react";
+import { FalconBrandMark } from "../../../../../shared/components/brand/FalconBrandMark";
 import { CompanyAdminFrame } from "./CompanyAdminFrame";
 import { AdministrationAccount } from "../account/AdministrationAccount";
 import type { AdministrationPort } from "../../application/ports/administration-port";
@@ -50,7 +51,7 @@ export function AdministrationShell({ children, section, page, session, logout, 
   return <div className={styles.page} data-falcon-shell data-section={section}>
     <aside className={styles.sidebar}>
       <a className={styles.brand} href={session.audience === "platform" ? "/sandbox/" : "/work/"}>
-        <img src="/falcon/falcon-mark-light.png" alt="" />Falcon
+        <FalconBrandMark className={styles.brandMark} />Falcon
       </a>
       {companyName && <div className={styles.companyName}>{companyName}</div>}
       {navigation}

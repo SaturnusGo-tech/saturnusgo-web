@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
 import { ArrowRight, Check, ChevronDown, Layers2, ListChecks, Network, ShieldCheck, UsersRound, X } from "lucide-react";
+import { FalconBrandMark } from "../../../../../shared/components/brand/FalconBrandMark";
 import type { BillingPlan, BillingPlanId, BillingSubscription } from "../../domain/billing";
 import css from "./plans.module.css";
 
@@ -59,7 +60,7 @@ export function BillingPlans({ plans, current, occupiedSeats, workspaceKind, can
   return <section className={css.offer} aria-labelledby="billing-plans-title" data-offer={selectedId}>
     <div className={css.visual}>
       {onClose && <button type="button" className={css.close} onClick={onClose} aria-label={ru ? "Закрыть тарифы" : "Close plans"}><X size={24} strokeWidth={1.5} aria-hidden="true" /></button>}
-      <div className={css.logoTile}><span className={css.logo} aria-hidden="true" /></div>
+      <div className={css.logoTile}><FalconBrandMark className={css.logo} /></div>
       <p className={css.eyebrow}>{ru ? "БОЛЬШЕ С FALCON" : "UPGRADE YOUR WORKFLOW"}</p>
       <h3 id="billing-plans-title" className={css.title}>{enterprise ? (ru ? "Новый масштаб с" : "Go further with") : (ru ? "Больше возможностей с" : "Unlock features with")} <span>{names[selectedId]}</span></h3>
       <p className={css.subtitle}>{enterprise ? (ru ? "Обсудим, как Falcon подойдёт вашей компании." : "Let’s find the right Falcon setup for your company.")

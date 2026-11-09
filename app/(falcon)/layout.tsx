@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import type React from "react";
+import { falconBrandIcons, falconBrandPreview } from "../src/modules/core-falcon-public/shared/brand-metadata";
 import "../src/modules/core-tms/presentation/theme/falcon-theme.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://tms.saturnusgo.com"),
   applicationName: "Falcon",
+  icons: falconBrandIcons,
   robots: { index: false, follow: false },
   title: {
     default: "Falcon — управление качеством продукта",
@@ -16,11 +18,13 @@ export const metadata: Metadata = {
     description: "Единое пространство для ручного и автоматизированного тестирования.",
     url: "https://tms.saturnusgo.com/",
     siteName: "Falcon",
+    images: [falconBrandPreview],
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title: "Falcon — управление качеством продукта",
     description: "Единое пространство для ручного и автоматизированного тестирования.",
+    images: [falconBrandPreview.url],
   },
 };
 

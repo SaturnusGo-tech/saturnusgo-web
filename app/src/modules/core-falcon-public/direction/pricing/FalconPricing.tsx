@@ -1,4 +1,5 @@
 import { Check } from 'lucide-react';
+import { FalconBrandMark } from '../../../../shared/components/brand/FalconBrandMark';
 import { publicBillingCatalog } from '../../../core-tms/billing/domain/catalog/public-billing-catalog';
 import { planNames } from '../../../core-tms/billing/requests/domain/plan-request';
 import type { LandingLocale } from '../../landing/localization/model/locale';
@@ -133,7 +134,10 @@ export function FalconPricing({ locale }: { locale: LandingLocale }) {
         </svg>
       </div>
       <div className={styles.masthead}>
-        <span className={styles.wordmark} aria-hidden="true">Falcon</span>
+        <span className={styles.wordmark} aria-hidden="true">
+          <FalconBrandMark className={styles.wordmarkIcon} />
+          Falcon
+        </span>
         <h2 id="plans-title" className={styles.title}>{c.title}</h2>
       </div>
       <PricingPlanPages label={c.title} plans={plans.map(plan => plan.name)}>

@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
+import { FalconBrandMark } from "../../../../../shared/components/brand/FalconBrandMark";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import styles from "./workspace-startup.module.css";
 
@@ -61,8 +61,7 @@ export function WorkspaceStartup({ children }: { children: ReactNode }) {
       {covered && <div className={styles.intro} data-testid="workspace-startup" data-phase={phase}
         role="status" aria-label={t("workspace.loading")} aria-busy="true">
         <div className={styles.artwork} aria-hidden="true">
-          <span className={styles.mark} />
-          <LoadingOrb size="brand" className={styles.orb} />
+          <FalconBrandMark intro />
         </div>
       </div>}
     </WorkspaceStartupContext.Provider>

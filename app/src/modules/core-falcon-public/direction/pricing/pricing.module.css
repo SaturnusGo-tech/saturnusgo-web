@@ -55,12 +55,17 @@
   position: absolute;
   inset-block-start: -12px;
   inset-inline-end: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: .14em;
   color: #99e5f6;
   font-size: clamp(27px, 4.5vw, 58px);
   font-weight: 550;
   letter-spacing: -.045em;
   line-height: 1;
 }
+
+.wordmarkIcon { --falcon-brand-mark-size: .82em; }
 
 .title {
   padding-bottom: .16em;

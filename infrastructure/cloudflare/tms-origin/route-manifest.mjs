@@ -80,8 +80,11 @@ export const requiredPublicAssets = Object.freeze([
   "/assets/integrations/codex/codex-light.png",
   "/assets/integrations/codex/codex-dark.png",
   ...["hero-preview", "hero-velvet", "repository-stage", "run-stage", "ai-stage"].map((id) => `/falcon/landing/2026-10/${id}.png`),
+  "/falcon/falcon-brand-mark.svg",
+  "/falcon/falcon-icon.png",
   "/falcon/falcon-mark-dark.png",
   "/falcon/falcon-mark-light.png",
+  "/falcon/favicon.ico",
   "/falcon/auth/silver-wing.webp",
   "/falcon/impact/ai-paused-20261018.webp",
 ]);

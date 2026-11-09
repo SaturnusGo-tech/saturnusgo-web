@@ -9,10 +9,5 @@
   text-decoration: none;
 }
 
-.mark {
-  width: 32px;
-  height: 32px;
-  object-fit: contain;
-  content: url("/falcon/falcon-mark-dark.png");
-}
-:global(.dark) .mark { content: url("/falcon/falcon-mark-light.png"); }
+.mark { --falcon-brand-mark-size: 32px; }
+.inverse { color: #fff; }

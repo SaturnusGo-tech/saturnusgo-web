@@ -324,18 +324,6 @@ button.headerMetaItem:disabled { cursor: default; opacity: .55; }
 }
 
 
-.tessiqMark {
-  width: 40px;
-  height: 40px;
-  display: block;
-  flex: 0 0 40px;
-  background: url("../../assets/falcon/falcon-mark-on-dark.png") center / contain no-repeat;
-}
-
-:global(.dark) .tessiqMark {
-  background-image: url("../../assets/falcon/falcon-mark-on-dark.png");
-}
-
 .tessiqWordmark {
   width: 156px;
   min-width: 156px;
@@ -795,10 +783,6 @@ button.headerMetaItem:disabled { cursor: default; opacity: .55; }
 :global(.dark) .shell .header {
   background: var(--tms-bg-canvas);
 }
-:global(.dark) .shell .tessiqMark {
-  background-image: url("../../assets/falcon/falcon-mark-on-dark.png");
-}
-
 .runTime { display: flex; align-items: center; flex-shrink: 0; padding: 0 12px; color: var(--ink); font-size: 13px; }
 .runTime time { font-weight: 750; letter-spacing: .02em; }
 .runHeader .headerMeta { gap: 6px; }
@@ -830,7 +814,6 @@ button.headerMetaItem:disabled { cursor: default; opacity: .55; }
     padding-inline: 19px;
   }
   .brandButton { height: 36px; gap: 12px; }
-  .tessiqMark { width: 30px; height: 30px; flex-basis: 30px; }
   .tessiqWordmark { font-size: 18px; }
   .navigationNotifications { display: flex; }
   .compactSettingsNotifications { display: block; }
@@ -868,8 +851,6 @@ button.headerMetaItem:disabled { cursor: default; opacity: .55; }
 }
 :global(.dark) .shell[data-appearance="glass"] .navigation { --sidebar-soft: var(--falcon-icon-muted); }
 .shell[data-appearance="glass"] .brandArea { border-bottom: 0; height: 72px; flex-basis: 72px; }
-.shell[data-appearance="glass"] .tessiqMark { background-image: url("../../assets/falcon/falcon-mark-on-light.png"); }
-:global(.dark) .shell[data-appearance="glass"] .tessiqMark { background-image: url("../../assets/falcon/falcon-mark-on-dark.png"); }
 .shell[data-appearance="glass"] :is(.navigationItem, .navigationUtilityButton, .navigationToggle) { border-radius: 999px; }
 .shell[data-appearance="glass"] .navigationIcon { color: var(--sidebar-soft); }
 .shell[data-appearance="glass"] .navigationIcon > svg { stroke-width: 1.7; }

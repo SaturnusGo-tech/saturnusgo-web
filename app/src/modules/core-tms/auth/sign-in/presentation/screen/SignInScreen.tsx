@@ -1,4 +1,5 @@
 "use client";
+import { FalconBrandMark } from "../../../../../../shared/components/brand/FalconBrandMark";
 import { ArrowLeft } from "lucide-react";
 import { useEffect } from "react";
 import type { useSignIn } from "../../application/useSignIn";
@@ -32,7 +33,7 @@ export function SignInScreen({ signIn, signup = false, planIntent = null, organi
       <button onClick={() => setLocale("en")} aria-pressed={locale === "en"}>EN</button>
     </div></header>
     <section className={styles.content} aria-busy={state.pending || state.loading} aria-labelledby="sign-in-title">
-      <a href={`/?lang=${locale}`} className={styles.brand} aria-label="Falcon"><span className={styles.brandMark} aria-hidden="true" /></a>
+      <a href={`/?lang=${locale}`} className={styles.brand} aria-label="Falcon"><FalconBrandMark className={styles.brandMark} /></a>
       <h1 id="sign-in-title">{title}</h1>
       {state.error && <p className={styles.error} role="alert">{signupRequired ? copy.signupRequired : signInError(state.error, state.step, copy)}</p>}
       {state.loading && <span className={styles.srOnly} role="status">{copy.loading}</span>}

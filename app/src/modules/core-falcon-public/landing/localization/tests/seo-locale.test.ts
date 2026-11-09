@@ -48,6 +48,14 @@ test('social previews and structured data use the landing language product captu
     assert.equal(images[0].width, 3456);
     assert.equal(images[0].height, 2234);
     assert.deepEqual(metadata.twitter?.images, [expected]);
+    assert.deepEqual(metadata.icons, {
+      icon: [
+        { url: '/falcon/favicon.ico', type: 'image/x-icon' },
+        { url: '/falcon/falcon-mark-dark.png?v=20261109', type: 'image/png', sizes: '256x256', media: '(prefers-color-scheme: light)' },
+        { url: '/falcon/falcon-mark-light.png?v=20261109', type: 'image/png', sizes: '256x256', media: '(prefers-color-scheme: dark)' },
+      ],
+      apple: { url: '/falcon/falcon-icon.png', type: 'image/png', sizes: '256x256' },
+    });
     assert.equal(falconStructuredData(locale)['@graph'][1].image, expected);
   }
 });

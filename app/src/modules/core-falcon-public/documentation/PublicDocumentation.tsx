@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type MouseEvent, type ReactNode } from "react";
+import { FalconBrandMark } from "../../../shared/components/brand/FalconBrandMark";
 import { writeClipboardText } from "../../../shared/lib/clipboard";
 import type { DocArticle, DocBlock } from "../../core-tms/documentation/model/article";
 import { buildDocumentationFolders } from "../../core-tms/documentation/model/library";
@@ -18,7 +19,6 @@ import { PublicDocsNavigation } from "./PublicDocsNavigation";
 import { PublicDocsSearch } from "./PublicDocsSearch";
 import styles from "./documentation.module.css";
 
-const mark = "/falcon/landing/2026-11/falcon-line-mark.svg";
 export type DocumentationReaderCatalog = { articles: readonly DocArticle[]; groups: readonly { id: string; title: string }[] };
 export type DocumentationReaderProps = {
   catalog: DocumentationReaderCatalog;
@@ -177,7 +177,10 @@ export function DocumentationReader({ catalog: { articles, groups }, locale, act
     <aside id={navigationId} className={`${styles.sidebar} ${navigationOpen ? styles.sidebarOpen : ""}`} aria-label={labels.browse}
       ref={element => { if (element && panel) element.inert = !navigationOpen; }}>
       <div className={styles.sidebarBrand}>
-        <a href={panel ? href("introduction") : locale === "ru" ? "/ru/" : "/"} onClick={panel ? event => navigate(event, "introduction") : undefined} className={styles.brand} aria-label={labels.home}><img src={mark} alt="" width="24" height="24" /><span>Falcon</span></a>
+        <a href={panel ? href("introduction") : locale === "ru" ? "/ru/" : "/"} onClick={panel ? event => navigate(event, "introduction") : undefined} className={styles.brand} aria-label={labels.home}>
+          <FalconBrandMark className={styles.brandMark} />
+          <span>Falcon</span>
+        </a>
         <span className={styles.brandDivider} />
         <a href={href("introduction")} className={styles.docLabel} onClick={event => navigate(event, "introduction")}>Docs</a>
         <button type="button" className={styles.searchButton} onClick={() => setSearchOpen(true)} aria-label={labels.search} title={`${labels.search} (⌘K)`}><PublicDocsIcon name="search" /></button>
@@ -199,7 +202,10 @@ export function DocumentationReader({ catalog: { articles, groups }, locale, act
       </main>
       {!isHome && <aside className={styles.outline} aria-label={labels.onPage}><p>{labels.onPage}</p><nav>{active.sections.map(section => <a key={section.id} href={href(active.id, section.id)} aria-current={activeSection === section.id ? "location" : undefined} onClick={event => { setActiveSection(section.id); if (panel) navigate(event, active.id, section.id); }}>{section.title}</a>)}</nav></aside>}
     </div>
-    {!panel && <a className={styles.aiPill} href={aiHref ?? `/cloud-login/?lang=${locale}&guide=chat`} aria-label={onAskAI ? "Falcon AI" : labels.ai} onClick={onAskAI}><img src={mark} alt="" width="20" height="20" /><span>Falcon AI</span></a>}
+    {!panel && <a className={styles.aiPill} href={aiHref ?? `/cloud-login/?lang=${locale}&guide=chat`} aria-label={onAskAI ? "Falcon AI" : labels.ai} onClick={onAskAI}>
+      <FalconBrandMark className={styles.aiMark} />
+      <span>Falcon AI</span>
+    </a>}
     {searchOpen && <PublicDocsSearch articles={articles} locale={locale} href={href} onClose={() => setSearchOpen(false)} onNavigate={navigate} />}
   </div>;
 }

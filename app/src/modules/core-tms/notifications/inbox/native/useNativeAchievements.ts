@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { FALCON_ICON } from "../../../../core-falcon-public/shared/brand-metadata";
 import { useTmsSession } from "../../../auth/presentation/session/TmsSessionContext";
 import { isFalconDesktop } from "../../../auth/sign-in/domain/desktop-mode";
 import { visitWorkspace } from "../../../state/navigation/browser/workspace-history";
@@ -31,7 +32,7 @@ export function useNativeAchievements(workspaceId: string, items: readonly Notif
       const href = notificationHref(item.url, window.location.href, workspaceId);
       if (!href) continue;
       try {
-        const notice = new Notification(item.title, { body: item.body, tag: item.tag, icon: "/falcon/falcon-mark-light.png" });
+        const notice = new Notification(item.title, { body: item.body, tag: item.tag, icon: FALCON_ICON });
         context.notices.add(notice);
         notice.onclose = () => context.notices.delete(notice);
         notice.onclick = () => {

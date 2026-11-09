@@ -2,6 +2,7 @@
 import { ArrowRight, ArrowUp, BookOpen, Layers3, ListChecks, Menu, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 import type { ReactNode } from 'react';
+import { FalconBrandMark } from '../../../shared/components/brand/FalconBrandMark';
 import { useLandingLocale } from '../landing/localization/context/LandingLocaleProvider';
 import { LanguageSelector } from '../landing/localization/presentation/LanguageSelector';
 import { DirectionMarquee } from './DirectionMarquee';
@@ -41,7 +42,10 @@ export function FalconDirection() {
       }
     }}>
       <div className={styles.navigationInner}>
-        <a className={styles.brand} href="#top" aria-label="Falcon"><img src="/falcon/landing/2026-11/falcon-line-mark.svg" width={30} height={30} alt="" /><span>Falcon</span></a>
+        <a className={styles.brand} href="#top" aria-label="Falcon">
+          <FalconBrandMark className={styles.brandMark} />
+          <span>Falcon</span>
+        </a>
         <nav className={styles.desktopNav} aria-label={c.product}>
           {navigation.map(([label, href]) => <a key={href} href={href}>{label}</a>)}
         </nav>
@@ -129,7 +133,7 @@ export function FalconDirection() {
         <div className={styles.footerMain}>
           <div className={styles.footerIdentity}>
             <a className={styles.brand} href="#top">
-              <img src="/falcon/landing/2026-11/falcon-line-mark.svg" width={28} height={28} alt="" />
+              <FalconBrandMark className={styles.footerMark} />
               <span>Falcon</span>
             </a>
             <p>{c.brand}</p>

@@ -15,7 +15,7 @@ self.addEventListener("push", event => {
     if (url.origin !== self.location.origin || !url.pathname.startsWith("/testcases/")) return;
     await self.registration.showNotification(String(message.title).slice(0,200), {
       body:String(message.body).slice(0,500),tag:String(message.tag),
-      icon:"/falcon/falcon-mark-dark.png",data:{url:url.href},renotify:false
+      icon:"/falcon/falcon-icon.png",data:{url:url.href},renotify:false
     });
   })());
 });

@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { ArrowUpRight, Check, Copy, Mail, Settings2, X } from "lucide-react";
+import { FalconBrandMark } from "../../../../../shared/components/brand/FalconBrandMark";
 import { workspaceDisplayName } from "../../../localization/format/workspace/display-name";
 import type { BillingPlanId } from "../../domain/billing";
 import { planNames, planRequestGmailUrl, planSupportEmail, type PlanRequest, type PlanRequestList } from "../domain/plan-request";
@@ -72,7 +73,7 @@ export function PlanRequestDialog({ planId, ru, data, request, busy, loading, er
     <div className={css.content}>
       <div className={css.banner}>
         <div className={css.marks} aria-hidden="true">
-          <span className={css.markTile}><img src="/falcon/landing/2026-11/falcon-line-mark.svg" alt="" width={26} height={26} /></span>
+          <span className={css.markTile}><FalconBrandMark className={css.brandMark} /></span>
           <span className={css.dots}><i /><i /><i /></span>
           <span className={css.markTile}><Mail size={23} strokeWidth={1.6} /></span>
         </div>

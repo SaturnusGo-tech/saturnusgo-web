@@ -197,6 +197,7 @@ test("serves only approved shared and Falcon asset prefixes", async (context) =>
     "/_next/static/chunks/app.js",
     "/falcon/falcon-mark-dark.png",
     "/falcon/landing/hero.webp",
+    "/falcon/favicon.ico",
     "/favicon.ico",
   ]) {
     assert.equal((await worker.fetch(new Request(`https://tms.saturnusgo.com${path}`))).status, 200);
@@ -205,6 +206,7 @@ test("serves only approved shared and Falcon asset prefixes", async (context) =>
     "/_next/static/chunks/app.js",
     "/falcon/falcon-mark-dark.png",
     "/falcon/landing/hero.webp",
+    "/falcon/favicon.ico",
     "/favicon.ico",
   ]);
 });

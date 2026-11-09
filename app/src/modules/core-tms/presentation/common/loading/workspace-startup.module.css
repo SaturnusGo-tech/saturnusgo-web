@@ -18,23 +18,12 @@
 }
 
 .artwork {
+  --falcon-brand-mark-size: 108px;
+  color: var(--falcon-text);
   position: relative;
   display: grid;
   place-items: center;
   animation: arrive 320ms cubic-bezier(.2, .8, .2, 1) both;
-}
-
-.mark {
-  position: absolute;
-  inset-block-end: calc(100% + 18px);
-  inline-size: 76px;
-  block-size: 76px;
-  background: var(--falcon-text);
-  mask: url("../../../assets/falcon/falcon-line-mark.svg") center / contain no-repeat;
-}
-
-.orb {
-  --loading-orb-size: 64px;
 }
 
 @keyframes arrive {

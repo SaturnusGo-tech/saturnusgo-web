@@ -4,7 +4,7 @@
 .offer .close { position: absolute; z-index: 1; top: 20px; right: 20px; display: grid; place-items: center; width: 40px; height: 40px; padding: 8px; border: 0; border-radius: 50%; color: var(--falcon-text-muted); background: transparent; }
 .offer .close:hover { background: var(--falcon-hover); color: var(--falcon-text); }
 .logoTile { display: grid; place-items: center; flex-shrink: 0; width: 68px; height: 68px; margin: 0 auto 21px; border: 1px solid var(--falcon-border); border-radius: 18px; background: linear-gradient(135deg, color-mix(in oklab, var(--falcon-chart-5) 18%, transparent), color-mix(in oklab, var(--falcon-chart-1) 8%, transparent) 55%, color-mix(in oklab, var(--falcon-chart-4) 18%, transparent)); }
-.logo { display: block; width: 44px; height: 44px; background: var(--falcon-text); -webkit-mask: url("../../../assets/falcon/falcon-line-mark.svg") center / contain no-repeat; mask: url("../../../assets/falcon/falcon-line-mark.svg") center / contain no-repeat; }
+.logo { --falcon-brand-mark-size: 44px; color: var(--falcon-text); }
 .offer .eyebrow { margin: 0 0 12px; font-size: 12px; font-weight: 500; line-height: 1.5; color: var(--falcon-chart-5); }
 .offer .title { margin: 0; max-width: 100%; font-size: clamp(30px, 3.2vw, 48px); font-weight: 400; line-height: 1.16; letter-spacing: -.035em; text-wrap: balance; }
 .title span { font-weight: 400; }

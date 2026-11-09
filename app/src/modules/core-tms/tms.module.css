@@ -2181,22 +2181,8 @@
   background: var(--paper);
 }
 .workspaceLoaderBrand {
-  position: relative;
-  width: 82px;
-  display: grid;
-  place-items: center;
-  gap: 20px;
-}
-.workspaceLoaderMark {
-  position: relative;
-  z-index: 1;
-  width: 82px;
-  height: 82px;
-  display: block;
-  background: var(--falcon-text, #fff);
-  -webkit-mask: url("./assets/falcon/falcon-line-mark.svg") center / contain no-repeat;
-  mask: url("./assets/falcon/falcon-line-mark.svg") center / contain no-repeat;
-  mask-mode: alpha;
+  --falcon-brand-mark-size: 108px;
+  color: var(--falcon-text);
 }
 
 /* Restrained shape hierarchy: rounded shells, structured rows, and true pills only. */
