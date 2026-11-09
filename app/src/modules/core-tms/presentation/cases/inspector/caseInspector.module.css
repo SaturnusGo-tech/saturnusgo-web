@@ -4,25 +4,30 @@
 .utilityRow { min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 8px 16px 7px 24px; }
 .caseIdentity { min-width: 0; display: flex; align-items: center; }
 .caseKey { overflow: hidden; color: var(--falcon-text-muted); font-size: 13px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
-.headerActions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.headerActions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; margin-inline-start: auto; }
+.headerPrimarySlot { display: grid; justify-items: end; min-block-size: 28px; }
+.headerPrimaryContent { display: grid; justify-items: end; }
 .headerTextButton { min-height: 34px; display: inline-flex; align-items: center; gap: 7px; padding: 0 12px; color: var(--falcon-text-secondary); background: transparent; border: 1px solid var(--falcon-border-strong); border-radius: 12px; cursor: pointer; font: inherit; font-size: 13px; font-weight: 500; white-space: nowrap; transition: background-color 160ms ease, color 160ms ease; }
 .headerTextButton:hover { color: var(--falcon-text); background: var(--falcon-hover); }
 .headerEditActions { display: flex; align-items: center; gap: inherit; }
-.headerActions :is(.headerRunButton, .headerQuarantineButton) { min-height: 28px; min-inline-size: 100px; justify-content: center; gap: 5px; padding-inline: 9px; border-color: transparent; border-radius: 999px; font-size: 11px; }
+.headerActions :is(.headerRunButton, .headerCancelButton) { min-height: 28px; min-inline-size: 100px; justify-content: center; gap: 5px; padding-inline: 9px; border-color: transparent; border-radius: 999px; font-size: 11px; }
 .headerActions .headerRunButton { background: var(--falcon-action); color: var(--falcon-on-action); }
 .headerActions .headerRunButton:hover:not(:disabled) { background: var(--falcon-action-hover); color: var(--falcon-on-action); }
 .headerActions .headerRunButton svg { color: inherit; }
-.headerActions .headerQuarantineButton { background: color-mix(in srgb, var(--falcon-text) 7%, var(--falcon-surface)); color: var(--falcon-text-secondary); }
-.headerActions .headerQuarantineButton:hover:not(:disabled) { background: var(--falcon-hover); }
+.headerActions .headerCancelButton { background: color-mix(in srgb, var(--falcon-text) 7%, var(--falcon-surface)); color: var(--falcon-text-secondary); }
+.headerActions .headerCancelButton:hover:not(:disabled) { background: var(--falcon-hover); }
+@media (prefers-reduced-motion: no-preference) {
+  .headerPrimaryContent { animation: case-header-action-enter 130ms ease-out both; }
+}
+@keyframes case-header-action-enter { from { opacity: 0; transform: translateX(4px); } to { opacity: 1; transform: none; } }
 @media(prefers-reduced-motion:reduce) { .headerTextButton { transition: none; } }
+@container case-inspector (max-width: 360px) {
+  .headerActions :is(.headerRunButton, .headerCancelButton) { min-inline-size: 68px; }
+}
 .headerTextButton:disabled { cursor: default; opacity: .45; }
 .iconButton { width: 30px; height: 30px; display: inline-grid; place-items: center; flex: 0 0 auto; padding: 0; color: var(--falcon-text-muted); background: transparent; border: 1px solid transparent; border-radius: 4px; cursor: pointer; }
 .iconButton:hover { color: var(--falcon-text); background: var(--falcon-hover); border-color: var(--falcon-border); }
 .iconButton:disabled { cursor: default; opacity: .32; }
-.headerActionMenuRoot { position: relative; display: inline-grid; }
-.headerActionMenu { position: absolute; z-index: 80; top: calc(100% + 5px); right: 0; width: max-content; min-width: 184px; padding: 5px; color: var(--falcon-text); background: var(--falcon-elevated); border: 1px solid var(--falcon-border-strong); border-radius: 6px; box-shadow: var(--falcon-shadow-popover); }
-.headerActionMenu > button { width: 100%; min-height: 34px; display: flex; align-items: center; gap: 9px; padding: 5px 8px; color: inherit; background: transparent; border: 0; border-radius: 4px; cursor: pointer; font: inherit; font-size: 12px; }
-.headerActionMenu > button:hover, .headerActionMenu > button:focus-visible { background: var(--falcon-hover); outline: 1px solid var(--falcon-action); outline-offset: -1px; }
 .caseLocation { padding-inline: 24px; }
 .metaRow { display: flex; padding: 0 24px 4px; }
 .retestBadge { min-height: 20px; flex: 0 0 auto; display: inline-flex; align-items: center; padding: 2px 6px; color: var(--falcon-discovery); background: var(--falcon-discovery-bg); border-radius: 10px; font-size: 10px; font-weight: 600; line-height: 1.3; white-space: nowrap; }
@@ -160,7 +165,7 @@
 :global([data-appearance="glass"]) .shell { background: transparent; }
 :global([data-appearance="glass"]) .caseHeader { border-color: var(--falcon-border); }
 :global([data-appearance="glass"]) :is(.iconButton, .headerTextButton, .addButton) { border-radius: 999px; }
-:global([data-appearance="glass"]) .headerActions .headerQuarantineButton { background: var(--falcon-hover); border-radius: 999px; }
+:global([data-appearance="glass"]) .headerActions .headerCancelButton { background: var(--falcon-hover); border-radius: 999px; }
 :global([data-appearance="glass"]) .headerActionMenu { padding: 6px; border-radius: 16px; background: var(--falcon-elevated); box-shadow: var(--falcon-shadow-popover); }
 :global([data-appearance="glass"]) .headerActionMenu > button { border-radius: 10px; }
 :global([data-appearance="glass"]) .titleRow h2 { font-size: clamp(20px, 2.8cqi, 25px); }

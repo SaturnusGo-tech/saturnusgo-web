@@ -31,7 +31,7 @@ export type CasesViewProps = {
   onEdit: () => void;
   onClone: () => void;
   onCreateDefect?: () => void;
-  onArchive: () => void;
+  onArchive: () => boolean | void | Promise<boolean | void>;
   onRunCase: () => void;
   onRunCases: (caseIds: string[]) => void;
   onBulkChangeLifecycle: (

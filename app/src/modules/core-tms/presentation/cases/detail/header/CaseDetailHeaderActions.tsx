@@ -1,3 +1,4 @@
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
 import {
   Archive, Bug, Check, Copy, Files, Link2, Maximize2, Minimize2,
   MoreHorizontal, Play, RotateCcw, X,
@@ -6,6 +7,8 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { TestCaseSummary } from "../../../../../../core/tms/contracts/legacy-contract";
 import type { TmsLocale } from "../../../../localization/model/locale";
 import { buildCaseDeepLink } from "../../../../test-cases/navigation/case-deep-link";
+import { ProductDocModal } from "../../../../product-docs/presentation/overlay/ProductDocModal";
+import overlays from "./case-header-overlays.module.css";
 import layout from "../../cases.module.css";
 import inspector from "../../inspector/caseInspector.module.css";
 
@@ -21,31 +24,38 @@ type Props = {
   onToggleFullscreen: () => void;
   onClone: () => void;
   onCreateDefect?: () => void;
-  onArchive: () => void;
+  onArchive: () => void | boolean | Promise<void | boolean>;
   onClose?: () => void;
 };
 
 export function CaseDetailHeaderActions(props: Props) {
   const [copied, setCopied] = useState<"key" | "link" | null>(null);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuRoot = useRef<HTMLDivElement>(null);
-  const menuButton = useRef<HTMLButtonElement>(null);
+  const [confirmation, setConfirmation] = useState<"quarantine" | "restore" | null>(null);
+  const [archivePending, setArchivePending] = useState(false);
+  const [archiveFailed, setArchiveFailed] = useState(false);
+  const pendingRef = useRef(false);
+  const menuButton = useRef<HTMLButtonElement>(null!);
+  const returnToMenu = useRef(false);
   const ru = props.locale === "ru";
   const item = props.testCase;
   const archived = Boolean(item?.archivedAt);
+  const more = ru ? "Другие действия" : "More actions";
   const restoreTitle = ru ? "Сначала восстановите тест-кейс" : "Restore the test case first";
+  const archiveAction = archived ? "restore" : "quarantine";
+  const archiveLabel = archived ? (ru ? "Восстановить" : "Restore") : (ru ? "Карантин" : "Quarantine");
   useEffect(() => {
     setCopied(null);
-    setMenuOpen(false);
+    setConfirmation(null);
+    setArchiveFailed(false);
+    setArchivePending(false);
+    pendingRef.current = false;
   }, [item?.id, props.editorOpen]);
   useEffect(() => {
-    if (!menuOpen) return;
-    const closeOutside = (event: PointerEvent) => {
-      if (!menuRoot.current?.contains(event.target as Node)) setMenuOpen(false);
-    };
-    document.addEventListener("pointerdown", closeOutside);
-    return () => document.removeEventListener("pointerdown", closeOutside);
-  }, [menuOpen]);
+    if (confirmation || !returnToMenu.current) return;
+    returnToMenu.current = false;
+    const frame = requestAnimationFrame(() => menuButton.current?.focus({ preventScroll: true }));
+    return () => cancelAnimationFrame(frame);
+  }, [confirmation]);
 
   async function copy(value: string, kind: "key" | "link") {
     try {
@@ -65,62 +75,103 @@ export function CaseDetailHeaderActions(props: Props) {
     window.setTimeout(() => setCopied((current) => current === kind ? null : current), 1800);
   }
 
+  const actions: { key: string; label: string; icon: typeof Copy; disabled?: boolean; danger?: boolean; run: () => void }[] = [
+    ...(item ? [
+      { key: "key", label: ru ? "Копировать ID" : "Copy ID", icon: copied === "key" ? Check : Copy,
+        run: () => void copy(item.key, "key") },
+      { key: "link", label: ru ? "Копировать ссылку" : "Copy link", icon: copied === "link" ? Check : Link2,
+        run: () => void copy(buildCaseDeepLink(window.location.href, { caseId: item.id, projectId: item.projectId }), "link") },
+    ] : []),
+    ...(!props.readOnly ? [{ key: "clone", label: ru ? "Создать копию" : "Create a copy", icon: Files, disabled: archived, run: props.onClone }] : []),
+    ...(item && props.onCreateDefect ? [{ key: "defect", label: ru ? "Завести баг-репорт" : "Create bug report", icon: Bug,
+      disabled: archived, run: props.onCreateDefect }] : []),
+    ...(item && !props.readOnly ? [{ key: archiveAction, label: archiveLabel, icon: archived ? RotateCcw : Archive,
+      danger: !archived, run: () => setConfirmation(archiveAction) }] : []),
+  ];
+  const restoring = confirmation === "restore";
+  const confirmTitle = restoring
+    ? (ru ? "Восстановить тест-кейс?" : "Restore this test case?")
+    : (ru ? "Отправить тест-кейс в карантин?" : "Move this test case to quarantine?");
+  const confirmDescription = restoring
+    ? (ru ? "Тест-кейс снова появится среди активных." : "The test case will return to the active list.")
+    : (ru ? "Кейс исчезнет из активного списка. Вы сможете восстановить его из карантина." : "The case will leave the active list. You can restore it from quarantine.");
+  async function confirmArchive(dismiss: () => void) {
+    if (pendingRef.current || confirmation !== archiveAction) return;
+    pendingRef.current = true;
+    setArchivePending(true);
+    setArchiveFailed(false);
+    let succeeded = false;
+    try {
+      succeeded = await props.onArchive() !== false;
+    } catch {
+      succeeded = false;
+    }
+    if (succeeded) dismiss();
+    else {
+      setArchiveFailed(true);
+      setArchivePending(false);
+      pendingRef.current = false;
+    }
+  }
+  function closeConfirmation() {
+    returnToMenu.current = true;
+    setConfirmation(null);
+    setArchivePending(false);
+    setArchiveFailed(false);
+    pendingRef.current = false;
+  }
+
   return <div className={inspector.utilityRow}>
-    <div className={inspector.caseIdentity}>
-      <span className={inspector.caseKey}>{props.creating
-        ? (ru ? "Новый тест-кейс" : "New test case")
-        : (ru ? "Карточка тест-кейса" : "Test case")}</span>
-    </div>
+    {props.creating && <div className={inspector.caseIdentity}>
+      <span className={inspector.caseKey}>{ru ? "Новый тест-кейс" : "New test case"}</span>
+    </div>}
     <div className={inspector.headerActions}>
-      {props.children ?? (!props.creating && !props.editorOpen && !props.readOnly && <>
-      <button type="button" disabled={archived} title={archived ? restoreTitle : undefined}
-        className={`${inspector.headerTextButton} ${inspector.headerRunButton}`} onClick={() => { if (!archived) props.onRunCase(); }}>
-        <Play size={14} />{ru ? "Запустить" : "Run"}</button>
-      <button type="button"
-        className={`${inspector.headerTextButton} ${inspector.headerQuarantineButton}`} onClick={props.onArchive}>
-        {item?.archivedAt ? <RotateCcw size={14} /> : <Archive size={14} />}
-        {item?.archivedAt ? (ru ? "Восстановить" : "Restore") : (ru ? "Карантин" : "Quarantine")}
-      </button></>)}
-      {!props.creating && <div ref={menuRoot} className={inspector.headerActionMenuRoot}
-        onKeyDown={(event) => {
-          if (event.key !== "Escape" || !menuOpen) return;
-          event.preventDefault();
-          event.stopPropagation();
-          setMenuOpen(false);
-          menuButton.current?.focus();
-        }}>
-        <button ref={menuButton} type="button" disabled={props.editorOpen}
-          className={inspector.iconButton} aria-haspopup="menu" aria-expanded={menuOpen}
-          onClick={() => setMenuOpen((open) => !open)}
-          aria-label={ru ? "Другие действия" : "More actions"}><MoreHorizontal size={15} /></button>
-        {menuOpen && !props.editorOpen && <div role="menu" className={inspector.headerActionMenu}>
-          {item && <button type="button" role="menuitem" onClick={() => { setMenuOpen(false); void copy(item.key, "key"); }}>
-            {copied === "key" ? <Check size={14} /> : <Copy size={14} />}{ru ? "Копировать ID" : "Copy ID"}
-          </button>}
-          {item && <button type="button" role="menuitem" onClick={() => {
-            setMenuOpen(false);
-            void copy(buildCaseDeepLink(window.location.href, { caseId: item.id, projectId: item.projectId }), "link");
-          }}>{copied === "link" ? <Check size={14} /> : <Link2 size={14} />}{ru ? "Копировать ссылку" : "Copy link"}</button>}
-          {!props.readOnly && <button type="button" role="menuitem" disabled={archived} title={archived ? restoreTitle : undefined} onClick={() => {
-            if (archived) return;
-            setMenuOpen(false);
-            props.onClone();
-          }}><Files size={14} />{ru ? "Создать копию" : "Create a copy"}</button>}
-          {item && props.onCreateDefect && <button type="button" role="menuitem"
-            disabled={archived || props.editorOpen} title={archived ? restoreTitle : undefined}
-            onClick={() => {
-              if (archived || props.editorOpen) return;
-              setMenuOpen(false);
-              props.onCreateDefect?.();
-            }}><Bug size={14} />{ru ? "Завести баг-репорт" : "Create bug report"}</button>}
-        </div>}
+      {!props.creating && (props.children || !props.readOnly) && <div className={inspector.headerPrimarySlot}>
+        <div key={props.editorOpen ? "edit" : "run"} className={inspector.headerPrimaryContent}>
+          {props.children ?? (!props.editorOpen && !props.readOnly &&
+            <button type="button" disabled={archived} title={archived ? restoreTitle : undefined}
+              className={`${inspector.headerTextButton} ${inspector.headerRunButton}`} onClick={() => { if (!archived) props.onRunCase(); }}>
+              <Play size={14} aria-hidden="true" />{ru ? "Запустить" : "Run"}
+            </button>)}
+        </div>
       </div>}
+      {!props.creating && actions.length > 0 && <Dropdown triggerRef={menuButton} placement="bottom-end" offset={5} disableAnimation
+        classNames={{ base: overlays.positioner, content: overlays.menu }} shouldBlockScroll={false}>
+        <DropdownTrigger>
+          <Button type="button" isIconOnly variant="light" disableRipple isDisabled={props.editorOpen}
+            className={inspector.iconButton} aria-label={more}><MoreHorizontal size={15} aria-hidden="true" /></Button>
+        </DropdownTrigger>
+        <DropdownMenu aria-label={more} classNames={{ list: overlays.menuList }}
+          disabledKeys={actions.filter((action) => action.disabled).map((action) => action.key)}
+          onAction={(key) => {
+            if (props.editorOpen) return;
+            const action = actions.find((action) => action.key === key);
+            if (action && !action.disabled) action.run();
+          }}>
+          {actions.map(({ key, label, icon: Icon, danger }) => <DropdownItem key={key} textValue={label}
+            className={danger ? `${overlays.menuItem} ${overlays.danger}` : overlays.menuItem}
+            startContent={<Icon size={14} aria-hidden="true" />}>{label}</DropdownItem>)}
+        </DropdownMenu>
+      </Dropdown>}
       <button type="button" className={inspector.iconButton} onClick={props.onToggleFullscreen}
         aria-label={props.fullscreen ? (ru ? "Выйти из полного экрана" : "Exit full screen") : (ru ? "На весь экран" : "Open full screen")}
         aria-pressed={props.fullscreen}>{props.fullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}</button>
       {props.onClose && <button type="button" className={inspector.iconButton}
         onClick={props.onClose} aria-label={ru ? "Закрыть" : "Close"}><X size={15} /></button>}
     </div>
+    {confirmation && item && !props.readOnly && !props.editorOpen &&
+      <ProductDocModal title={confirmTitle} subtitle={confirmDescription} closeLabel={ru ? "Закрыть" : "Close"}
+        busy={archivePending} onClose={closeConfirmation}>
+        {(dismiss) => <>
+          {archiveFailed && <p className={overlays.confirmError} role="alert">{ru ? "Не удалось обновить тест-кейс. Повторите попытку." : "Could not update this test case. Try again."}</p>}
+          <div className={overlays.confirmActions}>
+            <Button type="button" size="sm" variant="light" disableRipple autoFocus isDisabled={archivePending}
+              onPress={dismiss}>{ru ? "Отмена" : "Cancel"}</Button>
+            <Button type="button" size="sm" disableRipple isLoading={archivePending} className={overlays.confirm}
+              onPress={() => void confirmArchive(dismiss)}>{restoring ? (ru ? "Восстановить" : "Restore") : (ru ? "В карантин" : "Move to quarantine")}</Button>
+          </div>
+        </>}
+      </ProductDocModal>}
     <span className={layout.visuallyHidden} role="status" aria-live="polite">{copied === "key"
       ? (ru ? "ID тест-кейса скопирован" : "Test case ID copied")
       : copied === "link" ? (ru ? "Ссылка на тест-кейс скопирована" : "Test case link copied") : ""}</span>

@@ -10,6 +10,7 @@ import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { TessiqLoader } from "../common/loading/TessiqLoader";
 import { CaseLocationBreadcrumbs } from "./detail/location/CaseLocationBreadcrumbs";
 import { CaseDetailPanel } from "./detail/CaseDetailPanel";
+import { useCasePanelExit } from "./detail/motion/useCasePanelExit";
 import {
   CASE_INSPECTOR_MAX,
   CASE_INSPECTOR_MIN,
@@ -28,6 +29,10 @@ export function CasesView(props: CasesViewProps) {
   const [selectionAction, setSelectionAction] = useState<"move" | "archive" | null>(null);
   const detailPanelRef = useRef<HTMLElement>(null);
   const listPaneRef = useRef<HTMLElement>(null);
+  const animateDetailExit = useCasePanelExit(detailPanelRef, view.inspectorOpen && props.editor?.mode !== "create", props.selectedCaseId);
+  const closeDetail = () => {
+    if (!props.editor?.submitting) animateDetailExit(view.closeInspector);
+  };
   const moveWasOpen = useRef(false);
   const returnFocusRef = useRef<HTMLElement | null>(null);
   const captureBrowserFocus = useCaseBrowserFocus(Boolean(props.folders), view.inspectorOpen, view.detailFullscreen, view.workspaceRef, detailPanelRef);
@@ -104,7 +109,7 @@ export function CasesView(props: CasesViewProps) {
       aria-valuenow={view.inspectorResize.width}
       tabIndex={0}
     />}
-    {!props.folders && view.inspectorOpen && <button type="button" className={styles.detailScrim} onClick={view.closeInspector} aria-label={locale === "ru" ? "Закрыть тест-кейс" : "Close test case"} />}
+    {!props.folders && view.inspectorOpen && <button type="button" className={styles.detailScrim} onClick={closeDetail} aria-label={locale === "ru" ? "Закрыть тест-кейс" : "Close test case"} />}
     {(props.folders || view.inspectorOpen) && <aside
       ref={detailPanelRef}
       id="case-detail-panel"
@@ -151,7 +156,7 @@ export function CasesView(props: CasesViewProps) {
             onRunCase={props.onRunCase}
             fullscreen={view.detailFullscreen}
             onToggleFullscreen={() => view.setDetailFullscreen((current) => !current)}
-            onClose={view.closeInspector}
+            onClose={closeDetail}
           />}
     </aside>}
     </div>

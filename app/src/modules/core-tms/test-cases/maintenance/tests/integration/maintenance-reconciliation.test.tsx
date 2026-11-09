@@ -92,3 +92,37 @@ test("an in-flight case detail response keeps newer maintenance from the same co
   assert.equal(selected.detail?.maintenance?.rowVersion, 2, "new catalog metadata reaches an already loaded detail without changing its content ETag");
   assert.equal(selected.detail?.current, content);
 });
+
+test("committing an archive or restore receipt keeps the selected detail mounted", async t => {
+  let reads = 0;
+  const http = { getResource: async () => {
+    reads++;
+    return { data: dto, etag: "case-1" };
+  } } as unknown as TmsHttpClient;
+  let setRows!: React.Dispatch<React.SetStateAction<TestCaseSummary[]>>;
+  let selected!: ReturnType<typeof useSelectedCaseResource>;
+  const rendered: (string | null | undefined)[] = [];
+  function Harness() {
+    const [rows, update] = useState([row]);
+    setRows = update;
+    selected = useSelectedCaseResource(http, "connected", rows, "a");
+    rendered.push(selected.detail?.archivedAt);
+    return null;
+  }
+  let view!: ReactTestRenderer;
+  t.after(async () => { await act(async () => view.unmount()); });
+  await act(async () => { view = create(<Harness />); });
+  assert.equal(reads, 1);
+  rendered.length = 0;
+  for (const [etag, archivedAt] of [["case-2", "2026-11-05T00:00:00Z"], ["case-3", null]] as const) {
+    await act(async () => {
+      setRows([{ ...row, etag, archivedAt }]);
+      selected.setDetail({ ...dto, archivedAt });
+      selected.setEtag(etag);
+    });
+    assert.equal(selected.detail?.archivedAt, archivedAt);
+    assert.equal(selected.etag, etag);
+  }
+  assert.equal(reads, 1);
+  assert.ok(!rendered.includes(undefined), "a locally committed revision must never render an empty detail");
+});

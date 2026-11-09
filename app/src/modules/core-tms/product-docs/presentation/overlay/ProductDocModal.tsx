@@ -12,7 +12,7 @@ export function ProductDocModal({ title, subtitle, closeLabel, onClose, busy, ch
   onClose(): void;
   busy?: boolean;
   isOpen?: boolean;
-  children: ReactNode;
+  children: ReactNode | ((dismiss: () => void) => ReactNode);
   className?: string;
   bodyClassName?: string;
 }) {
@@ -46,7 +46,7 @@ export function ProductDocModal({ title, subtitle, closeLabel, onClose, busy, ch
         <Button size="sm" radius="full" isIconOnly variant="light" isDisabled={busy} className={styles.close}
           aria-label={closeLabel} onPress={dismiss}><X size={17} aria-hidden="true" /></Button>
       </ModalHeader>
-      <ModalBody className={`${styles.body} ${bodyClassName ?? ""}`}>{children}</ModalBody>
+      <ModalBody className={`${styles.body} ${bodyClassName ?? ""}`}>{typeof children === "function" ? children(dismiss) : children}</ModalBody>
     </ModalContent>
   </Modal>;
 }

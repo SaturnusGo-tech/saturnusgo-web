@@ -135,7 +135,7 @@ export function CaseInspectorContent({
       </InspectorSectionView>
     </main>
     <aside className={`${css.sideRail} ${rail.sideRail}`} data-case-property-rail aria-label={ru ? "Свойства тест-кейса" : "Test case properties"}>
-      <InspectorSectionView title={ru ? "Свойства" : "Properties"} editLabel={ru ? "Изменить свойства" : "Edit properties"} actionsInHeader {...controls("properties")}>
+      <InspectorSectionView title={ru ? "Свойства" : "Properties"} actionsInHeader {...controls("properties")} hideEdit>
         <CaseMetadataControls onRequestEdit={requestField("properties")} locale={locale} revision={value} archived={archived} editing={sectionEditing("properties")}
           autoFocus={!creating} disabled={editor?.submitting || editor?.attachmentsPending} onChange={readOnly ? undefined : editor?.onChange} />
       </InspectorSectionView>

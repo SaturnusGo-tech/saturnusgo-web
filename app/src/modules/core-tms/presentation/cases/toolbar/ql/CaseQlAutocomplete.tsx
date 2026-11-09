@@ -8,7 +8,7 @@ import type { QueryMember } from "../../model/query/match";
 import { insertQuerySuggestion, querySuggestions, type QuerySuggestion } from "./suggestions/query-suggestions";
 import styles from "../../listing/caseListing.module.css";
 
-type Props = { locale: TmsLocale; query: string; folders: string[]; components: string[]; tags?: string[]; members?: readonly QueryMember[]; onQuery: (value: string) => void; floatingSuggestions?: boolean };
+type Props = { locale: TmsLocale; query: string; folders: string[]; components: string[]; tags?: string[]; members?: readonly QueryMember[]; onQuery: (value: string) => void; floatingSuggestions?: boolean; onDismiss?: () => void };
 export function CaseQlAutocomplete(props: Props) {
  const ru = props.locale === "ru"; const id = useId();
  const [open, setOpen] = useState(false); const [active, setActive] = useState(0); const [caret, setCaret] = useState(props.query.length);
@@ -56,10 +56,11 @@ export function CaseQlAutocomplete(props: Props) {
   },
   onKeyDown: (event) => {
     if (event.nativeEvent.isComposing) return;
-    if (event.key === "Escape" && open) {
+    if (event.key === "Escape" && (open || props.onDismiss)) {
       event.preventDefault();
       event.stopPropagation();
-      setOpen(false);
+      if (open) setOpen(false);
+      else props.onDismiss?.();
     }
     if ((event.key === "ArrowDown" || event.key === "ArrowUp") && result.suggestions.length) {
       event.preventDefault();

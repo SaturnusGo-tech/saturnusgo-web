@@ -26,10 +26,6 @@ import { reconcileMaintenance } from "../../test-cases/maintenance/model/case-ma
 import type { DraftProductDocRequirement } from "../../product-docs/domain/product-docs";
 import { useCaseDocumentation } from "./documentation/useCaseDocumentation";
 
-function summaryOf(testCase: TestCase, etag: string): TestCaseSummary {
-  const { current: _current, linkIds: _linkIds, ...summary } = testCase;
-  return { ...summary, etag };
-}
 export function useCaseActions(
   state: ReturnType<typeof useWorkspaceState>,
   derived: ReturnType<typeof useWorkspaceDerived>,
@@ -39,14 +35,15 @@ export function useCaseActions(
   const attachments = useAttachmentClient();
   const { locale, t } = useTmsLocale();
   const caseOperation = useRef<PendingOperation | null>(null);
+  const archiveOperation = useRef<PendingOperation | null>(null);
+  const archivePending = useRef(false);
   const saveCheckpoint = useRef<CaseSaveCheckpoint | null>(null);
   const [caseAttachmentRecovery, setCaseAttachmentRecovery] = useState(false);
   const [caseRequiredFields, setCaseRequiredFields] = useState(false);
   const documentation = useCaseDocumentation(http, locale, notify);
   function commit(testCase: TestCase, etag: string | null, append = false) {
-    const summary: TestCaseSummary = state.connection === "demo"
-      ? summaryOf(testCase, "")
-      : summaryOf(testCase, etag ?? "");
+    const { current: _current, linkIds: _linkIds, ...fields } = testCase;
+    const summary: TestCaseSummary = { ...fields, etag: state.connection === "demo" ? "" : etag ?? "" };
     state.setData((current) => ({
       ...current,
       testCases: append && !current.testCases.some(item => item.id === summary.id)
@@ -59,7 +56,6 @@ export function useCaseActions(
     state.setSelectedCaseDetail(current => reconcileMaintenance(testCase, current));
     state.setSelectedCaseEtag(etag);
   }
-
   function openNewCase(folderPath = state.selectedFolder || "/Unsorted", requirement?: DraftProductDocRequirement) {
     if (state.isCaseSubmitting()) return;
     caseOperation.current = null;
@@ -72,7 +68,6 @@ export function useCaseActions(
     state.setEditing(false);
     state.setDialog("case");
   }
-
   function openEditCase() {
     if (state.isCaseSubmitting() || !derived.selectedRevision || derived.selectedCase?.archivedAt) return;
     caseOperation.current = null;
@@ -178,22 +173,27 @@ export function useCaseActions(
     }
     notify(t("actions.caseCloned"));
   }
-
   async function toggleArchiveCase() {
-    if (!derived.selectedCase || !state.selectedCaseEtag) return;
+    if (archivePending.current || !derived.selectedCase || !state.selectedCaseEtag) return false;
     const restoring = Boolean(derived.selectedCase.archivedAt);
+    const { id } = derived.selectedCase;
+    const operation = restoring ? "restore" : "archive";
+    const etag = state.selectedCaseEtag;
+    const pending = resolvePendingOperation(archiveOperation.current, JSON.stringify([id, operation, etag]));
+    archiveOperation.current = pending;
+    archivePending.current = true;
     try {
-      const result = await transitionTestCase(
-        http, derived.selectedCase.id, restoring ? "restore" : "archive",
-        state.selectedCaseEtag, crypto.randomUUID(),
-      );
-      const refreshed = await getTestCase(http, result.data.id);
-      commit(refreshed.data, refreshed.etag);
+      const receipt = await transitionTestCase(http, id, operation, etag, pending.key);
+      commit(receipt.data, receipt.etag);
+      archiveOperation.current = null;
     } catch {
       notify(restoring ? t("actions.caseRestoreError") : t("actions.caseArchiveError"));
-      return;
+      return false;
+    } finally {
+      archivePending.current = false;
     }
     notify(restoring ? t("actions.caseRestored") : t("actions.caseArchived"));
+    return true;
   }
 
   return { caseAttachmentRecovery, caseRequiredFields, ...documentation.fields, openNewCase, openEditCase, saveCase, cloneCase, toggleArchiveCase };

@@ -12,10 +12,11 @@ import { CaseAttachmentDraftProvider } from "../inspector/attachments/CaseAttach
 import { caseMarkdownImages, caseRevisionMarkdown } from "../inspector/attachments/links/caseMarkdownImages";
 import type { PendingCaseAttachment, CaseAttachmentProgress } from "../../../application/evidence/case/pendingCaseAttachment";
 import { CaseOverview } from "./CaseOverview";
+import { CaseDetailDates } from "./header/CaseDetailDates";
 import { CaseDetailHeaderActions } from "./header/CaseDetailHeaderActions";
 import { CaseContextTab, type DetailTab } from "./tabs/CaseContextTab";
 import { CaseDetailTabs } from "./tabs/CaseDetailTabs";
-import { useCreateCaseExit } from "./motion/create/useCreateCaseExit";
+import { useCasePanelExit } from "./motion/useCasePanelExit";
 import { useCreateCaseEntrance } from "./motion/create/useCreateCaseEntrance";
 import { caseActivityForKey } from "../collaboration/model";
 import { readyDefectCount } from "../../../test-cases/collaboration/model/test-case-collaboration";
@@ -38,7 +39,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
   const ru = props.locale === "ru";
   const creating = props.editor?.mode === "create";
   useCreateCaseEntrance(panelRef, creating, creating ? undefined : props.testCase?.id);
-  const closeWithMotion = useCreateCaseExit(panelRef, creating);
+  const closeWithMotion = useCasePanelExit(panelRef, creating);
   const archived = !creating && Boolean(props.testCase?.archivedAt);
   const editorOpen = Boolean(props.editor);
   const documentationRetry = Boolean(props.editor?.documentationRetry && !creating);
@@ -55,9 +56,6 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
     ...caseRevisionMarkdown(revision), ...comments.map(comment => comment.body),
   ]) : [], [comments, revision]);
   const readyDefects = creating ? 0 : readyDefectCount(props.collaboration.defects.items);
-  const formatDate = (value: string) => new Intl.DateTimeFormat(props.languageTag, {
-    day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
-  }).format(new Date(value));
   useEffect(() => {
     setTab("overview"); setAttempted(false);
     setFiles([]);
@@ -113,7 +111,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
     {props.editor.attachmentsPending && !props.editor.submitting && <span className={inspector.validationMessage} role="status">{ru ? "Повторите сохранение, чтобы завершить загрузку файлов." : "Save again to finish uploading the files."}</span>}
     {documentationRetry && !props.editor.submitting && <span className={inspector.validationMessage} role="status">{ru ? "Повторите сохранение, чтобы привязать оставшиеся статьи." : "Save again to link the remaining pages."}</span>}
   </>;
-  const cancel = <button type="button" className={creating ? undefined : `${inspector.headerTextButton} ${inspector.headerQuarantineButton}`} disabled={props.editor?.submitting} onClick={cancelEditor}>{ru ? "Отмена" : "Cancel"}</button>;
+  const cancel = <button type="button" className={creating ? undefined : `${inspector.headerTextButton} ${inspector.headerCancelButton}`} disabled={props.editor?.submitting} onClick={cancelEditor}>{ru ? "Отмена" : "Cancel"}</button>;
   const save = <button type="submit" className={creating ? undefined : `${inspector.headerTextButton} ${inspector.headerRunButton}`} form={formId} disabled={archived || props.editor?.submitting}>{props.editor?.submitting ? (ru ? "Сохранение…" : "Saving…") : creating && !props.editor?.documentation?.retry ? (ru ? "Создать" : "Create") : (ru ? "Сохранить" : "Save")}</button>;
   const editorActions = props.editor && <div id="case-editor-actions" tabIndex={-1} className={creating ? `${inspector.createActions} ${inspector.creationFooter}` : inspector.headerEditActions}>
     {creating ? <>{editorFeedback}{cancel}{save}</> : <>{save}{cancel}</>}
@@ -155,8 +153,6 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
           <h2>{revision.title}{props.testCase && <span className={inspector.titleKey}>#{props.testCase.key}</span>}</h2>
           {props.testCase && <p className={inspector.caseByline}>
             <LifecycleBadge neutral locale={props.locale} lifecycle={revision.lifecycle} archived={Boolean(props.testCase.archivedAt)} />
-            <span>{ru ? "Создан" : "Created"} {formatDate(props.testCase.createdAt)}</span>
-            <span>{ru ? "Обновлён" : "Updated"} {formatDate(props.testCase.updatedAt)}</span>
           </p>}
         </div>}
         {!props.readOnly && !creating && headerEditing !== "title" && <button ref={titleEditButton} type="button" disabled={archived || uploadLocked} className={inspector.iconButton} onClick={() => beginHeaderEdit("title")} aria-label={ru ? "Изменить название" : "Edit title"}><Pencil size={14} /></button>}
@@ -165,7 +161,11 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
         <div className={inspector.headerFeedback}>{editorFeedback}</div>}
       {!creating && <CaseDetailTabs locale={props.locale} active={activeTab} tabsId={tabsId} creating={creating}
         fileCount={attachmentIds.length + externalImages.length} activityCount={caseActivity.length} onActive={setTab}
-        actions={props.testCase && <CaseMaintenanceFeature caseId={props.testCase.id} initial={props.testCase.maintenance} blocked={archived || editorOpen || Boolean(props.readOnly)} />} />}
+        actions={props.testCase && <>
+          <CaseMaintenanceFeature caseId={props.testCase.id} initial={props.testCase.maintenance} blocked={archived || editorOpen || Boolean(props.readOnly)} />
+          <CaseDetailDates locale={props.locale} languageTag={props.languageTag}
+            createdAt={props.testCase.createdAt} updatedAt={props.testCase.updatedAt} />
+        </>} />}
     </header>
     <CaseAttachmentDraftProvider locale={props.locale} enabled={canAttach && editorOpen} locked={uploadLocked} entries={files} onEntries={setFiles}
       validStepIds={new Set(revision.steps.map(({ id }) => id))} validChecklistIds={new Set(revision.checklist.map(({ id }) => id))}>

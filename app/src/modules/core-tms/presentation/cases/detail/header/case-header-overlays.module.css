@@ -1,0 +1,53 @@
+.positioner { z-index: 145; }
+.menu, .dates {
+  border: 1px solid var(--falcon-border);
+  border-radius: 12px;
+  background: var(--falcon-elevated);
+  color: var(--falcon-text);
+  box-shadow: var(--falcon-shadow-popover);
+}
+.menu { min-inline-size: 188px; padding: 4px; }
+.menuList { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-block-size: 32px;
+  padding: 4px 8px;
+  border-radius: 7px;
+  color: var(--falcon-text);
+  font-size: 12px;
+  cursor: pointer;
+}
+.menuItem svg { flex: none; color: var(--falcon-icon); }
+.menuItem:is([data-hover="true"], [data-focus-visible="true"]) { background: var(--falcon-hover); }
+.menuItem[data-disabled="true"] { opacity: .42; cursor: default; }
+.menuItem.danger, .menuItem.danger svg { color: var(--falcon-danger); }
+
+.dateTrigger {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 28px;
+  block-size: 28px;
+  min-inline-size: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--falcon-text-muted);
+  cursor: pointer;
+}
+.dateTrigger:is([data-hover="true"], [aria-describedby]) { color: var(--falcon-text); background: var(--falcon-hover); }
+.dates { padding: 8px 10px; }
+.dates dl { display: grid; gap: 6px; margin: 0; font-size: 12px; line-height: 1.35; }
+.dates dl > div { display: grid; grid-template-columns: auto 1fr; align-items: baseline; gap: 14px; }
+.dates dt { color: var(--falcon-text-secondary); }
+.dates dd { margin: 0; text-align: end; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.confirmError { margin: 0; padding: 0 18px 8px; color: var(--falcon-danger); font-size: 12px; }
+.confirmActions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; padding: 8px 18px 16px; }
+.confirmActions button { min-block-size: 32px; padding: 0 12px; border-radius: 999px; font-size: 12px; }
+.confirmActions .confirm { background: var(--falcon-action); color: var(--falcon-on-action); }
+@media (prefers-reduced-motion: no-preference) {
+  .menu, .dates { animation: case-header-overlay-enter 110ms ease-out both; }
+}
+@keyframes case-header-overlay-enter { from { opacity: 0; } to { opacity: 1; } }

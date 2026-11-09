@@ -71,6 +71,7 @@ export function browserHarness(transition = (update: () => void) => update()) {
     : name.endsWith(".css") ? { default: proxy } : proxy;
   const listing = h.load<{ CasesRepositoryList: (props: unknown) => unknown }>(new URL("../../workspace/CasesRepositoryList.tsx", import.meta.url), resolvePresentation);
   const cases = h.load<{ CasesView: (props: CasesViewProps) => unknown }>(new URL("../../CasesView.tsx", import.meta.url), (name) => {
+    if (name.endsWith("useCasePanelExit")) return { useCasePanelExit: () => (close: () => void) => close() };
     if (name.endsWith("useCaseBrowserFocus")) return { useCaseBrowserFocus: () => () => {} };
     if (name.endsWith("useCasesViewController")) return { useCasesViewController: controller };
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en", languageTag: "en-US", t: (key: string) => key }) };

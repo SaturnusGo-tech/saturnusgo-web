@@ -19,6 +19,9 @@ export function useSelectedCaseResource(
   const [failed, setFailed] = useState(false);
   const [requestVersion, setRequestVersion] = useState(0);
 
+  const resource = useRef({ detail, etag });
+  resource.current = { detail, etag };
+  const requestScope = useRef({ http, connection, requestVersion });
   const selected = testCases.find(item => item.id === caseId);
   const selectedRef = useRef(selected); selectedRef.current = selected;
   const contentKey = connection === "demo" ? selected : selected ? JSON.stringify([selected.projectId, selected.etag]) : "";
@@ -26,6 +29,8 @@ export function useSelectedCaseResource(
     setDetail(current => current ? reconcileMaintenance(current, selected) : current);
   }, [caseId, selected?.maintenance]);
   useEffect(() => {
+    const previous = requestScope.current;
+    requestScope.current = { http, connection, requestVersion };
     setFailed(false);
     if (connection === "demo") {
       setDetail(selected && "current" in selected && "linkIds" in selected
@@ -34,6 +39,13 @@ export function useSelectedCaseResource(
       setEtag(null);
       return;
     }
+    const cached = resource.current;
+    const current = selectedRef.current;
+    // The mutation receipt already supplied the exact version that the repository lists.
+    if (connection === "connected" && previous.connection === connection && previous.http === http
+      && previous.requestVersion === requestVersion && cached.detail?.id === caseId
+      && cached.detail?.projectId === current?.projectId && cached.etag && cached.etag === current?.etag) return;
+
     setDetail(null);
     setEtag(null);
     if (connection !== "connected" || !caseId) return;

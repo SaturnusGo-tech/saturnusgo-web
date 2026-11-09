@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import { setImmediate as flush } from "node:timers/promises";
 import { runInNewContext } from "node:vm";
 import ts from "typescript";
 import * as model from "../../model";
@@ -8,7 +9,7 @@ import * as markdownImages from "../../attachments/links/caseMarkdownImages";
 import { createEmptyRevision } from "../../../../../helpers/cases/caseRevision";
 
 type Node = { type: string; props: Record<string, unknown> };
-function render(path: string, exported: string, props: unknown, menu = false) {
+function render(path: string, exported: string, props: unknown, confirmation?: "restore" | "quarantine") {
   let stateIndex = 0;
   const module = { exports: {} as Record<string, (props: unknown) => unknown> };
   const source = readFileSync(new URL(path, import.meta.url), "utf8");
@@ -20,13 +21,13 @@ function render(path: string, exported: string, props: unknown, menu = false) {
     require(name: string) {
       if (name === "react/jsx-runtime") return { jsx, jsxs: jsx };
       if (name === "react") return {
-        useState: (initial: unknown) => [menu && stateIndex++ === 1 ? true : typeof initial === "function" ? initial() : initial, () => {}],
+        useState: (initial: unknown) => [stateIndex++ === 1 && confirmation ? confirmation : typeof initial === "function" ? initial() : initial, () => {}],
         useEffect: () => {}, useMemo: (value: () => unknown) => value(), useRef: (current: unknown) => ({ current }), useId: () => "inspector",
       };
       if (name.endsWith("inspector/model") || name === "./model") return model;
       if (name.endsWith("caseMarkdownImages")) return markdownImages;
       if (name.endsWith("useCaseActivityNavigation")) return { useCaseActivityNavigation: () => {} };
-      if (name.endsWith("useCreateCaseExit")) return { useCreateCaseExit: () => (close: () => void) => close() };
+      if (name.endsWith("useCasePanelExit")) return { useCasePanelExit: () => (close: () => void) => close() };
       if (name.endsWith("useCreateCaseEntrance")) return { useCreateCaseEntrance: () => {} };
       if (name.endsWith("useScenarioLayout")) return { useScenarioLayout: () => ["list", () => {}] };
       if (name.endsWith("CaseAttachmentDraftContext")) return { useCaseAttachmentDraft: () => undefined, CaseAttachmentDraftProvider: "CaseAttachmentDraftProvider" };
@@ -61,19 +62,37 @@ test("archived header blocks run and clone while restore and navigation remain a
     locale: "en", testCase: archivedCase, creating: false, editorOpen: false,
     onRunCase: () => calls.push("run"), onClone: () => calls.push("clone"), onArchive: () => calls.push("restore"),
     onToggleFullscreen: () => calls.push("fullscreen"), onClose: () => calls.push("close"),
-  }, true);
-  for (const label of ["Run", "Create a copy"]) {
-    const button = all.find(node => node.type === "button" && text(node.props.children) === label)!;
-    assert.equal(button.props.disabled, true); invoke(button);
-  }
-  assert.deepEqual(calls, []);
-  for (const label of ["Copy ID", "Copy link", "Restore"]) {
-    const button = all.find(node => node.type === "button" && text(node.props.children) === label)!;
-    assert.notEqual(button.props.disabled, true);
-    if (label === "Restore") invoke(button);
-  }
+  });
+  const run = all.find(node => node.type === "button" && text(node.props.children) === "Run")!;
+  assert.equal(run.props.disabled, true); invoke(run);
+  const menu = all.find(node => node.type === "DropdownMenu")!;
+  assert.ok((menu.props.disabledKeys as string[]).includes("clone"));
+  invoke(menu, "onAction", "clone");
+  assert.deepEqual(Array.from(nodes(menu.props.children).filter(node => node.type === "DropdownItem"), node => node.props.textValue),
+    ["Copy ID", "Copy link", "Create a copy", "Restore"]);
+  invoke(menu, "onAction", "restore");
+  assert.deepEqual(calls, [], "menu actions open confirmation before a mutation");
   for (const label of ["Open full screen", "Close"]) invoke(all.find(node => node.props["aria-label"] === label)!);
-  assert.deepEqual(calls, ["restore", "fullscreen", "close"]);
+  assert.deepEqual(calls, ["fullscreen", "close"]);
+});
+
+test("the quarantine dialog dispatches only after confirming and dismisses only on success", async () => {
+  for (const succeeds of [false, true]) {
+    let mutations = 0; let dismissals = 0;
+    const tree = render("../../../detail/header/CaseDetailHeaderActions.tsx", "CaseDetailHeaderActions", {
+      locale: "en", testCase: { ...archivedCase, archivedAt: null }, creating: false, editorOpen: false,
+      onArchive: async () => { mutations++; return succeeds; },
+    }, "quarantine");
+    const dialog = tree.find(node => node.type === "ProductDocModal")!;
+    assert.equal(dialog.props.title, "Move this test case to quarantine?");
+    const buttons = nodes((dialog.props.children as (dismiss: () => void) => unknown)(() => { dismissals++; }));
+    invoke(buttons.find(node => node.type === "Button" && text(node.props.children) === "Cancel")!, "onPress");
+    assert.deepEqual([mutations, dismissals], [0, 1]);
+    const confirm = buttons.find(node => node.type === "Button" && text(node.props.children) === "Move to quarantine")!;
+    invoke(confirm, "onPress"); invoke(confirm, "onPress");
+    await flush();
+    assert.deepEqual([mutations, dismissals], [1, succeeds ? 2 : 1]);
+  }
 });
 
 test("archived inspector refuses edits and draft changes, while active creation stays canonical", () => {

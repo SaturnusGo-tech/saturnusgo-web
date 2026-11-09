@@ -150,11 +150,11 @@ export function useCasesViewController(
     props.onNew(path || "/");
   }
   function closeInspector() {
-    const cancellingEditor = Boolean(props.editor);
+    const restorePrevious = props.editor?.mode === "create" && Boolean(props.selectedCaseId);
     props.editor?.onCancel();
-    if (!cancellingEditor) props.onSelectCase("");
+    if (!restorePrevious) props.onSelectCase("");
     setDetailFullscreen(false);
-    setDetailOpen(cancellingEditor && Boolean(props.selectedCaseId));
+    setDetailOpen(restorePrevious);
   }
   function toggleSelectionMode() {
     setSelectionMode((current) => {

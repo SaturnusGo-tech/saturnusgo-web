@@ -26,7 +26,7 @@ export type CaseDetailPanelProps = {
   onEdit: () => void;
   onClone: () => void;
   onCreateDefect?: () => void;
-  onArchive: () => void;
+  onArchive: () => void | boolean | Promise<void | boolean>;
   onRunCase: () => void;
   fullscreen: boolean;
   onToggleFullscreen: () => void;

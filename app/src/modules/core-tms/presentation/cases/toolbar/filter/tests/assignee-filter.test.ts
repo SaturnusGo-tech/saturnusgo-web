@@ -18,6 +18,7 @@ function menu() {
   const { RepositoryFilterPicker: renderPicker } = pickerHarness.load<{ RepositoryFilterPicker: typeof RepositoryFilterPicker }>(
     new URL("../picker/RepositoryFilterPicker.tsx", import.meta.url));
   const fields = componentHarness().load(new URL("../../fields/CaseFieldFilterSections.tsx", import.meta.url));
+  const priority = componentHarness().load(new URL("../../../../common/properties/PriorityIcon.tsx", import.meta.url));
   runInNewContext(ts.transpileModule(readFileSync(new URL("../../CasesToolbarPopovers.tsx", import.meta.url), "utf8"), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2021, jsx: ts.JsxEmit.ReactJSX },
   }).outputText, { module, requestAnimationFrame: () => 0, exports: module.exports, require: (name: string) => {
@@ -27,6 +28,7 @@ function menu() {
     if (name.endsWith("CaseFieldFilterSections")) return fields;
     if (name.endsWith("RepositoryFilterPicker")) return { RepositoryFilterPicker: "RepositoryFilterPicker" };
     if (name.endsWith("useFilterPopup")) return { useFilterPopup() {} };
+    if (name.endsWith("PriorityIcon")) return priority;
     if (name.endsWith("localization/format/labels")) return { localizedComponentLabel: (_locale: string, value: string) => value };
     return name.endsWith(".css") ? { default: proxy } : proxy;
   } });

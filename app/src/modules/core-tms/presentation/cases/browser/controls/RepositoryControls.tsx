@@ -20,6 +20,22 @@ export function RepositoryControls({ props, view, locale }: {
   const qlButton = useRef<HTMLButtonElement>(null);
   const filterTrigger = useRef<HTMLButtonElement>(null!);
   const searchInput = useRef<HTMLInputElement>(null);
+  function toggleQl() {
+    const next = !qlOpen;
+    if (next) {
+      view.setFilterOpen(false);
+      requestAnimationFrame(() => qlRef.current?.querySelector("input")?.focus({ preventScroll: true }));
+    }
+    setQlOpen(next);
+  }
+  function closeQl() {
+    setQlOpen(false);
+    qlButton.current?.focus({ preventScroll: true });
+  }
+  function changeFilterOpen(next: boolean) {
+    if (next) setQlOpen(false);
+    view.setFilterOpen(next);
+  }
   const tags = useMemo(() => [...new Set(props.testCases.flatMap(item => item.tags))].sort(), [props.testCases]);
   const active = fieldFilterCount(view.facetFilters) + Number(props.filters.type !== "all") + Number(props.filters.priority !== "all")
     + Number(props.filters.lifecycle !== "all") + Number(Boolean(props.filters.maintenanceStatus && props.filters.maintenanceStatus !== "all")) + Number(Boolean(props.filters.tag.trim()))
@@ -38,10 +54,11 @@ export function RepositoryControls({ props, view, locale }: {
       </div>
       <Button ref={qlButton} type="button" size="sm" variant="light" disableRipple className={css.repositoryTool}
         aria-label={ru ? "QL-запрос" : "QL query"} aria-expanded={qlOpen} aria-controls={qlOpen ? qlId : undefined} data-active={Boolean(view.qlQuery) || undefined}
-        onPress={() => { setQlOpen(!qlOpen); if (!qlOpen) requestAnimationFrame(() => qlRef.current?.querySelector("input")?.focus({ preventScroll: true })); }}>QL</Button>
-      <Popover isOpen={view.filterOpen} onOpenChange={view.setFilterOpen} placement="bottom-end" offset={7} containerPadding={12}
+        onPress={toggleQl}>QL</Button>
+      <Popover isOpen={view.filterOpen} onOpenChange={changeFilterOpen} placement="bottom-end" offset={7} containerPadding={12}
         shouldBlockScroll={false} shouldCloseOnBlur={false} shouldCloseOnScroll={false} disableAnimation
-        shouldCloseOnInteractOutside={element => !element.closest("[data-repository-filter], [data-filter-value-panel], [data-testid='case-filter-toggle']")}
+        shouldCloseOnInteractOutside={element => !qlButton.current?.contains(element)
+          && !element.closest("[data-repository-filter], [data-filter-value-panel], [data-testid='case-filter-toggle']")}
         classNames={{ base: picker.positioner, content: picker.surface }} style={{ zIndex: 80 }}>
         <PopoverTrigger><Button ref={filterTrigger} type="button" size="sm" variant="light" disableRipple className={css.repositoryTool}
           aria-controls={view.filterOpen ? "case-filter-panel" : undefined}
@@ -55,8 +72,8 @@ export function RepositoryControls({ props, view, locale }: {
     </div>
     {view.directory.loading && Boolean(props.query || view.qlQuery) && <span role="status" className={css.queryHint}>{ru ? "Загружаем ответственных…" : "Loading assignees…"}</span>}
     {view.directory.error && <button type="button" className={css.tool} onClick={view.directory.retry}>{ru ? "Не удалось загрузить ответственных. Повторить" : "Could not load assignees. Retry"}</button>}
-    <QlDisclosure open={qlOpen}><div ref={qlRef} id={qlId} className={css.ql} onKeyDown={(event) => { if (event.key === "Escape" && !event.defaultPrevented) {
-      event.preventDefault(); event.stopPropagation(); setQlOpen(false); qlButton.current?.focus();
-    } }}><CaseQlAutocomplete floatingSuggestions locale={locale} query={view.qlQuery} folders={view.facetOptions.folders} components={view.facetOptions.components} members={view.directory.items} tags={tags} onQuery={view.setQlQuery} /></div></QlDisclosure>
+    {!view.filterOpen && <QlDisclosure open={qlOpen}><div ref={qlRef} id={qlId} className={css.ql} onKeyDown={(event) => { if (event.key === "Escape" && !event.defaultPrevented) {
+      event.preventDefault(); event.stopPropagation(); closeQl();
+    } }}><CaseQlAutocomplete floatingSuggestions onDismiss={closeQl} locale={locale} query={view.qlQuery} folders={view.facetOptions.folders} components={view.facetOptions.components} members={view.directory.items} tags={tags} onQuery={view.setQlQuery} /></div></QlDisclosure>}
   </div>;
 }
