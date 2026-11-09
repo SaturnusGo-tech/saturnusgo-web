@@ -31,7 +31,6 @@
 .rows > [data-case-member-name] { margin-inline-start: 7px; max-inline-size: calc(100% - 7px); }
 .rows [data-case-member-name] > :first-child { inline-size: 15px; block-size: 15px; font-size: 7px; }
 .rows [data-case-member-name] > :last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.placeholder { color: var(--falcon-text-muted); }
 
 .tags { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; }
 .tags > h4, .documentation dt { padding-block-end: 5px; }
@@ -43,85 +42,3 @@
 .documentation [data-documentation-field] > dt { padding-block-start: 0; }
 .documentation [data-documentation-field] > dd { font-size: 13px; min-inline-size: 0; }
 .documentation [data-documentation-field] > dd > button { color: var(--falcon-text-muted); }
-
-.testData, .noteRow {
-  display: grid;
-  grid-template-columns: 15px minmax(0, 1fr);
-  align-items: start;
-  gap: 8px;
-  inline-size: 100%;
-  min-block-size: 29px;
-  padding: 0 7px;
-  --case-details-focus-border: color-mix(in srgb, var(--falcon-text-muted) 48%, var(--falcon-border));
-  --case-details-input-inset: 8px;
-}
-.testData > .dataIcon, .noteRow > svg { margin-block-start: 7px; color: var(--falcon-icon); }
-.testData > button.dataIcon {
-  margin-block-start: 0;
-  margin-inline-start: -5px;
-  min-inline-size: 0;
-  inline-size: 25px;
-  block-size: 29px;
-  padding: 0;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-}
-.testData > button.dataIcon:is(:hover, :focus-visible) { background: var(--falcon-hover); }
-.additionalInput { min-inline-size: 0; padding-block-start: 4px; }
-.additionalInput:has([data-editor-shell]) { margin-inline-start: -8px; }
-.testData .additionalInput [data-editor-shell][data-appearance="plain"] {
-  --tms-focus-border: var(--case-details-focus-border);
-  --tms-focus-ring: transparent;
-  --tms-input-hover-border: var(--falcon-border);
-  border: 1px solid var(--falcon-border) !important;
-  border-radius: 10px;
-}
-
-.testData .additionalInput [data-editor-shell][data-appearance="plain"]:focus-within {
-  border-color: var(--case-details-focus-border) !important;
-}
-
-.additionalInput [data-editor-shell][data-appearance="plain"] > :global(.mdxeditor) { height: auto; min-height: 0; }
-.additionalInput [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-toolbar) { min-height: 26px; padding: 1px 5px; }
-.additionalInput [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-root-contenteditable) { height: auto; min-height: 28px; max-height: 180px; padding: 0; }
-.additionalInput [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-contenteditable-wrapper > [contenteditable]),
-.additionalInput [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-root-contenteditable > div:not(.mdxeditor-contenteditable-wrapper)) {
-  box-sizing: border-box;
-  min-height: 28px;
-  padding: 4px var(--case-details-input-inset);
-}
-.additionalInput [data-editor-shell][data-appearance="plain"] :global([class*="_placeholder_"]) { padding: 4px var(--case-details-input-inset); }
-.additionalInput [data-editor-shell][data-appearance="plain"] > div:has(> textarea) { height: 28px; min-height: 28px; }
-.additionalInput [data-editor-shell][data-appearance="plain"] > div > textarea { height: 28px; min-height: 28px; padding: 4px var(--case-details-input-inset); }
-.additionalInput [data-editor-shell][data-appearance="plain"] > div:has(> button) { min-height: 24px; padding: 0 5px; }
-
-.noteTooltip {
-  max-inline-size: min(280px, calc(100vw - 24px));
-  overflow-wrap: anywhere;
-  white-space: normal;
-}
-.noteWrapper {
-  height: auto;
-  min-height: 29px;
-  padding: 3px 6px;
-  margin-inline-start: -6px;
-  background: var(--falcon-control);
-  box-shadow: inset 0 0 0 1px var(--falcon-border);
-  border-radius: 8px;
-}
-.noteWrapper[data-focus-within="true"] { box-shadow: inset 0 0 0 1px var(--falcon-border-strong); }
-.noteWrapper .noteInput {
-  width: 100%;
-  padding: 0;
-  border: 0;
-  outline: 0;
-  box-shadow: none;
-  background: transparent;
-  font: inherit;
-}
-
-
-@media (pointer: coarse) {
-  .testData, .noteRow, .noteWrapper { min-block-size: 34px; }
-}

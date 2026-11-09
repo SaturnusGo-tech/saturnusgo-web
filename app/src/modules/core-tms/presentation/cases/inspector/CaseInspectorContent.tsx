@@ -105,6 +105,10 @@ export function CaseInspectorContent({
   const sectionEditing = (section: InspectorSection) => (
     !readOnly && !linksPending && Boolean(editor) && isInspectorSectionEditing(editorMode, editing, section)
   );
+  const preconditionsEditing = sectionEditing("preconditions");
+  const preconditionsLabel = ru ? "Предусловия" : "Preconditions";
+  const savedTestData = value.testData.trim();
+  const showSavedTestData = Boolean(savedTestData && savedTestData !== value.preconditions.trim());
   if (creating && editor) return <CaseCreationSections locale={locale} revision={value}
     editor={editor} tagSuggestions={tagSuggestions} sharedSteps={sharedSteps} onResolveSharedStep={onResolveSharedStep} />;
   return <div className={`${css.content} ${css.overviewLayout} ${rail.layout}`}>
@@ -114,10 +118,13 @@ export function CaseInspectorContent({
           autoFocus={!creating} onChange={sectionEditing("description") && editor ? (description) => patch({ description }) : undefined}
           emptyLabel={ru ? "Описание не указано" : "No description"} />
       </InspectorSectionView>
-      <InspectorSectionView title={ru ? "Предусловия" : "Preconditions"} editLabel={ru ? "Изменить условия" : "Edit conditions"} {...controls("preconditions")}>
-        <MarkdownField appearance="plain" onRequestEdit={requestField("preconditions")} attachmentKey="preconditions" value={value.preconditions} label={ru ? "Предусловия" : "Preconditions"}
-          autoFocus={!creating} onChange={sectionEditing("preconditions") && editor ? (preconditions) => patch({ preconditions }) : undefined}
-          emptyLabel={ru ? "Предусловия не указаны" : "No preconditions specified"} />
+      <InspectorSectionView title={preconditionsLabel} editLabel={ru ? "Изменить условия" : "Edit conditions"} {...controls("preconditions")}>
+        {(preconditionsEditing || value.preconditions.trim() || !showSavedTestData) && <MarkdownField appearance="plain"
+          onRequestEdit={requestField("preconditions")} attachmentKey="preconditions" value={value.preconditions} label={preconditionsLabel}
+          autoFocus={!creating} onChange={preconditionsEditing ? (preconditions) => patch({ preconditions }) : undefined}
+          emptyLabel={ru ? "Предусловия не указаны" : "No preconditions specified"} />}
+        {showSavedTestData && <MarkdownField attachmentKey="test-data" allowAttachments={false}
+          value={value.testData} label={preconditionsLabel} />}
       </InspectorSectionView>
       <InspectorSectionView title={ru ? "Сценарий" : "Scenario"}
         headingActions={value.type !== "checklist" && <ScenarioLayoutToggle value={layout} onChange={setLayout} ru={ru} />}
@@ -133,7 +140,7 @@ export function CaseInspectorContent({
           autoFocus={!creating} disabled={editor?.submitting || editor?.attachmentsPending} onChange={readOnly ? undefined : editor?.onChange} />
       </InspectorSectionView>
       <InspectorSectionView title={ru ? "Дополнительно" : "Additional details"} actionsInHeader {...controls("details")} hideHeading hideEdit>
-        <InspectorDetails tagSuggestions={tagSuggestions} onRequestEdit={requestField("details")} disabled={editor?.submitting || editor?.attachmentsPending} testCaseId={testCaseId} revision={value} editing={sectionEditing("details")} autoFocus={!creating} ru={ru} onPatch={patch}
+        <InspectorDetails tagSuggestions={tagSuggestions} onRequestEdit={requestField("details")} disabled={editor?.submitting || editor?.attachmentsPending} testCaseId={testCaseId} revision={value} editing={sectionEditing("details")} ru={ru} onPatch={patch}
           documentation={testCaseId && <Requirements projectId={projectId} subject={{caseId: testCaseId, readOnly, disabled: Boolean(editor)}} ru={ru} />} />
       </InspectorSectionView>
       <InspectorSectionView title={ru ? "Поля" : "Custom fields"} actionsInHeader {...controls("component")}>

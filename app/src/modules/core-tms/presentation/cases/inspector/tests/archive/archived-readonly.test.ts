@@ -100,6 +100,21 @@ test("archived inspector refuses edits and draft changes, while active creation 
   assert.equal(creation[0].type, "CaseCreationSections");
 });
 
+test("saved test data is readable once in Preconditions without a separate editor", () => {
+  const inspect = (preconditions: string, testData: string) => render("../../CaseInspectorContent.tsx", "CaseInspectorContent", {
+    locale: "en", revision: { ...revision, preconditions, testData }, sharedSteps: [], onRequestEdit() {},
+  });
+  const section = (all: Node[]) => all.find(node => node.type === "InspectorSectionView" && node.props.section === "preconditions")!;
+  const fields = (preconditions: string, testData: string) => nodes(section(inspect(preconditions, testData))).filter(node => node.type === "MarkdownField");
+  const withData = fields("User signed in", "Demo booking");
+  assert.deepEqual(withData.map(node => node.props.value), ["User signed in", "Demo booking"]);
+  assert.equal(withData[1].props.onChange, undefined);
+  assert.equal(withData[1].props.allowAttachments, false);
+  assert.deepEqual(fields(" Demo booking ", "Demo booking").map(node => node.props.value), [" Demo booking "]);
+  assert.deepEqual(fields("", "Demo booking").map(node => node.props.value), ["Demo booking"]);
+  assert.equal(fields("", "")[0].props.emptyLabel, "No preconditions specified");
+});
+
 test("archiving an open draft disables title/save, retains cancel and displays the stored revision", () => {
   let edits = 0; let runs = 0; let submits = 0; let cancels = 0; let prevented = 0;
   const all = render("../../../detail/CaseDetailPanel.tsx", "CaseDetailPanel", {

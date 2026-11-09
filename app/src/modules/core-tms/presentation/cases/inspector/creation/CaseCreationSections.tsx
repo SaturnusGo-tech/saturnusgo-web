@@ -61,7 +61,7 @@ export function CaseCreationSections({
         <CaseMetadataControls locale={locale} revision={revision} editing disabled={editor.submitting} onChange={editor.onChange} />
       </CreationSection>
       <section data-rail-details><InspectorDetails tagSuggestions={tagSuggestions} revision={revision} editing
-        autoFocus={false} disabled={editor.submitting} ru={ru} onPatch={patch} documentation={documentation} /></section>
+        disabled={editor.submitting} ru={ru} onPatch={patch} documentation={documentation} /></section>
     </aside>
   </div>;
 }

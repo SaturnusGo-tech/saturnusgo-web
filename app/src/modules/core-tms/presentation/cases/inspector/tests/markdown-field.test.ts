@@ -74,7 +74,7 @@ test("case Markdown inputs attach or paste private files from the conventional l
   assert.match(source, /onDropCapture=\{transfer.onDrop\}/);
   assert.match(content, /attachmentKey="description"/);
   assert.match(content, /attachmentKey="preconditions"/);
-  assert.match(details, /attachmentKey="test-data"/);
+  assert.match(content, /attachmentKey="test-data" allowAttachments=\{false\}/);
   assert.match(steps, /fieldKey=\{`checklist:\$\{props\.id\}`\}/);
   assert.match(scenarioStep, /stepId=\{props\.step\.id\}/);
   assert.match(comments, /allowAttachments=\{false\}/);
@@ -131,7 +131,7 @@ test("fullscreen inspector content keeps the normal full-width layout", () => {
 test("rich text is scoped to narrative test-case fields", () => {
   assert.match(content, /value=\{value\.description\}/);
   assert.match(content, /value=\{value\.preconditions\}/);
-  assert.match(details, /value=\{revision\.testData\}/);
+  assert.doesNotMatch(details, /MarkdownField/);
   assert.doesNotMatch(steps, /MarkdownField/);
   assert.match(steps, /<ScenarioStepEditor/);
   assert.doesNotMatch(content, /<MarkdownField[^>]+value=\{value\.component\}/s);
@@ -140,9 +140,9 @@ test("rich text is scoped to narrative test-case fields", () => {
 test("section snapshots and rich field labels remain interaction-safe", () => {
   assert.match(content, /if \(snapshots\.current\[section\]\) return/);
   assert.match(section, /!props\.persistentEditing && !active/);
-  assert.match(details, /<MarkdownField[^>]*label=\{labels\.testData\}/);
+  assert.match(content, /<MarkdownField[^>]*label=\{preconditionsLabel\}/);
   const markdownInsideLabel = /<label[^>]*>(?:(?!<\/label>)[\s\S])*<MarkdownField/;
-  assert.doesNotMatch(details, markdownInsideLabel);
+  assert.doesNotMatch(content, markdownInsideLabel);
   assert.doesNotMatch(scenarioStep, /MarkdownField/);
 });
 

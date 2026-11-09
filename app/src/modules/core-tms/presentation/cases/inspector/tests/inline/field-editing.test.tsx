@@ -8,10 +8,12 @@ const Details = loadFieldComponent("../../details/InspectorDetails.tsx", "Inspec
 const Metadata = loadFieldComponent("../../../detail/metadata/CaseMetadataControls.tsx", "CaseMetadataControls");
 const byType = (view: ReactTestRenderer, type: string) => view.root.findAll(node => (node.type as unknown) === type);
 const revision = { ...createEmptyRevision("en"), testData: "Data", tags: ["smoke"], changeNote: "Original" };
-test("tapping tags opens only tags and retains audit authors", () => {
+test("details retain the case author and expose neither test data nor a revision note", () => {
   let edits = 0; let next: any; let view!: ReactTestRenderer;
   const props = { testCaseId: "case", revision, ru: false, editing: false, onPatch: (value: unknown) => { next = value; }, onRequestEdit: () => { edits++; } };
   act(() => { view = create(<Details {...props} />); });
+  assert.equal(byType(view, "markdown-field").length, 0);
+  assert.equal(byType(view, "field-value").length, 0);
   const tags = byType(view, "label-field")[0];
   assert.ok(tags, "saved tags must be directly editable");
   act(() => { tags.props.onRequestEdit(); view.update(<Details {...props} editing />); });
@@ -19,7 +21,7 @@ test("tapping tags opens only tags and retains audit authors", () => {
   assert.equal(byType(view, "input").length, 0);
   assert.equal(byType(view, "label-field")[0].props.autoOpen, true);
   assert.equal(byType(view, "responsible-picker").some(node => node.props.onChange), false);
-  assert.equal(byType(view, "markdown-field").some(node => node.props.onChange), false);
+  assert.equal(byType(view, "markdown-field").length, 0);
   assert.equal(byType(view, "case-author").length, 1);
   act(() => byType(view, "label-field")[0].props.onAdd("web"));
   assert.deepEqual(JSON.parse(JSON.stringify(next)), { tags: ["smoke", "web"] });
