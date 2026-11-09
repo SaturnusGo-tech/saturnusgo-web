@@ -4,7 +4,7 @@
 .status:is([data-status="blocked"], [data-status="aborted"]) { color: var(--falcon-warning); background: var(--falcon-warning-bg); }
 .status:is([data-status="passed"], [data-status="verified"], [data-status="completed"], [data-status="closed"]) { color: color-mix(in srgb, var(--falcon-success) 95%, var(--falcon-text)); background: var(--falcon-success-bg); }
 .progress { display: flex; flex: 0 1 185px; align-items: center; gap: 9px; min-width: 0; width: 100%; max-width: 185px; }
-.progress > span { flex: none; color: var(--falcon-text-muted); font-size: 11px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.progress > span:last-child { flex: none; color: var(--falcon-text-muted); font-size: 11px; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .progress i { font-style: normal; color: var(--falcon-text-muted); padding: 0 3px; }
 .track { height: 4px; min-width: 30px; flex: 1; display: flex; overflow: hidden; border-radius: 4px; background: var(--falcon-border-subtle); }
 .track span { height: 100%; }
