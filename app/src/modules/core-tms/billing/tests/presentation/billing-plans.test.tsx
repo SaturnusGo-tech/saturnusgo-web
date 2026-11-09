@@ -3,6 +3,7 @@ import { test } from "node:test";
 import { componentHarness, invoke, nodes } from "../../../portfolios/tests/support/component-harness";
 import type { BillingOffers, BillingPlans } from "../../presentation/plans/BillingPlans";
 import type { BillingPlan } from "../../domain/billing";
+import * as publicCatalog from "../../domain/catalog/public-billing-catalog";
 import { subscription } from "../fixtures/billing-fixtures";
 const plans = [
   { id: "individual", amount: 1100, seats: 1, workspaceKind: "personal" },
@@ -14,7 +15,8 @@ const personalOffers: BillingOffers = { suggestedPlanId: "individual", allowedCh
 function setup(overrides: Partial<Props> = {}) {
   let selected = "";
   const h = componentHarness();
-  const { BillingPlans: render } = h.load<{ BillingPlans: typeof BillingPlans }>(new URL("../../presentation/plans/BillingPlans.tsx", import.meta.url));
+  const { BillingPlans: render } = h.load<{ BillingPlans: typeof BillingPlans }>(new URL("../../presentation/plans/BillingPlans.tsx", import.meta.url),
+    name => name === "../../domain/catalog/public-billing-catalog" ? publicCatalog : undefined);
   const input: Props = { plans, current: null, occupiedSeats: 1, workspaceKind: "personal", canManage: true,
     busy: false, ru: false, offers: personalOffers, onChoose(id) { selected = id; }, ...overrides };
   const draw = () => nodes(h.render(() => render(input)));
@@ -43,7 +45,7 @@ test("other plans opens a discreet path to a direct Startup checkout", () => {
   assert.ok(all.some(node => node.props.children === "Members and invitations"));
   invoke(action, "onClick"); assert.equal(h.selected(), "startup");
 });
-test("Startup recommends contact-only Enterprise without old catalog price or seat claims", () => {
+test("Startup recommends contact-only Enterprise with an indicative price for 25 seats", () => {
   const h = setup({ current: subscription, workspaceKind: "company", occupiedSeats: 2,
     offers: { suggestedPlanId: "enterprise", allowedCheckoutPlanIds: [], allowedChangePlanIds: [], contactSales: true } });
   assert.equal(h.all.find(node => node.props["data-offer"])!.props["data-offer"], "enterprise");
@@ -51,7 +53,15 @@ test("Startup recommends contact-only Enterprise without old catalog price or se
   assert.ok(h.all.some(node => node.type === "a" && node.props.href === "mailto:falcon@saturnusgo.com"));
   assert.ok(h.all.some(node => node.props.children === "SAML single sign-on"));
   assert.ok(h.all.some(node => node.props.children === "Discuss member permissions"));
+  assert.ok(h.all.some(node => node.props.children === "Illustrative price for 25 seats is $399.99 per month."));
   assert.ok(!h.all.some(node => ["$249", "25 seats", "$59"].includes(String(node.props.children))));
+});
+test("an active subscription shows its agreed price when the public price has changed", () => {
+  const h = setup({ plans: publicCatalog.publicBillingCatalog, current: subscription, workspaceKind: "company",
+    offers: { ...personalOffers, suggestedPlanId: "startup", allowedCheckoutPlanIds: [] } });
+  assert.ok(h.all.some(node => node.props.children === "$59"));
+  assert.ok(!h.all.some(node => node.props.children === "$79.99"));
+  assert.equal(h.all.find(node => node.props["data-plan"] === "startup")?.props.disabled, true);
 });
 test("Individual recommends the server-authorized Startup payment despite personal workspace kind", () => {
   const h = setup({ current: { ...subscription, planId: "individual", seats: 1 },

@@ -90,7 +90,7 @@ test("a production workspace admin can request Individual or Startup when checko
     const individualAction = button(root, "Request access");
     assert.ok(individualAction, "Production billing should show the manual request action for the Individual plan");
     assert.equal(individualAction.props.disabled, false);
-    assert.ok(root.findAllByType("strong").some(node => node.children.includes("$11")));
+    assert.ok(root.findAllByType("strong").some(node => node.children.includes("$15.99")));
 
     const otherPlans = button(root, "Other plans");
     assert.ok(otherPlans);
@@ -102,7 +102,7 @@ test("a production workspace admin can request Individual or Startup when checko
     const startupAction = button(root, "Request access");
     assert.ok(startupAction);
     assert.equal(startupAction.props.disabled, false);
-    assert.ok(root.findAllByType("strong").some(node => node.children.includes("$59")));
+    assert.ok(root.findAllByType("strong").some(node => node.children.includes("$79.99")));
     await act(async () => startupAction.props.onClick());
     const dialog = root.findByType("dialog");
     assert.ok(dialog.findAllByType("span").some(node => node.children.includes("Startup")));

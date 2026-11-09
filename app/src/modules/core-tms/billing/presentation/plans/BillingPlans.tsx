@@ -2,6 +2,7 @@ import { useState, type ReactNode } from "react";
 import { ArrowRight, Check, ChevronDown, Layers2, ListChecks, Network, ShieldCheck, UsersRound, X } from "lucide-react";
 import { FalconBrandMark } from "../../../../../shared/components/brand/FalconBrandMark";
 import type { BillingPlan, BillingPlanId, BillingSubscription } from "../../domain/billing";
+import { enterprisePriceExample, formatBillingAmount } from "../../domain/catalog/public-billing-catalog";
 import css from "./plans.module.css";
 
 export type BillingOffers = {
@@ -35,17 +36,19 @@ export function BillingPlans({ plans, current, occupiedSeats, workspaceKind, can
   const plan = plans.find(item => item.id === selectedId);
   const enterprise = selectedId === "enterprise";
   const quote = manualOffers ? undefined : quotes?.find(item => item.planId === selectedId);
-  const money = (amount: number, currency: string) => new Intl.NumberFormat(ru ? "ru-RU" : "en-US", { style: "currency", currency, maximumFractionDigits: amount % 100 ? 2 : 0 }).format(amount / 100);
+  const money = (amount: number, currency: string) => formatBillingAmount(amount, currency, ru ? "ru" : "en");
   const checkoutAllowed = offers?.allowedCheckoutPlanIds.includes(selectedId);
   const available = offers ? Boolean(checkoutAllowed || offers.allowedChangePlanIds.includes(selectedId))
     : Boolean(plan && plan.workspaceKind === workspaceKind && occupiedSeats <= plan.seats);
   const isCurrent = active?.planId === selectedId;
+  const recurringPrice = isCurrent ? active : plan;
   const scheduled = active?.pendingPlanId === selectedId;
   const unavailable = paymentsAvailable && !enterprise && !available;
   const preparing = setupAvailable && selectedId === "startup" && available;
   const disabled = (!paymentsAvailable && !preparing) || busy || Boolean(restriction) || unavailable || isCurrent || scheduled;
   const requestAction = manualOffers?.action(selectedId);
   const seats = plan?.seats;
+  const enterprisePrice = money(enterprisePriceExample.amount, enterprisePriceExample.currency);
   const features = [
     { icon: UsersRound, title: enterprise ? (ru ? "Ваша команда" : "Your team") : seats ? `${seats} ${ru ? seats === 1 ? "место" : "мест" : seats === 1 ? "seat" : "seats"}` : (ru ? "Ваше пространство" : "Your workspace"),
       detail: enterprise ? (ru ? "Обсудим места и доступ" : "Discuss capacity and access") : selectedId === "individual" ? (ru ? "Для личной работы" : "For your own workflow") : (ru ? "Для совместной работы" : "For a shared workflow") },
@@ -72,8 +75,8 @@ export function BillingPlans({ plans, current, occupiedSeats, workspaceKind, can
     <ul className={css.features}>{features.map(({ icon: Icon, title, detail }) => <li key={title}><span className={css.featureIcon}><Icon size={17} strokeWidth={1.5} aria-hidden="true" /></span><div><strong>{title}</strong><span>{detail}</span></div></li>)}</ul>
     <footer className={css.footer}>
       <div className={css.summary}>
-      {enterprise ? <div className={css.contactPrice}><strong>{ru ? "Индивидуальные условия" : "Let’s talk about your team"}</strong><span>{ru ? "Места и условия обсудим вместе." : "We’ll discuss capacity and terms together."}</span></div>
-        : <div className={css.price}><strong>{quote?.prorated ? money(quote.subtotal, quote.currency) : plan ? money(plan.amount, plan.currency) : "—"}</strong><div><span>{quote?.prorated ? (ru ? "к оплате сейчас" : "due now") : (ru ? "в месяц" : "per month")}</span><small>{quote?.prorated && plan ? (ru ? `Затем ${money(plan.amount, plan.currency)} в месяц · без налогов` : `Then ${money(plan.amount, plan.currency)} / month · excluding tax`) : (ru ? "USD · без налогов" : "USD · excluding tax")}</small></div></div>}
+      {enterprise ? <div className={css.contactPrice}><strong>{ru ? "Индивидуальные условия" : "Custom quote"}</strong><span>{ru ? `Ориентир для ${enterprisePriceExample.seats} мест — ${enterprisePrice} в месяц.` : `Illustrative price for ${enterprisePriceExample.seats} seats is ${enterprisePrice} per month.`}</span></div>
+        : <div className={css.price}><strong>{quote?.prorated ? money(quote.subtotal, quote.currency) : recurringPrice ? money(recurringPrice.amount, recurringPrice.currency) : "—"}</strong><div><span>{quote?.prorated ? (ru ? "к оплате сейчас" : "due now") : (ru ? "в месяц" : "per month")}</span><small>{quote?.prorated && plan ? (ru ? `Затем ${money(plan.amount, plan.currency)} в месяц · без налогов` : `Then ${money(plan.amount, plan.currency)} / month · excluding tax`) : (ru ? "USD · без налогов" : "USD · excluding tax")}</small></div></div>}
       <div className={css.controls}>{!controlledTest && <div className={css.otherPlans}><button type="button" className={css.disclosure} aria-expanded={showOptions} aria-controls="billing-other-plans" onClick={() => setShowOptions(value => !value)}>{ru ? "Другие тарифы" : "Other plans"}<ChevronDown size={16} aria-hidden="true" data-open={showOptions} /></button>
         {showOptions && <div id="billing-other-plans" className={css.options} role="group" aria-label={ru ? "Выбрать тариф для просмотра" : "Choose a plan to view"}>{order.map(id => <button type="button" key={id} data-view-plan={id} aria-pressed={id === selectedId} onClick={() => select(id)}>{names[id]}{id === selectedId && <Check size={14} aria-hidden="true" />}</button>)}</div>}
       </div>}{children}</div></div>

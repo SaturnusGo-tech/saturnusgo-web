@@ -1,6 +1,6 @@
 import { Check } from 'lucide-react';
 import { FalconBrandMark } from '../../../../shared/components/brand/FalconBrandMark';
-import { publicBillingCatalog } from '../../../core-tms/billing/domain/catalog/public-billing-catalog';
+import { enterprisePriceExample, formatBillingAmount, publicBillingCatalog } from '../../../core-tms/billing/domain/catalog/public-billing-catalog';
 import { planNames } from '../../../core-tms/billing/requests/domain/plan-request';
 import type { LandingLocale } from '../../landing/localization/model/locale';
 import { PricingPlanPages } from './PricingPlanPages';
@@ -11,6 +11,7 @@ const copy = {
     title: 'Pricing',
     interval: '/mo',
     quote: 'On request',
+    example: (price: string, seats: number) => `Illustrative price for ${seats} seats is ${price} per month.`,
     request: 'Request access',
     contact: 'Contact us',
     trial: 'Try Falcon free for 7 days',
@@ -18,7 +19,6 @@ const copy = {
     descriptions: {
       individual: 'Own your QA workflow from the first check to release.',
       startup: 'Give your team one place to coordinate QA.',
-      enterprise: 'Fit Falcon to the way your organization works.',
     },
     features: {
       individual: [
@@ -46,6 +46,7 @@ const copy = {
     title: 'Тарифы',
     interval: '/мес.',
     quote: 'По запросу',
+    example: (price: string, seats: number) => `Ориентир для ${seats} мест — ${price} в месяц.`,
     request: 'Запросить подключение',
     contact: 'Связаться с нами',
     trial: 'Попробуйте Falcon бесплатно 7 дней',
@@ -53,7 +54,6 @@ const copy = {
     descriptions: {
       individual: 'Ведите QA самостоятельно от первой проверки до релиза.',
       startup: 'Объедините работу команды QA в одном месте.',
-      enterprise: 'Подключите Falcon на условиях вашей организации.',
     },
     features: {
       individual: [
@@ -83,16 +83,12 @@ const horizon = 'M 273 853 C 310 770 352 708 425 667 C 541 602 704 602 813 548 C
 
 export function FalconPricing({ locale }: { locale: LandingLocale }) {
   const c = copy[locale];
+  const example = c.example(formatBillingAmount(enterprisePriceExample.amount, enterprisePriceExample.currency, locale), enterprisePriceExample.seats);
   const plans = [
     ...publicBillingCatalog.map(plan => ({
       id: plan.id,
       name: planNames[plan.id],
-      price: new Intl.NumberFormat(locale, {
-        style: 'currency',
-        currency: plan.currency,
-        currencyDisplay: 'narrowSymbol',
-        maximumFractionDigits: 0,
-      }).format(plan.amount / 100),
+      price: formatBillingAmount(plan.amount, plan.currency, locale),
       interval: c.interval,
       features: [
         locale === 'ru'
@@ -144,7 +140,7 @@ export function FalconPricing({ locale }: { locale: LandingLocale }) {
         {plans.map(plan => <article className={styles.card} data-plan={plan.id} key={plan.id}>
           <h3>{plan.name}</h3>
           <p className={styles.price}>{plan.price}{plan.interval}</p>
-          <p className={styles.description}>{c.descriptions[plan.id]}</p>
+          <p className={styles.description}>{plan.id === 'enterprise' ? example : c.descriptions[plan.id]}</p>
           <ul className={styles.features}>
             {plan.features.map(feature => <li key={feature}>
               <span className={styles.check}><Check size={16} strokeWidth={2.25} aria-hidden="true" /></span>
