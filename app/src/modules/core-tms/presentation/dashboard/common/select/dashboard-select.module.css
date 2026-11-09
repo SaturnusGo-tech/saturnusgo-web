@@ -1,5 +1,8 @@
 .select { inline-size: min(var(--dashboard-select-width, 150px), 100%); }
 .select .trigger {
+  position: relative;
+  display: flex;
+  align-items: center;
   min-block-size: 30px;
   block-size: 30px;
   padding-inline: 10px 28px;
@@ -11,7 +14,15 @@
 }
 .select .trigger:is([data-hover="true"], [data-open="true"]) { background: var(--falcon-hover); }
 .select .value { color: inherit; font-size: 11px; }
-.select .selectorIcon { inset-inline-end: 8px; inline-size: 12px; block-size: 12px; }
+.select .selectorIcon {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-end: 8px;
+  inline-size: 12px;
+  block-size: 12px;
+  transform: translateY(-50%);
+}
+.select .trigger[data-open="true"] .selectorIcon { transform: translateY(-50%) rotate(180deg); }
 .popover {
   min-inline-size: 150px;
   border: 1px solid var(--dashboard-card-border, var(--falcon-border));
