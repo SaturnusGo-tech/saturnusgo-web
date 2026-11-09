@@ -64,11 +64,14 @@
 .caseOrb { --loading-orb-size: 15px; position: absolute; inset: 0; margin: auto; }
 @media (prefers-reduced-motion: reduce) { .caseAccessory > :not(.caseOrb) { transition: none; } }
 .caseCopy, .caseTitle { flex: 1; min-width: 0; font-size: 12px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.5; }
-.caseButton small { font-size: 10px; display: block; color: var(--falcon-text-muted); }
+.caseButton small, .caseKey { font-size: 10px; display: block; color: var(--falcon-text-muted); }
 .leaf[data-title-mode="inline"] { min-height: 34px; align-items: center; }
 .leaf[data-title-mode="inline"] .caseButton { min-height: 34px; align-items: center; padding-block: 4px; }
 .leaf[data-title-mode="inline"] .caseAccessory > svg { color: var(--falcon-icon); }
 .caseKey { flex: none; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.caseLine { grid-column: 3 / -1; position: relative; display: flex; align-items: center; gap: 7px; min-width: 0; padding-inline-end: 3px; }
+.caseLine > .caseButton { flex: 1; width: auto; padding-inline-end: 0; }
+.caseLine > .caseButton::after { content: ""; position: absolute; inset: 0; }
 .leaf[data-quick-create] { grid-template-columns: 20px var(--repository-selection-width) minmax(0, 1fr) 25px; }
 .leaf[data-quick-create] > .caseButton { grid-column: 3; }
 .caseAddButton { grid-column: 4; align-self: center; display: grid; place-items: center; width: 25px; height: 27px;

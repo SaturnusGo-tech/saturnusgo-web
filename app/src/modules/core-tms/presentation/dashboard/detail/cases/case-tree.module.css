@@ -1,12 +1,12 @@
 .breadcrumb {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
   min-inline-size: 0;
-  max-inline-size: 34%;
+  max-inline-size: 42%;
   color: var(--falcon-text-muted);
   font-size: 11px;
 }
-.breadcrumb svg { flex: none; }
-.breadcrumb span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.breadcrumb :global([data-slot="list"]) { flex-wrap: nowrap; gap: 2px; overflow: hidden; }
+.breadcrumb li { gap: 2px; }
+.breadcrumb li:first-child:not(:last-child) { min-inline-size: 0; }
+.breadcrumb :global([data-slot="item"]) { padding: 0; color: inherit; font-size: inherit; opacity: 1; }
+.breadcrumb :global([data-slot="separator"]) svg { width: 10px; height: 10px; }
 @container dashboard-detail (max-width: 470px) { .breadcrumb { display: none; } }

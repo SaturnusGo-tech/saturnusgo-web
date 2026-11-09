@@ -35,14 +35,14 @@ function snapshot(rate: number | null): DashboardSnapshot {
   };
 }
 
-function assertLinearMeter(element: Node, value: number) {
+function assertSegmentedMeter(element: Node, value: number, segments: number) {
   assert.equal(element.props.value, value);
-  assert.equal(element.props.segments, 1);
-  assert.equal(element.props.shape, "pill");
+  assert.equal(element.props.segments, segments);
+  assert.equal(element.props.shape ?? "tick", "tick");
   assert.equal(element.props["aria-hidden"], "true");
 }
 
-void test("Components and risks shows linear pass rate and reach with each column's drill", () => {
+void test("Components and risks shows numeric pass rate and segmented reach with each column's drill", () => {
   for (const value of [0, 37.5, 100, null]) {
     const opened: string[] = [];
     const view = DashboardcnPortfolio({ title: "Components and risks", snapshot: snapshot(value),
@@ -55,8 +55,11 @@ void test("Components and risks shows linear pass rate and reach with each colum
       }
       const children = nodes(cell);
       const meter = children.find(node => node.type === "TickBar");
-      assert.ok(meter);
-      assertLinearMeter(meter, value);
+      if (index === 0) assert.equal(meter, undefined);
+      else {
+        assert.ok(meter);
+        assertSegmentedMeter(meter, value, 12);
+      }
       assert.equal(children.find(node => node.type === "MetricValue")?.props.value, `${value}%`);
       const action = children.find(node => node.type === "WidgetAction");
       assert.ok(action);
@@ -66,7 +69,7 @@ void test("Components and risks shows linear pass rate and reach with each colum
   }
 });
 
-void test("Run pass rate shows a linear meter with its numeric value and omits it when unavailable", () => {
+void test("Run pass rate shows a segmented meter with its numeric value and omits it when unavailable", () => {
   for (const value of [0, 37.5, 100, null]) {
     const view = DashboardcnWidget({ widget: "passRate", title: "Run pass rate", snapshot: snapshot(value), workbench: {} });
     const metric = view.props.children as Node;
@@ -76,7 +79,7 @@ void test("Run pass rate shows a linear meter with its numeric value and omits i
     if (value === null) assert.equal(meter, undefined);
     else {
       assert.ok(meter);
-      assertLinearMeter(meter, value);
+      assertSegmentedMeter(meter, value, 20);
     }
   }
 });

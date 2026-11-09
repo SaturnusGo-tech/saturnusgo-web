@@ -1,7 +1,8 @@
-import { Folder } from "lucide-react";
 import type { DashboardDrillRow } from "../../../../dashboards/model/dashboard-analytics";
+import type { RepositoryFolder } from "../../../../folders/model/folder";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import { SelectionTree } from "../../../cases/selection/tree/SelectionTree";
+import { WorkspaceBreadcrumbs } from "../../../common/breadcrumbs/WorkspaceBreadcrumbs";
 import { DetailResults, DetailState } from "../DetailPage";
 import { useDrillCaseCatalog } from "../../../../dashboards/state/case-catalog/useDrillCaseCatalog";
 import styles from "./case-tree.module.css";
@@ -33,12 +34,24 @@ export function DrillCaseTree({ rows, workspaceId, selection, onSelection, onOpe
     const catalog = state.catalog[projectId];
     const byId = new Map(catalog.cases.map((item) => [item.id, item]));
     const foldersById = new Map(catalog.folders.map(folder => [folder.id, folder]));
+    const foldersByPath = new Map<string, RepositoryFolder>();
+    for (const folder of catalog.folders) {
+      if (!foldersByPath.has(folder.path) || !folder.archivedAt) foldersByPath.set(folder.path, folder);
+    }
     return <SelectionTree key={projectId} cases={projectRows.map((row) => byId.get(row.id)!)} folders={catalog.folders}
       selected={selected} selectable={Boolean(selection)} includeArchived preserveCaseOrder titleMode="inline" hideRedundantRootCount ru={ru}
       trailing={item => {
-        const path = (item.folderId ? foldersById.get(item.folderId)?.path : item.folderPath) ?? item.folderPath;
-        const breadcrumb = path.split("/").filter(Boolean).join(" / ");
-        return breadcrumb && <span className={styles.breadcrumb} title={breadcrumb}><Folder size={13} aria-hidden="true" /><span>{breadcrumb}</span></span>;
+        let folder = item.folderId ? foldersById.get(item.folderId) : foldersByPath.get(item.folderPath);
+        const items = [];
+        const visited = new Set<string>();
+        while (folder && !visited.has(folder.id)) {
+          visited.add(folder.id);
+          items.push({ id: folder.id, label: folder.name });
+          folder = folder.parentId ? foldersById.get(folder.parentId) : undefined;
+        }
+        return items.length > 0 && <div className={styles.breadcrumb} data-testid="drill-case-folder-path">
+          <WorkspaceBreadcrumbs label={`${ru ? "Путь к папке" : "Folder path"} · ${item.key}`} items={items.reverse()} />
+        </div>;
       }}
       onToggle={(id) => scope([id])} onScope={scope}
       onOpen={(item) => { const row = projectRows.find((row) => row.id === item.id); if (row) onOpenRow(row); }}

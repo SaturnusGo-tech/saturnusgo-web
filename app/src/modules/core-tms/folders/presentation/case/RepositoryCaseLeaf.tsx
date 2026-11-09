@@ -21,12 +21,10 @@ export function RepositoryCaseLeaf({ item, depth, selected, active, loading, loc
   const moving = useContext(RepositoryDragSelectionContext);
   const quickCreate = creation && canManage && !item.archivedAt;
   const inline = titleMode === "inline";
+  const hasInlineMetadata = inline && Boolean(trailing);
   const priority = item.priorityAssigned === false ? null : item.priority;
-  return <li className={css.leaf} data-repository-drag-row data-repository-drag-id={`tree-case:${item.id}`} data-quick-create={quickCreate || undefined} data-title-mode={titleMode} data-depth={depth} data-selected={selected || undefined} data-active={active || undefined} data-drag-source={moving.caseIds.has(item.id) || undefined}>
-    <span className={css.caseRail} aria-hidden="true" />
-    <input type="checkbox" checked={selected} disabled={locked || !(canSelect ?? canManage) || (Boolean(item.archivedAt) && !allowArchivedSelection)}
-      aria-label={`${ru ? "Выбрать" : "Select"} ${item.key}`} onChange={() => onToggle(item.id)} />
-    <button ref={drag.setNodeRef} {...drag.listeners} {...drag.attributes} type="button" className={css.caseButton}
+  const caseKey = inline && <small className={css.caseKey}>{item.key}</small>;
+  const button = <button ref={drag.setNodeRef} {...drag.listeners} {...drag.attributes} type="button" className={css.caseButton}
       disabled={locked} aria-disabled={locked || undefined}
       aria-label={`${item.key} · ${item.title}`} aria-current={active ? "page" : undefined} aria-busy={loading || undefined}
       aria-description={inline ? priorityLabel(ru ? "ru" : "en", priority) : undefined}
@@ -37,9 +35,13 @@ export function RepositoryCaseLeaf({ item, depth, selected, active, loading, loc
       </span>
       {inline ? <span className={css.caseTitle}>{item.title}</span>
         : <span className={css.caseCopy}>{titleMode === "marquee" ? <RepositoryCaseTitle title={item.title} /> : item.title}<small>{item.key}</small></span>}
-      {trailing}
-      {inline && <small className={css.caseKey}>{item.key}</small>}
-    </button>
+      {inline ? !hasInlineMetadata && caseKey : trailing}
+    </button>;
+  return <li className={css.leaf} data-repository-drag-row data-repository-drag-id={`tree-case:${item.id}`} data-quick-create={quickCreate || undefined} data-title-mode={titleMode} data-depth={depth} data-selected={selected || undefined} data-active={active || undefined} data-drag-source={moving.caseIds.has(item.id) || undefined}>
+    <span className={css.caseRail} aria-hidden="true" />
+    <input type="checkbox" checked={selected} disabled={locked || !(canSelect ?? canManage) || (Boolean(item.archivedAt) && !allowArchivedSelection)}
+      aria-label={`${ru ? "Выбрать" : "Select"} ${item.key}`} onChange={() => onToggle(item.id)} />
+    {hasInlineMetadata ? <div className={css.caseLine}>{button}{trailing}{caseKey}</div> : button}
     {quickCreate && <CaseQuickAdd folderPath={item.folderPath || "/"} onCreate={creation.createCase} disabled={locked} ru={ru} />}
   </li>;
 }

@@ -145,9 +145,8 @@
 .table th:first-child { text-align: start; }
 .riskName { display: grid; gap: 2px; align-items: start; font-weight: 540; }
 .riskName small { color: var(--muted); font-weight: 400; }
-.riskRate { display: flex; width: 100%; justify-content: flex-end; align-items: center; gap: 6px; }
-.riskRate > [data-slot="metric-value"] { min-inline-size: 6ch; text-align: end; font-variant-numeric: tabular-nums; }
-.riskMeter { --tick-bar-width: 42px; --tick-bar-height: 7px; flex: none; }
+.riskCoverage { display: flex; width: 100%; justify-content: flex-end; align-items: center; gap: 6px; }
+.riskMeter { --tick-bar-width: 42px; --tick-bar-height: 12px; flex: none; }
 .riskDefects { display: flex; justify-content: flex-end; align-items: center; gap: 4px; }
 .critical { color: var(--dash-danger); }
 .note { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.45; }
