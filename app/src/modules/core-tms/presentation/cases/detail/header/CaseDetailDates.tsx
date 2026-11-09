@@ -1,5 +1,5 @@
 import { Button, Tooltip } from "@heroui/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Info } from "lucide-react";
 import type { TmsLocale } from "../../../../localization/model/locale";
 import styles from "./case-header-overlays.module.css";
@@ -11,6 +11,7 @@ export function CaseDetailDates({ createdAt, updatedAt, locale, languageTag }: {
   languageTag: string;
 }) {
   const [open, setOpen] = useState(false);
+  const wasOpenBeforeTouch = useRef(false);
   const ru = locale === "ru";
   const label = ru ? "Даты тест-кейса" : "Test case dates";
   const format = new Intl.DateTimeFormat(languageTag, { dateStyle: "medium", timeStyle: "short" });
@@ -24,7 +25,8 @@ export function CaseDetailDates({ createdAt, updatedAt, locale, languageTag }: {
       <dt>{name}</dt><dd><time dateTime={value}>{format.format(new Date(value))}</time></dd>
     </div>)}</dl>}>
     <Button type="button" isIconOnly variant="light" disableRipple className={styles.dateTrigger} aria-label={label}
-      onPress={event => { if (event.pointerType === "touch") setOpen(value => !value); }}>
+      onPointerDownCapture={event => { if (event.pointerType === "touch") wasOpenBeforeTouch.current = open; }}
+      onPress={event => { if (event.pointerType === "touch") setOpen(!wasOpenBeforeTouch.current); }}>
       <Info size={15} aria-hidden="true" />
     </Button>
   </Tooltip>;

@@ -45,8 +45,20 @@
 .dates dd { margin: 0; text-align: end; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .confirmError { margin: 0; padding: 0 18px 8px; color: var(--falcon-danger); font-size: 12px; }
 .confirmActions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; padding: 8px 18px 16px; }
-.confirmActions button { min-block-size: 32px; padding: 0 12px; border-radius: 999px; font-size: 12px; }
+.confirmActions button {
+  min-block-size: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--falcon-text-secondary);
+  box-shadow: none;
+  font-size: 12px;
+}
+.confirmActions button[data-hover="true"] { background: var(--falcon-hover); }
+.confirmActions button:focus-visible { outline: 1px solid var(--falcon-focus); outline-offset: 2px; }
 .confirmActions .confirm { background: var(--falcon-action); color: var(--falcon-on-action); }
+.confirmActions .confirm[data-hover="true"] { background: var(--falcon-action-hover); }
 @media (prefers-reduced-motion: no-preference) {
   .menu, .dates { animation: case-header-overlay-enter 110ms ease-out both; }
 }
