@@ -28,7 +28,7 @@ test('every product scene uses the requested language and native capture dimensi
         assert.ok(image.props.alt);
       }
       assert.equal(images[0].props.loading, kind === 'hero' ? 'eager' : 'lazy');
-      assert.equal(images[1].props.loading, 'lazy');
+      assert.equal(images[1].props.loading, kind === 'hero' ? 'eager' : 'lazy');
     } finally { tree.unmount(); }
   }
 });

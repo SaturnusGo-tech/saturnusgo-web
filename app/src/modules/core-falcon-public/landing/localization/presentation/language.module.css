@@ -1,9 +1,134 @@
-.root { position: relative; flex-shrink: 0; }
-.trigger { display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 8px; border: 0; border-radius: 22px; background: transparent; color: var(--falcon-text-muted); cursor: pointer; font: inherit; font-size: 11px; }
-.trigger:hover, .trigger[aria-expanded="true"] { background: var(--falcon-hover); color: var(--falcon-text); }
-.panel { position: absolute; right: 0; top: calc(100% + 8px); width: 200px; padding: 6px; border: 1px solid var(--falcon-border); border-radius: 16px; background: var(--falcon-elevated); box-shadow: var(--falcon-shadow-popover); animation: enter 140ms ease-out; }
-.panel button { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 0; padding: 12px; border-radius: 11px; background: transparent; color: var(--falcon-text); text-align: left; cursor: pointer; font: inherit; font-size: 13px; }
-.panel button:hover, .panel button:focus-visible { background: var(--falcon-hover); }
-@keyframes enter { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: translateY(0); } }
-@media (prefers-reduced-motion: reduce) { .panel { animation: none; } }
-@media (max-width: 480px) { .trigger span { display: none; } .trigger { padding: 0 10px; } }
+.trigger {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--landing-muted);
+  font-size: 13px;
+  white-space: nowrap;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+.trigger:is(:hover, [aria-expanded="true"]) {
+  background: var(--falcon-hover);
+  color: var(--landing-text);
+}
+.trigger svg { flex: none; }
+.chevron { opacity: .72; }
+
+.backdrop {
+  position: fixed;
+  z-index: 60;
+  inset: 0;
+  background: #08090ab8;
+}
+.wrapper {
+  position: fixed;
+  z-index: 61;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+.dialog {
+  --language-ink: #f7f8f8;
+  --language-muted: #a0a1a8;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(360px, 100%);
+  max-height: calc(100dvh - 32px);
+  margin: 0;
+  border: 1px solid #38393e;
+  border-radius: 12px;
+  background: #141517;
+  color: var(--language-ink);
+  box-shadow: 0 16px 56px #0009;
+  font-family: var(--font-geist-sans), Arial, sans-serif;
+  color-scheme: dark;
+  overflow: hidden;
+}
+.dialog:focus { outline: none; }
+.header {
+  margin: 0;
+  padding: 17px 60px 12px 20px;
+  font-size: 17px;
+  font-weight: 550;
+  line-height: 1.35;
+  letter-spacing: -.015em;
+}
+.close {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--language-muted);
+}
+.close:hover { color: var(--language-ink); }
+.close:focus-visible {
+  outline: 1px solid var(--language-muted);
+  outline-offset: -4px;
+}
+.body { min-height: 0; padding: 0 10px 10px; overflow-y: auto; }
+.listbox { padding: 0; }
+.options {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--language-ink);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 130ms ease;
+}
+.option[data-hover="true"] { background: #232429; }
+.option[data-focus-visible="true"] {
+  outline: 1px solid var(--language-muted);
+  outline-offset: -2px;
+}
+.label { flex: 1; font-size: inherit; }
+.code {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 29px;
+  height: 24px;
+  border: 1px solid #38393e;
+  border-radius: 6px;
+  color: var(--language-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .025em;
+}
+.check { flex: none; width: 16px; height: 16px; color: var(--language-ink); }
+@media (max-width: 480px) {
+  .trigger span, .chevron { display: none; }
+  .trigger { width: 44px; padding: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .trigger, .option { transition: none; }
+}

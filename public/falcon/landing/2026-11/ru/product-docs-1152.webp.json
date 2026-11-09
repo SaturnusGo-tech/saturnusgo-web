@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "origin": "isolated-local-fixture",
+  "sourceComponent": "app/src/modules/core-tms/product-docs/presentation/ProductDocsView.tsx",
+  "fixture": "Synthetic Booking QA workspace, release readiness article, Mermaid diagram and linked cases",
+  "capturedAt": "2026-11-09T20:06:04.235641Z",
+  "releaseSha": "c10c59397e2e46c846ab8015bfc008a92d904479",
+  "locale": "ru",
+  "uiLocale": "ru",
+  "contentLanguage": "ru",
+  "viewport": {
+    "width": 720,
+    "height": 535,
+    "deviceScaleFactor": 2
+  },
+  "image": {
+    "width": 1152,
+    "height": 856
+  },
+  "rawSha256": "a5de5ff3bfd68455a10b6173463bb8cbf36c023ca1f2e0e6b2ab7ffb4ae85324",
+  "finalSha256": "1668b7978db6e1f90cc268cc4e288dd8a3b877f921a88b44c3109e5e05e77ae0",
+  "encoding": {
+    "format": "webp",
+    "encoder": "cwebp",
+    "quality": 90,
+    "method": 6,
+    "resized": true,
+    "cropped": false
+  }
+}

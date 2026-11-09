@@ -6,11 +6,14 @@ import { releaseSmokeFigure } from "./figures/release-smoke-figure";
 export const productDocAuthoring: DocArticle = {
   id: "product-docs-authoring",
   title: "Create and publish a product page",
-  description: "Organize product rules, prepare a page for publication, and trace a test case or run back to the rule it uses.",
+  description: "Write a product rule, review it with your team, and trace the checks and evidence behind a release decision.",
   group: "product-docs",
-  keywords: ["documentation", "article", "requirements", "product rules", "draft", "version history", "marker", "Codex"],
-  related: ["codex-prompts-product-docs", "create-test-case", "execute-run"],
+  keywords: ["documentation", "article", "requirements", "product rules", "draft", "version history", "marker", "Mermaid", "dashboard snapshot", "Codex"],
+  related: ["codex-prompts-product-docs", "create-test-case", "execute-run", "dashboard"],
   sections: [
+    section("release-workflow", "From a product rule to a release decision",
+      paragraph("**Write the rule → Review and publish → Link cases → Run checks → Share the evidence.**"),
+      paragraph("Follow one example through Falcon. Write a rule for changing a booking, review the decision boundary, and link each case to the section it covers. The run keeps the version it tested. In the release summary, attach its results and record the decision so the team can see what passed, what failed, and what is still open.")),
     section("create-page", "Create a page",
       paragraph("Use **Documentation** for product rules and QA procedures. A page can hold the business rule, examples and evidence expectations. A case describes how to verify one scenario."),
       paragraph("Start in the project that owns the behavior and its test cases. In the Booking QA example, **Bookings** contains pages about reservations, **Roles and access** contains permission rules, and **Release verification** contains checklists. Keep the rule in one place and link each relevant case to that page."),
@@ -110,6 +113,17 @@ export const productDocAuthoring: DocArticle = {
         ["Check which rule was tested", "Look for the published article version pinned by the run. If the run has no pin for this article, the card says so. Select the run title to see the current results and individual checks."],
       ),
       paragraph("A saved card keeps its original results. To report a later set of results, insert a new snapshot and publish a new article version. With Codex, ask it to insert a snapshot of the named run into the release summary, include the pinned version when available, and save the draft for review.")),
+    section("diagram-dashboard", "Show the flow and the release metrics",
+      paragraph("Type `/` in the article and choose **Diagram**. Paste the Mermaid example below into the block. It shows the same cutoff as the case matrix. For a draft you describe in words, use **Generate** when it is available, then check the labels and branches against the published rule."),
+      code("mermaid", "Rescheduling decision · paste into a Diagram block", `flowchart LR
+  A[Confirmed booking] --> B{At least 48 hours left?}
+  B -->|Yes| C[Choose new dates]
+  B -->|No| D[Contact Support]`),
+      paragraph("In the release summary, choose **Insert → Dashboard**. Pick the period and the widget that answers the release question, then choose **Add dashboard**. For example, use **Run outcomes** to show the distribution of results for the selected period."),
+      table(["View", "What it tells the team"],
+        ["Snapshot", "Shows the widget data captured when it was inserted. Use it to explain the release decision later."],
+        ["Current", "Fetches current project data for the selected widget and period. Use it to check what has changed since the summary was written."],
+      )),
     section("troubleshoot", "Resolve access, links and versions",
       table(["What you see", "What to check"],
         ["A page is missing from Add page", "Confirm that the case and page are in the same project and the page is published. Search for a distinctive word from its title. If you still cannot open it from Docs, ask someone with project access to confirm its location and your access."],

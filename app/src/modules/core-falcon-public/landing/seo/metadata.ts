@@ -29,7 +29,7 @@ export function falconStructuredData(locale: LandingLocale) {
     {'@type':'SoftwareApplication','@id':`${FALCON_ORIGIN}/#software`,name:'Falcon TMS',alternateName:'Falcon',
       url:`${FALCON_ORIGIN}/`,applicationCategory:'DeveloperApplication',operatingSystem:'Web browser, macOS, Windows',
       description:copy.description,image:`${FALCON_ORIGIN}${falconProductImage('repository', locale).src}`,
-      featureList:['Test case repository','Shared test steps','Test runs and results','Defect tracking','Release readiness','API testing'],
+      featureList:['Product documentation','Test case repository','Shared test steps','Test runs and results','Defect tracking','Release readiness','API testing'],
       creator:{'@type':'Person',name:'Mercury Rucks'},sameAs:['https://t.me/falcon_tms']},
   ]};
 }

@@ -26,12 +26,14 @@ export function FalconDirection() {
   const ru = locale === 'ru';
   const plansLabel = ru ? 'Тарифы' : 'Plans';
   const open = `/cloud-login/?lang=${locale}`;
+  const docsGuidePath = '?article=product-docs-authoring';
+  const guideLocales = ru ? ['ru', 'en'] as const : ['en', 'ru'] as const;
   const navigation = [
     [c.product, '#repository'],
+    [c.documentation.nav, '#documentation'],
     [c.integrations, '#falcon-ai'],
     [plansLabel, '#plans'],
     [c.resources, '#resources'],
-    [c.contact, '#contact'],
   ] as const;
   return <div className={styles.page} lang={locale}>
     <a href="#main-content" className={styles.skipLink}>{c.skip}</a>
@@ -82,6 +84,38 @@ export function FalconDirection() {
             <p><ResponsiveCopy desktop={item.body} phone={phone.principles[i].body} /></p>
           </article>)}
         </div>
+      </section>
+      <section id="documentation" className={styles.chapter} aria-labelledby="documentation-title">
+        <div className={styles.chapterHeading}>
+          <h2 id="documentation-title">{c.documentation.title}</h2>
+          <div>
+            <p>{c.documentation.body}</p>
+            <div className={styles.documentationLinks}>
+              {guideLocales.map(language => <a
+                key={language}
+                className={styles.textLink}
+                href={`${language === 'ru' ? '/ru/docs/' : '/docs/'}${docsGuidePath}`}
+                hrefLang={language}
+              >
+                {c.documentation.guides[language]}<ArrowRight size={16} aria-hidden="true" />
+              </a>)}
+            </div>
+          </div>
+        </div>
+        <figure className={styles.documentationScene}>
+          <picture>
+            <source media="(max-width: 760px)" srcSet={`/falcon/landing/2026-11/${locale}/product-docs-1152.webp`} />
+            <img
+              src={`/falcon/landing/2026-11/${locale}/product-docs.webp`}
+              width={2000}
+              height={900}
+              alt={c.documentation.alt}
+              loading="lazy"
+              decoding="async"
+            />
+          </picture>
+          <figcaption>{c.documentation.caption}</figcaption>
+        </figure>
       </section>
       <section id="repository" className={styles.chapter} aria-labelledby="repository-title">
         <div className={styles.chapterHeading}>
@@ -141,17 +175,17 @@ export function FalconDirection() {
           <nav className={styles.footerGroup} aria-labelledby="footer-product">
             <h2 id="footer-product">{c.product}</h2>
             <ul>
+              <li><a href="#documentation">{c.documentation.nav}</a></li>
               <li><a href="#repository">{c.cases}</a></li>
               <li><a href="#execution">{c.runs}</a></li>
               <li><a href="#falcon-ai">{c.integrations}</a></li>
               <li><a href="#plans">{plansLabel}</a></li>
             </ul>
           </nav>
-          <nav id="contact" className={styles.footerGroup} aria-labelledby="footer-resources">
+          <nav className={styles.footerGroup} aria-labelledby="footer-resources">
             <h2 id="footer-resources">{c.resources}</h2>
             <ul>
               <li><a href={docs}>{c.docs}</a></li>
-              <li><a href="mailto:falcon@saturnusgo.com">{c.contact}</a></li>
               <li><a href="https://t.me/falcon_tms">Telegram</a></li>
             </ul>
           </nav>

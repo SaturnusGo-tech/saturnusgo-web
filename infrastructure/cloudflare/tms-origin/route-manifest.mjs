@@ -76,6 +76,8 @@ export const requiredPublicAssets = Object.freeze([
   ...["repository", "suites", "dashboard", "run", "integrations", "codex"].map((id) => `/falcon/landing/2026-11/product-${id}.webp`),
   ...["en", "ru"].flatMap((locale) => ["repository", "suites", "dashboard", "run", "integrations", "codex"]
     .map((id) => `/falcon/landing/2026-11/${locale}/product-${id}.webp`)),
+  ...["en", "ru"].flatMap((locale) => ["docs", "docs-1152"]
+    .map((id) => `/falcon/landing/2026-11/${locale}/product-${id}.webp`)),
   ...["Regular", "RegularItalic", "Medium", "Semibold", "Bold"].map((weight) => `/falcon/docs/fonts/OpenAISans-${weight}.woff2`),
   "/assets/integrations/codex/codex-light.png",
   "/assets/integrations/codex/codex-dark.png",
