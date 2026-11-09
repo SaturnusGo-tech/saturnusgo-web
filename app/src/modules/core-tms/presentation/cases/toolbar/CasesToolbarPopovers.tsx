@@ -29,7 +29,7 @@ const repositoryValueIcons: Record<string, LucideIcon> = {
 
 type FilterProps = {
   customSectionsOnly?: boolean; extraSections?: ExtraFilterSection[]; onResetExtra?: () => void;
-  repositoryTrigger?: RefObject<HTMLButtonElement>; tags?: string[];
+  repositoryTrigger?: RefObject<HTMLButtonElement>; tags?: string[]; panelId?: string; overlayLayer?: number; portalContainer?: HTMLElement;
   locale: TmsLocale; filters: CaseFilters; facets: CaseFacetFilters; options: CaseFacetOptions;
   onFilters: (value: CaseFilters) => void; onFacets: (value: CaseFacetFilters) => void; onClose: () => void;
 };
@@ -68,10 +68,10 @@ export function CaseFilterMenu(props: FilterProps) {
     { id: "tag", label: labels.tag, icon: <Tags size={16} />, active: !!props.filters.tag.trim(), summary: "" },
   ] : [])];
   const categoryQuery = categorySearch.trim().toLocaleLowerCase();
-  const categories = repository
-    ? navigation.filter(item => item.label.toLocaleLowerCase().includes(categoryQuery))
-      .sort((a, b) => repositoryOrder.indexOf(a.id) - repositoryOrder.indexOf(b.id))
-    : navigation;
+  const categories = repository ? navigation.filter(item => item.label.toLocaleLowerCase().includes(categoryQuery)) : navigation;
+  if (repository && !props.customSectionsOnly) {
+    categories.sort((a, b) => repositoryOrder.indexOf(a.id) - repositoryOrder.indexOf(b.id));
+  }
   const section = categories.some(item => item.id === requestedSection) ? requestedSection : repository ? "" : categories[0]?.id ?? "";
   const current = navigation.find(item => item.id === section);
   useFilterPopup(panelRef, props.onClose);
@@ -122,7 +122,7 @@ export function CaseFilterMenu(props: FilterProps) {
       icon: section === "priority" && value !== "all" ? <PriorityIcon level={value as PriorityLevel} empty="circle" size={14} />
         : ValueIcon && <ValueIcon size={14} strokeWidth={2.5} className={styles.tone} data-value={value} aria-hidden="true" /> };
   });
-  if (props.repositoryTrigger) return <RepositoryFilterPicker ru={ru} categories={categories} section={section}
+  if (props.repositoryTrigger) return <RepositoryFilterPicker ru={ru} panelId={props.panelId} layer={props.overlayLayer} portalContainer={props.portalContainer} categories={categories} section={section}
     categorySearch={categorySearch} search={search} filters={props.filters} trigger={props.repositoryTrigger}
     extra={extra?.render()} values={valueOptions} multiple={multiple} onChoose={choose}
     hasActive={navigation.some(item => item.active) || props.filters.includeArchived}

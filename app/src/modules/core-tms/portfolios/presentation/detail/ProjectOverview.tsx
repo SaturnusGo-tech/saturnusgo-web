@@ -9,7 +9,7 @@ import { InlineProjectPortfolio } from "../inline/project/InlineProjectPortfolio
 import type { ReactNode } from "react";
 import { PiFolderSimpleDuotone } from "react-icons/pi";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
-import { ResponsiblePicker } from "../../../workspace/members/presentation/ResponsiblePicker";
+import { PropertyIdentityField } from "../../../presentation/common/properties/metadata/identity/PropertyIdentityField";
 import { FormError } from "../../../presentation/common/error/FormError";
 import type { PortfolioCopy } from "../../model/copy";
 import type { usePortfoliosView } from "../../state/view/usePortfoliosView";
@@ -52,7 +52,7 @@ export function ProjectOverview({ navigation, state, projectId, workspaceId, can
         <aside className={styles.sidebar} aria-label={copy.properties}><dl>
         <dt>{organizationCopy(locale).phase}</dt><dd><WorkflowSelect value={project.workflowPhase ?? "new"} disabled={management.disabled} onChange={(workflowPhase) => void management.save({ workflowPhase })} /></dd>
         <dt>{copy.portfolio}</dt><dd><InlineProjectPortfolio workspaceId={workspaceId} value={project.portfolioId ?? null} name={portfolio?.name} disabled={management.disabled} copy={copy} onChange={portfolioId => void management.save({ portfolioId })} /></dd>
-        <dt>{copy.responsible}</dt><dd><div className={styles.inlineResponsible}><ResponsiblePicker workspaceId={workspaceId} value={project.responsibleIdentityId ?? null} disabled={management.disabled} onChange={responsibleIdentityId => void management.save({ responsibleIdentityId })} /></div></dd>
+        <dt>{copy.responsible}</dt><dd><div className={styles.inlineResponsible}><PropertyIdentityField workspaceId={workspaceId} locale={locale} value={project.responsibleIdentityId ?? null} disabled={management.disabled} onChange={responsibleIdentityId => void management.save({ responsibleIdentityId })} /></div></dd>
         <dt>{copy.key}</dt><dd><code>{project.key}</code></dd>
         {project.createdAt && <><dt>{copy.created}</dt><dd>{new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(project.createdAt))}</dd></>}
       </dl><ResourceFeedback loading={state.portfolio.loading} error={state.portfolio.error} retry={state.portfolio.reload} copy={copy} /></aside>

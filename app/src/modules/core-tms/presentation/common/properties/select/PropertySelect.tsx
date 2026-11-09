@@ -23,7 +23,7 @@ export function PropertyValue({ label, children, compact, disabled, onEdit }: Va
 
 export function PropertyPopover({
   label, triggerLabel, trigger, open, onOpenChange, compact, disabled, autoFocus, invalid, errorId, children, onMenuKeyDown,
-  placement = "bottom-start", narrow,
+  placement = "bottom-start", narrow, portalContainer, menuClassName,
 }: {
   label: string;
   triggerLabel?: string;
@@ -39,11 +39,13 @@ export function PropertyPopover({
   onMenuKeyDown?: (event: KeyboardEvent<HTMLElement>) => void;
   placement?: PopoverProps["placement"];
   narrow?: boolean;
+  portalContainer?: HTMLElement;
+  menuClassName?: string;
 }) {
   const button = useRef<HTMLButtonElement>(null);
   // HeroUI’s retained exit can flash at full opacity just before unmounting.
   return <Popover disableAnimation placement={placement} offset={4} isOpen={open && !disabled} onOpenChange={onOpenChange}
-    shouldBlockScroll={false} classNames={{ base: styles.positioner, content: narrow ? `${styles.popover} ${styles.narrowMenu}` : styles.popover }}>
+    shouldBlockScroll={false} portalContainer={portalContainer} classNames={{ base: styles.positioner, content: [styles.popover, narrow && styles.narrowMenu, menuClassName].filter(Boolean).join(" ") }}>
     <PopoverTrigger><Button ref={button} type="button" variant="light" className={styles.trigger}
       autoFocus={autoFocus} isDisabled={disabled} data-compact={compact || undefined} aria-label={triggerLabel ?? label}
       aria-invalid={invalid || undefined} aria-describedby={errorId}>{trigger}</Button></PopoverTrigger>
@@ -76,7 +78,7 @@ export function PropertySearch({ label, value, onChange, disabled, maxLength }: 
 export type PropertyOption<K extends string> = { value: K; label: string; icon?: ReactNode; shortcut?: string };
 
 export function PropertySelect<K extends string>({
-  locale, label, searchLabel, value, options, onChange, disabled, compact, autoFocus, autoOpen, onRequestEdit, displayValue, triggerLabel,
+  locale, label, searchLabel, value, options, onChange, disabled, compact, autoFocus, autoOpen, onRequestEdit, displayValue, triggerLabel, menuClassName,
 }: {
   locale: TmsLocale;
   label: string;
@@ -91,6 +93,7 @@ export function PropertySelect<K extends string>({
   onRequestEdit?: () => void;
   displayValue?: ReactNode;
   triggerLabel?: string;
+  menuClassName?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -117,7 +120,7 @@ export function PropertySelect<K extends string>({
   };
   const search = query.trim().toLocaleLowerCase(locale);
   return <PropertyPopover label={label} triggerLabel={name} trigger={trigger} compact={compact} disabled={disabled}
-    autoFocus={autoFocus} open={open} onOpenChange={setMenu} onMenuKeyDown={(event) => {
+    autoFocus={autoFocus} open={open} onOpenChange={setMenu} menuClassName={menuClassName} onMenuKeyDown={(event) => {
       if (query || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
       const match = options.find((option) => option.shortcut === event.key);
       if (!match) return;

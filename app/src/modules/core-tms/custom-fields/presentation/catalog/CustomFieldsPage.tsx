@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { Plus, Search } from "lucide-react";
+import { Button, Tooltip } from "@heroui/react";
+import { Pencil, Plus, Search } from "lucide-react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { customFieldError } from "../../application/field-errors";
 import { customFieldLabel } from "../../application/field-labels";
 import type { CustomFieldDefinition, CustomFieldScope } from "../../model/custom-field";
 import { useCustomFieldCatalog } from "../../state/catalog/useCustomFieldCatalog";
 import { useCustomFieldWrite } from "../../state/catalog/useCustomFieldWrite";
-import { FieldRowMenu } from "../shared/FieldRowMenu";
 import { FieldToggle } from "../shared/FieldToggle";
 import { CustomFieldEditor } from "../editor/CustomFieldEditor";
 import css from "../shared/customFields.module.css";
@@ -20,10 +20,6 @@ export function CustomFieldsPage({ workspaceId, projectId, canManageFields, canM
   async function required(field: CustomFieldDefinition, required: boolean) {
     if (!manageable) return;
     const saved = await write.save({ name: field.name, identifier: field.identifier, type: field.type, multiple: field.multiple, required }, field);
-    if (saved) page.refresh();
-  }
-  async function transition(field: CustomFieldDefinition) {
-    if (!manageable) return; const saved = await write.transition(field, field.archivedAt ? "restore" : "archive");
     if (saved) page.refresh();
   }
   if (editing) return <CustomFieldEditor key={editing === "new" ? "new" : `${editing.id}:${editing.rowVersion}`} field={editing === "new" ? null : editing}
@@ -49,8 +45,11 @@ export function CustomFieldsPage({ workspaceId, projectId, canManageFields, canM
               label={`${ru ? "Обязательное поле" : "Required field"}: ${customFieldLabel(field, ru)}`} /></td>
             <td className={css.updated}>{new Date(field.updatedAt).toLocaleString(languageTag, { dateStyle: "short", timeStyle: "short" })}</td>
             <td><span className={css.by} title={field.updatedBy?.displayName}>{field.updatedBy?.displayName ?? "Falcon"}</span></td>
-            <td>{manageable && <FieldRowMenu ru={ru} name={field.name} archived={Boolean(field.archivedAt)} disabled={write.pending} canArchive={!field.systemKey}
-              onEdit={() => setEditing(field)} onTransition={() => void transition(field)} />}</td>
+            <td>{manageable && <Tooltip content={ru ? "Изменить поле" : "Edit field"} delay={250} closeDelay={0}>
+              <Button type="button" size="sm" isIconOnly variant="light" disableRipple className={css.icon}
+                isDisabled={write.pending} aria-label={`${ru ? "Изменить поле" : "Edit field"}: ${customFieldLabel(field, ru)}`}
+                onPress={() => { write.clearError(); setEditing(field); }}><Pencil size={15} aria-hidden="true" /></Button>
+            </Tooltip>}</td>
           </tr>)}</tbody>
         </table>
         {!page.items.length && !page.failure && <p className={css.empty}>{!connected ? (ru ? "Для справочника требуется подключение." : "Connect to manage custom fields.")

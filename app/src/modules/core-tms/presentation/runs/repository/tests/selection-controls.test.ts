@@ -4,6 +4,7 @@ import type { RunRepositoryBrowser } from "../RunRepositoryBrowser";
 import type { RunRepositoryHeader } from "../header/RunRepositoryHeader";
 import { isWorkingRun } from "../../../../runs/model/history/run-history";
 import type { SelectionControls } from "../../../cases/selection/controls/SelectionControls";
+import type { RepositoryQueryControls } from "../../../cases/browser/controls/RepositoryQueryControls";
 import { componentHarness, invoke, nodes } from "../../../../portfolios/tests/support/component-harness";
 
 function browser() {
@@ -17,7 +18,7 @@ function browser() {
   const props = { model: { connection: "connected", data: { meta: { authorization: { capabilities: ["run:manage"] } }, workspace: { id: "w" } } },
     repository: { browser: { choices: [], ready: true }, rows: [], run: { status: "active" }, cases: [], visible: [{ id: "a" }, { id: "b" }],
       assignments: { selecting: false, selected: new Set(), toggleScope: (ids: string[]) => selected.push(ids) }, runFilters: { sections: [] },
-      filters: { filters: {} }, groups: [{ id: "p1", label: "Project one", cases: [{ id: "a" }] }, { id: "p2", label: "Project two", cases: [{ id: "b" }] }], lookup: new Map() },
+      filters: { filters: {}, options: { tags: [] } }, groups: [{ id: "p1", label: "Project one", cases: [{ id: "a" }] }, { id: "p2", label: "Project two", cases: [{ id: "b" }] }], lookup: new Map() },
     lifecycleBlocked: false } as unknown as Parameters<typeof RunRepositoryBrowser>[0];
   const all = () => nodes(h.render(() => render(props)));
   const headings = () => all().filter(node => node.type === "SelectionTree").flatMap(node => nodes(node.props.heading));
@@ -45,13 +46,41 @@ test("run selection commands stay mounted and inaccessible until selection mode 
   assert.ok(h.headings().filter(node => node.type === "button").every(node => node.props.disabled));
 });
 
-test("runs expose the selection toggle in repository controls and no refresh action", () => {
-  const h = browser(); assert.ok(h.all().filter(node => node.type === "SelectionTree").every(node => node.props.titleMode === "marquee")); const controls = h.all().find(node => node.type === "SelectionControls")!;
-  assert.equal(controls.props.repository, true); assert.equal(controls.props.onSelectAll, undefined);
-  const action = nodes(controls.props.action).find(node => node.type === "button")!;
-  assert.equal(action.props["aria-label"], "Select test cases");
-  assert.equal(controls.props.tools, undefined);
+test("run selection is the trailing group action, separate from the shared repository query controls", () => {
+  const h = browser();
+  assert.ok(h.all().filter(node => node.type === "SelectionTree").every(node => node.props.titleMode === "marquee"));
+  const controls = h.all().find(node => node.type === "RepositoryQueryControls")!;
+  assert.equal(controls.props.compact, true);
+  assert.equal(controls.props.customSectionsOnly, true);
+  assert.equal(controls.props.action, undefined);
+  const actions = h.headings().filter(node => node.props["aria-label"] === "Select test cases");
+  assert.equal(actions.length, 1);
+  assert.equal(actions[0].props.children, "Select");
+  h.props.repository.assignments.selecting = true;
+  assert.equal(h.headings().find(node => node.props["aria-label"] === "Select test cases")?.props.children, "Done");
   assert.equal(h.all().some(node => node.props["aria-label"] === "Refresh"), false);
+});
+
+test("the shared repository search closes QL while showing the HeroUI filters, and vice versa", () => {
+  const h = componentHarness(undefined, { requestAnimationFrame() {} });
+  const { RepositoryQueryControls: render } = h.load<{ RepositoryQueryControls: typeof RepositoryQueryControls }>(
+    new URL("../../../cases/browser/controls/RepositoryQueryControls.tsx", import.meta.url), name => {
+      if (name.endsWith("case-field-filters")) return { fieldFilterCount: () => 0 };
+      return undefined;
+    });
+  const props = { locale: "en", query: "", qlQuery: "key:HOST-1", tags: [], directory: { items: [] },
+    facets: { folders: [], components: [] }, options: { folders: [], components: [] }, filterOpen: false,
+    filters: { type: "all", priority: "all", lifecycle: "all", tag: "", includeArchived: false },
+    onFilterOpen(value: boolean) { props.filterOpen = value; } } as unknown as Parameters<typeof render>[0];
+  const view = () => nodes(h.render(() => render(props)));
+  assert.equal(view().find(node => node.type === "QlDisclosure")?.props.open, true);
+  invoke(view().find(node => node.type === "Popover")!, "onOpenChange", true);
+  assert.ok(view().some(node => node.type === "CaseFilterMenu"));
+  assert.ok(!view().some(node => node.type === "CaseQlAutocomplete"));
+  invoke(view().find(node => node.props["aria-label"] === "QL query")!, "onPress");
+  assert.ok(!view().some(node => node.type === "CaseFilterMenu"));
+  assert.equal(view().find(node => node.type === "QlDisclosure")?.props.open, true);
+  assert.equal(props.qlQuery, "key:HOST-1");
 });
 
 test("repository control placement preserves run-creation and suite selection actions", () => {
@@ -77,13 +106,13 @@ test("same-scope background reload keeps repository trees and active identity mo
   const all = h.all(), trees = all.filter(node => node.type === "SelectionTree");
   assert.equal(trees.length, 2, "the confirmed folder trees must survive a background reload");
   assert.equal(all.some(node => node.type === "RunCasesSkeleton"), false);
-  assert.equal(all.find(node => node.type === "SelectionControls")?.props.disabled, true);
+  assert.equal(all.find(node => node.type === "RepositoryQueryControls")?.props.disabled, true);
   assert.equal(all.find(node => node.type === "RunRepositoryHeader")?.props.disabled, false, "run navigation remains available during a read refresh");
   assert.equal(all.find(node => node.type === "RunRepositoryHeader")?.props.actionsDisabled, true);
   assert.ok(trees.every(node => node.props.disabled && node.props.activeId === "b"));
   h.props.repository.browser.loading = false; h.props.repository.browser.ready = false;
   assert.equal(h.all().filter(node => node.type === "SelectionTree").length, 2);
-  assert.equal(h.all().find(node => node.type === "SelectionControls")?.props.disabled, true, "the revision changes before its loading effect runs");
+  assert.equal(h.all().find(node => node.type === "RepositoryQueryControls")?.props.disabled, true, "the revision changes before its loading effect runs");
 });
 
 test("initial repository load uses skeleton without an empty-state flash", () => {
@@ -109,7 +138,7 @@ test("failed repository reads keep the run chooser and creation available while 
   assert.equal(header.props.onEdit, undefined);
   invoke(header, "onChoose", "other"); invoke(header, "onCreate");
   assert.deepEqual(chosen, ["project:p2", "run:other", "item:null"]); assert.equal(created, 1);
-  assert.equal(all.find(node => node.type === "SelectionControls")?.props.disabled, true);
+  assert.equal(all.find(node => node.type === "RepositoryQueryControls")?.props.disabled, true);
   assert.ok(all.filter(node => node.type === "SelectionTree").every(node => node.props.disabled));
 });
 
@@ -140,4 +169,20 @@ test("impact approval blocks starting a draft but permits resuming a paused run"
   };
   assert.equal(lifecycleButton("draft", "Start run"), true);
   assert.equal(lifecycleButton("paused", "Resume run"), false);
+});
+
+test("the HeroUI run filter forwards selection, deselection and All without replacing the run filter state", () => {
+  const h = componentHarness();
+  const { RunFilterOptions: render } = h.load<typeof import("../../filters/options/RunFilterOptions")>(
+    new URL("../../filters/options/RunFilterOptions.tsx", import.meta.url));
+  const changed: string[] = [];
+  const options = [{ value: "all", label: "All" }, { value: "passed", label: "Passed" }, { value: "failed", label: "Failed" }];
+  const choose = (selected: string[], keys: string[]) => invoke(
+    nodes(h.render(() => render({ label: "Results", popover: true, multiple: true, options, selected,
+      onChange: value => changed.push(value) }))).find(node => node.type === "Listbox")!,
+    "onSelectionChange", new Set(keys));
+  choose(["all"], ["all", "passed"]);
+  choose(["passed", "failed"], ["failed"]);
+  choose(["failed"], ["all", "failed"]);
+  assert.deepEqual(changed, ["passed", "passed", "all"]);
 });

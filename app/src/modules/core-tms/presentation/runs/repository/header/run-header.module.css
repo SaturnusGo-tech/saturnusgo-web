@@ -14,9 +14,19 @@
 
 .newRun:hover:not(:disabled){background:var(--falcon-action-hover)}
 .menu{max-height:min(560px,65dvh);overflow-y:auto;scrollbar-width:thin}
-.search{display:flex;align-items:center;gap:7px;margin:3px 3px 7px;padding:6px 8px;border:1px solid var(--falcon-border-subtle);border-radius:9px;color:var(--falcon-text-muted)}
-.search input{appearance:none;-webkit-appearance:none;width:100%;min-width:0;min-height:0;margin:0;border:0!important;border-radius:0;outline:0!important;box-shadow:none!important;padding:0;background:transparent!important;color:var(--falcon-text);font:inherit;font-size:12px}
-.search:focus-within{border-color:var(--falcon-action)}
+.search[data-input-shell] {
+  --tms-focus-border: transparent;
+  --tms-focus-ring: transparent;
+  margin: 3px 3px 7px;
+  border: 1px solid var(--falcon-border-subtle);
+  border-radius: 9px;
+  color: var(--falcon-text-muted);
+}
+.search[data-input-shell]:focus-within { border-color: var(--falcon-icon-muted); }
+.search .searchControl { display: flex; align-items: center; height: 32px; min-height: 32px; padding: 0 8px; border: 0; border-radius: inherit; background: transparent; box-shadow: none; }
+.search .searchInner { display: flex; align-items: center; gap: 7px; width: 100%; min-width: 0; }
+.searchInner svg { flex: none; }
+.search .searchInput, .search .searchInput:focus-visible { appearance: none; width: 100%; min-width: 0; margin: 0; border: 0; outline: 0; box-shadow: none; padding: 0; background: transparent; color: var(--falcon-text); font: inherit; font-size: 12px; }
 .archiveToggle{display:flex;align-items:center;gap:6px;width:100%;padding:10px 8px;border:0;border-top:1px solid var(--falcon-border-subtle);border-radius:8px;background:transparent;color:var(--falcon-text);font:inherit;font-size:12px;text-align:left}
 .archiveToggle:hover,.archiveToggle:focus-visible{background:var(--falcon-hover)}
 .archiveToggle small{margin-left:auto;color:var(--falcon-text-muted)}
@@ -24,9 +34,10 @@
 .archiveList{animation:appear .16s ease-out}.empty{margin:0;padding:8px;color:var(--falcon-text-muted);font-size:12px}
 @media(prefers-reduced-motion:reduce){.archiveToggle svg{transition:none}.archiveList{animation:none}}
 
-.choices{max-height:230px;overflow-y:auto;scrollbar-width:thin;padding:4px 2px}
+.choices{display:grid;gap:2px;max-height:230px;overflow-y:auto;scrollbar-width:thin;padding:4px 2px}
 .choice{display:flex;align-items:center;gap:4px;min-height:32px;padding-right:8px;border-radius:7px;color:var(--falcon-text)}
-.choice:hover,.choice:focus-within,.choice[data-selected=true]{background:var(--falcon-hover)}
+.choice:hover,.menu:not(:has(.choice:hover)) .choice:focus-within{background:var(--falcon-hover)}
+.menu:not(:has(.choice:is(:hover,:focus-within))) .choice[data-selected=true]{background:var(--falcon-selected)}
 .choice[data-selected=true]{color:var(--falcon-action)}.choice>svg{flex-shrink:0}
 .choose{flex:1;min-width:0;display:flex;align-items:center;padding:6px 8px;border:0;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer;border-radius:7px}
 .choose>span{min-width:0;overflow:hidden;text-overflow:ellipsis}.choose small{display:block;font-size:10px;color:var(--falcon-text-muted);overflow:hidden;text-overflow:ellipsis}

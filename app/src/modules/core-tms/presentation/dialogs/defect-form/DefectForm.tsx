@@ -1,3 +1,4 @@
+import { Input } from "@heroui/react";
 import { LoaderCircle } from "lucide-react";
 import { useEffect, useId, useRef, useState, type FormEvent, type MutableRefObject } from "react";
 import { DefectPageHost } from "./page/DefectPageHost";
@@ -51,11 +52,11 @@ export function DefectForm(props: Props) {
       ref={element => { if (element) element.inert = closing || submitting; }}>
       <div className={css.body}>
         <div className={css.titleField}>
-          <label className={css.srOnly} htmlFor={`${id}-title`}>{copy.summary}</label>
-          <input id={`${id}-title`} ref={titleRef} data-autofocus data-testid="defect-title" autoFocus
-            value={value.title} onChange={event => onChange({ title: event.target.value })}
+          <Input id={`${id}-title`} ref={titleRef} data-autofocus data-testid="defect-title" autoFocus
+            aria-label={copy.summary} value={value.title} onValueChange={title => onChange({ title })}
+            classNames={{ inputWrapper: `${css.fieldShell} ${css.titleShell}`, input: `${css.fieldInput} ${css.titleInput}` }}
             placeholder={ru ? "Название дефекта" : "Defect title"} aria-required="true"
-            aria-invalid={Boolean(errors.title)} aria-describedby={errors.title ? `${id}-title-error` : undefined} />
+            isInvalid={Boolean(errors.title)} aria-describedby={errors.title ? `${id}-title-error` : undefined} />
           {errors.title && <small id={`${id}-title-error`} className={css.validation} role="alert">{errors.title}</small>}
         </div>
         <div className={css.layout}>

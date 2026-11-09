@@ -2,9 +2,12 @@
 .platform { min-width: 0; display: grid; gap: 8px; }
 .platform h3 { margin: 0; font-size: 14px; font-weight: 600; line-height: 1.4; }
 .field { display: grid; min-width: 0; gap: 5px; font-size: 13px; }
-.field > span { color: var(--falcon-text-muted); }
-.field > input { min-width: 0; width: 100%; border: 1px solid var(--falcon-border); border-radius: 9px; padding: 8px 10px; color: inherit; background: transparent; font: inherit; outline: none; }
-.field > input:focus { border-color: var(--falcon-focus); box-shadow: 0 0 0 2px color-mix(in srgb, var(--falcon-focus) 16%, transparent); }
+.field .label { position: static; padding: 0; transform: none; color: var(--falcon-text-muted); font-size: 12px; font-weight: 500; }
+.field .control, .field .control:hover { display: flex; align-items: center; min-height: 34px; padding: 7px 10px; border: 1px solid var(--falcon-border); border-radius: 9px; background: var(--falcon-control); box-shadow: none; }
+.field .inner { width: 100%; min-width: 0; }
+.field .control:focus-within { border-color: var(--falcon-icon-muted); }
+.field .input, .field .input:focus { box-sizing: border-box; width: 100%; min-width: 0; padding: 0; border: 0; outline: 0; box-shadow: none; background: transparent; color: inherit; font: inherit; }
+.projectOptions { border: 1px solid var(--falcon-border); border-radius: 10px; background: var(--falcon-elevated); color: var(--falcon-text); box-shadow: var(--falcon-shadow-popover); }
 .upload { min-width: 0; display: grid; justify-items: start; gap: 8px; }
 .fileInput { display: none; }
 .uploadButton, .retry { display: inline-flex; align-items: center; justify-content: center; gap: 5px; border: 1px solid var(--falcon-border); border-radius: 9px; background: transparent; color: inherit; padding: 7px 10px; cursor: pointer; font: inherit; font-size: 12px; }
@@ -13,7 +16,7 @@
 .uploadButton:disabled, .retry:disabled, .filename button:disabled { opacity: .5; cursor: default; }
 .filename { width: 100%; min-width: 0; display: flex; align-items: center; gap: 6px; font-size: 12px; }
 .filename span { min-width: 0; overflow-wrap: anywhere; flex: 1; }
-.filename button { display: inline-flex; padding: 4px; background: transparent; color: var(--falcon-text-muted); border: 0; cursor: pointer; }
+.filename button { display: inline-grid; place-items: center; min-width: 24px; width: 24px; height: 24px; padding: 0; background: transparent; color: var(--falcon-text-muted); border: 0; cursor: pointer; }
 .hint, .error { margin: 0; font-size: 11px; line-height: 1.45; overflow-wrap: anywhere; }
 .hint { color: var(--falcon-text-muted); }
 .error { color: var(--falcon-danger); }

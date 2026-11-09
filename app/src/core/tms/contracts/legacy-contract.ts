@@ -12,7 +12,7 @@ export type Project = {
   name: string;
   description?: string;
   testingPlan?: string;
-  workflowPhase?: "new" | "in_progress" | "in_review" | "done" | "on_hold";
+  workflowPhase?: components["schemas"]["OrganizationWorkflowPhase"];
   checklist?: readonly Readonly<{ id: string; text: string; completed: boolean }>[];
   status?: "active" | "archived";
   portfolioId?: string | null;

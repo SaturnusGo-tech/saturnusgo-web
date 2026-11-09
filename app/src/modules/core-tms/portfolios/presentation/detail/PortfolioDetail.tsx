@@ -9,7 +9,7 @@ import { InlineOrganizationMarkdown } from "../inline/InlineOrganizationMarkdown
 import { OrganizationHeaderSlot } from "../header/OrganizationHeaderSlot";
 import { PiArchive, PiPlus, PiArrowCounterClockwise } from "react-icons/pi";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
-import { ResponsiblePicker } from "../../../workspace/members/presentation/ResponsiblePicker";
+import { PropertyIdentityField } from "../../../presentation/common/properties/metadata/identity/PropertyIdentityField";
 import type { PortfolioCopy } from "../../model/copy";
 import type { usePortfoliosView } from "../../state/view/usePortfoliosView";
 import { CatalogTable } from "../catalog/CatalogTable";
@@ -49,7 +49,7 @@ export function PortfolioDetail({ actionsTargetId, state, workspaceId, canManage
         <ManagementFeedback state={management} />
         <aside className={styles.sidebar} aria-label={copy.properties}><dl>
         <dt>{organizationCopy(locale).phase}</dt><dd><WorkflowSelect value={portfolio.workflowPhase ?? "new"} disabled={management.disabled} onChange={(workflowPhase) => void management.save({ workflowPhase })} /></dd>
-      <dt>{copy.responsible}</dt><dd><div className={styles.inlineResponsible}><ResponsiblePicker workspaceId={workspaceId} value={portfolio.responsibleIdentityId} disabled={management.disabled} onChange={(responsibleIdentityId) => void management.save({ responsibleIdentityId })} /></div></dd>
+      <dt>{copy.responsible}</dt><dd><div className={styles.inlineResponsible}><PropertyIdentityField workspaceId={workspaceId} locale={locale} value={portfolio.responsibleIdentityId} disabled={management.disabled} onChange={(responsibleIdentityId) => void management.save({ responsibleIdentityId })} /></div></dd>
       <dt>{copy.projects}</dt><dd>{portfolio.projectCount}</dd>
       <dt>{copy.created}</dt><dd>{new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(portfolio.createdAt))}</dd>
     </dl></aside>

@@ -73,7 +73,20 @@
 .repositorySearch .searchControl:focus-within { border-color: var(--falcon-icon-muted); }
 .searchInner { display: flex; width: 100%; min-width: 0; align-items: center; gap: 7px; }
 .searchInner > svg { flex: none; color: var(--falcon-text-muted); }
-.repositorySearch .searchText { padding: 0; min-width: 0; color: var(--falcon-text); font: inherit; font-size: 12px; }
+.repositorySearch .searchText, .repositorySearch .searchText:focus-visible {
+  appearance: none;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  box-shadow: none;
+  background: transparent;
+  color: var(--falcon-text);
+  font: inherit;
+  font-size: 12px;
+}
 .searchText::placeholder { color: var(--falcon-text-secondary); }
 .searchText::-webkit-search-cancel-button { display: none; }
 .searchInner .searchClear {
@@ -84,7 +97,9 @@
   min-width: 22px;
   height: 22px;
   padding: 0;
+  border: 0;
   border-radius: 6px;
+  background: transparent;
   color: var(--falcon-text-secondary);
 }
 .searchInner .searchClear:hover { background: var(--falcon-hover); color: var(--falcon-text); }
@@ -111,3 +126,6 @@
 @media (forced-colors: active) {
   .repositorySearch .searchControl:focus-within { outline: 1px solid Highlight; }
 }
+
+.controls[data-compact] .searchControl { height: 32px; min-height: 32px; }
+.controls[data-compact] .repositoryTool { height: 30px; }

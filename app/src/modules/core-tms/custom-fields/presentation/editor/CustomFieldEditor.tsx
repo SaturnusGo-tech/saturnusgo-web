@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Button } from "@heroui/react";
+import { Archive, RotateCcw } from "lucide-react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { customFieldTypes, type CustomFieldDefinition, type CustomFieldDraft, type CustomFieldScope } from "../../model/custom-field";
 import { fieldDraftError } from "../../model/field-validation";
@@ -20,8 +22,16 @@ export function CustomFieldEditor({ field, scope, canManageFields, canManageValu
     if (readonly) return; const error = fieldDraftError(draft, ru); setValidation(error); if (error) return;
     const saved = await write.save({ ...draft, name: draft.name.trim() }, field); if (saved) onSaved(saved);
   }
+  async function transition() {
+    if (!field || field.systemKey || !canManageFields || write.pending) return;
+    const saved = await write.transition(field, field.archivedAt ? "restore" : "archive");
+    if (saved) onSaved(saved);
+  }
   return <section className={css.page}>
-    <header className={css.head}><h1>{field ? (ru ? "Настройка поля" : "Field settings") : (ru ? "Новое поле" : "New field")}</h1></header>
+    <header className={css.head}><h1>{field ? (ru ? "Настройка поля" : "Field settings") : (ru ? "Новое поле" : "New field")}</h1>{field && !field.systemKey && canManageFields && <Button type="button" variant="light" className={css.secondary}
+      isDisabled={write.pending} onPress={() => void transition()} startContent={field.archivedAt ? <RotateCcw size={15} /> : <Archive size={15} />}>
+      {field.archivedAt ? (ru ? "Восстановить поле" : "Restore field") : (ru ? "Архивировать поле" : "Archive field")}
+    </Button>}</header>
     <div className={css.scroll}>
       <form id="custom-field-definition" className={css.form} onSubmit={event => { event.preventDefault(); void save(); }}>
         <input className={css.nameInput} value={draft.name} placeholder={ru ? "Название поля" : "Field name"} aria-label={ru ? "Название поля" : "Field name"}

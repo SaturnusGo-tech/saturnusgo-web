@@ -12,7 +12,7 @@ import styles from "../property-controls.module.css";
 type Assignee = { identityId: string; displayName: string } | null;
 
 export function PropertyAssigneeField({
-  workspaceId, locale, value, onChange, disabled, compact, autoOpen, offline, includeAgents, onRequestEdit,
+  workspaceId, locale, value, onChange, disabled, compact, autoOpen, offline, includeAgents, onRequestEdit, portalContainer,
 }: {
   workspaceId: string;
   locale: TmsLocale;
@@ -23,6 +23,7 @@ export function PropertyAssigneeField({
   autoOpen?: boolean;
   offline?: boolean;
   includeAgents?: boolean;
+  portalContainer?: HTMLElement;
   onRequestEdit?(): void;
 }) {
   const [open, setOpen] = useState(false);
@@ -57,7 +58,7 @@ export function PropertyAssigneeField({
   };
   const shortcuts = new Map(members.search ? [] : options.slice(0, 10).map((person, index) => [person.id, String(index)]));
   return <PropertyPopover label={label} triggerLabel={name} trigger={content} compact={compact} narrow
-    open={open} disabled={disabled || offline} onOpenChange={setMenu} onMenuKeyDown={(event) => {
+    open={open} portalContainer={portalContainer} disabled={disabled || offline} onOpenChange={setMenu} onMenuKeyDown={(event) => {
       if (members.search || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || !/^[0-9]$/.test(event.key)) return;
       const option = options[Number(event.key)];
       if (!option) return;

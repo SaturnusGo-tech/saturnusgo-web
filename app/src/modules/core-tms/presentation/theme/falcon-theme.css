@@ -53,6 +53,7 @@ html:has([data-falcon-shell]) {
   --falcon-warning-border: color-mix(in oklab, #e25507 15%, transparent);
   --falcon-warning-solid: #e25507;
   --falcon-warning-on-solid: #0d0d0d;
+  --falcon-workflow-complete: #555eb5;
   --falcon-caution: #6e5400;
   --falcon-caution-bg: color-mix(in oklab, #ffc300 8%, transparent);
   --falcon-caution-border: #916f00;
@@ -132,6 +133,7 @@ html.dark:has([data-falcon-shell]) {
   --falcon-warning-border: color-mix(in oklab, #ff8549 40%, transparent);
   --falcon-warning-solid: #fb6a22;
   --falcon-warning-on-solid: #0d0d0d;
+  --falcon-workflow-complete: #6874d0;
   --falcon-caution: #ffc300;
   --falcon-caution-bg: color-mix(in oklab, #ffc300 15%, transparent);
   --falcon-caution-border: #916f00;

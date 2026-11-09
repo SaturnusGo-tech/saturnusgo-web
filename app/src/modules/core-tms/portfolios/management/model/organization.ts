@@ -1,4 +1,4 @@
-export const workflowPhases = ["new", "in_progress", "in_review", "done", "on_hold"] as const;
+export const workflowPhases = ["backlog", "todo", "in_progress", "done", "canceled", "duplicate", "new", "in_review", "on_hold"] as const;
 export type WorkflowPhase = typeof workflowPhases[number];
 export type ChecklistItem = Readonly<{ id: string; text: string; completed: boolean }>;
 export type OrganizationFields = { workflowPhase: WorkflowPhase; checklist: readonly ChecklistItem[] };

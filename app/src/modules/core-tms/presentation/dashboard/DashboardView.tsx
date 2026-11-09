@@ -90,20 +90,23 @@ function DashboardWorkspace(props: DashboardViewProps) {
         {editing ? <input data-inline-title className={styles.name} aria-label={t("dashboardLayout.name")} maxLength={200}
           value={layout.draft!.name} disabled={disabled || layout.failure === "conflict"} onChange={(event) => layout.controller.rename(event.target.value)} />
           : <h1>{board?.name ?? t("dashboard.analyticsTitle")}</h1>}
-        {editing && <p>{t(personalEditing ? "dashboardLayout.personalEditHint" : "dashboardLayout.editHint")}</p>}
+        <div className={styles.editDisclosure} data-open={editing} aria-hidden={!editing || undefined}>
+          <div><p>{t(personalEditing ? "dashboardLayout.personalEditHint" : "dashboardLayout.editHint")}</p></div>
+        </div>
       </div>
       {!loading && <div className={styles.actions}>
-        {editing ? <>
+        <div className={styles.actionGroup} data-active={editing} inert={!editing} aria-hidden={!editing || undefined}>
           <button type="button" className={styles.quiet} disabled={disabled} onClick={() => { setCatalogScope(null); layout.controller.cancel(); }}>{t("dashboardLayout.cancel")}</button>
           <button type="button" ref={addButton} className={styles.secondary} disabled={disabled || layout.failure === "conflict"} onClick={openCatalog}><Plus size={15} />{t("dashboardLayout.add")}</button>
-          <button type="button" className={styles.primary} disabled={layout.saving || !layout.draft!.name.trim() || layout.failure === "conflict"}
+          <button type="button" className={styles.primary} disabled={layout.saving || !layout.draft?.name.trim() || layout.failure === "conflict"}
             onClick={() => void layout.controller.save()}>{layout.saving && <LoaderCircle size={15} className={surface.spin} />}{t(layout.saving ? "dashboardLayout.saving" : layout.retryPending ? "dashboardLayout.retry" : "dashboardLayout.save")}</button>
-        </> : <>
+        </div>
+        <div className={styles.actionGroup} data-active={!editing} inert={editing} aria-hidden={editing || undefined}>
           {canComposePersonal && canManageTeam && !teamLayout.loading && !teamLayout.failure &&
             <button type="button" className={styles.quiet} onClick={editTeam}>{t("dashboardLayout.editTeam")}</button>}
           {canEdit && board && <button type="button" className={styles.editButton} onClick={edit}
             aria-label={t("dashboardLayout.edit")} title={t("dashboardLayout.edit")}><Pencil size={15} />{t("dashboardLayout.edit")}</button>}
-        </>}
+        </div>
       </div>}
     </header>
     {failure && <div className={styles.failure} role="alert">

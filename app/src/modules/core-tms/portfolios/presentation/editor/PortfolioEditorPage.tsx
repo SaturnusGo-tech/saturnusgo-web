@@ -10,7 +10,7 @@ import { PiCheck, PiPlus, PiSpinnerGap } from "react-icons/pi";
 import type { TmsMutationFailure } from "../../../../../core/tms/errors/mutation-failure";
 import { formatTmsMutationFailure } from "../../../../../core/tms/errors/mutation-failure";
 import { FormError } from "../../../presentation/common/error/FormError";
-import { ResponsiblePicker } from "../../../workspace/members/presentation/ResponsiblePicker";
+import { PropertyIdentityField } from "../../../presentation/common/properties/metadata/identity/PropertyIdentityField";
 import type { Portfolio, PortfolioDraft } from "../../model/portfolio";
 import type { PortfolioCopy } from "../../model/copy";
 import { OrganizationMarkdownField } from "./markdown/OrganizationMarkdownField";
@@ -53,7 +53,7 @@ export function PortfolioEditorPage({ actionsTargetId, workspaceId, canReadAttac
       {attempted && errors.checklist && <p data-field="checklist" tabIndex={-1} className={css.limit} role="alert">{errors.checklist}</p>}
     </main><aside className={css.properties} aria-label={copy.properties}>
       <div className={css.property}><span>{organizationCopy(locale).phase}</span><WorkflowSelect value={workflowPhase} disabled={pending} onChange={setWorkflowPhase} /></div>
-      <div className={css.property}><span>{copy.responsible}</span><ResponsiblePicker workspaceId={workspaceId} value={responsibleIdentityId}
+      <div className={css.property}><span>{copy.responsible}</span><PropertyIdentityField workspaceId={workspaceId} locale={locale} value={responsibleIdentityId}
         onChange={setResponsibleIdentityId} disabled={pending} /></div>
     </aside></div>
   </form>;

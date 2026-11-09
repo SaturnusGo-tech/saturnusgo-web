@@ -47950,7 +47950,11 @@
           "in_progress",
           "in_review",
           "done",
-          "on_hold"
+          "on_hold",
+          "backlog",
+          "todo",
+          "canceled",
+          "duplicate"
         ],
         "description": "Work phase, independent of active/archived lifecycle. New entities default to new."
       },

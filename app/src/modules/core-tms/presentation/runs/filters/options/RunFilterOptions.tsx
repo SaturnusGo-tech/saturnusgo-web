@@ -23,8 +23,13 @@ export function RunFilterOptions({ label, options, selected, onChange, search, o
       }} />}
     <Listbox aria-label={label} selectionMode={multiple ? "multiple" : "single"} selectionBehavior="toggle"
       selectedKeys={selected} variant="light" disableAnimation hideEmptyContent hideSelectedIcon
+      onSelectionChange={keys => {
+        if (keys === "all") return;
+        const changed = [...keys].find(key => !selected.includes(String(key))) ?? selected.find(key => !keys.has(key));
+        if (changed !== undefined) onChange(String(changed));
+      }}
       classNames={{ base: css.pickerListbox, list: css.pickerList }} itemClasses={{ base: css.pickerRow, wrapper: css.pickerTitle }}>
-      {visible.map(option => <ListboxItem key={option.value} textValue={option.label} startContent={option.avatar} onPress={() => onChange(option.value)}
+      {visible.map(option => <ListboxItem key={option.value} textValue={option.label} startContent={option.avatar}
         endContent={selected.includes(option.value) && <Check size={13} aria-hidden="true" />}>
         <span className={css.label}>{option.label}{option.detail && <small>{option.detail}</small>}</span>
       </ListboxItem>)}

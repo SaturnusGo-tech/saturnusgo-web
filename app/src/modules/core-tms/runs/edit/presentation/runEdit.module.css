@@ -1,31 +1,72 @@
-.panel { width: min(480px, 100vw) !important; max-width: 100vw; color: var(--falcon-text); }
+.wrapper {
+  position: fixed;
+  inset: 0;
+  z-index: 184;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0;
+  background: var(--falcon-scrim);
+}
+.wrapper .panel {
+  display: flex;
+  flex-direction: column;
+  inline-size: min(440px, 100vw);
+  max-inline-size: 100vw;
+  block-size: 100%;
+  max-block-size: 100%;
+  margin: 0;
+  border: 0;
+  border-inline-start: 1px solid var(--falcon-border);
+  border-radius: 0;
+  background: var(--falcon-elevated);
+  color: var(--falcon-text);
+  overflow: visible;
+  box-shadow: var(--falcon-shadow-popover);
+}
+.panel:focus { outline: 0; }
+.header { display: flex; flex: none; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 18px 20px 14px; }
+.header h2 { margin: 0; padding: 0; font-size: 17px; line-height: 1.35; font-weight: 620; }
+.header p { margin: 3px 0 0; color: var(--falcon-text-muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.header .close { display: grid; place-items: center; min-width: 30px; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--falcon-text-secondary); }
+.header .close:hover:not(:disabled) { background: var(--falcon-hover); color: var(--falcon-text); }
 .form { display: flex; flex-direction: column; flex: 1; min-height: 0; }
-.content { display: grid; align-content: start; gap: 14px; min-height: 0; padding: 16px 20px; overflow-y: auto; overscroll-behavior: contain; }
-.field { display: grid; gap: 5px; min-width: 0; font-size: 13px; font-weight: 500; }
-.field > span { color: var(--falcon-text-muted); }
-.field > input, .field > textarea { box-sizing: border-box; min-width: 0; width: 100%; padding: 7px 10px; border: 1px solid var(--falcon-border); border-radius: 10px; background: transparent; color: inherit; font: inherit; line-height: 1.5; box-shadow: none; }
-.field > textarea { resize: vertical; min-height: 64px; max-height: 280px; }
-.field > input:focus-visible, .field > textarea:focus-visible { outline: 2px solid var(--falcon-action); outline-offset: 2px; }
-.field > input:disabled, .field > textarea:disabled { opacity: .6; }
+.content { display: grid; align-content: start; gap: 14px; min-height: 0; padding: 8px 20px 20px; overflow-y: auto; overscroll-behavior: contain; }
+.content .field { display: grid; gap: 5px; min-width: 0; font-size: 13px; }
+.field .label { position: static; padding: 0; color: var(--falcon-text-muted); font-size: 12px; font-weight: 500; transform: none; }
+.field .fieldControl, .field .fieldControl:hover {
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 1px solid var(--falcon-border);
+  border-radius: 9px;
+  background: var(--falcon-control);
+  box-shadow: none;
+}
+.field .fieldControl:focus-within { border-color: var(--falcon-icon-muted); }
+.field .input, .field .input:focus { box-sizing: border-box; width: 100%; min-width: 0; padding: 0; border: 0; outline: 0; box-shadow: none; background: transparent; color: inherit; font: inherit; line-height: 1.45; }
+.field .inner { width: 100%; min-width: 0; }
+.field textarea.input { min-height: 40px; resize: none; }
 .builds { padding-top: 14px; border-top: 1px solid var(--falcon-border); }
-.hint { margin: 0; color: var(--falcon-text-muted); font-size: 12px; font-weight: 400; line-height: 1.45; }
+.hint { margin: 0; color: var(--falcon-text-muted); font-size: 12px; line-height: 1.45; }
 .error { margin: 0; color: var(--falcon-danger); font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
-.footer { display: flex; justify-content: flex-end; align-items: center; gap: 10px; padding: 12px 20px; margin-top: auto; border-top: 1px solid var(--falcon-border); }
-.cancel, .save, .confirm button { border: 0; border-radius: 999px; padding: 9px 17px; font: inherit; font-size: 13px; cursor: pointer; }
-.cancel, .confirm button { background: transparent; color: var(--falcon-text); }
-.cancel:hover, .confirm button:hover { background: var(--falcon-hover); }
-.save { background: var(--falcon-action); color: var(--falcon-on-action); }
+.loading { justify-self: start; }
+.footer { display: flex; justify-content: flex-end; align-items: center; gap: 6px; padding: 12px 20px; margin-top: auto; border-top: 1px solid var(--falcon-border); }
+.footer button, .confirm button { min-height: 32px; padding: 0 12px; border: 0; border-radius: 999px; font: inherit; font-size: 12px; cursor: pointer; }
+.footer .cancel, .confirm button, .content .textButton { background: transparent; color: var(--falcon-text-secondary); }
+.cancel:hover:not(:disabled), .confirm button:hover { background: var(--falcon-hover); color: var(--falcon-text); }
+.footer .save { background: var(--falcon-action); color: var(--falcon-on-action); }
+.save:hover:not(:disabled) { background: var(--falcon-action-hover); }
 .footer button:disabled { opacity: .45; cursor: default; }
-.footer button:focus-visible, .confirm button:focus-visible, .textButton:focus-visible { outline: 2px solid var(--falcon-action); outline-offset: 3px; }
-.textButton { justify-self: start; padding: 0; border: 0; background: transparent; color: var(--falcon-action); font: inherit; font-size: 13px; cursor: pointer; }
-.confirm { border-top: 1px solid var(--falcon-border); padding-top: 14px; font-size: 13px; line-height: 1.5; }
+.wrapper button:focus-visible { outline: 1px solid var(--falcon-icon-muted); outline-offset: 2px; }
+.textButton { justify-self: start; padding: 0; border: 0; font: inherit; font-size: 12px; cursor: pointer; }
+.confirm { border-top: 1px solid var(--falcon-border); padding-top: 12px; font-size: 13px; line-height: 1.5; }
 .confirm p { margin: 0 0 10px; }
 .confirm > div { display: flex; flex-wrap: wrap; gap: 6px; }
-@media (max-width: 600px) { .content { padding: 16px; gap: 14px; } .footer { padding: 14px 16px; } }
-
-.panel[role="dialog"] > .form { overflow: hidden; padding: 0; }
-.panel[role="dialog"] > header { min-height: 68px; padding: 14px 20px; }
-.panel[role="dialog"] > header h2 { font-size: 18px; color: var(--falcon-text); }
-.panel[role="dialog"] > header p { color: var(--falcon-text-muted); margin-top: 3px; }
-
-.field > div > button[aria-haspopup="listbox"] { min-height: 36px; padding: 5px 10px; border-color: var(--falcon-border); }
+@media (max-width: 600px) { .content { padding: 8px 16px 16px; } .header, .footer { padding-inline: 16px; } }
+@media (prefers-reduced-motion: no-preference) {
+  .wrapper { animation: run-edit-scrim 180ms ease both; }
+  .wrapper .panel { animation: run-edit-enter 240ms cubic-bezier(.22,.61,.36,1) both; }
+}
+@keyframes run-edit-scrim { from { background: transparent; } to { background: var(--falcon-scrim); } }
+@keyframes run-edit-enter { from { transform: translateX(100%); } to { transform: none; } }

@@ -17,10 +17,13 @@ function focusFirst(event: KeyboardEvent<HTMLInputElement>) {
 }
 
 export function RepositoryFilterPicker({
-  ru, categories, section, categorySearch, search, filters, hasActive, trigger, extra, values, multiple,
+  ru, panelId = "case-filter-panel", layer = 81, portalContainer, categories, section, categorySearch, search, filters, hasActive, trigger, extra, values, multiple,
   onCategorySearch, onSearch, openSection, onClose, onReset, onArchived, onTag, onChoose,
 }: {
   ru: boolean;
+  panelId?: string;
+  layer?: number;
+  portalContainer?: HTMLElement;
   categories: Category[];
   section: string;
   categorySearch: string;
@@ -64,7 +67,7 @@ export function RepositoryFilterPicker({
     categoryInput.current?.focus({ preventScroll: true });
   }
 
-  return <PopoverContent id="case-filter-panel" aria-label={filterLabel} data-testid="case-filters" data-repository-filter data-case-popover-root
+  return <PopoverContent id={panelId} aria-label={filterLabel} data-testid="case-filters" data-repository-filter data-case-popover-root
       onKeyDownCapture={event => {
         if (event.key !== "Escape" || event.nativeEvent.isComposing
           || event.target instanceof Element && event.target.closest("[data-filter-value-panel]")) return;
@@ -110,8 +113,8 @@ export function RepositoryFilterPicker({
       {current && <FreeSoloPopover key={section} isOpen disableDialogFocus triggerRef={anchor}
         dialogProps={{ "aria-label": current.label }} placement="left-start" offset={8} crossOffset={-38} containerPadding={10}
         shouldBlockScroll={false} shouldCloseOnBlur={false} shouldCloseOnScroll={false}
-        isDismissable={false} isKeyboardDismissDisabled disableAnimation
-        classNames={{ base: css.positioner, content: css.surface }} style={{ zIndex: 81 }}>
+        isDismissable={false} isKeyboardDismissDisabled disableAnimation portalContainer={portalContainer}
+        classNames={{ base: css.positioner, content: css.surface }} style={{ zIndex: layer }}>
         <div ref={optionPanel} id={optionsId} aria-label={current.label} className={css.values}
           data-filter-value-panel data-case-popover-root onKeyDownCapture={event => {
             if (event.key !== "Escape" || event.nativeEvent.isComposing) return;

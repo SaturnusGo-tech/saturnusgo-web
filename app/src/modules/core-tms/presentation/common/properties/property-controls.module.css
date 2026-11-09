@@ -146,7 +146,7 @@
   font-size: 13px;
 }
 .searchInput::placeholder { color: var(--property-menu-placeholder); }
-.popover .list { max-block-size: min(232px, 38dvh); overflow: auto; padding: 5px 6px; }
+.popover .list { max-block-size: min(var(--property-list-max, 232px), 38dvh); overflow: auto; padding: 5px 6px; }
 .popover .options { display: grid; margin: 0; padding: 0; list-style: none; }
 .popover .option, .popover .add {
   display: flex;

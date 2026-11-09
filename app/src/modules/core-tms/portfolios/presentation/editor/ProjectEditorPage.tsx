@@ -11,7 +11,7 @@ import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { useProjectForm } from "../../../projects/state/dialog/useProjectForm";
 import { ProjectKeyHelp } from "../../../projects/presentation/key/ProjectKeyHelp";
 import { useProjectPortfolioOptions } from "../../../projects/state/dialog/useProjectPortfolioOptions";
-import { ResponsiblePicker } from "../../../workspace/members/presentation/ResponsiblePicker";
+import { PropertyIdentityField } from "../../../presentation/common/properties/metadata/identity/PropertyIdentityField";
 import { AnimatedSelect } from "../../../presentation/common/select/AnimatedSelect";
 import { FormError } from "../../../presentation/common/error/FormError";
 import { getProjectDialogCopy } from "../../../presentation/dialogs/project/copy";
@@ -73,7 +73,7 @@ export function ProjectEditorPage({ actionsTargetId, workspaceId, canReadAttachm
         {portfolios.error && <button type="button" className={styles.textButton} onClick={portfolios.retry}>{copy.optionsError} {copy.retry}</button>}
         {portfolios.cursor && <button type="button" className={styles.textButton} disabled={portfolios.loading} onClick={portfolios.more}>{copy.portfolioMore}</button>}
       </div>
-      <div className={css.property}><span>{copy.responsible}</span><ResponsiblePicker workspaceId={workspaceId} value={form.responsibleIdentityId} onChange={form.setResponsibleIdentityId} disabled={form.pending} /></div>
+      <div className={css.property}><span>{copy.responsible}</span><PropertyIdentityField workspaceId={workspaceId} locale={locale} value={form.responsibleIdentityId} onChange={form.setResponsibleIdentityId} disabled={form.pending} /></div>
     </aside></div>
   </form>;
 }

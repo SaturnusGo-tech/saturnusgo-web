@@ -2,6 +2,7 @@
 import { AnimatedSelect } from "../../common/select/AnimatedSelect";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { RefreshCw } from "lucide-react";
+import { useLayoutEffect, useRef } from "react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import type { DashboardPeriod } from "../../../dashboards/model/dashboard-analytics";
 import type { DashboardLayoutModel } from "../../../dashboards/layout/application/useDashboardLayout";
@@ -28,6 +29,16 @@ export function DashboardContent({ onOpenRow, layout, model }: DashboardViewProp
   const reduced = useReducedMotion();
   const widgets = (layout.draft ?? layout.board)?.widgets ?? [];
   const editing = Boolean(layout.draft);
+  const sectionsRef = useRef<HTMLDivElement>(null);
+  const previousMode = useRef(editing);
+  useLayoutEffect(() => {
+    if (previousMode.current === editing) return;
+    previousMode.current = editing;
+    if (reduced) return;
+    const animation = sectionsRef.current?.animate?.([{ opacity: .85 }, { opacity: 1 }],
+      { duration: 180, easing: "ease-out" });
+    return () => animation?.cancel();
+  }, [editing, reduced]);
   const sections = dashboardSections.filter(section => widgets.some(widget => widgetSection(widgetKey(widget)) === section));
   const selected = sections.length === 1 ? sections[0] : preferences.value.section === "all" || sections.includes(preferences.value.section)
     ? preferences.value.section : sections[0] ?? "overview";
@@ -45,7 +56,7 @@ export function DashboardContent({ onOpenRow, layout, model }: DashboardViewProp
       <button onClick={analytics.refresh}>{t("dashboard.retry")}</button></p>}
     {!preferences.stored && <p className={surface.syncError} role="alert">{t("dashboardLayout.personalSyncError")}
       <button type="button" onClick={() => void preferences.refresh()}>{t("dashboardLayout.retry")}</button></p>}
-    <div className={styles.sections}>
+    <div ref={sectionsRef} className={styles.sections}>
       {sections.filter(section => selected === "all" || section === selected).map(section => <section key={section} className={styles.dashboardSection} data-dashboard-section={section}>
         <div className={styles.sectionHeading}><div><h2>{sectionLabels[section][locale === "ru" ? "ru" : "en"]}</h2>
           <p>{sectionLabels[section][locale === "ru" ? "hintRu" : "hintEn"]}</p></div>

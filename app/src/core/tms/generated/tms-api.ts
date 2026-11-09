@@ -10417,7 +10417,7 @@ export interface components {
          * @description Work phase, independent of active/archived lifecycle. New entities default to new.
          * @enum {string}
          */
-        OrganizationWorkflowPhase: "new" | "in_progress" | "in_review" | "done" | "on_hold";
+        OrganizationWorkflowPhase: "new" | "in_progress" | "in_review" | "done" | "on_hold" | "backlog" | "todo" | "canceled" | "duplicate";
         OrganizationChecklistItem: {
             /** @description Stable item identity, unique within this checklist. */
             id: string;

@@ -32,10 +32,10 @@ export function useRunFilterSections({workspaceId,scope,projects,rows,ru}:{works
   ];
   const sections:ExtraFilterSection[]=[{id:"assignee",label:ru?"Ответственные":"Assignees",icon:<Users size={13}/>,
     active:!!filters.owners.length,summary:filters.owners.length?String(filters.owners.length):all,
-    render:()=> <RunAssigneeFilter workspaceId={workspaceId} selected={filters.owners} onChange={value=>change("owners",value)} ru={ru}/>},
+    render:()=> <RunAssigneeFilter popover workspaceId={workspaceId} selected={filters.owners} onChange={value=>change("owners",value)} ru={ru}/>},
     ...definitions.map(d=>({id:d.id,label:d.label,icon:d.icon,active:d.id==="groups"?filters.groups.join()!=="project":!!filters[d.id].length,
       summary:filters[d.id].length?String(filters[d.id].length):d.id==="groups"?(ru?"Без группировки":"None"):all,
-      render:()=> <RunFilterOptions label={d.label} multiple selected={filters[d.id].length?filters[d.id]:["all"]}
+      render:()=> <RunFilterOptions popover label={d.label} multiple selected={filters[d.id].length?filters[d.id]:["all"]}
         options={[{value:"all",label:d.id==="groups"?(ru?"Без группировки":"No grouping"):all},...d.options]}
         placeholder={ru?"Поиск":"Search"} onChange={value=>change(d.id,value)}/>}))];
   return {sections,group:filters.groups,matches:(row:RunRepositoryEntry)=>matchesRunFilters(row,filters),reset:()=>setFilters(emptyRunFilters())};

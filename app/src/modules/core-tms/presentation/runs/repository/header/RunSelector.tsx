@@ -1,3 +1,4 @@
+import { Input } from "@heroui/react";
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { Check, ChevronDown, Pencil, Search } from "lucide-react";
 import type { TestRunSummary } from "../../../../../../core/tms/contracts/legacy-contract";
@@ -42,7 +43,7 @@ export function RunSelector({ ru, choices, value, onChoose, onEdit, disabled, fi
       </button>
       {choice.id === value && onEdit && !isHistoricalRunChoice(choice) && <button type="button" className={css.edit}
         aria-label={ru ? "Редактировать прогон" : "Edit run"} title={ru ? "Редактировать прогон" : "Edit run"}
-        onClick={event => { event.stopPropagation(); if (disabled) return; onEdit(); setOpen(false); }}><Pencil size={14} aria-hidden="true"/></button>}
+        onClick={event => { event.stopPropagation(); if (disabled) return; trigger.current?.focus({ preventScroll: true }); onEdit(); setOpen(false); }}><Pencil size={14} aria-hidden="true"/></button>}
       {choice.id === value && <Check size={13} aria-hidden="true"/>}
     </div>)}
   </div>;
@@ -70,11 +71,12 @@ export function RunSelector({ ru, choices, value, onChoose, onEdit, disabled, fi
       {run && <span className={css.status} data-status={run.status}>{status}</span>}
     </button>
     {visible && <div className={css.menu} role="dialog" aria-label={ru ? "Выбрать прогон" : "Choose a run"}>
-      <label className={css.search} data-input-shell><Search size={14} aria-hidden="true"/><input
+      <div className={css.search} data-input-shell><Input size="sm" variant="flat"
+        startContent={<Search size={14} aria-hidden="true" />} classNames={{ inputWrapper: css.searchControl, innerWrapper: css.searchInner, input: css.searchInput }}
         aria-label={ru ? "Найти прогон или тег" : "Find run or tag"} placeholder={ru ? "Найти прогон или тег" : "Find run or tag"}
-        value={query} onChange={event => setQuery(event.target.value)} onKeyDown={event => {
+        value={query} onValueChange={setQuery} onKeyDown={event => {
           if (event.key === "ArrowDown") { event.preventDefault(); root.current?.querySelector<HTMLButtonElement>("[data-run-select], [data-archive-toggle]")?.focus(); }
-        }}/></label>
+        }} /></div>
       {options(working, ru ? "Текущие прогоны" : "Current runs")}
       {!working.length && <p className={css.empty}>{query ? (ru ? "Нет текущих прогонов по запросу" : "No current runs match") : (ru ? "Нет текущих прогонов" : "No current runs")}</p>}
       {archiveCount > 0 && <>

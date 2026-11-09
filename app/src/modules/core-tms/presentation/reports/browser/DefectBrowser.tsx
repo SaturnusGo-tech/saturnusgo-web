@@ -1,3 +1,4 @@
+import { Input, Tab, Tabs } from "@heroui/react";
 import { ArrowDownWideNarrow, ArrowUpWideNarrow, Bug, Plus, Search } from "lucide-react";
 import { useEffect } from "react";
 import type { Defect } from "../../../../../core/tms/contracts/legacy-contract";
@@ -47,18 +48,17 @@ export function DefectBrowser({ workspaceId, projectId, projectName, connected, 
   return <section className={styles.pane} aria-label={t("reports.title")}>
     <header className={styles.header}>
       <h1>{locale === "ru" ? "Баг-репорты" : "Bug reports"}</h1>
-      <div className={styles.scopes} role="group" aria-label={locale === "ru" ? "Состояние баг-репортов" : "Bug report state"}>
-        {scopes.map((option) => <button key={option.value} type="button" aria-pressed={scope === option.value}
-          onClick={() => setScope(option.value)}>{option.label}</button>)}
-      </div>
+      <Tabs aria-label={locale === "ru" ? "Состояние баг-репортов" : "Bug report state"}
+        selectedKey={scope} onSelectionChange={key => setScope(normalizeDefectScope(key))}
+        classNames={{ tabList: styles.scopes, tab: styles.scopeTab, cursor: styles.scopeCursor, tabContent: styles.scopeLabel }}>
+        {scopes.map(option => <Tab key={option.value} title={option.label} />)}
+      </Tabs>
     </header>
     <div className={styles.toolbar}>
-      <label className={styles.search} data-input-shell>
-        <Search size={17} aria-hidden="true" />
-        <input value={query} onChange={(event) => onQueryChange(event.target.value)} maxLength={200}
-          placeholder={locale === "ru" ? "Найти баг-репорт" : "Find a bug report"}
-          aria-label={t("reports.searchPlaceholder")} />
-      </label>
+      <Input size="sm" value={query} onValueChange={onQueryChange} maxLength={200}
+        placeholder={locale === "ru" ? "Найти баг-репорт" : "Find a bug report"}
+        aria-label={t("reports.searchPlaceholder")} startContent={<Search size={17} aria-hidden="true" />}
+        classNames={{ base: styles.search, inputWrapper: styles.searchShell, input: styles.searchInput }} />
       <button type="button" className={styles.sort} aria-label={sortLabel} title={sortLabel}
         aria-pressed={Boolean(severitySort)} data-direction={severitySort ?? undefined}
         onClick={() => onSeveritySortChange(severitySort === "desc" ? "asc" : severitySort === "asc" ? null : "desc")}>

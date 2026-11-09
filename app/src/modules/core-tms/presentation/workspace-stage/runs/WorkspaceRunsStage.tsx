@@ -86,7 +86,7 @@ export function WorkspaceRunsStage({ model, fixedRun = false, onCloseLockedChang
         }}
       />
       </div>
-      {editingRun && <RunEditDialog key={editingRun.id} run={editingRun} workspaceId={model.data.workspace.id} inline={fixedRun}
+      {editingRun && <RunEditDialog key={editingRun.id} run={editingRun} workspaceId={model.data.workspace.id}
         onClose={() => setEditingRun(null)} onSaved={run => {
           model.setData(current => ({ ...current, runs: current.runs.map(item => item.id === run.id ? run : item) }));
           setEditingRun(null); repository.browser.refresh(); model.retryRunResource();
