@@ -1,0 +1,27 @@
+.segments {
+  --dashboard-tab-cursor: var(--dashboard-card-bg, var(--falcon-elevated));
+  display: inline-flex;
+  max-inline-size: 100%;
+  gap: 2px;
+  overflow-x: auto;
+  padding: 3px;
+  border-radius: 9px;
+  background: var(--dashboard-card-subtle, var(--falcon-hover));
+  scrollbar-width: thin;
+}
+.segments button[role="tab"] {
+  flex: 0 0 auto;
+  inline-size: auto;
+  min-block-size: 26px;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--dashboard-card-muted, var(--falcon-text-muted));
+  background: transparent;
+  font-size: 11px;
+  line-height: 1.35;
+}
+.segments :global([data-slot="tabContent"]) { pointer-events: none; }
+.segments button[role="tab"]:is(:hover, [data-selected="true"]) { color: var(--dashboard-card-text, var(--falcon-text)); }
+.segments button[role="tab"][data-selected="true"] { font-weight: 570; }
+.segments button[role="tab"]:focus-visible { outline: 1px solid var(--falcon-focus); outline-offset: 1px; }

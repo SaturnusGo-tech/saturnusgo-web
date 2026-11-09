@@ -1,0 +1,100 @@
+.shell {
+  --triage-rail: 475px;
+  --triage-pad: 25px;
+  --triage-ink: var(--dashboard-card-text, var(--ink));
+  --triage-muted: var(--dashboard-card-muted, var(--falcon-text-secondary));
+  --triage-line: var(--dashboard-card-border, var(--line));
+  --triage-surface: var(--dashboard-card-bg, var(--paper));
+  --triage-subtle: var(--dashboard-card-subtle, var(--control));
+  --triage-hover: color-mix(in srgb, var(--triage-ink) 7%, var(--triage-surface));
+  --triage-line-strong: color-mix(in srgb, var(--triage-muted) 55%, var(--triage-line));
+  min-inline-size: 0;
+  color: var(--triage-ink);
+  background: var(--triage-surface);
+  border: 1px solid var(--triage-line);
+  border-radius: var(--dashboard-card-radius, 12px);
+  overflow: clip;
+}
+.toolbar {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-inline-size: 0;
+  min-block-size: 44px;
+  gap: 8px;
+  padding: 6px var(--triage-pad);
+  border-block-end: 1px solid var(--triage-line);
+}
+.toolbar h2 {
+  min-inline-size: 0;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 580;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.toolbar { flex-wrap: wrap; }
+.toolbar .surfaceTabs {
+  display: flex;
+  max-inline-size: 100%;
+  flex-wrap: wrap;
+  gap: 3px;
+  padding: 2px;
+  overflow: visible;
+  border: 1px solid var(--triage-line);
+  border-radius: 7px;
+  background: var(--triage-subtle);
+}
+.toolbar .surfaceTab {
+  width: auto;
+  min-block-size: 27px;
+  padding-inline: 8px;
+  border-radius: 5px;
+  color: var(--triage-muted);
+  font-size: 11px;
+}
+.toolbar .surfaceTab[data-selected="true"] { color: var(--triage-ink); }
+.toolbar .surfaceTab:focus-visible { outline: 1px solid var(--triage-muted); outline-offset: 1px; }
+.toolbar .surfaceTabs { --dashboard-tab-cursor: var(--triage-hover); }
+.panelContent { animation: triage-panel-in 150ms ease-out both; }
+@keyframes triage-panel-in { from { opacity: .65; } }
+@media (prefers-reduced-motion: reduce) { .panelContent { animation: none; } }
+.placeholder, .workbench { margin: 0; padding: 14px var(--triage-pad) 18px; }
+.workbench, .workbenchPanel { display: grid; min-inline-size: 0; gap: 8px; }
+.placeholder, .context, .error {
+  color: var(--triage-muted);
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.context, .error { margin: 0; }
+.error { color: var(--triage-ink); }
+.shell .tabs { width: 100%; max-width: 100%; flex-wrap: wrap; gap: 4px; overflow: visible; }
+.shell .tabs :global([data-slot="tab"]) { width: auto; min-block-size: 28px; padding-inline: 8px; border-radius: 6px; }
+.workbenchPanel > ul > li > button { padding: 8px 7px; }
+@container (max-width: 420px) {
+  .shell { --triage-pad: 14px; }
+}
+.button, .primary, .iconButton {
+  min-width: 0;
+  min-height: 30px;
+  padding: 3px 7px;
+  color: var(--triage-ink);
+  font: inherit;
+  font-size: 11px;
+  line-height: 1.25;
+  gap: 5px;
+  border: 1px solid var(--triage-line);
+  border-radius: 6px;
+  background: var(--triage-subtle);
+}
+.primary { border-color: var(--triage-line-strong); background: var(--triage-hover); cursor: pointer; }
+.button:not(:disabled):hover, .primary:not(:disabled):hover { border-color: var(--triage-line-strong); background: var(--triage-hover); }
+.primary:not(:disabled):hover { border-color: var(--triage-muted); }
+.button:disabled, .primary:disabled { opacity: .6; }
+.iconButton { min-inline-size: 28px; inline-size: 28px; min-block-size: 28px; padding: 0; }
+.shell :is(.button, .primary, .iconButton):focus-visible {
+  outline: 1px solid var(--triage-muted);
+  outline-offset: 2px;
+}

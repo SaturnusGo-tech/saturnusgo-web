@@ -10,7 +10,7 @@ test("folder paths render named segments and preserve the complete normalized pa
   assert.equal(all[0].props.title, "/Host/Calendar");
   assert.deepEqual(all.filter(node => node.props["data-folder-segment"]).map(node => node.props.children), ["Host", "Calendar"]);
   assert.equal(all.filter(node => node.type === "PiCaretRight").length, 1);
-  assert.equal(all.some(node => node.type === "PiFolderSimpleDuotone"), true);
+  assert.equal(all.find(node => node.type === "FolderVisual")?.props.path, "//Host///Calendar/");
   assert.equal(all.some(node => node.props.children === "/"), false); h.dispose();
 });
 test("root and unavailable folder identities are distinct in both languages", () => {

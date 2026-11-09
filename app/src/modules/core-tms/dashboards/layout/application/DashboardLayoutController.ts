@@ -1,7 +1,11 @@
 import { consolidateWidgets } from "../migration/consolidate-widgets";
-import { widgetKey } from "../model/widget-catalog";
+import { collapseWorkflowWidgets } from "../migration/workflow-widgets";
+import { dashboardcnEnabled, widgetKey } from "../model/widget-catalog";
 import { LayoutError, moveWidget, placeWidgets, type BoardDraft, type BoardScope,
   type BoardWidget, type LayoutSource, type LayoutState, type ProjectBoard } from "../model/layout";
+
+const prepareWidgets = (widgets: BoardWidget[]) => dashboardcnEnabled()
+  ? placeWidgets(collapseWorkflowWidgets(consolidateWidgets(widgets))) : consolidateWidgets(widgets);
 
 export class DashboardLayoutController {
   private state: LayoutState = { loading: true, saving: false, board: null, draft: null, failure: null, retryPending: false };
@@ -27,7 +31,7 @@ export class DashboardLayoutController {
     }
     try {
       const board = await this.source.load(this.scope, reader.signal);
-      if (generation === this.generation && !reader.signal.aborted && !this.state.draft) this.emit({ failure: null, board: board ? { ...board, widgets: consolidateWidgets(board.widgets) } : null, loading: false });
+      if (generation === this.generation && !reader.signal.aborted && !this.state.draft) this.emit({ failure: null, board: board ? { ...board, widgets: prepareWidgets(board.widgets) } : null, loading: false });
     } catch (error) {
       if (reset && generation === this.generation && !reader.signal.aborted) {
         this.emit({ loading: false, failure: error instanceof LayoutError ? error.kind : "unavailable" });
@@ -40,7 +44,8 @@ export class DashboardLayoutController {
     if (this.state.loading || this.state.saving || this.state.retryPending) return;
     this.reader?.abort();
     const board = this.state.board ?? template;
-    this.emit({ draft: board ? { name: board.name, widgets: placeWidgets(board.widgets) } : { name, widgets: [] }, failure: null });
+    const widgets = board && (dashboardcnEnabled() ? prepareWidgets(board.widgets) : placeWidgets(board.widgets));
+    this.emit({ draft: board && widgets ? { name: board.name, widgets } : { name, widgets: [] }, failure: null });
   };
   cancel = () => {
     if (this.state.saving || this.state.retryPending) return;

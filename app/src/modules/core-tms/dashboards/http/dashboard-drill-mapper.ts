@@ -58,7 +58,7 @@ export function mapDefectDrill(envelope: Api["DashboardAnalyticsDefectListEnvelo
     id: item.id, entity: "defect" as const, projectId: item.projectId,
     key: item.key, title: item.title, project: project(projects, item.projectId),
     detail: "", component: item.component, priority: item.priority,
-    status: item.status, occurredAt: item.sortAt,
+    status: item.status, occurredAt: item.sortAt, archivedAt: item.archivedAt,
     links: item.links.map((link) => ({ label: link.label, url: link.url })),
   })), envelope.meta);
 }

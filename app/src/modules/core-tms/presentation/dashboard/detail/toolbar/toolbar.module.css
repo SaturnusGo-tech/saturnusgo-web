@@ -1,0 +1,30 @@
+.toolbar { container-type: inline-size; min-width: 0; margin-bottom: 12px; }
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 8px; min-width: 0; }
+.search { display: flex; flex: 0 1 196px; align-items: center; gap: 7px; min-width: 116px; min-height: 28px; padding: 0 8px; border: 1px solid var(--falcon-border-subtle); border-radius: 7px; color: var(--falcon-text-muted); }
+.search > svg { flex: none; }
+.search input { flex: 1; min-width: 0; width: 100%; height: 26px; padding: 0; border: 0; outline: none !important; background: transparent; box-shadow: none; color: var(--falcon-text); caret-color: var(--falcon-text); font: inherit; font-size: 12px; }
+.search input::placeholder { color: var(--falcon-text-muted); }
+.search:focus-within { border-color: var(--falcon-icon-muted); }
+.actions { display: flex; flex: none; align-items: center; gap: 6px; margin-inline-start: auto; }
+.actions .round { display: inline-grid; place-items: center; flex: none; width: 28px; min-width: 28px; height: 28px; min-height: 28px; padding: 0; border: 1px solid var(--falcon-border-subtle); border-radius: 50%; background: var(--falcon-panel); color: var(--falcon-text-muted); }
+.actions .round:is([data-hover="true"], [aria-expanded="true"], [data-active]) { border-color: var(--falcon-border); background: var(--falcon-hover); color: var(--falcon-text); }
+.chips { display: flex; flex: 1 1 0; flex-wrap: wrap; align-items: center; gap: 4px; min-width: 0; }
+.chip { display: flex; align-items: stretch; gap: 1px; max-width: 100%; overflow: hidden; border: 1px solid var(--falcon-border-subtle); border-radius: 6px; background: var(--falcon-border-subtle); }
+.chip .chipValue, .chip .remove { display: inline-flex; align-items: center; gap: 5px; min-width: 0; min-height: 25px; height: 25px; padding: 0 7px; border: 0; border-radius: 0; background: var(--falcon-panel); color: var(--falcon-text); font: inherit; font-size: 12px; }
+.chip .chipValue { max-width: 175px; }
+.chip .chipValue svg { flex: none; color: var(--falcon-text-muted); }
+.chipValue span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chip .remove { flex: none; justify-content: center; width: 24px; padding: 0; color: var(--falcon-text-muted); }
+.chip :is(.chipValue, .remove):is([data-hover="true"], [aria-expanded="true"]) { background: var(--falcon-hover); color: var(--falcon-text); }
+.toolbar :is(.round, .chipValue, .remove):focus-visible { outline: 1px solid var(--falcon-icon-muted) !important; outline-offset: -2px !important; }
+.hint { margin: 7px 0 0; color: var(--falcon-text-muted); font-size: 11px; line-height: 1.45; }
+@container (max-width: 450px) {
+  .search { flex: 1 1 0; max-width: 230px; }
+  .chips { order: 3; flex: 1 0 100%; }
+}
+@media (pointer: coarse) {
+  .actions .round { width: 40px; min-width: 40px; height: 40px; }
+  .search { min-height: 36px; }
+  .chip .chipValue, .chip .remove { min-height: 34px; }
+  .chip .remove { width: 34px; }
+}

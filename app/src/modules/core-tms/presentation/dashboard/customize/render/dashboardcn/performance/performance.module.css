@@ -1,0 +1,78 @@
+.performance {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; min-width: 0;
+  --panel-surface: var(--dashboard-card-bg, var(--falcon-panel));
+  --panel-rule: var(--dashboard-card-border, var(--falcon-border));
+  --panel-text: var(--dashboard-card-text, var(--falcon-text));
+  --panel-muted: var(--dashboard-card-muted, var(--falcon-text-muted));
+  --panel-hover: var(--dashboard-card-subtle, var(--falcon-hover));
+  --chart-grid: color-mix(in srgb, var(--panel-rule) 68%, var(--panel-surface));
+  --performance-orange: #ac4827;
+  --performance-gold: #916515;
+  --performance-green: #27823a;
+  --performance-cyan: #277985;
+  --performance-violet: #5457b4;
+  --performance-muted: #626571;
+  --performance-slate: #65758b;
+}
+.panel {
+  display: flex; min-width: 0; min-block-size: 322px; flex-direction: column; gap: 10px;
+  padding: 12px; border: 1px solid var(--panel-rule); border-radius: var(--dashboard-card-radius, 12px);
+  color: var(--panel-text); background: var(--panel-surface);
+}
+.panel h2 { margin: 0; padding: 0 2px; font-size: 13px; font-weight: 550; line-height: 1.4; }
+.panel .count {
+  display: grid; flex: 1; min-height: 0; width: 100%; place-items: center; border-radius: 5px; color: var(--panel-text);
+  padding-block: 0 8px; font-size: 34px; font-weight: 530; line-height: 1; font-variant-numeric: tabular-nums; background: transparent;
+}
+button.count:hover { background: var(--panel-hover); }
+.lead, .reported { padding-bottom: 5px; }
+.reported { grid-column: 1 / -1; }
+.notice { display: grid; place-content: center; justify-items: center; min-block-size: 130px; flex: 1; margin: 0;
+  padding: 8px; color: var(--panel-muted); font-size: 12px; text-align: center; gap: 4px; }
+.chart { min-width: 0; min-block-size: 210px; flex: 1; position: relative; }
+.chart > div:first-child { min-block-size: 210px; position: absolute; inset: 0; }
+.point circle:last-child { animation: appear 200ms ease-out both; }
+@keyframes appear { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .point circle:last-child { animation: none; } }
+:global(.dark) .performance {
+  --performance-orange: #ee8758;
+  --performance-gold: #eac74e;
+  --performance-green: #77cf85;
+  --performance-cyan: #6dbdc5;
+  --performance-violet: #6568c7;
+  --performance-muted: #dedee1;
+  --performance-slate: #9ca6b7;
+}
+.point[role="button"] { cursor: pointer; }
+.point[role="button"]:is(:hover, :focus-visible) circle:last-child { stroke: var(--panel-text); stroke-width: 1.4px; }
+.more { align-self: flex-end; min-height: 25px; color: var(--panel-muted); }
+.reportChart { position: relative; flex: 1; min-block-size: 210px; min-width: 0; margin-top: 22px; }
+.gridLines {
+  position: absolute; display: flex; flex-direction: column; justify-content: space-between;
+  inset: 0 28px 20px 0; pointer-events: none;
+}
+.gridLines > div { position: relative; border-block-start: 1px dashed var(--chart-grid); }
+.gridLines > div:last-child { border-block-start-style: solid; }
+.gridLines span { position: absolute; inset-inline-start: calc(100% + 5px); top: -7px; font-size: 10px; color: var(--panel-muted); }
+.statusBars { position: absolute; inset: 0 28px 0 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.status {
+  position: relative; display: grid; grid-template-rows: minmax(0, 1fr) 20px; min-width: 0;
+  padding: 0 3px; color: var(--panel-muted); border: 0; background: transparent; cursor: pointer;
+}
+.status:disabled { opacity: 1; cursor: default; }
+.status:not(:disabled):hover { color: var(--panel-text); background: var(--panel-hover); }
+.barTrack { display: flex; align-items: end; justify-content: center; min-height: 0; }
+.barTrack > span { width: min(8px, 100%); border-radius: 1px 1px 0 0; }
+.statusLabel { align-self: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; }
+.compactStatus { display: none; }
+@container (max-width: 600px) {
+  .performance { grid-template-columns: minmax(0, 1fr); }
+  .open { min-block-size: 110px; }
+}
+@container (max-width: 420px) {
+  .gridLines { inset-block-end: 30px; }
+  .status { grid-template-rows: minmax(0, 1fr) 30px; padding-inline: 2px; }
+  .statusLabel { white-space: normal; font-size: 9px; line-height: 1.15; }
+  .fullStatus { display: none; }
+  .compactStatus { display: inline; }
+}

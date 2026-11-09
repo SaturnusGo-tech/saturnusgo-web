@@ -20,6 +20,7 @@ import { GuidePanelProvider } from "../../documentation/panel/GuidePanelProvider
 import guideStyles from "../../documentation/panel/guide-panel.module.css";
 import styles from "../../tms.module.css";
 import { WorkspaceHeader } from "./WorkspaceHeader";
+import { WorkspaceHeaderActionsHost } from "./header-actions/WorkspaceHeaderActions";
 import { VerificationQueueControl } from "../../runs/verification/presentation/queue/VerificationQueueControl";
 import shellStyles from "./tms-shell.module.css";
 import { useHistoryScroll } from "./history/useHistoryScroll";
@@ -42,6 +43,7 @@ export function LocalizedWorkspace() {
   const { locale, languageTag, t } = useTmsLocale();
   const docs = useProductDocsAccess(model.data.workspace.id, model.project?.id ?? "", model.connection === "connected");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
+  const [dashboardActionsHost, setDashboardActionsHost] = useState<HTMLDivElement | null>(null);
 
   useEffect(() => {
     try {
@@ -99,6 +101,7 @@ export function LocalizedWorkspace() {
           model={model}
           sidebarCollapsed={sidebarCollapsed}
           onToggleSidebar={toggleSidebar}
+          dashboardActionsRef={setDashboardActionsHost}
         />
         <main className={`${styles.stage} ${shellStyles.stage}`}>
           {model.connection === "demo" && (
@@ -126,7 +129,9 @@ export function LocalizedWorkspace() {
                 } : undefined}
                 fallback={docs.pending || model.connection === "loading" ? <TessiqLoader pane label={t("common.loading")} />
                   : <CompanyFeatureUnavailable onReturn={() => changeView("cases")} />}>
-                <WorkspaceStage model={model} />
+                <WorkspaceHeaderActionsHost.Provider value={dashboardActionsHost}>
+                  <WorkspaceStage model={model} />
+                </WorkspaceHeaderActionsHost.Provider>
               </ProductDocsWorkspace>
             </GuidePanelProvider>
           </div>

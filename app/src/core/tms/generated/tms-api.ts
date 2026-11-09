@@ -1055,6 +1055,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/defects/triage": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the project defect triage queue
+         * @description Lists nonarchived open and reopened defects, oldest first. The snoozed view contains defects whose wake time is in the future. A defect returns to the inbox at its deadline or after a defect edit. The cursor is scoped to the workspace, project and view. Requires defect:read.
+         */
+        get: operations["listDefectTriage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/defects/{defectId}/triage": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                defectId: components["parameters"]["DefectIdPath"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Record a defect triage decision
+         * @description Requires defect:manage and the current row version. Accept moves the defect to triaged. Decline and duplicate close it under the existing closure policy. Duplicate links a canonical nonarchived defect within the same project. Snooze sets a future wake time and resume clears an active snooze. Mutations and replay receipts are atomic. YouTrack-authoritative closure remains subject to the existing retest and workflow guards.
+         */
+        post: operations["triageDefect"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/defects/{defectId}": {
         parameters: {
             query?: never;
@@ -1067,7 +1115,10 @@ export interface paths {
             };
             cookie?: never;
         };
-        /** Get a defect */
+        /**
+         * Get a defect
+         * @description Requires defect:read in the defect workspace. Archived defects are excluded unless explicitly requested for read-only inspection.
+         */
         get: operations["getDefect"];
         put?: never;
         post?: never;
@@ -1419,7 +1470,7 @@ export interface paths {
         };
         /**
          * Drill into an exact test-case analytics cohort
-         * @description current is the live inventory at request time; created uses createdAt in the inclusive-from, exclusive-to window. Current-revision dimensions and coverage apply only to current. componentIsEmpty represents the null/empty Component bucket. coverage means a current case did or did not appear in a run started in the exact period.
+         * @description current is the live inventory at request time; created uses createdAt in the inclusive-from, exclusive-to window. Type matches the current revision on either basis. Tag, Component, and coverage filters apply only to current. componentIsEmpty represents the null/empty Component bucket. coverage means a current case did or did not appear in a run started in the exact period.
          */
         get: operations["listDashboardAnalyticsTestCases"];
         put?: never;
@@ -1476,6 +1527,52 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/dashboard-analytics/defect-breakdown": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Break down project defects by one dimension and one segment
+         * @description Counts distinct defects from the same population as the defects drill-down. Current includes only nonarchived defects and ignores the period. Reported selects creation time within the period and includes archived defects. Both bases use the stored classification on each defect at read time. Workspace scope includes active projects only. Groups are ordered by descending count, then stable key. Totals cover every matching group even when the group limit truncates the response.
+         */
+        get: operations["getDashboardDefectBreakdown"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/dashboard-analytics/defect-lead-time": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List first-resolution defect lead-time points
+         * @description One point per defect whose first recorded transition to verified or closed occurred within the selected period. Later closure, edits, reopening, and archiving do not replace that first resolution. Uses stored current priority and elapsed 24-hour days from defect creation to the resolution event. Workspace scope includes active projects only. Ordered by resolution time descending, then ID descending.
+         */
+        get: operations["listDashboardDefectLeadTime"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/dashboard-analytics/defects": {
         parameters: {
             query?: never;
@@ -1488,7 +1585,7 @@ export interface paths {
         };
         /**
          * Drill into an exact defect analytics cohort with safe links
-         * @description reported uses createdAt in the period and includes archived records; current is the live non-archived set and ignores the period. Returned links are Falcon or active HTTPS external/YouTrack links only. occurrence identifies the immutable originating run item, case revision and step. Current risk filters reproduce Component, active/open and critical hotspot cohorts.
+         * @description Reported selects creation time in the period and includes archived records. Current is the live nonarchived set and ignores the period. Both bases support filtering by the stored current status, component, severity, priority, and assignee. Link and active filters apply only to the current basis. Returned links are Falcon or active HTTPS external/YouTrack links. An occurrence identifies the immutable originating run item, case revision and step.
          */
         get: operations["listDashboardAnalyticsDefects"];
         put?: never;
@@ -7714,6 +7811,8 @@ export interface components {
                 byComponent: components["schemas"]["AnalyticsNullableStringDimension"] | null;
             };
             createdInPeriod: components["schemas"]["AnalyticsCount"];
+            /** @description Cases created in the selected period grouped by current type, including cases later archived. */
+            createdInPeriodByType?: components["schemas"]["AnalyticsTestCaseTypeBucket"][];
         };
         AnalyticsTimelineCompletedOutcomes: {
             passed: components["schemas"]["AnalyticsCount"];
@@ -7973,6 +8072,47 @@ export interface components {
         DashboardAnalyticsRunItemListEnvelope: {
             data: components["schemas"]["DashboardAnalyticsRunItem"][];
             meta: components["schemas"]["AnalyticsRunItemPageMeta"];
+        };
+        DashboardDefectBreakdownSegment: {
+            key: string;
+            count: components["schemas"]["AnalyticsCount"];
+        };
+        DashboardDefectBreakdownGroup: {
+            /** @description Stable dimension key. Null means no assigned identity or no component. */
+            key: string | null;
+            /** @description Display name or dimension value. Null when no display label is available. */
+            label: string | null;
+            count: components["schemas"]["AnalyticsCount"];
+            segments: components["schemas"]["DashboardDefectBreakdownSegment"][];
+        };
+        DashboardDefectBreakdown: {
+            total: components["schemas"]["AnalyticsCount"];
+            groupCount: components["schemas"]["AnalyticsCount"];
+            truncated: boolean;
+            period: components["schemas"]["AnalyticsPeriod"];
+            periodApplied: boolean;
+            groups: components["schemas"]["DashboardDefectBreakdownGroup"][];
+        };
+        DashboardDefectBreakdownEnvelope: {
+            data: components["schemas"]["DashboardDefectBreakdown"];
+        };
+        DashboardDefectLeadTimePoint: {
+            id: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            key: string;
+            title: string;
+            priority: components["schemas"]["Priority"];
+            /** @description True when the source defect is archived. Ordinary detail excludes archived defects. Authorized callers can opt in with includeArchived=true. */
+            archived: boolean;
+            createdAt: components["schemas"]["Timestamp"];
+            resolvedAt: components["schemas"]["Timestamp"];
+            /** @enum {string} */
+            resolvedStatus: "verified" | "closed";
+            leadTimeDays: number;
+        };
+        DashboardDefectLeadTimeEnvelope: {
+            data: components["schemas"]["DashboardDefectLeadTimePoint"][];
+            meta: components["schemas"]["AnalyticsPageMeta"];
         };
         DashboardAnalyticsDefectListEnvelope: {
             data: components["schemas"]["DashboardAnalyticsDefect"][];
@@ -8824,8 +8964,12 @@ export interface components {
             createdByIdentityId: components["schemas"]["Identifier"];
             createdAt: components["schemas"]["Timestamp"];
             updatedAt: components["schemas"]["Timestamp"];
+            /** @description Archive timestamp returned only on an explicitly requested archived defect detail. */
+            archivedAt?: components["schemas"]["Timestamp"];
             /** @description Direct source test case in the same project, without creating a run. Mutually exclusive with runId, runItemId and stepId; immutable after creation. */
             sourceCaseId?: components["schemas"]["Identifier"] | null;
+            /** @description Canonical defect in the same project when this defect was closed as a duplicate. */
+            triageDuplicateOfDefectId?: components["schemas"]["Identifier"] | null;
         };
         DefectCreateRequest: {
             projectId: components["schemas"]["Identifier"];
@@ -9226,6 +9370,81 @@ export interface components {
         DefectListEnvelope: {
             data: components["schemas"]["Defect"][];
             meta: components["schemas"]["PageMeta"];
+        };
+        DefectTriageRow: {
+            id: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            key: string;
+            title: string;
+            description: components["schemas"]["LongText"];
+            severity: components["schemas"]["Priority"];
+            priority: components["schemas"]["Priority"];
+            status: components["schemas"]["DefectStatus"];
+            reproducibility: components["schemas"]["ShortText"];
+            assigneeIdentityId: components["schemas"]["Identifier"] | null;
+            component: components["schemas"]["ShortText"];
+            /** @description Normalized labels. Occurrence defects include two immutable server-derived provenance labels: <case-type>-run and the run type. */
+            labels: string[];
+            integrationTarget: components["schemas"]["DefectIntegrationTarget"] | null;
+            externalIssue: components["schemas"]["DefectExternalIssue"] | null;
+            occurrence: components["schemas"]["DefectOccurrence"] | null;
+            expectedResult: components["schemas"]["LongText"];
+            actualResult: components["schemas"]["LongText"];
+            attachmentIds: components["schemas"]["Identifier"][];
+            linkIds: components["schemas"]["Identifier"][];
+            createdByIdentityId: components["schemas"]["Identifier"];
+            createdAt: components["schemas"]["Timestamp"];
+            updatedAt: components["schemas"]["Timestamp"];
+            /** @description Direct source test case in the same project, without creating a run. Mutually exclusive with runId, runItemId and stepId; immutable after creation. */
+            sourceCaseId?: components["schemas"]["Identifier"] | null;
+            /** @description Canonical defect in the same project when this defect was closed as a duplicate. */
+            triageDuplicateOfDefectId: components["schemas"]["Identifier"] | null;
+            rowVersion: number;
+            /** @description Active wake time for a snoozed defect. Inbox rows have a null wake time. */
+            triageSnoozedUntil: components["schemas"]["Timestamp"] | null;
+        };
+        DefectTriageEnvelope: {
+            data: components["schemas"]["DefectTriageRow"];
+        };
+        DefectTriageListEnvelope: {
+            data: components["schemas"]["DefectTriageRow"][];
+            meta: components["schemas"]["PageMeta"];
+        };
+        DefectTriageRequest: {
+            workspaceId: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            expectedVersion: number;
+            /** @enum {string} */
+            action: "accept" | "decline" | "resume";
+            /**
+             * @description Optional note recorded when the decision changes defect status.
+             * @default
+             */
+            reason: string;
+        } | {
+            workspaceId: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            expectedVersion: number;
+            /** @constant */
+            action: "duplicate";
+            /**
+             * @description Optional note recorded when the decision changes defect status.
+             * @default
+             */
+            reason: string;
+            duplicateOfDefectId: components["schemas"]["Identifier"];
+        } | {
+            workspaceId: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            expectedVersion: number;
+            /** @constant */
+            action: "snooze";
+            /**
+             * @description Optional note recorded when the decision changes defect status.
+             * @default
+             */
+            reason: string;
+            snoozedUntil: components["schemas"]["Timestamp"];
         };
         /** @enum {string} */
         AttachmentKind: "file" | "screenshot" | "video" | "log";
@@ -13714,6 +13933,29 @@ export interface components {
                 "application/json": components["schemas"]["DefectListEnvelope"];
             };
         };
+        /** @description Defect and triage state after the command. */
+        DefectTriageResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                ETag: components["headers"]["ETag"];
+                "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["DefectTriageEnvelope"];
+            };
+        };
+        /** @description Page of incoming project defects ordered by creation time and then ID, ascending. */
+        DefectTriageListResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                "X-Next-Cursor": components["headers"]["XNextCursor"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["DefectTriageListEnvelope"];
+            };
+        };
         /** @description Defect representation. */
         DefectResponse: {
             headers: {
@@ -13942,6 +14184,27 @@ export interface components {
             };
             content: {
                 "application/json": components["schemas"]["DashboardAnalyticsRunItemListEnvelope"];
+            };
+        };
+        /** @description Exact counts and bounded groups for the selected defect population. */
+        DashboardDefectBreakdownResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["DashboardDefectBreakdownEnvelope"];
+            };
+        };
+        /** @description Page of exact first-resolution defect lead-time points, newest resolution first. */
+        DashboardDefectLeadTimeResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                "X-Next-Cursor": components["headers"]["XNextCursor"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["DashboardDefectLeadTimeEnvelope"];
             };
         };
         /** @description A bounded exact defect cohort ordered by immutable createdAt then ID, newest first, with safe links and originating occurrence. */
@@ -16367,9 +16630,71 @@ export interface operations {
             500: components["responses"]["InternalError"];
         };
     };
-    getDefect: {
+    listDefectTriage: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                /** @description Required project scope; cross-project reads are never performed and filtered afterward. */
+                projectId: components["parameters"]["ProjectIdQueryRequired"];
+                view?: "inbox" | "snoozed";
+                cursor?: string;
+                /** @description Requested page size. */
+                limit?: components["parameters"]["Limit"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["DefectTriageListResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    triageDefect: {
         parameters: {
             query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                defectId: components["parameters"]["DefectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DefectTriageRequest"];
+            };
+        };
+        responses: {
+            200: components["responses"]["DefectTriageResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getDefect: {
+        parameters: {
+            query?: {
+                /** @description True permits the authorized detail read of an archived defect. */
+                includeArchived?: boolean;
+            };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
                 "X-Request-Id"?: components["parameters"]["XRequestId"];
@@ -16382,6 +16707,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: components["responses"]["DefectResponse"];
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
@@ -17060,6 +17386,93 @@ export interface operations {
             503: components["responses"]["AnalyticsUnavailable"];
         };
     };
+    getDashboardDefectBreakdown: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                projectId?: components["parameters"]["ProjectIdQuery"];
+                /** @description Server-owned UTC event window preset. Presets reject from/to; custom requires both exact bounds and is capped at 366 days. Preset bounds are frozen into every continuation cursor. */
+                period?: components["parameters"]["AnalyticsPeriodQuery"];
+                /** @description Inclusive UTC bound. Required only with period=custom. */
+                from?: components["parameters"]["AnalyticsFromQuery"];
+                /** @description Exclusive UTC bound. Required only with period=custom and cannot be in the future. */
+                to?: components["parameters"]["AnalyticsToQuery"];
+                dimensionLimit?: number;
+                /** @description Stable catalog value identifier. */
+                productGroupId?: components["schemas"]["Identifier"];
+                /** @description Stable catalog value identifier. */
+                productId?: components["schemas"]["Identifier"];
+                /** @description Filter by the immutable case field snapshot; false is an explicit filter, not absence. */
+                regression?: "true" | "false";
+                basis?: "current" | "reported";
+                groupBy: "project" | "component" | "assignee" | "status" | "priority" | "severity";
+                segmentBy?: "none" | "status" | "priority" | "severity";
+                /** @description Current basis only. Filters active safe HTTPS external/YouTrack links. The always-present Falcon resource link is not part of this predicate. */
+                hasLink?: boolean;
+                /** @description Current basis only. Restrict to nonarchived defects outside verified and closed. */
+                activeOnly?: boolean;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["DashboardDefectBreakdownResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["AnalyticsUnavailable"];
+        };
+    };
+    listDashboardDefectLeadTime: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                projectId?: components["parameters"]["ProjectIdQuery"];
+                /** @description Server-owned UTC event window preset. Presets reject from/to; custom requires both exact bounds and is capped at 366 days. Preset bounds are frozen into every continuation cursor. */
+                period?: components["parameters"]["AnalyticsPeriodQuery"];
+                /** @description Inclusive UTC bound. Required only with period=custom. */
+                from?: components["parameters"]["AnalyticsFromQuery"];
+                /** @description Exclusive UTC bound. Required only with period=custom and cannot be in the future. */
+                to?: components["parameters"]["AnalyticsToQuery"];
+                /** @description Opaque continuation token returned as meta.nextCursor or X-Next-Cursor. It is bound to the original filters and ordering. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Requested page size. */
+                limit?: components["parameters"]["Limit"];
+                priority?: components["schemas"]["Priority"];
+                /** @description Stable catalog value identifier. */
+                productGroupId?: components["schemas"]["Identifier"];
+                /** @description Stable catalog value identifier. */
+                productId?: components["schemas"]["Identifier"];
+                /** @description Filter by the immutable case field snapshot; false is an explicit filter, not absence. */
+                regression?: "true" | "false";
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["DashboardDefectLeadTimeResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["AnalyticsUnavailable"];
+        };
+    };
     listDashboardAnalyticsDefects: {
         parameters: {
             query: {
@@ -17083,6 +17496,11 @@ export interface operations {
                 component?: string;
                 componentIsEmpty?: boolean;
                 severity?: components["schemas"]["Priority"];
+                priority?: components["schemas"]["Priority"];
+                /** @description Exact assigned identity. Mutually exclusive with unassigned=true. */
+                assigneeIdentityId?: components["schemas"]["Identifier"];
+                /** @description Selects only defects with no assigned identity. */
+                unassigned?: boolean;
                 activeOnly?: boolean;
                 runId?: components["schemas"]["Identifier"];
                 testCaseId?: components["schemas"]["Identifier"];

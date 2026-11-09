@@ -8,10 +8,11 @@ export function useSelectedDefectResource(
   projectId: string,
   defects: Defect[],
   defectId: string | null,
+  includeArchived = false,
 ) {
   const http = useTmsHttpClient();
-  const scope = JSON.stringify([projectId, defectId]);
-  const cached = defects.find((defect) => (
+  const scope = JSON.stringify([projectId, defectId, includeArchived]);
+  const cached = includeArchived ? null : defects.find((defect) => (
     defect.id === defectId && defect.projectId === projectId
   )) ?? null;
   const [resource, setResource] = useState<{
@@ -21,9 +22,13 @@ export function useSelectedDefectResource(
 
   useEffect(() => {
     setResource({ scope, status: "loading", data: null });
-    if (!connected || !defectId || cached) return;
+    if (!defectId || cached) return;
+    if (!connected) {
+      if (includeArchived) setResource({ scope, status: "error", data: null });
+      return;
+    }
     const controller = new AbortController();
-    getDefect(http, defectId, controller.signal).then((resource) => {
+    getDefect(http, defectId, controller.signal, includeArchived).then((resource) => {
       if (!controller.signal.aborted) {
         setResource(resource.data.projectId === projectId
           ? { scope, status: "ready", data: resource.data }
@@ -35,7 +40,7 @@ export function useSelectedDefectResource(
       }
     });
     return () => controller.abort();
-  }, [cached, connected, defectId, http, projectId, retry, scope]);
+  }, [cached, connected, defectId, http, includeArchived, projectId, retry, scope]);
 
   if (cached) return { data: cached, status: "ready" as const, retry: () => {} };
   if (!defectId) return { data: null, status: "idle" as const, retry: () => {} };

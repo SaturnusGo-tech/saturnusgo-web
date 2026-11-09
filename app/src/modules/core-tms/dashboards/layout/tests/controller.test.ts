@@ -84,6 +84,32 @@ test("legacy full-width metrics render compactly and are normalized only in the 
   c.edit(""); await c.save(); assert.equal(c.getState().board?.widgets[0].position.width,3);
 });
 
+
+test("the dashboardcn preview saves a chart metric's selected width and restores it when reopened", async (t) => {
+  const previousPreview = process.env.NEXT_PUBLIC_TMS_DASHBOARDCN_PREVIEW;
+  process.env.NEXT_PUBLIC_TMS_DASHBOARDCN_PREVIEW = "1";
+  t.after(() => {
+    if (previousPreview === undefined) delete process.env.NEXT_PUBLIC_TMS_DASHBOARDCN_PREVIEW;
+    else process.env.NEXT_PUBLIC_TMS_DASHBOARDCN_PREVIEW = previousPreview;
+  });
+  const metric = createBoardWidget(widgetByKey.get("runsLaunched")!, "en", "resizable-metric");
+  const { controller } = setup();
+  await controller.load();
+  controller.edit("Quality");
+  controller.add([metric]);
+  assert.equal(controller.getState().draft?.widgets[0].position.width, 3);
+
+  controller.resize(metric.id, 6);
+  assert.equal(controller.getState().draft?.widgets[0].position.width, 6);
+  controller.resize(metric.id, 12);
+  await controller.save();
+  await controller.load();
+
+  const savedMetric = controller.getState().board!.widgets[0];
+  assert.equal(savedMetric.position.width, 12);
+  assert.equal(widgetLayoutWidth(savedMetric), 12);
+});
+
 const definition = (key:string) => createBoardWidget(widgetByKey.get(key)!,"en",key);
 const legacyWidgets = () => [...freshnessLegacyKeys].map((key,index) => ({...definition("currentCases"),
   id:`legacy-${index}`,title:`Saved ${key}`,settings:{presentation:key,custom:{owner:"qa"}}}));

@@ -2,3 +2,6 @@
 .badge svg { flex: none; }
 .badge[data-suite-kind="dynamic"] { color: var(--falcon-info); background: var(--falcon-info-bg); }
 .badge[data-suite-kind="archived"] { color: var(--falcon-text-muted); background: transparent; }
+.icon { display: inline-grid; place-items: center; flex: none; width: 18px; color: var(--falcon-case-icon); }
+.icon[data-suite-kind="dynamic"] { color: var(--falcon-info); }
+.icon[data-suite-kind="archived"] { color: var(--falcon-text-muted); }

@@ -27,7 +27,9 @@ export async function getDefect(
   http: TmsHttpClient,
   defectId: string,
   signal?: AbortSignal,
+  includeArchived = false,
 ) {
-  const resource = await http.getResource<Api["Defect"]>(`/defects/${defectId}`, signal);
+  const path = `/defects/${encodeURIComponent(defectId)}${includeArchived ? "?includeArchived=true" : ""}`;
+  const resource = await http.getResource<Api["Defect"]>(path, signal);
   return { data: mapDefect(resource.data), etag: resource.etag };
 }

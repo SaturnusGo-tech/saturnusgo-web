@@ -135,7 +135,7 @@ test("dashboard drill-downs use full pages and retain contextual navigation", ()
   assert.match(inspector, /<DetailPage/);
   assert.match(inspector, /onOpenEntity\(tab, props\.selected\)/);
   assert.match(inspector, /relatedDashboardDrill/);
-  assert.match(inspector, /<ComponentRail/);
+  assert.match(inspector, /<DetailToolbar scope=\{/);
   assert.match(inspector, /<GroupedChecks/);
   assert.match(inspector, /<DetailToolbar/);
   assert.match(inspector, /props\.onCreateRun\(\[\.\.\.selection\]\)/);

@@ -18,7 +18,7 @@ export function WorkspaceSuitesStage({ model }: { model: WorkspaceModel }) {
     if (previous.current && !editing) catalog.current?.querySelector<HTMLElement>("h1")?.focus();
     previous.current = editing;
   }, [editing]);
-  const view = <div ref={catalog} hidden={editing} style={{ flex: 1, minHeight: 0, minWidth: 0, display: editing ? "none" : "flex" }}>
+  const view = <div ref={catalog} hidden={editing} style={{ flex: 1, height: "100%", minHeight: 0, minWidth: 0, display: editing ? "none" : "flex" }}>
     <SuitesView workspaceId={model.data.workspace.id} projectId={project.id} projectName={project.name}
       suites={model.projectSuites} cases={model.projectCases} folders={model.folders.items}
       selectedDetail={model.selectedSuite} detailError={model.selectedSuiteDetailError} onRetryDetail={model.retrySelectedSuiteDetail}

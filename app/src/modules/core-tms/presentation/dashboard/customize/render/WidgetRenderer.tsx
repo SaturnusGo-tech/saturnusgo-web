@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { DeferredPane } from "../../../common/loading/feedback/DeferredPane";
-import { widgetByKey } from "../../../../dashboards/layout/model/widget-catalog";
+import { useState } from "react";
+import { dashboardcnEnabled, widgetByKey } from "../../../../dashboards/layout/model/widget-catalog";
+import { workflowDefinition } from "../../../../dashboards/layout/migration/workflow-widgets";
 import type { DashboardSnapshot } from "../../../../dashboards/model/dashboard-analytics";
 import type { WorkbenchSnapshot } from "../../../../dashboards/workbench/model/workbench";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
@@ -16,11 +17,12 @@ import { FreshnessPanel } from "../../workbench/FreshnessPanel";
 import { WorkbenchPanel } from "../../workbench/WorkbenchPanel";
 import { MetricWidget } from "../widgets/MetricWidget";
 import { OutcomeWidget } from "../widgets/OutcomeWidget";
+import { DashboardcnWidget } from "./dashboardcn/DashboardcnWidget";
 import styles from "../layout.module.css";
 
 type WidgetProps = { widget: string; title?: string };
 type Props = WidgetProps & (
-  | { model: DashboardModel; onOpenRow: DashboardViewProps["onOpenRow"] }
+  | { model: DashboardModel; onOpenRow: DashboardViewProps["onOpenRow"]; canManageDefects?: boolean; catalogPreview?: boolean; projectName?: string }
   | { evidence: { snapshot: DashboardSnapshot | null; workbench: WorkbenchSnapshot | null; valueContext: string } }
 );
 
@@ -28,8 +30,10 @@ export function WidgetRenderer(props: Props) {
   const { widget, title } = props;
   const { locale, t } = useTmsLocale();
   const [tab, selectTab] = useState<"activeRuns" | "readyForRetest">("activeRuns");
-  const definition = widgetByKey.get(widget);
   const model = "model" in props ? props.model : undefined;
+  const workflow = Boolean(model && dashboardcnEnabled());
+  const interactive = "model" in props && !props.catalogPreview;
+  const definition = workflow ? workflowDefinition(widget) : widgetByKey.get(widget);
   const evidence = "evidence" in props ? props.evidence : undefined;
   const snapshot = model?.snapshot ?? evidence?.snapshot ?? null;
   const openDrill = model?.analytics.openDrill;
@@ -39,8 +43,20 @@ export function WidgetRenderer(props: Props) {
   };
 
   if (!definition) return <p className={styles.unavailable}>{t("dashboardLayout.unknown")}</p>;
+  const displayTitle = title ?? (locale === "ru" ? definition.ru : definition.en);
+  if (dashboardcnEnabled()) {
+    return <DashboardcnWidget widget={widget} title={displayTitle} snapshot={snapshot}
+      workbench={workbench} summaryPending={model?.analytics.summaryLoading} openDrill={interactive ? openDrill : undefined} valueContext={evidence?.valueContext}
+      workflow={workflow} interactive={interactive} scope={model?.query}
+      projectName={"model" in props ? props.projectName : undefined}
+      canManageDefects={interactive && props.canManageDefects}
+      readDrill={interactive ? model?.analytics.readDrill : undefined}
+      readDefectBreakdown={interactive ? model?.analytics.readDefectBreakdown : undefined}
+      onTriageChange={interactive && model ? () => { model.analytics.refresh(); void model.workbench.refresh(); } : undefined}
+      onOpenRow={interactive ? props.onOpenRow : undefined} />;
+  }
   if (definition.width === 3 || widget === "readyForRetest") return <MetricWidget metric={widget}
-    title={title ?? (locale === "ru" ? definition.ru : definition.en)} snapshot={snapshot} model={workbench}
+    title={displayTitle} snapshot={snapshot} model={workbench}
     openDrill={openDrill} valueContext={evidence?.valueContext} />;
   if (widget === "queue") return <WorkbenchPanel model={workbench} onOpenRow={"onOpenRow" in props ? props.onOpenRow : undefined} />;
   if (widget === "freshness") return <FreshnessPanel model={workbench} page={model?.preferences.value.freshnessPage}

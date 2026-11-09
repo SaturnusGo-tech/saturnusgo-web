@@ -69,7 +69,7 @@ export function useWorkspaceModel() {
     setView: state.setView, clearDefectSelection: defectNavigation.clearDefectSelection });
   const selectedDefectResource = useSelectedDefectResource(
     state.connection === "connected", derived.project?.id ?? "", derived.projectDefects,
-    defectNavigation.selectedDefectId,
+    defectNavigation.selectedDefectId, defectNavigation.selectedDefectIncludesArchived,
   );
   const sharedSteps = useSharedSteps(derived.project?.id ?? "", state.connection);
   const verification = useWorkspaceVerification(state, derived, openRun);
@@ -81,11 +81,12 @@ export function useWorkspaceModel() {
   }, [state.view, state.canWriteNavigation, defectNavigation.canonicalizeSelectedDefect, derived.project?.id,
     selectedDefectResource.data?.projectId, selectedDefectResource.status]);
   const selectedDefect = selectedDefectResource.data;
-  const defectRetest = useDefectRetest(state, derived, selectedDefect
-    ?? derived.projectDefects.find((item) => item.id === defectNavigation.selectedDefectId), openRun);
-  const reportDefects = selectedDefect
-    && !derived.projectDefects.some((defect) => defect.id === selectedDefect.id)
-    ? [...derived.projectDefects, selectedDefect] : derived.projectDefects;
+  const cachedSelected = derived.projectDefects.find((item) => item.id === defectNavigation.selectedDefectId);
+  const retestDefect = selectedDefect ?? (defectNavigation.selectedDefectIncludesArchived ? null : cachedSelected);
+  const defectRetest = useDefectRetest(state, derived, retestDefect?.archivedAt ? null : retestDefect, openRun);
+  const reportDefects = !selectedDefect || selectedDefect === cachedSelected ? derived.projectDefects
+    : cachedSelected ? derived.projectDefects.map(item => item.id === selectedDefect.id ? selectedDefect : item)
+    : [...derived.projectDefects, selectedDefect];
   return {
     ...state,
     repositoryScope, portfolioRepository,

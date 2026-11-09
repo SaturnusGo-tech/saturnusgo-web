@@ -1,30 +1,58 @@
-import { ChevronDown } from "lucide-react";
-import { useCallback, useId, useRef, useState } from "react";
-import { useAnchoredPopup } from "../../../../common/popup/useAnchoredPopup";
+import { Button, Input, Listbox, ListboxItem } from "@heroui/react";
+import { ArrowLeft, Check, ChevronRight } from "lucide-react";
+import type { KeyboardEvent, ReactNode } from "react";
+import dashboardStyles from "../../../dashboard.module.css";
 import styles from "./picker.module.css";
 
-export function FacetPicker({ label, allLabel, options, selected, onToggle }: {
-  label: string; allLabel: string; options: Array<{ value: string; label: string; count: number }>;
-  selected: string[]; onToggle: (value: string) => void;
+type Option = { value: string; label: string; count?: number; disabled?: boolean; icon?: ReactNode };
+type Search = { label: string; value: string; onChange(value: string): void };
+
+export const drillFacetPopoverClasses = { base: styles.positioner, content: `${styles.surface} ${dashboardStyles.popupEnter}` };
+
+export function FacetPicker({ label, options, selected, search, empty, onChoose, onHover, onBack, children, focus = true, single, busy }: {
+  label: string; options: readonly Option[]; selected?: string[]; search?: Search; empty?: string | null;
+  onChoose(value: string, row: HTMLElement): void;
+  onHover?(value: string, row: HTMLElement): void;
+  onBack?(): void;
+  children?: ReactNode; focus?: boolean; single?: boolean; busy?: boolean;
 }) {
-  const [open, setOpen] = useState(false); const id = useId();
-  const root = useRef<HTMLDivElement>(null), trigger = useRef<HTMLButtonElement>(null), panel = useRef<HTMLDivElement>(null);
-  const close = useCallback(() => setOpen(false), []);
-  useAnchoredPopup(open, false, root, trigger, panel, close, 260);
-  const summary = selected.length ? selected.map(value => options.find(option => option.value === value)?.label ?? value).join(", ") : allLabel;
-  return <div className={styles.field} ref={root} onKeyDown={event => {
-    if (event.key === "Escape" && open) { event.preventDefault(); event.stopPropagation(); close(); trigger.current?.focus(); }
-  }} onBlur={event => { if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget as Node)) close(); }}>
-    <span className={styles.label}>{label}</span>
-    <button type="button" ref={trigger} className={styles.trigger} title={summary} aria-label={`${label}: ${summary}`}
-      aria-haspopup="dialog" aria-expanded={open} aria-controls={open ? id : undefined} onClick={() => setOpen(value => !value)}>
-      <span>{summary}</span><ChevronDown size={14} />
-    </button>
-    {open && <div ref={panel} id={id} className={styles.menu} popover="manual" role="dialog" aria-label={label}>
-      {options.map(option => <label key={option.value} title={option.label}>
-        <input type="checkbox" checked={selected.includes(option.value)} onChange={() => onToggle(option.value)} />
-        <span>{option.label}</span><small>{option.count}</small>
-      </label>)}
-    </div>}
+  function handleOptionKey(event: KeyboardEvent<HTMLDivElement>) {
+    if (event.nativeEvent.isComposing) return;
+    const row = event.target instanceof Element ? event.target.closest<HTMLElement>("[data-drill-facet-option]") : null;
+    if (!row || row.closest("[data-drill-facet-picker]") !== event.currentTarget || row.getAttribute("aria-disabled") === "true") return;
+    if (event.key === "Enter" || event.key === " " || (onHover && event.key === "ArrowRight")) {
+      event.preventDefault();
+      event.stopPropagation();
+      onChoose(row.dataset.drillFacetOption!, row);
+    }
+  }
+  function focusOption(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+    const options = event.currentTarget.closest("[data-drill-facet-picker]")?.querySelectorAll<HTMLElement>("[data-drill-facet-option]:not([aria-disabled=true])");
+    const option = event.key === "ArrowDown" ? options?.[0] : options?.[options.length - 1];
+    if (!option) return;
+    event.preventDefault();
+    option.focus({ preventScroll: true });
+  }
+  return <div className={styles.menu} data-drill-facet-picker onKeyDownCapture={handleOptionKey}>
+    {onBack && <Button size="sm" variant="light" className={styles.back} onPress={onBack}>
+      <ArrowLeft size={14} aria-hidden="true" />{label}
+    </Button>}
+    {search && <Input autoFocus={focus} size="sm" variant="flat" aria-label={search.label} placeholder={search.label} value={search.value}
+      classNames={{ base: styles.search, inputWrapper: styles.inputShell, input: styles.input }} onValueChange={search.onChange} onKeyDown={focusOption} />}
+    <Listbox aria-label={label} aria-busy={busy} variant="light" selectionMode={selected ? single ? "single" : "multiple" : "none"}
+      selectedKeys={selected} hideSelectedIcon autoFocus={!search && focus} emptyContent={empty}
+      disabledKeys={options.filter(option => option.disabled).map(option => option.value)}
+      classNames={{ base: styles.listbox, list: styles.list, emptyContent: styles.empty }} itemClasses={{ base: styles.row, title: styles.title }}>
+      {options.map(option => <ListboxItem key={option.value} textValue={option.label} data-drill-facet-option={option.value}
+        onPress={event => { if (event.target instanceof HTMLElement) onChoose(option.value, event.target); }}
+        onMouseEnter={onHover ? event => onHover(option.value, event.currentTarget) : undefined}
+        startContent={option.icon} endContent={onHover ? <ChevronRight className={styles.detail} size={13} aria-hidden="true" />
+          : <>{option.count !== undefined && <small className={styles.detail}>{option.count}</small>}
+            {selected?.includes(option.value) && <Check size={14} className={styles.detail} aria-hidden="true" />}</>}>
+        {option.label}
+      </ListboxItem>)}
+    </Listbox>
+    {children}
   </div>;
 }

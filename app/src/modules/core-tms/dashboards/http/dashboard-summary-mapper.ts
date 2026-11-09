@@ -96,6 +96,11 @@ export function mapDashboardAnalyticsSummary(summary: Summary,
       drill: drill(`cases:type:${item.key}`, item.key,
         { entity: "test_case", basis: "current", type: item.key }),
     })),
+    createdCaseTypes: summary.testCases.createdInPeriodByType?.map((item) => ({
+      key: item.key, label: item.key, value: item.count,
+      drill: drill(`cases:created:type:${item.key}`, item.key,
+        { entity: "test_case", basis: "created", type: item.key }),
+    })),
     tags: summary.testCases.current.byTag.buckets.map((item) => ({
       key: item.key, label: item.key, value: item.count,
       drill: drill(`cases:tag:${item.key}`, item.key,

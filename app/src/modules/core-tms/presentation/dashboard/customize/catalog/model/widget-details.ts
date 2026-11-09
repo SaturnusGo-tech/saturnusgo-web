@@ -62,13 +62,48 @@ const details: Record<string, Detail> = {
   },
 };
 
-export function widgetDetails(widget: WidgetDefinition, locale: string) {
+const workflowDetails: Record<string, Detail & { context: Localized }> = {
+  queue: {
+    purpose: ["Выберите проверку, требующую внимания, или разберите входящие дефекты.", "Find a check that needs attention or triage incoming defects."],
+    context: ["Проверки учитывают окружение и сборку. Триаж показывает очередь выбранного проекта.", "Check signals follow environment and build filters. Triage shows the selected project's inbox."],
+    overlap: ["Карта дефектов даёт обзор статусов, здесь можно принять решение по отдельной записи.", "Defect map summarizes statuses. Use this queue to make decisions on individual defects."],
+    included: [["Сигналы QA", "QA signals"], ["Входящие и отложенные дефекты", "Inbox and snoozed defects"]],
+    related: ["defects"],
+  },
+  defects: {
+    purpose: ["Откройте список дефектов по статусу, дате создания или наличию ссылки.", "Open the underlying defects by status, report date or linked issue."],
+    context: ["Статусы и ссылки отражают текущее состояние. Новые дефекты считаются за выбранный период.", "Statuses and links reflect the current state. New defects use the selected period."],
+    overlap: ["Входящие дефекты можно разобрать в очереди QA.", "Use the QA queue to triage incoming defects."],
+    related: ["queue"],
+  },
+  types: {
+    purpose: ["Сравните типы кейсов и откройте записи выбранного типа прямо в виджете.", "Compare case types and open the records for a selected type from the widget."],
+    context: ["Переключайтесь между текущей базой и кейсами, созданными за выбранный период.", "Switch between the current library and cases created during the selected period."],
+    overlap: ["Покрытие показывает, какие кейсы попали в прогоны.", "Coverage shows which cases were included in runs."],
+    related: ["coverage", "tags"],
+  },
+  defectPerformance: {
+    purpose: ["Посмотрите открытые дефекты, срок до первого решения и статусы новых записей.", "Inspect open bugs, time to first resolution, and current statuses of reported defects."],
+    context: ["Открытые дефекты отражают текущее состояние. Для новых и решённых дефектов используется выбранный период.", "Open bugs use current inventory. Reports and resolutions use the selected period."],
+    overlap: ["В Insights можно разбить дефекты по ответственным, продуктам и другим полям.", "Use Defect map to break defects down by assignee, product and other properties."],
+    related: ["defects", "queue"],
+  },
+  completedRuns: {
+    purpose: ["Выберите дату и результат, чтобы увидеть завершённые прогоны и открыть нужный.", "Choose a date and outcome to inspect the completed runs and open a record."],
+    context: ["Учитывается дата завершения в пределах выбранного периода.", "Uses completion dates within the selected period."],
+    overlap: ["Динамика прогонов показывает запуски и результаты по времени.", "Run activity charts launches and outcomes over time."],
+    related: ["trend", "outcomes"],
+  },
+};
+
+export function widgetDetails(widget: WidgetDefinition, locale: string, workflowPreview = false) {
   const index = locale === "ru" ? 0 : 1;
   const section = widgetSection(widget.key);
   const parent = widget.key.startsWith("defect:") || ["currentDefects", "linkedDefects"].includes(widget.key) ? "defects"
     : widget.key.startsWith("type:") || widget.key === "currentCases" ? "types"
     : section === "runs" ? "outcomes" : undefined;
-  const detail = details[widget.key];
+  const workflow = workflowPreview ? workflowDetails[widget.key] : undefined;
+  const detail = workflow ?? details[widget.key];
   const context: Localized = section === "overview"
     ? ["Текущая рабочая выборка с выбранными фильтрами окружения и сборки.", "Current work scope with the selected environment and build filters."]
     : widget.group === "history"
@@ -82,9 +117,9 @@ export function widgetDetails(widget: WidgetDefinition, locale: string) {
         : `This metric also appears in ${parentWidget.en}. A separate card keeps it in focus.`
       : index === 0 ? "Показывает изменения за период. Не заменяет общее число объектов проекта."
         : "Shows changes within the period. It does not replace the current project total."),
-    context: widget.key === "portfolio" ? (index === 0
+    context: workflow?.context[index] ?? (widget.key === "portfolio" ? (index === 0
       ? "Текущая база и дефекты проекта; результаты прогонов за выбранный период."
-      : "Current project library and defects; run outcomes for the selected period.") : context[index], included: detail?.included?.map((item) => item[index]) ?? [],
+      : "Current project library and defects; run outcomes for the selected period.") : context[index]), included: detail?.included?.map((item) => item[index]) ?? [],
     related: (detail?.related ?? (parent ? [parent] : [section === "library" ? "currentCases" : "currentDefects"]))
       .map((key) => widgetByKey.get(key)).filter((item): item is WidgetDefinition => Boolean(item) && item?.key !== widget.key),
   };

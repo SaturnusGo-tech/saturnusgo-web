@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { componentHarness, invoke, nodes } from "../../../portfolios/tests/support/component-harness";
 import type { DefectBrowser } from "../browser/DefectBrowser";
+import type { DefectRow } from "../branches/DefectRow";
 import type { Defect } from "../../../../../core/tms/contracts/legacy-contract";
 import * as scopeModel from "../../../defects/browser/model/defect-browser";
 import type { useNavigationValue } from "../../../state/navigation/context/useNavigationValue";
@@ -17,13 +18,14 @@ function harness(components = ["Payments", "Sign in"]) {
   const expansion = h.load(new URL("../../../defects/browser/state/expansion/useDefectExpansion.ts", import.meta.url));
   const requests: { scope: string; query: string; severitySort: string | null }[] = [];
   const state = { groups: components.map(component => ({ component, total: 125, open: 90, critical: 2 })),
-    totals: { total: 250, open: 180, critical: 4 }, groupsStatus: "ready", hasMoreGroups: false,
+    totals: { total: 250, open: 180, critical: 4 }, groupsStatus: "ready", groupsError: null as string | null, hasMoreGroups: false,
     branches: {} as Record<string, unknown>, openComponent: (component: string) => { opened.push(component); },
     loadMoreGroups() {}, retryGroups() {}, loadMoreComponent() {}, retryComponent() {} };
   const { DefectBrowser: View } = h.load<{ DefectBrowser: typeof DefectBrowser }>(new URL("../browser/DefectBrowser.tsx", import.meta.url), name => {
     if (name.endsWith("useDefectBrowser")) return { useDefectBrowser: (options: typeof requests[number]) => { requests.push(options); return state; } };
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "ru", t: (key: string) => key }) };
     if (name.endsWith("useDefectExpansion")) return expansion;
+    if (name.endsWith("usePageAppearance")) return { usePageAppearance: () => ({ current: null }) };
     if (name.endsWith("useNavigationValue")) return navigationHook;
     if (name.endsWith("defect-browser")) return scopeModel;
     return undefined;
@@ -73,7 +75,7 @@ test("active is the default and scope changes preserve the search, sort and sele
   f.render(); assert.equal(f.requests[f.requests.length - 1]?.scope, "active");
   invoke(f.render().find(node => node.props["aria-label"] === "Сортировать по серьёзности")!, "onClick");
   invoke(f.render().find(node => node.type === "DefectBranch")!, "onSelectDefect", "selected-bug");
-  invoke(f.render().find(node => node.type === "button" && node.props.children === "Закрытые")!, "onClick");
+  invoke(f.render().find(node => node.type === "Tabs")!, "onSelectionChange", "closed");
   f.render();
   assert.equal(f.requests[f.requests.length - 1]?.scope, "closed");
   assert.equal(f.requests[f.requests.length - 1]?.query, "Payment");
@@ -83,10 +85,60 @@ test("active is the default and scope changes preserve the search, sort and sele
   f.h.dispose();
 });
 
+test("scope changes retain the settled queue until new expanded rows finish loading", () => {
+  const f = harness(["Payments"]);
+  f.state.branches = { Payments: { items: [], status: "ready" } };
+  const ready = f.render();
+  invoke(ready.find(node => node.type === "Tabs")!, "onSelectionChange", "closed");
+  f.state.groupsStatus = "loading"; f.state.groups = []; f.state.branches = {};
+  const pending = f.render();
+  assert.ok(pending.some(node => node.type === "DefectBranch"));
+  const queue = { inert: false };
+  invoke(pending.find(node => typeof node.props.ref === "function")!, "ref", queue);
+  assert.equal(queue.inert, true);
+  assert.ok(pending.some(node => node.props["aria-busy"] === true));
+  assert.ok(!pending.some(node => node.props["aria-label"] === "Загрузка разделов"));
+
+  f.state.groupsStatus = "ready";
+  f.state.groups = [{ component: "Archive", total: 2, open: 0, critical: 0 }];
+  assert.equal((f.render().find(node => node.type === "DefectBranch")?.props.group as { component: string }).component, "Payments");
+  invoke(f.render().find(node => node.type === "Tabs")!, "onSelectionChange", "active");
+  f.state.groupsStatus = "loading"; f.state.groups = [];
+  assert.equal((f.render().find(node => node.type === "DefectBranch")?.props.group as { component: string }).component, "Payments");
+  invoke(f.render().find(node => node.type === "Tabs")!, "onSelectionChange", "all");
+  f.state.groupsStatus = "ready";
+  f.state.groups = [{ component: "Archive", total: 2, open: 0, critical: 0 }];
+  f.state.branches = { Archive: { items: [], status: "ready" } };
+  const settled = f.render();
+  assert.equal((settled.find(node => node.type === "DefectBranch")?.props.group as { component: string }).component, "Archive");
+  invoke(settled.find(node => typeof node.props.ref === "function")!, "ref", queue);
+  assert.equal(queue.inert, false);
+  f.h.dispose();
+});
+
+test("scope retention clears immediately on access error or project changes", () => {
+  const f = harness(["Payments"]);
+  f.state.branches = { Payments: { items: [], status: "ready" } };
+  invoke(f.render().find(node => node.type === "Tabs")!, "onSelectionChange", "closed");
+  f.state.groupsStatus = "error"; f.state.groupsError = "access_unavailable"; f.state.groups = []; f.state.branches = {};
+  const error = f.render();
+  assert.ok(error.some(node => node.props.role === "alert"));
+  assert.ok(!error.some(node => node.type === "DefectBranch"));
+
+  f.state.groupsStatus = "ready"; f.state.groupsError = null;
+  f.state.groups = [{ component: "Payments", total: 2, open: 0, critical: 0 }];
+  f.state.branches = { Payments: { items: [], status: "ready" } };
+  invoke(f.render().find(node => node.type === "Tabs")!, "onSelectionChange", "all");
+  f.state.groupsStatus = "loading"; f.state.groups = []; f.state.branches = {};
+  f.input.projectId = "other-project";
+  assert.ok(!f.render().some(node => node.type === "DefectBranch"));
+  f.h.dispose();
+});
+
 test("navigation restores its queue scope and a different project starts with active bugs", () => {
   const f = harness(); f.render();
   f.navigation.set("reports:workspace:project:scope", "closed"); f.h.emit("popstate");
-  assert.equal(f.render().find(node => node.type === "button" && node.props.children === "Закрытые")?.props["aria-pressed"], true);
+  assert.equal(f.render().find(node => node.type === "Tabs")?.props.selectedKey, "closed");
   f.input.projectId = "other-project"; f.render(); assert.equal(f.requests[f.requests.length - 1]?.scope, "active");
   f.input.projectId = "project"; f.render(); assert.equal(f.requests[f.requests.length - 1]?.scope, "closed");
   f.h.dispose();
@@ -111,4 +163,30 @@ test("an empty scoped search offers all statuses without clearing the query", ()
   assert.ok(broaden); invoke(broaden, "onClick"); f.render();
   assert.equal(f.requests[f.requests.length - 1]?.scope, "all");
   assert.equal(f.requests[f.requests.length - 1]?.query, "HOST-BUG-12"); f.h.dispose();
+});
+
+test("a bug row shows actual priority, localized status, and its ID after the title", t => {
+  const h = componentHarness(); t.after(() => h.dispose());
+  const { DefectRow: Row } = h.load<{ DefectRow: typeof DefectRow }>(new URL("../branches/DefectRow.tsx", import.meta.url), name => {
+    if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en", t: (key: string) => key }) };
+    if (name.endsWith("labels")) return { localizedLabel: (_: string, value: string) => `Status ${value}` };
+    if (name.endsWith("PriorityIcon")) return { PriorityIcon: "PriorityIcon", priorityLabel: (_: string, value: string) => `Priority ${value}` };
+    return undefined;
+  });
+  const defect = { id: "defect-real-id", key: "HOST-BUG-81", title: "Failed to save the payment",
+    priority: "low", severity: "critical", status: "open", assigneeIdentityId: "actor-assigned" } as Defect;
+  let opened = "";
+  const tree = nodes(h.render(() => Row({ defect, workspaceId: "workspace", selected: true, onSelect: id => { opened = id; } })));
+  assert.equal(tree.find(node => node.type === "PriorityIcon")?.props.level, "low");
+  assert.ok(tree.some(node => node.props["aria-label"] === "Priority low"));
+  assert.equal(tree.find(node => node.type === "DefectStatusIcon")?.props.status, "open");
+  assert.ok(tree.some(node => node.props.children === "Status open"));
+  const title = tree.findIndex(node => node.props.children === defect.title);
+  const key = tree.findIndex(node => node.props.children === defect.key);
+  assert.ok(title > -1 && key > title);
+  assert.equal(tree.find(node => node.type === "ResponsibleName")?.props.identityId, "actor-assigned");
+  const action = tree.find(node => node.type === "Button")!;
+  assert.equal(action.props["aria-current"], "page");
+  invoke(action, "onPress");
+  assert.equal(opened, defect.id);
 });

@@ -12,7 +12,6 @@ import { DetailPage, DetailState, DetailFooter } from "../detail/DetailPage";
 import { DetailToolbar, emptyDetailFilters, type DetailSort } from "../detail/toolbar/DetailToolbar";
 import { sortDetailRows } from "../detail/toolbar/sort-rows";
 import { scopedDashboardDrill } from "./scope/product-scope";
-import { ComponentRail } from "../detail/components/ComponentRail";
 import { DrillCaseTree } from "../detail/cases/DrillCaseTree";
 import { GroupedChecks } from "../detail/groups/GroupedChecks";
 import { groupRunRecords } from "../detail/groups/group-records";
@@ -67,10 +66,10 @@ export function DashboardDrillInspector(props: Props) {
         onClick={() => item.drill && props.onSelectDrill(item.drill)}>{item.label}{displayTab === item.id && total !== undefined && <span>{total}</span>}</button>)}
       {selectable && <button type="button" data-action disabled={!selection.size} onClick={() => props.onCreateRun([...selection])}><Plus size={14} />{ru ? "Создать прогон" : "Create run"}{selection.size > 0 && <span>{selection.size}</span>}</button>}
     </nav> : null}
-    <DetailToolbar scopeCount={[props.selected.filter.productGroupId, props.selected.filter.productId, props.selected.filter.regression].filter(value => value !== undefined).length}
-      scopeFields={productProjectId ? <ComponentRail workspaceId={props.query.workspaceId} projectId={productProjectId} filter={props.selected.filter} onSelect={chooseProduct} /> : undefined}
+    <DetailToolbar scope={productProjectId ? { workspaceId: props.query.workspaceId, projectId: productProjectId,
+      filter: props.selected.filter, onSelect: chooseProduct } : undefined}
       rows={props.page?.rows ?? []} filters={filters} onFilters={setFilters} sort={sort} onSort={setSort} partial={Boolean(props.page?.nextCursor)} />
-    {!componentContext && statuses.length > 1 && <nav className={styles.tabs} aria-label={t("dashboard.status")}>
+    {tab !== "defect" && !componentContext && statuses.length > 1 && <nav className={styles.tabs} aria-label={t("dashboard.status")}>
       <button type="button" aria-current={!filters.status.length ? "page" : undefined} onClick={() => setFilters({ ...filters, status: [] })}>{ru ? "Все" : "All"}</button>
       {statuses.map(status => <button type="button" key={status} aria-current={filters.status[0] === status ? "page" : undefined}
         onClick={() => setFilters({ ...filters, status: [status] })}>{localizedLabel(locale, status)}</button>)}

@@ -97,7 +97,11 @@ test("dashboard snapshot uses only authoritative project records in its 30-day w
     workspaceId: "workspace-1", projectId: "project-1", period: "30d",
   });
   assert.equal(result.metrics.currentCases, 1);
-  assert.equal(result.metrics.casesCreated, 1);
+  assert.equal(result.metrics.casesCreated, 2);
+  assert.deepEqual(result.createdCaseTypes?.map(({ value }) => value), [2, 0, 0]);
+  assert.deepEqual(result.createdCaseTypes?.[0]?.drill.filter, {
+    entity: "test_case", basis: "created", type: "manual",
+  });
   assert.equal(result.metrics.runsLaunched, 1);
   assert.equal(result.metrics.completedRuns, 2);
   assert.equal(result.metrics.openDefects, 1);

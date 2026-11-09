@@ -3,11 +3,12 @@ import { LoadingOrb } from "../../../../shared/components/loading/LoadingOrb";
 import { transitionContent } from "../workspace/motion/transition/content-transition";
 import { useTmsSession } from "../../auth/presentation/session/TmsSessionContext";
 import { useEffect, useRef, useState } from "react";
+import { Button } from "@heroui/react";
 import { Plus, Pencil } from "lucide-react";
 import { usePersonalDashboardBoard } from "../../dashboards/layout/personal/board/usePersonalDashboardBoard";
 import { usePersonalDashboardLayout } from "../../dashboards/layout/personal/usePersonalDashboardLayout";
 import { useDashboardLayout } from "../../dashboards/layout/application/useDashboardLayout";
-import { createBoardWidget, widgetKey } from "../../dashboards/layout/model/widget-catalog";
+import { createBoardWidget, dashboardcnEnabled, widgetKey } from "../../dashboards/layout/model/widget-catalog";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { useDashboardModel } from "./customize/model/useDashboardModel";
 import { WidgetRenderer } from "./customize/render/WidgetRenderer";
@@ -50,6 +51,7 @@ function DashboardWorkspace(props: DashboardViewProps) {
   const loading = layout.loading || Boolean(personalBoard?.loading && !teamLayout.draft);
   const disabled = layout.saving || layout.retryPending;
   const canEditPersonal = Boolean(personalBoard && !personalBoard.loading && !personalBoard.failure);
+  const workflow = dashboardcnEnabled();
   const canEdit = editing || canEditPersonal || (!canComposePersonal && canManageTeam);
   const currentProject = data.projects.find((project) => project.id === projectId)?.name ?? projectId;
   const editPersonal = () => {
@@ -62,30 +64,40 @@ function DashboardWorkspace(props: DashboardViewProps) {
   };
   const editTeam = () => teamLayout.controller.edit(t("dashboardLayout.defaultName"));
   const edit = canComposePersonal ? editPersonal : editTeam;
-  const openCatalog = () => transitionContent(() => {
-    if (!editing) edit();
-    setCatalogScope(scope);
-  });
+  const catalogTrigger = useRef<HTMLElement | null>(null);
+  const openCatalog = () => {
+    if (document.activeElement instanceof HTMLElement) catalogTrigger.current = document.activeElement;
+    transitionContent(() => {
+      if (!editing) edit();
+      setCatalogScope(scope);
+    });
+  };
   const catalogOpen = editing && catalogScope === scope;
   const fallbackFailure = personalBoard?.failure ?? legacyLayout?.failure;
   const layoutFailure = layout === teamLayout && !teamLayout.draft && canEditPersonal ? null : layout.failure;
   const loadFailure = layoutFailure === "unavailable" && !board;
   const failure = layoutFailure ?? fallbackFailure;
-  const addButton = useRef<HTMLButtonElement>(null);
   const wasCatalogOpen = useRef(false);
   useEffect(() => { setCatalogScope(null); }, [scope]);
   useEffect(() => {
-    if (!catalogOpen && wasCatalogOpen.current) addButton.current?.focus();
+    if (!catalogOpen && wasCatalogOpen.current) {
+      if (catalogTrigger.current?.isConnected) catalogTrigger.current.focus();
+      else document.querySelector<HTMLElement>("[data-dashboard-workspace] [data-dashboard-add-insight]")?.focus();
+    }
     wasCatalogOpen.current = catalogOpen;
   }, [catalogOpen]);
   if (model.analytics.drill.selected || model.workbench.drill) return <DashboardDetail {...props} model={model} onBack={navigation.close} />;
   if (catalogOpen) return <div key="catalog" className={`${shell.pageScroll} ${surface.page} ${styles.page}`} data-dashboard-workspace="true">
     <WidgetCatalog dashboardName={board!.name} projectName={currentProject}
-      renderPreview={key => <WidgetRenderer widget={key} model={model} onOpenRow={props.onOpenRow} />} selected={new Set(board!.widgets.map(widgetKey))}
+      renderPreview={key => <WidgetRenderer widget={key} model={model} projectName={currentProject} catalogPreview onOpenRow={props.onOpenRow} />} selected={new Set(board!.widgets.map(widgetKey))}
       onBack={() => transitionContent(() => setCatalogScope(null))}
-      onAdd={(definitions) => layout.controller.add(definitions.map((definition) => createBoardWidget(definition, locale, crypto.randomUUID())))} />
+      onAdd={(definitions) => {
+        layout.controller.add(definitions.map((definition) => createBoardWidget(definition, locale, crypto.randomUUID())));
+        const added = new Set(layout.controller.getState().draft?.widgets.map(widgetKey));
+        return definitions.every((definition) => added.has(definition.key));
+      }} />
   </div>;
-  return <div key="dashboard" className={`${shell.pageScroll} ${surface.page} ${styles.page}`} data-dashboard-workspace="true">
+  return <div key="dashboard" className={`${shell.pageScroll} ${surface.page} ${styles.page}`} data-dashboard-workspace="true" data-dashboard-workflow={workflow || undefined}>
     <header className={styles.header}>
       <div className={styles.heading}>
         <span className={styles.eyebrow}>{currentProject}<span> / </span>{t("dashboard.analyticsTitle")}</span>
@@ -99,7 +111,8 @@ function DashboardWorkspace(props: DashboardViewProps) {
       {!loading && <div className={styles.actions}>
         <div className={styles.actionGroup} data-active={editing} inert={!editing} aria-hidden={!editing || undefined}>
           <button type="button" className={styles.quiet} disabled={disabled} onClick={() => { setCatalogScope(null); layout.controller.cancel(); }}>{t("dashboardLayout.cancel")}</button>
-          <button type="button" ref={addButton} className={styles.secondary} disabled={disabled || layout.failure === "conflict"} onClick={openCatalog}><Plus size={15} />{t("dashboardLayout.add")}</button>
+          <Button size="sm" variant="flat" className={styles.secondary} data-dashboard-add-insight
+            isDisabled={disabled || layout.failure === "conflict"} onPress={openCatalog}><Plus size={15} />{t("dashboardLayout.add")}</Button>
           <button type="button" className={styles.primary} disabled={layout.saving || !layout.draft?.name.trim() || layout.failure === "conflict"}
             onClick={() => void layout.controller.save()}>{layout.saving && <LoadingOrb />}{t(layout.saving ? "dashboardLayout.saving" : layout.retryPending ? "dashboardLayout.retry" : "dashboardLayout.save")}</button>
         </div>
@@ -123,7 +136,7 @@ function DashboardWorkspace(props: DashboardViewProps) {
         canEdit={canEdit} onAdd={openCatalog} />
         : !board.widgets.length ? <DashboardEmpty editing={editing} personal={personalEditing || (!editing && canComposePersonal)}
           canEdit={canEdit && !disabled && layout.failure !== "conflict"} onAdd={openCatalog} />
-        : <DashboardContent key={scope} {...props} layout={layout} model={model} />}
+        : <DashboardContent key={scope} {...props} layout={layout} model={model} projectName={currentProject} />}
     </DeferredPane>
   </div>;
 }

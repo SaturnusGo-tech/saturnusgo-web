@@ -1,0 +1,51 @@
+.theme {
+  min-width: 0;
+}
+
+.theme :global(:is(
+  [data-slot="bar-list"],
+  [data-slot="distribution-bar"],
+  [data-slot="donut-chart"],
+  [data-slot="kpi-card"],
+  [data-slot="metric-list"],
+  [data-slot="sparkline"],
+  [data-slot="tick-bar"],
+  [data-slot="trend-chart"]
+)) {
+  --background: var(--falcon-elevated);
+  --foreground: var(--falcon-text);
+  --card: var(--falcon-panel);
+  --card-foreground: var(--falcon-text);
+  --popover: var(--falcon-elevated);
+  --popover-foreground: var(--falcon-text);
+  --primary: var(--falcon-action);
+  --primary-foreground: var(--falcon-on-action);
+  --muted: var(--falcon-selected);
+  --muted-foreground: var(--falcon-text-secondary);
+  --accent: var(--falcon-hover);
+  --accent-foreground: var(--falcon-text);
+  --border: var(--falcon-border-subtle);
+  --ring: var(--falcon-focus);
+  --chart-1: var(--falcon-chart-1);
+  --chart-2: var(--falcon-chart-2);
+  --chart-3: var(--falcon-chart-3);
+  --chart-4: var(--falcon-chart-4);
+  --chart-5: var(--falcon-chart-5);
+  --radius: 8px;
+}
+
+.theme :global([data-slot="kpi-card"]) {
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.theme :global([data-slot="delta-badge"][data-positive="true"]) {
+  color: var(--falcon-success);
+}
+
+.theme :global([data-slot="delta-badge"][data-positive="false"]) {
+  color: var(--falcon-danger);
+}

@@ -68,7 +68,7 @@ test("chart uses authoritative daily run counts, while case pass rate stays a se
 test("keyboard date selection includes zero days and preserves exact day drills and unknown pass rate", () => {
   const h = harness(); let tree = h.render();
   results(tree); tree = h.render();
-  const picker = find(tree, "AnimatedSelect");
+  const picker = find(tree, "DashboardSelect");
   assert.equal(picker.props.options.length, 3);
   picker.props.onChange(data.trend[1].start); tree = h.render();
   assert.equal(nodes(tree).some((node) => node.props["aria-label"]?.includes("—%")), false);
@@ -99,9 +99,9 @@ test("reduced motion disables chart animation and stale date selection cannot re
   const h = harness(true); let tree = h.render();
   assert.equal(nodes(tree).filter((node) => ["Area", "Line"].includes(node.type)).every((node) => node.props.isAnimationActive === false), true);
   results(tree); tree = h.render();
-  find(tree, "AnimatedSelect").props.onChange(data.trend[0].start);
+  find(tree, "DashboardSelect").props.onChange(data.trend[0].start);
   tree = h.render({ ...data, trend: [data.trend[1]] });
-  assert.equal(find(tree, "AnimatedSelect").props.value, "all");
+  assert.equal(find(tree, "DashboardSelect").props.value, "all");
   button(tree, "dashboard.open.run: failed, 0").props.onClick();
   assert.equal(h.drills[0].window, undefined);
   assert.equal(nodes(tree).some((node) => node.type === "ComposedChart"), false);

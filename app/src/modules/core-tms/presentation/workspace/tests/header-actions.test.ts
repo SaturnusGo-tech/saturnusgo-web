@@ -16,7 +16,7 @@ function header(view: View, project: object | null = { id: "project-a" }, connec
       if (name.endsWith("company-features")) return { companyViewAvailable };
     });
   const model = { view, project, connection, repositoryScope: {}, folders: { canManage }, data: { workspace: { name: "Umbrella" }, meta: { authorization: { capabilities: attachmentAccess ? ["attachment:manage"] : [] } } } } as unknown as WorkspaceModel;
-  return nodes(h.render(() => component({ model, sidebarCollapsed: true, onToggleSidebar() {} })));
+  return nodes(h.render(() => component({ model, sidebarCollapsed: true, onToggleSidebar() {}, dashboardActionsRef() {} })));
 }
 
 test("environment management stays out of the global header", () => {
@@ -36,4 +36,10 @@ test("the test case import shortcut lives in the repository header and keeps imp
   assert.equal(shortcut(header("cases", { id: "project-a" }, "connected", true, true, [])), undefined);
   assert.equal(shortcut(header("cases", null)), undefined);
   assert.equal(shortcut(header("dashboard")), undefined);
+});
+
+test("the global header exposes dashboard actions only on Dashboard", () => {
+  for (const view of workspaceViews) {
+    assert.equal(header(view).some(node => "data-workspace-dashboard-actions" in node.props), view === "dashboard", view);
+  }
 });

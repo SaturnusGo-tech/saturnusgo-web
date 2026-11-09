@@ -1,0 +1,27 @@
+.chart {
+  --plot-top: 27px;
+  --plot-bottom: 37px;
+  --axis: 35px;
+  position: relative;
+  min-inline-size: 0;
+  block-size: 244px;
+  padding: var(--plot-top) var(--axis) var(--plot-bottom) 12px;
+}
+.plotScroll { block-size: calc(100% + 23px); min-width: 0; overflow-x: auto; overflow-y: hidden; }
+.plot { position: relative; block-size: calc(100% - 23px); min-inline-size: calc(var(--groups) * 19px); }
+.guides, .columns { position: absolute; inset: 0; }
+.guides span { position: absolute; inset-inline: 0; border-top: 1px dashed var(--insight-edge); }
+.columns, .xAxis { display: grid; grid-template-columns: repeat(var(--groups), minmax(0, 1fr)); }
+.column { display: grid; place-items: end center; min-width: 0; }
+.stack { display: flex; flex-direction: column-reverse; align-items: stretch; height: 100%; width: min(7px, 50%); }
+.mark { min-height: 1px; flex: 0 0 auto; border: 0; padding: 0; display: block; position: relative; }
+button.mark { cursor: pointer; }
+button.mark::before { content: ""; position: absolute; inset: 0 -5px; }
+button.mark:not([aria-disabled="true"]):is(:hover, [aria-pressed="true"], :focus-visible) { filter: brightness(1.24); z-index: 1; }
+button.mark:focus-visible { outline: 1px solid var(--insight-text); outline-offset: 2px; }
+.xAxis { position: absolute; inset-inline: 0; inset-block-start: calc(100% + 5px); align-items: center; text-align: center; }
+.xLabel { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 9px; padding-inline: 2px; color: var(--insight-muted); }
+.avatar { justify-self: center; width: 11px; height: 11px; line-height: 10px; border-radius: 50%; font-size: 6px; font-weight: 620; background: var(--insight-subtle); color: var(--insight-text); border: 1px solid var(--insight-edge); }
+.yAxis { position: absolute; inset: var(--plot-top) 0 var(--plot-bottom) auto; width: var(--axis); pointer-events: none; }
+.yAxis span { position: absolute; inset-inline-start: 8px; transform: translateY(50%); color: var(--insight-muted); font-size: 9px; font-variant-numeric: tabular-nums; }
+button.mark[aria-disabled="true"] { cursor: default; }

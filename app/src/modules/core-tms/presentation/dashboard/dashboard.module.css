@@ -304,3 +304,9 @@
   border-radius: 15px; background: var(--falcon-elevated); box-shadow: var(--falcon-shadow);
 }
 :global([data-appearance="glass"]) :is(.chartControls button, .linkMetric, .rowActions button, .rowActions a) { border-radius: 999px; }
+
+/* Keep the popup anchored and avoid the opacity reset at the end of HeroUI's motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .popupEnter { animation: dashboard-popup-enter 140ms ease-out both; }
+}
+@keyframes dashboard-popup-enter { from { opacity: 0; } to { opacity: 1; } }

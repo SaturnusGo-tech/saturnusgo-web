@@ -64,7 +64,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
     }
     if (row.entity === "defect" && row.projectId !== model.project?.id) {
       visitWorkspace(buildDefectDeepLink(window.location.href, {
-        projectId: row.projectId, defectId: row.id,
+        projectId: row.projectId, defectId: row.id, includeArchived: Boolean(row.archivedAt),
       }));
       return;
     }
@@ -72,7 +72,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
     if (row.entity === "test_case") {
       model.setCaseFilters({ type: "all", priority: "all", lifecycle: "all", tag: "", includeArchived: false });
       model.setQuery(""); model.setSelectedCaseId(row.id); model.setView("cases");
-    } else model.openDefect(row.id);
+    } else model.openDefect(row.id, Boolean(row.archivedAt));
   }
   const exchange = model.project && (companyViewAvailable("imports", session?.companyCapabilities) ? <ImportCasesPage key={model.data.workspace.id} project={model.project}
     workspaceId={model.data.workspace.id} canManage={model.data.meta.authorization.capabilities.includes("test_case:manage") && model.data.meta.authorization.capabilities.includes("attachment:manage")}

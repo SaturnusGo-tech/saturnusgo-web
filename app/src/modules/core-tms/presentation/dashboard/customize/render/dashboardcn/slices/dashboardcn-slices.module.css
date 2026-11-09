@@ -1,0 +1,46 @@
+.surface {
+  --insight-panel: var(--dashboard-card-bg, var(--falcon-panel));
+  --insight-subtle: var(--dashboard-card-subtle, var(--falcon-elevated));
+  --insight-edge: var(--dashboard-card-border, var(--falcon-border-subtle));
+  --insight-hover: var(--falcon-hover, var(--insight-subtle));
+  --insight-text: var(--dashboard-card-text, var(--falcon-text));
+  --insight-muted: var(--dashboard-card-muted, var(--falcon-text-secondary));
+  --insight-iris: light-dark(#615cc5, #7470d2);
+  min-inline-size: 0;
+  border: 1px solid var(--insight-edge);
+  border-radius: var(--dashboard-card-radius, 12px);
+  overflow: hidden;
+  color: var(--insight-text);
+  background: var(--insight-panel);
+}
+.toolbar { display: flex; align-items: center; gap: 8px; padding-inline: 9px; min-height: 24px; border-block-end: 1px solid var(--insight-edge); }
+.toolbar h2 { min-width: 0; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; font-weight: 630; }
+.toolbar .expand { margin-inline-start: auto; min-width: 18px; min-height: 19px; width: 18px; height: 19px; padding: 0; color: var(--insight-muted); border-radius: 4px; }
+.toolbar .expand:is(:focus-visible, [data-focus-visible="true"]) { outline: 1px solid var(--insight-text); outline-offset: -1px; }
+.body { display: grid; grid-template-columns: minmax(0, 1fr) clamp(140px, 21.5%, 205px); min-width: 0; }
+.primary { position: relative; min-width: 0; }
+.visual { transition: opacity 150ms ease-out; }
+.visual[data-updating="true"] { opacity: .58; }
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  position: absolute;
+  inset-block-start: 6px;
+  inset-inline-end: 8px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: var(--insight-subtle);
+  color: var(--insight-text);
+  font-size: 10px;
+}
+.notice { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 10px; color: var(--insight-muted); font-size: 10px; }
+.retry { color: var(--insight-text); background: var(--insight-subtle); border: 1px solid var(--insight-edge); border-radius: 4px; padding: 4px 8px; font: inherit; cursor: pointer; }
+.recordTransition { overflow: hidden; }
+.truncated { margin: 4px 10px 6px; color: var(--insight-muted); font-size: 9px; }
+.surface:fullscreen { overflow: auto; border-radius: 0; }
+@container (max-width: 435px) {
+  .body { grid-template-columns: minmax(0, 1fr); }
+  .primary { grid-row: 2; }
+}
+@media (prefers-reduced-motion: reduce) { .visual { transition: none; } }

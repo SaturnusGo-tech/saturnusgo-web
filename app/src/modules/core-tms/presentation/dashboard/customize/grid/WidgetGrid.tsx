@@ -2,7 +2,8 @@ import type { ReactNode } from "react";
 import { DndContext, KeyboardSensor, PointerSensor, MeasuringStrategy, useSensor, useSensors, type Modifier } from "@dnd-kit/core";
 import { SortableContext, rectSortingStrategy, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import type { BoardWidget } from "../../../../dashboards/layout/model/layout";
-import { widgetByKey, widgetKey } from "../../../../dashboards/layout/model/widget-catalog";
+import { dashboardcnEnabled, widgetByKey, widgetKey } from "../../../../dashboards/layout/model/widget-catalog";
+import { workflowDefinition } from "../../../../dashboards/layout/migration/workflow-widgets";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import { SortableWidget } from "./SortableWidget";
 import { widgetCollisions } from "./collision/widgetCollisions";
@@ -34,7 +35,8 @@ export function WidgetGrid({ widgets, editing, disabled, onMove, onRemove, onRes
   const alignRows = widgets.every(widget => ["queue", "freshness", "readyForRetest"].includes(widgetKey(widget)));
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }));
-  const title = (widget: BoardWidget) => { const definition = widgetByKey.get(widgetKey(widget));
+  const title = (widget: BoardWidget) => { const key = widgetKey(widget);
+    const definition = dashboardcnEnabled() ? workflowDefinition(key) : widgetByKey.get(key);
     return definition ? locale === "ru" ? definition.ru : definition.en : widget.title; };
   const name = (id: string | number) => { const widget = widgets.find((item) => item.id === String(id)); return widget ? title(widget) : String(id); };
   return <DndContext sensors={sensors} modifiers={widgetModifiers} collisionDetection={widgetCollisions} measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}

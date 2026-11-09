@@ -1,4 +1,4 @@
-.pane { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; container: reports-list / inline-size; }
+.pane { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; container-type: inline-size; }
 .header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; padding: 14px 24px; }
 .header h1 { margin: 0; color: var(--falcon-text); font-size: 16px; line-height: 1.4; font-weight: 600; }
 .scopes { display: flex; align-items: center; gap: 2px; padding: 2px; border-radius: 9px; background: color-mix(in srgb, var(--falcon-text) 5%, var(--falcon-surface)); }
@@ -7,27 +7,39 @@
 .scopeTab .scopeLabel { position: relative; color: var(--falcon-text-muted); }
 .scopeTab:is([data-hover="true"], [data-selected="true"]) .scopeLabel { color: var(--falcon-text); }
 .scopes .scopeCursor { position: absolute; inset: 0; border-radius: 7px; background: var(--falcon-control); box-shadow: inset 0 0 0 .5px var(--falcon-border-subtle); }
-.newButton.newButton { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; padding: 0 14px; color: var(--falcon-on-action); background: var(--falcon-action); border: 0; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 550; }
-.newButton:hover { background: var(--falcon-action-hover); }
-.toolbar { display: flex; align-items: center; gap: 10px; padding: 0 24px 18px; }
-.search { flex: 1; max-width: 660px; min-width: 0; }
+.toolbar { display: flex; align-items: center; gap: 8px; padding: 0 24px 14px; }
+.search[data-input-shell] {
+  --tms-focus-border: transparent;
+  --tms-focus-ring: transparent;
+  flex: 0 1 264px;
+  min-width: 0;
+  border-radius: 999px;
+}
 .search .searchShell {
-  display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 11px; color: var(--falcon-text-muted);
-  background: var(--falcon-panel); border: 1px solid var(--falcon-border-subtle); border-radius: 10px;
-  box-shadow: none; transition: border-color 150ms ease;
+  display: flex; align-items: center; height: 32px; min-height: 32px; padding: 0 10px;
+  color: var(--falcon-text-muted); background: var(--falcon-panel);
+  border: 1px solid var(--falcon-border-subtle); border-radius: 999px; box-shadow: none;
+  transition: border-color 150ms ease;
 }
 .search .searchShell:is([data-focus="true"], [data-focus-within="true"]) {
-  border-color: var(--falcon-border-strong); background: var(--falcon-panel);
+  border-color: var(--falcon-icon-muted); background: var(--falcon-panel);
 }
-.searchShell svg { flex: none; }
+.searchInner { display: flex; align-items: center; gap: 7px; min-width: 0; }
+.searchInner svg { flex: none; }
 .search .searchShell input.searchInput {
-  width: 100%; min-width: 0; padding: 0; color: var(--falcon-text); background: transparent; border: 0; outline: 0;
-  box-shadow: none; font-size: 13px;
+  width: 100%; min-width: 0; padding: 0; color: var(--falcon-text); background: transparent; border: 0;
+  outline: 0; box-shadow: none; font-size: 13px;
 }
 .searchInput::placeholder { color: var(--falcon-text-muted); }
-.sort { flex: 0 0 auto; display: grid; place-items: center; width: 36px; height: 36px; padding: 0; color: var(--falcon-text-muted); background: transparent; border: 0; border-radius: 50%; cursor: pointer; }
+.toolbar :is(.sort, .newButton) {
+  flex: none; display: inline-grid; place-items: center; width: 32px; min-width: 32px; height: 32px;
+  padding: 0; border-radius: 50%; cursor: pointer;
+}
+.sort { color: var(--falcon-text-muted); background: transparent; border: 1px solid var(--falcon-border-subtle); }
+.toolbar .newButton { border: 0; background: var(--falcon-action); color: var(--falcon-on-action); }
+.toolbar .newButton:is(:hover, [data-hover="true"]) { background: var(--falcon-action-hover); }
 .sort:hover { background: var(--falcon-hover); }
-.sort[data-direction] { color: var(--falcon-action); background: var(--falcon-selected); }
+.sort[data-direction] { color: var(--falcon-text); background: var(--falcon-selected); }
 .summary { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; min-height: 45px; padding: 5px 26px 10px; font-size: 12px; }
 .summary strong { overflow: hidden; max-width: 65%; color: var(--falcon-text); font-weight: 600; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
 .total { color: var(--falcon-text-muted); font-variant-numeric: tabular-nums; }
@@ -36,7 +48,11 @@
 .scopeHint button, .empty button { border: 0; border-radius: 8px; padding: 5px 7px; background: transparent; color: var(--falcon-action); font-size: 12px; cursor: pointer; }
 .scopeHint button:hover, .empty button:hover { background: var(--falcon-hover); }
 .viewport { min-height: 0; flex: 1; overflow: auto; padding: 0 18px 24px; scrollbar-gutter: stable; scrollbar-color: var(--falcon-border-strong) transparent; }
-.groups { list-style: none; margin: 0; padding: 0; }
+.groups {
+  list-style: none; margin: 0; padding: 0;
+  min-inline-size: var(--reports-list-min-width, 0px);
+  container-type: inline-size;
+}
 .message { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 18px; color: var(--falcon-text-muted); font-size: 12px; }
 .message button { border: 0; border-radius: 8px; padding: 8px 10px; background: transparent; color: var(--falcon-action); cursor: pointer; }
 .message button:hover { background: var(--falcon-hover); }
@@ -51,9 +67,7 @@
 @container (max-width: 430px) {
   .header { padding: 14px 14px 12px; gap: 8px; }
   .header h1 { font-size: 16px; }
-  .newButton.newButton { padding: 0 10px; font-size: 11px; }
-  .toolbar { padding-inline: 14px; flex-wrap: wrap; }
-  .search { flex-basis: calc(100% - 46px); }
+  .toolbar { padding-inline: 14px; }
   .summary { padding-inline: 18px; }
   .scopeHint { margin-inline: 14px; }
   .metrics { width: 100%; margin-left: 0; }

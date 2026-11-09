@@ -7,7 +7,6 @@
   border-radius: 15px;
 }
 .panel :is(button, input, select):focus-visible,
-.contextBar :is(button, input, select):focus-visible,
 .inspector :is(button, input, select):focus-visible {
   outline: 2px solid var(--action, var(--falcon-focus));
   outline-offset: 3px;
@@ -23,27 +22,7 @@
 .heading h2 { margin: 0; font-size: 15px; font-weight: 620; letter-spacing: -.025em; }
 .heading p { margin: 5px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
 .heading > small { color: var(--muted); font-size: 10px; white-space: nowrap; }
-.contextBar { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; min-width: 0; }
-.contextHeading { min-width: 200px; flex: 1; }
-.contextHeading strong { font-size: 13px; font-weight: 600; }
-.contextHeading p { max-width: 520px; margin: 5px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
-.filters { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; max-width: 100%; }
-.filters label { display: grid; min-width: 0; gap: 5px; color: var(--muted); font-size: 10px; }
-.filters input, .filters select {
-  box-sizing: border-box;
-  width: 180px;
-  max-width: 100%;
-  min-height: 32px;
-  padding: 6px 9px;
-  color: var(--ink);
-  background: var(--control);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  font: inherit;
-  font-size: 11px;
-}
-.filters :is(input, select):disabled { opacity: .6; }
-.filters button, .state button {
+.state button {
   min-height: 32px;
   padding: 6px 11px;
   color: var(--ink);
@@ -54,10 +33,7 @@
   font: inherit;
   font-size: 11px;
 }
-.filters button:hover, .state button:hover { background: var(--control-hover); }
-.filters button:disabled { opacity: .45; cursor: default; }
-.filters .quietButton { color: var(--muted); background: transparent; border-color: transparent; }
-.choiceNote { flex-basis: 100%; margin: 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+.state button:hover { background: var(--control-hover); }
 .tabs { --dashboard-tab-cursor: transparent; display: flex; gap: 20px; padding: 0 18px; border-bottom: 1px solid var(--line); }
 .tabs button { display: flex; align-items: center; gap: 7px; min-height: 39px; padding: 6px 0 10px; color: var(--muted); background: transparent; border: 0; border-bottom: 2px solid transparent; font: inherit; font-size: 11px; cursor: pointer; }
 .tabs button[data-selected="true"] { color: var(--ink); }
@@ -126,11 +102,6 @@
 .drillCount button:disabled, .loadMore:disabled { opacity: .5; cursor: default; }
 .truncation { margin: 0; padding: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; line-height: 1.6; }
 @media (max-width: 640px) {
-  .contextBar { align-items: stretch; }
-  .contextHeading { flex-basis: 100%; }
-  .filters { width: 100%; }
-  .filters label { flex: 1 1 130px; }
-  .filters input, .filters select { width: 100%; }
   .heading, .row { padding-inline: 14px; }
   .tabs { gap: 16px; padding-inline: 14px; }
   .freshness { padding-inline: 14px; }
@@ -138,11 +109,6 @@
   .row.runRow { padding-inline: 14px; }
 }
 
-.filterField { display: grid; min-width: 0; gap: 5px; color: var(--muted); font-size: 10px; }
-.filterSelect { width: 180px; max-width: 100%; }
-.filterSelect > button { width: 100%; border-radius: 7px; }
-.filterSelect [role="option"] { border: 0; width: 100%; text-align: left; background: transparent; }
-@media (max-width: 640px) { .filterField { flex: 1 1 130px; }.filterSelect { width: 100%; } }
 
 .row .rowTitle strong { text-align: left; }
 @media (prefers-reduced-motion: reduce) { .continue svg { transition: none; } }
@@ -157,7 +123,7 @@
 :global([data-appearance="glass"]) .tabs [data-slot="tabContent"] > span { border-radius: 999px; background: color-mix(in srgb, currentColor 12%, transparent); }
 :global([data-appearance="glass"]) .queuePanel .tabs { gap: 5px; }
 :global([data-appearance="glass"]) .queuePanel .tabs button { min-height: 32px; padding-bottom: 6px; }
-:global([data-appearance="glass"]) :is(.filters input, .filters select, .filters button, .state button, .filterSelect > button, .loadMore) { border-radius: 999px; }
+:global([data-appearance="glass"]) :is(.state button, .loadMore) { border-radius: 999px; }
 :global([data-appearance="glass"]) .row { width: calc(100% - 16px); margin: 4px 8px; border-radius: 13px; padding-inline: 10px; }
 :global([data-appearance="glass"]) .row.runRow { padding-inline: 12px; }
 :global([data-appearance="glass"]) .rows li + li { border-top-color: transparent; }

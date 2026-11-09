@@ -1,0 +1,28 @@
+.records { container-type: inline-size; border-block-start: 1px solid var(--insight-edge); padding: 7px 10px; }
+.heading { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.heading h3 { min-width: 0; margin: 0; font-size: 11px; font-weight: 610; overflow-wrap: anywhere; }
+.heading > div { flex: none; display: flex; gap: 3px; color: var(--insight-muted); font-size: 10px; }
+.heading button:is(:focus-visible, [data-focus-visible="true"]) { outline: 1px solid var(--insight-text); outline-offset: -1px; }
+.records p { margin: 5px 0; color: var(--insight-muted); font-size: 10px; }
+.loading { display: flex; align-items: center; gap: 5px; }
+.records .list { padding: 4px 0 0; }
+.records .listItems { gap: 1px; animation: appear 160ms ease-out both; }
+.records .list ul.listItems[role="listbox"] { padding: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.records .option { min-height: 34px; padding: 4px 6px; color: var(--insight-text); border-radius: 6px; }
+.records .option[data-hover="true"] { background: var(--insight-hover); color: var(--insight-text); }
+.records .option:is(:focus-visible, [data-focus-visible="true"]) { outline: 1px solid var(--insight-text); outline-offset: -1px; }
+.records .option[data-disabled="true"] { opacity: 1; }
+.title { min-width: 0; }
+.row { display: flex; gap: 7px; align-items: center; width: 100%; font-size: 12px; }
+.row strong { flex: 1; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+.priority, .status { flex: none; display: inline-flex; align-items: center; gap: 5px; color: var(--insight-muted); }
+.status { max-inline-size: 31%; }
+.status svg { flex: none; }
+.status small, .key { color: var(--insight-muted); font-size: 11px; }
+.status small { min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; }
+.key { flex: none; max-inline-size: 31%; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+@container (max-width: 400px) {
+  .status:has(svg) small { display: none; }
+}
+@keyframes appear { from { opacity: 0; transform: translateY(-2px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .records .listItems { animation: none; } }

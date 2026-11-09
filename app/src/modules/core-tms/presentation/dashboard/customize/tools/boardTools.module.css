@@ -1,0 +1,142 @@
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  min-width: 0;
+  min-height: 28px;
+}
+.bar .filter, .bar .chipValue, .bar .remove, .surface .back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  min-width: 0;
+  height: 27px;
+  min-height: 27px;
+  padding: 0 7px;
+  border: 0;
+  border-radius: 5px;
+  color: var(--falcon-text-secondary);
+  background: transparent;
+  font-size: 12px;
+  line-height: 1.2;
+}
+.bar :is(.filter, .chipValue, .remove):is([data-hover="true"], [aria-expanded="true"]),
+.surface .back:hover {
+  color: var(--falcon-text);
+  background: var(--falcon-hover);
+}
+.bar :is(.filter, .chipValue, .remove):focus-visible, .surface .back:focus-visible {
+  outline: 1px solid var(--falcon-icon-muted);
+  outline-offset: -1px;
+}
+.chip {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+  gap: 1px;
+  overflow: hidden;
+  border-radius: 5px;
+  background: var(--falcon-border-subtle);
+}
+.chipLabel {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: none;
+  padding-inline: 7px;
+  color: var(--falcon-text-muted);
+  background: var(--falcon-elevated);
+  font-size: 12px;
+}
+.bar .chipValue, .bar .remove { border-radius: 0; background: var(--falcon-elevated); }
+.bar .chipValue {
+  display: block;
+  flex: 1 1 auto;
+  max-width: 168px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--falcon-text);
+}
+.bar .remove { width: 25px; padding: 0; justify-content: center; }
+.positioner { max-width: none; outline: none; }
+.positioner .surface {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: min(206px, calc(100vw - 20px));
+  max-height: min(360px, calc(100dvh - 24px));
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--falcon-border);
+  border-radius: 10px;
+  background: var(--falcon-elevated);
+  color: var(--falcon-text);
+  box-shadow: var(--falcon-shadow-popover);
+  font: inherit;
+  font-size: 13px;
+}
+.menu { display: flex; flex-direction: column; min-height: 0; width: 100%; }
+.menu .search { flex: none; width: 100%; border-bottom: 1px solid var(--falcon-border-subtle); }
+.menu .search .inputShell {
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.menu .search .input {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--falcon-text);
+  box-shadow: none;
+  font: inherit;
+}
+.menu .input::placeholder { color: var(--falcon-text-muted); }
+.menu .listbox { min-height: 0; padding: 4px; overflow: auto; scrollbar-width: thin; }
+.menu .list { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.menu .row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  min-height: 31px;
+  min-width: 0;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--falcon-text);
+  background: transparent;
+  font-size: 13px;
+  cursor: pointer;
+}
+.menu .row:is([data-hover="true"], [data-current], [data-focus-visible="true"]) {
+  background: var(--falcon-hover);
+}
+.menu .row[data-focus-visible="true"] { outline: 1px solid var(--falcon-icon-muted); outline-offset: -1px; }
+.menu .title { flex: 1; min-width: 0; white-space: normal; overflow-wrap: anywhere; font: inherit; }
+.icon, .chevron { flex: none; color: var(--falcon-text-muted); }
+.chevron, .check { margin-inline-start: auto; }
+.empty { padding: 7px; color: var(--falcon-text-muted); }
+.surface .back { justify-content: flex-start; height: 34px; padding-inline: 12px; font-weight: 550; }
+@media (max-width: 760px) {
+  .chipLabel { font-size: 0; }
+  .bar .chipValue { max-width: 100px; }
+}
+@media (max-width: 540px) {
+  .chipLabel { display: none; }
+  .bar .chipValue { max-width: 56px; }
+  .bar .remove { width: 20px; }
+  .bar .filter { padding-inline: 5px; }
+}
+@media (pointer: coarse) {
+  .bar .filter, .bar .chipValue, .bar .remove { min-height: 32px; }
+}

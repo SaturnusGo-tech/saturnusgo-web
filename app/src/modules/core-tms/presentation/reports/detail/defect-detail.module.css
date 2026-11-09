@@ -1,17 +1,82 @@
-.actions { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
-.originLink { border: 0; padding: 0; background: transparent; color: var(--falcon-action); text-align: left; font: inherit; cursor: pointer; overflow-wrap: anywhere; }
-.originLink:hover { text-decoration: underline; }
-.overview .discussion {
-  grid-column: 1 / -1; min-width: 0; padding-top: 8px;
-  border-top: 1px solid var(--falcon-border-subtle);
+.shell {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.header { flex: 0 0 auto; }
+.utility { justify-content: flex-end; }
+.utility > div { flex-wrap: nowrap; }
+.share { display: flex; }
+.share > span > span { left: auto; right: 0; }
+.utility .back { min-inline-size: 0; }
+.back > svg:last-child { display: none; }
+.tabRow { justify-content: space-between; flex-wrap: nowrap; padding-inline-start: 8px; }
+.tabRow > :first-child { overflow: hidden; }
+.tabRow [role="tab"] { inline-size: auto; }
+.scroll {
+  min-height: 0;
+  flex: 1;
+  overflow: auto;
+  scrollbar-color: var(--falcon-border-strong) transparent;
+}
+.scroll:focus-visible { outline: 1px solid var(--falcon-focus); outline-offset: -1px; }
+.overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(190px, 25%, 232px);
+  align-items: start;
+  gap: 28px;
+  padding: 24px;
+}
+.rail { min-width: 0; display: grid; align-content: start; gap: 20px; }
+.properties > h3 {
+  margin: 0 0 4px;
+  color: var(--falcon-text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 19px;
+}
+.propertiesList { margin: 0; }
+.propertiesList > div { width: 100%; }
+.propertiesList dd { min-width: 0; margin: 0; }
+.propertiesList dt {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.assignee dd > div > span { max-inline-size: 100%; }
+.assignee dd > div > span > :first-child { flex: none; inline-size: 15px; block-size: 15px; font-size: 7px; }
+.assignee dd > div > span > :last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.propertiesList .severity[data-level="critical"] { color: var(--falcon-danger); }
+.propertiesList .severity[data-level="high"] { color: var(--falcon-warning); }
+.originLink, .issue { color: var(--falcon-action); text-decoration: none; }
+.originLink { border: 0; padding: 0; background: transparent; text-align: left; font: inherit; font-size: 13px; cursor: pointer; overflow-wrap: anywhere; }
+.issue { display: inline-flex; min-width: 0; align-items: center; gap: 4px; }
+.issue span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.issue svg { flex: none; }
+.originLink:hover, .issue:hover { text-decoration: underline; }
+.muted, .retestContext { color: var(--falcon-text-muted); font-size: 13px; }
+.retestContext { margin-block-start: 8px; }
+.discussion {
+  grid-column: 1 / -1;
+  min-width: 0;
+  padding-block-start: 8px;
+  border-block-start: 1px solid var(--falcon-border-subtle);
   --comment-editor-height: 160px;
 }
-@container report-detail (max-width: 660px) {
-  .overview { grid-template-columns: minmax(0, 1fr); gap: 24px; }
-  .overview > aside { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-top: 20px; border-top: 1px solid var(--falcon-border-subtle); }
+@container (max-width: 620px) {
+  .overview { grid-template-columns: minmax(0, 1fr); gap: 22px; padding: 20px 18px; }
+  .rail { padding-block-start: 20px; border-block-start: 1px solid var(--falcon-border); }
+  .tabRow { padding-inline-start: 4px; }
 }
-@container report-detail (max-width: 380px) {
-  .actions { gap: 6px; }
-  .overview > aside { grid-template-columns: minmax(0, 1fr); }
+@media (max-width: 760px) {
+  .utility > div { flex: 1; justify-content: flex-end; }
+  .utility .back { order: -1; margin-inline-end: auto; }
+  .back > svg:first-child { display: none; }
+  .back > svg:last-child { display: block; }
 }
-@media (prefers-reduced-motion: reduce) { .actions .runButton { transition: none; } }

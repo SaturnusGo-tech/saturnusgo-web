@@ -34,7 +34,8 @@ export function ReportsView({ workspaceId, projectId, projectName = "", defects,
   const [detailTab, setDetailTab] = useNavigationValue<DetailTab>(`reports:${workspaceId}:${projectId}:tab`, "overview");
   useDefectCommentTab(projectId, selectedDefectId, useCallback(() => setDetailTab("overview"), [setDetailTab]));
   const [severitySort, setSeveritySort] = useNavigationValue<"asc" | "desc" | null>(`reports:${workspaceId}:${projectId}:sort`, null);
-  const selectedDefect = defects.find((item) => item.id === selectedDefectId);
+  const selectedDefect = selectedDefectStatus === "ready" ? defects.find((item) => item.id === selectedDefectId) : undefined;
+  const browseDefects = selectedDefect?.archivedAt ? defects.filter(item => item.id !== selectedDefect.id) : defects;
 
   function selectDefect(defectId: string | null) {
     if (defectId !== selectedDefectId) setDetailTab("overview");
@@ -43,7 +44,7 @@ export function ReportsView({ workspaceId, projectId, projectName = "", defects,
 
   return <div className={surface.workspace} data-testid="reports-view" data-detail-open={Boolean(selectedDefectId) || undefined}>
     <DefectBrowser workspaceId={workspaceId} projectId={projectId} projectName={projectName}
-      connected={connected} defects={defects} query={query} onQueryChange={setQuery}
+      connected={connected} defects={browseDefects} query={query} onQueryChange={setQuery}
       severitySort={severitySort} onSeveritySortChange={setSeveritySort}
       selectedDefectId={selectedDefectId} onSelectDefect={selectDefect} onNew={onNew} />
 

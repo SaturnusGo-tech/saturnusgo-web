@@ -1,11 +1,12 @@
-import { PiListChecks } from "react-icons/pi";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigationValue } from "../../../../state/navigation/context/useNavigationValue";
 import type { TestCaseSummary } from "../../../../../../core/tms/contracts/legacy-contract";
 import type { RepositoryFolder } from "../../../../folders/model/folder";
-import { SelectionControls, useSelectionFilters } from "../../../cases/selection/controls/SelectionControls";
+import { casePriority } from "../../../../helpers/cases/caseRevision";
+import { useSelectionFilters } from "../../../cases/selection/controls/SelectionControls";
+import { RepositoryQueryControls } from "../../../cases/browser/controls/RepositoryQueryControls";
 import { LifecycleBadge } from "../../../cases/list/CaseBadges";
-import { PrioritySignal } from "../../../cases/list/priority/PrioritySignal";
+import { PriorityIcon, priorityLabel } from "../../../common/properties/PriorityIcon";
 import { SuiteFolderPath } from "../../shared/folder-path/SuiteFolderPath";
 import shared from "../../suites.module.css";
 import css from "../detail.module.css";
@@ -15,7 +16,9 @@ type Props = {
   onOpen: (item: TestCaseSummary) => void;
 };
 export function SuiteRepository(props: Props) {
+  const locale = props.ru ? "ru" : "en";
   const [saved, setSaved] = useNavigationValue<Parameters<typeof useSelectionFilters>[1]>(`suite:${props.suiteId}:repository`, {});
+  const [filterOpen, setFilterOpen] = useState(false);
   const filters = useSelectionFilters(props.cases, saved);
   useEffect(() => {
     setSaved({ query: filters.query, qlQuery: filters.qlQuery, filters: filters.filters, facets: filters.facets });
@@ -25,22 +28,31 @@ export function SuiteRepository(props: Props) {
     filters.setFilters({ type: "all", priority: "all", lifecycle: "all", tag: "", includeArchived: false });
     filters.setFacets({ folders: [], components: [] });
   };
-  const priority = props.ru ? { low: "Низкий", medium: "Средний", high: "Высокий", critical: "Критический" } : { low: "Low", medium: "Medium", high: "High", critical: "Critical" };
   return <section className={css.repository} aria-label={props.ru ? "Состав сьюта" : "Suite membership"}>
     <div className={css.repositoryHeader}>
       <h2>{props.ru ? "Тест-кейсы" : "Test cases"}<span>{filters.visible.length === props.cases.length ? props.cases.length : `${filters.visible.length} / ${props.cases.length}`}</span></h2>
-      <div className={css.repositoryTools}><SelectionControls state={filters} ru={props.ru} repository /></div>
+      <div className={css.repositoryTools}>
+        <RepositoryQueryControls locale={locale} query={filters.query} onQuery={filters.setQuery} qlQuery={filters.qlQuery} onQlQuery={filters.setQlQuery}
+          filters={filters.filters} onFilters={filters.setFilters} facets={filters.facets} onFacets={filters.setFacets}
+          options={filters.options} tags={filters.options.tags} directory={filters.directory} filterOpen={filterOpen} onFilterOpen={setFilterOpen} />
+      </div>
     </div>
-    <ul className={css.cases}>{filters.visible.map(item => {
+    <ul className={css.cases} role="list">{filters.visible.map(item => {
       const folder = props.folders.find(value => value.id === item.folderId && value.projectId === item.projectId && !value.archivedAt);
       const path = folder?.path ?? item.folderPath;
+      const unavailable = Boolean(item.folderId && !folder);
+      const priority = casePriority(item);
+      const label = priorityLabel(locale, priority);
       return <li key={item.id}><button type="button" className={css.case} onClick={() => props.onOpen(item)} aria-label={`${item.key}: ${item.title}`}>
-        <PiListChecks size={17} aria-hidden="true" />
-        <span className={css.caseCopy}><strong title={item.title}>{item.title}</strong><span className={css.caseContext}><span>{item.key}</span>
-          <SuiteFolderPath appearance={folder?.appearance} folderId={folder?.id} projectId={item.projectId} path={path} ru={props.ru} unavailable={Boolean(item.folderId && !folder)} />
-        </span></span>
-        {item.priority && <PrioritySignal priority={item.priority} label={priority[item.priority]} size={13} />}
-        <span className={css.lifecycle}><LifecycleBadge locale={props.ru ? "ru" : "en"} lifecycle={item.lifecycle} archived={Boolean(item.archivedAt)} /></span>
+        <span className={css.priority} title={label} role="img" aria-label={label}><PriorityIcon level={priority} empty="circle" size={15} /></span>
+        <span className={css.caseCopy}>
+          <strong title={item.title}>{item.title}</strong>
+          {(unavailable || path.split("/").some(part => part.trim())) && <span className={css.casePath}>
+            <SuiteFolderPath appearance={folder?.appearance} folderId={folder?.id} projectId={item.projectId} path={path} ru={props.ru} unavailable={unavailable} />
+          </span>}
+        </span>
+        <span className={css.lifecycle}><LifecycleBadge locale={locale} lifecycle={item.lifecycle} archived={Boolean(item.archivedAt)} neutral /></span>
+        <span className={css.caseKey} title={item.key}>{item.key}</span>
       </button></li>;
     })}</ul>
     {!filters.visible.length && <div className={shared.empty}>

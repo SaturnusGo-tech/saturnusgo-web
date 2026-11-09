@@ -14,7 +14,7 @@ const personalProfile = new Map([
  ['me/profile/avatar',['POST','DELETE']], ['me/profile/banner',['POST','DELETE']],
 ]);
 const personalFeatures = new Map([
- ...['summary','test-cases','runs','run-items','defects'].map(name=>[`dashboard-analytics/${name}`,'GET']),
+ ...['summary','test-cases','runs','run-items','defects','defect-breakdown','defect-lead-time'].map(name=>[`dashboard-analytics/${name}`,'GET']),
  ['execution-history','GET'], ['test-case-import/inspect','POST'], ['test-case-import/normalize','POST'],
  ['impact/repositories','GET'], ['impact/analyses','GET'],
 ]);

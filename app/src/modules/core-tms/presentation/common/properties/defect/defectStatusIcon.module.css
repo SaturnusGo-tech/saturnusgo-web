@@ -1,0 +1,5 @@
+.icon { display: inline-grid; flex: none; place-items: center; color: var(--falcon-icon-muted); }
+.icon[data-status="in_progress"] { color: var(--falcon-warning); }
+.icon[data-status="ready_for_retest"] { color: var(--falcon-info); }
+.icon[data-status="reopened"] { color: var(--falcon-danger); }
+.icon:is([data-status="verified"], [data-status="closed"]) { color: var(--falcon-success); }

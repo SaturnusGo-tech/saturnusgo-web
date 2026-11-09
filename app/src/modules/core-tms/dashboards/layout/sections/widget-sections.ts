@@ -5,7 +5,7 @@ export type DashboardSection = typeof dashboardSections[number];
 export function widgetSection(key: string): DashboardSection {
   if (["queue", "readyForRetest", "freshness"].includes(key)) return "overview";
   if (["trend", "outcomes", "portfolio", "runsLaunched", "completedRuns", "passedRuns", "passRate"].includes(key)) return "runs";
-  if (key.startsWith("defect:") || ["defects", "currentDefects", "reportedDefects", "linkedDefects"].includes(key)) return "defects";
+  if (key.startsWith("defect:") || ["defects", "defectPerformance", "currentDefects", "reportedDefects", "linkedDefects"].includes(key)) return "defects";
   return "library";
 }
 export function sectionMoveTarget(widgets: BoardWidget[], section: DashboardSection, index: number): number {

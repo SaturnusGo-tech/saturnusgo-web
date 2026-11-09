@@ -3426,6 +3426,135 @@
         }
       }
     },
+    "/defects/triage": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Defects"
+        ],
+        "summary": "List the project defect triage queue",
+        "operationId": "listDefectTriage",
+        "description": "Lists nonarchived open and reopened defects, oldest first. The snoozed view contains defects whose wake time is in the future. A defect returns to the inbox at its deadline or after a defect edit. The cursor is scoped to the workspace, project and view. Requires defect:read.",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "$ref": "#/components/parameters/ProjectIdQueryRequired"
+          },
+          {
+            "name": "view",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "inbox",
+                "snoozed"
+              ],
+              "default": "inbox"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            }
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/DefectTriageListResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/defects/{defectId}/triage": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "$ref": "#/components/parameters/DefectIdPath"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Defects"
+        ],
+        "summary": "Record a defect triage decision",
+        "operationId": "triageDefect",
+        "description": "Requires defect:manage and the current row version. Accept moves the defect to triaged. Decline and duplicate close it under the existing closure policy. Duplicate links a canonical nonarchived defect within the same project. Snooze sets a future wake time and resume clears an active snooze. Mutations and replay receipts are atomic. YouTrack-authoritative closure remains subject to the existing retest and workflow guards.",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "body-version",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DefectTriageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/DefectTriageResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
     "/defects/{defectId}": {
       "parameters": [
         {
@@ -3441,9 +3570,25 @@
         ],
         "summary": "Get a defect",
         "operationId": "getDefect",
+        "description": "Requires defect:read in the defect workspace. Archived defects are excluded unless explicitly requested for read-only inspection.",
+        "parameters": [
+          {
+            "name": "includeArchived",
+            "in": "query",
+            "required": false,
+            "description": "True permits the authorized detail read of an archived defect.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/DefectResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
@@ -4519,7 +4664,7 @@
           "Analytics"
         ],
         "summary": "Drill into an exact test-case analytics cohort",
-        "description": "current is the live inventory at request time; created uses createdAt in the inclusive-from, exclusive-to window. Current-revision dimensions and coverage apply only to current. componentIsEmpty represents the null/empty Component bucket. coverage means a current case did or did not appear in a run started in the exact period.",
+        "description": "current is the live inventory at request time; created uses createdAt in the inclusive-from, exclusive-to window. Type matches the current revision on either basis. Tag, Component, and coverage filters apply only to current. componentIsEmpty represents the null/empty Component bucket. coverage means a current case did or did not appear in a run started in the exact period.",
         "operationId": "listDashboardAnalyticsTestCases",
         "x-tms-pagination": "cursor",
         "parameters": [
@@ -4965,6 +5110,267 @@
         }
       }
     },
+    "/dashboard-analytics/defect-breakdown": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "summary": "Break down project defects by one dimension and one segment",
+        "description": "Counts distinct defects from the same population as the defects drill-down. Current includes only nonarchived defects and ignores the period. Reported selects creation time within the period and includes archived defects. Both bases use the stored classification on each defect at read time. Workspace scope includes active projects only. Groups are ordered by descending count, then stable key. Totals cover every matching group even when the group limit truncates the response.",
+        "operationId": "getDashboardDefectBreakdown",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "$ref": "#/components/parameters/ProjectIdQuery"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsPeriodQuery"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsFromQuery"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsToQuery"
+          },
+          {
+            "name": "dimensionLimit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "productGroupId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            },
+            "description": "Stable catalog value identifier."
+          },
+          {
+            "name": "productId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            },
+            "description": "Stable catalog value identifier."
+          },
+          {
+            "name": "regression",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "description": "Filter by the immutable case field snapshot; false is an explicit filter, not absence."
+          },
+          {
+            "name": "basis",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "current",
+                "reported"
+              ],
+              "default": "current"
+            }
+          },
+          {
+            "name": "groupBy",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "project",
+                "component",
+                "assignee",
+                "status",
+                "priority",
+                "severity"
+              ]
+            }
+          },
+          {
+            "name": "segmentBy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "none",
+                "status",
+                "priority",
+                "severity"
+              ],
+              "default": "none"
+            }
+          },
+          {
+            "name": "hasLink",
+            "in": "query",
+            "required": false,
+            "description": "Current basis only. Filters active safe HTTPS external/YouTrack links. The always-present Falcon resource link is not part of this predicate.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "activeOnly",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Current basis only. Restrict to nonarchived defects outside verified and closed."
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/DashboardDefectBreakdownResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/AnalyticsUnavailable"
+          }
+        }
+      }
+    },
+    "/dashboard-analytics/defect-lead-time": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "summary": "List first-resolution defect lead-time points",
+        "description": "One point per defect whose first recorded transition to verified or closed occurred within the selected period. Later closure, edits, reopening, and archiving do not replace that first resolution. Uses stored current priority and elapsed 24-hour days from defect creation to the resolution event. Workspace scope includes active projects only. Ordered by resolution time descending, then ID descending.",
+        "operationId": "listDashboardDefectLeadTime",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "$ref": "#/components/parameters/ProjectIdQuery"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsPeriodQuery"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsFromQuery"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsToQuery"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "name": "priority",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Priority"
+            }
+          },
+          {
+            "name": "productGroupId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            },
+            "description": "Stable catalog value identifier."
+          },
+          {
+            "name": "productId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            },
+            "description": "Stable catalog value identifier."
+          },
+          {
+            "name": "regression",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "description": "Filter by the immutable case field snapshot; false is an explicit filter, not absence."
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/DashboardDefectLeadTimeResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/AnalyticsUnavailable"
+          }
+        }
+      }
+    },
     "/dashboard-analytics/defects": {
       "parameters": [
         {
@@ -4976,7 +5382,7 @@
           "Analytics"
         ],
         "summary": "Drill into an exact defect analytics cohort with safe links",
-        "description": "reported uses createdAt in the period and includes archived records; current is the live non-archived set and ignores the period. Returned links are Falcon or active HTTPS external/YouTrack links only. occurrence identifies the immutable originating run item, case revision and step. Current risk filters reproduce Component, active/open and critical hotspot cohorts.",
+        "description": "Reported selects creation time in the period and includes archived records. Current is the live nonarchived set and ignores the period. Both bases support filtering by the stored current status, component, severity, priority, and assignee. Link and active filters apply only to the current basis. Returned links are Falcon or active HTTPS external/YouTrack links. An occurrence identifies the immutable originating run item, case revision and step.",
         "operationId": "listDashboardAnalyticsDefects",
         "x-tms-pagination": "cursor",
         "parameters": [
@@ -5055,6 +5461,33 @@
             "required": false,
             "schema": {
               "$ref": "#/components/schemas/Priority"
+            }
+          },
+          {
+            "name": "priority",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Priority"
+            }
+          },
+          {
+            "name": "assigneeIdentityId",
+            "in": "query",
+            "required": false,
+            "description": "Exact assigned identity. Mutually exclusive with unassigned=true.",
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "unassigned",
+            "in": "query",
+            "required": false,
+            "description": "Selects only defects with no assigned identity.",
+            "schema": {
+              "type": "boolean",
+              "default": false
             }
           },
           {
@@ -31900,6 +32333,45 @@
           }
         }
       },
+      "DefectTriageResponse": {
+        "description": "Defect and triage state after the command.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          },
+          "ETag": {
+            "$ref": "#/components/headers/ETag"
+          },
+          "Idempotency-Replayed": {
+            "$ref": "#/components/headers/IdempotencyReplayed"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/DefectTriageEnvelope"
+            }
+          }
+        }
+      },
+      "DefectTriageListResponse": {
+        "description": "Page of incoming project defects ordered by creation time and then ID, ascending.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          },
+          "X-Next-Cursor": {
+            "$ref": "#/components/headers/XNextCursor"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/DefectTriageListEnvelope"
+            }
+          }
+        }
+      },
       "DefectResponse": {
         "description": "Defect representation.",
         "headers": {
@@ -32271,6 +32743,39 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/DashboardAnalyticsRunItemListEnvelope"
+            }
+          }
+        }
+      },
+      "DashboardDefectBreakdownResponse": {
+        "description": "Exact counts and bounded groups for the selected defect population.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/DashboardDefectBreakdownEnvelope"
+            }
+          }
+        }
+      },
+      "DashboardDefectLeadTimeResponse": {
+        "description": "Page of exact first-resolution defect lead-time points, newest resolution first.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          },
+          "X-Next-Cursor": {
+            "$ref": "#/components/headers/XNextCursor"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/DashboardDefectLeadTimeEnvelope"
             }
           }
         }
@@ -35070,6 +35575,15 @@
           },
           "createdInPeriod": {
             "$ref": "#/components/schemas/AnalyticsCount"
+          },
+          "createdInPeriodByType": {
+            "type": "array",
+            "description": "Cases created in the selected period grouped by current type, including cases later archived.",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsTestCaseTypeBucket"
+            }
           }
         }
       },
@@ -36238,6 +36752,188 @@
           },
           "meta": {
             "$ref": "#/components/schemas/AnalyticsRunItemPageMeta"
+          }
+        }
+      },
+      "DashboardDefectBreakdownSegment": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "count"
+        ],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "count": {
+            "$ref": "#/components/schemas/AnalyticsCount"
+          }
+        }
+      },
+      "DashboardDefectBreakdownGroup": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "label",
+          "count",
+          "segments"
+        ],
+        "properties": {
+          "key": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Stable dimension key. Null means no assigned identity or no component."
+          },
+          "label": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Display name or dimension value. Null when no display label is available."
+          },
+          "count": {
+            "$ref": "#/components/schemas/AnalyticsCount"
+          },
+          "segments": {
+            "type": "array",
+            "maxItems": 7,
+            "items": {
+              "$ref": "#/components/schemas/DashboardDefectBreakdownSegment"
+            }
+          }
+        }
+      },
+      "DashboardDefectBreakdown": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "total",
+          "groupCount",
+          "truncated",
+          "period",
+          "periodApplied",
+          "groups"
+        ],
+        "properties": {
+          "total": {
+            "$ref": "#/components/schemas/AnalyticsCount"
+          },
+          "groupCount": {
+            "$ref": "#/components/schemas/AnalyticsCount"
+          },
+          "truncated": {
+            "type": "boolean"
+          },
+          "period": {
+            "$ref": "#/components/schemas/AnalyticsPeriod"
+          },
+          "periodApplied": {
+            "type": "boolean"
+          },
+          "groups": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/DashboardDefectBreakdownGroup"
+            }
+          }
+        }
+      },
+      "DashboardDefectBreakdownEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/DashboardDefectBreakdown"
+          }
+        }
+      },
+      "DashboardDefectLeadTimePoint": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "projectId",
+          "key",
+          "title",
+          "priority",
+          "archived",
+          "createdAt",
+          "resolvedAt",
+          "resolvedStatus",
+          "leadTimeDays"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "projectId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "key": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/Priority"
+          },
+          "archived": {
+            "type": "boolean",
+            "description": "True when the source defect is archived. Ordinary detail excludes archived defects. Authorized callers can opt in with includeArchived=true."
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "resolvedAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "resolvedStatus": {
+            "type": "string",
+            "enum": [
+              "verified",
+              "closed"
+            ]
+          },
+          "leadTimeDays": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      },
+      "DashboardDefectLeadTimeEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/DashboardDefectLeadTimePoint"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/AnalyticsPageMeta"
           }
         }
       },
@@ -40699,6 +41395,10 @@
           "updatedAt": {
             "$ref": "#/components/schemas/Timestamp"
           },
+          "archivedAt": {
+            "$ref": "#/components/schemas/Timestamp",
+            "description": "Archive timestamp returned only on an explicitly requested archived defect detail."
+          },
           "sourceCaseId": {
             "anyOf": [
               {
@@ -40709,6 +41409,17 @@
               }
             ],
             "description": "Direct source test case in the same project, without creating a run. Mutually exclusive with runId, runItemId and stepId; immutable after creation."
+          },
+          "triageDuplicateOfDefectId": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Canonical defect in the same project when this defect was closed as a duplicate."
           }
         }
       },
@@ -42570,6 +43281,341 @@
             "$ref": "#/components/schemas/PageMeta"
           }
         }
+      },
+      "DefectTriageRow": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "projectId",
+          "key",
+          "title",
+          "description",
+          "severity",
+          "priority",
+          "status",
+          "reproducibility",
+          "assigneeIdentityId",
+          "component",
+          "labels",
+          "integrationTarget",
+          "externalIssue",
+          "occurrence",
+          "expectedResult",
+          "actualResult",
+          "attachmentIds",
+          "linkIds",
+          "createdByIdentityId",
+          "createdAt",
+          "updatedAt",
+          "rowVersion",
+          "triageSnoozedUntil",
+          "triageDuplicateOfDefectId"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "projectId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "description": {
+            "$ref": "#/components/schemas/LongText"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Priority"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/Priority"
+          },
+          "status": {
+            "$ref": "#/components/schemas/DefectStatus"
+          },
+          "reproducibility": {
+            "$ref": "#/components/schemas/ShortText"
+          },
+          "assigneeIdentityId": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "component": {
+            "$ref": "#/components/schemas/ShortText"
+          },
+          "labels": {
+            "type": "array",
+            "maxItems": 100,
+            "uniqueItems": true,
+            "description": "Normalized labels. Occurrence defects include two immutable server-derived provenance labels: <case-type>-run and the run type.",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$"
+            }
+          },
+          "integrationTarget": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DefectIntegrationTarget"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "externalIssue": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DefectExternalIssue"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "occurrence": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DefectOccurrence"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "expectedResult": {
+            "$ref": "#/components/schemas/LongText"
+          },
+          "actualResult": {
+            "$ref": "#/components/schemas/LongText"
+          },
+          "attachmentIds": {
+            "type": "array",
+            "maxItems": 500,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          "linkIds": {
+            "type": "array",
+            "maxItems": 500,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          "createdByIdentityId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "sourceCaseId": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Direct source test case in the same project, without creating a run. Mutually exclusive with runId, runItemId and stepId; immutable after creation."
+          },
+          "triageDuplicateOfDefectId": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Canonical defect in the same project when this defect was closed as a duplicate."
+          },
+          "rowVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "triageSnoozedUntil": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Timestamp"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Active wake time for a snoozed defect. Inbox rows have a null wake time."
+          }
+        }
+      },
+      "DefectTriageEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/DefectTriageRow"
+          }
+        }
+      },
+      "DefectTriageListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/DefectTriageRow"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PageMeta"
+          }
+        }
+      },
+      "DefectTriageRequest": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "workspaceId",
+              "projectId",
+              "expectedVersion",
+              "action"
+            ],
+            "properties": {
+              "workspaceId": {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              "projectId": {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              "expectedVersion": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "accept",
+                  "decline",
+                  "resume"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "maxLength": 2000,
+                "default": "",
+                "description": "Optional note recorded when the decision changes defect status."
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "workspaceId",
+              "projectId",
+              "expectedVersion",
+              "action",
+              "duplicateOfDefectId"
+            ],
+            "properties": {
+              "workspaceId": {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              "projectId": {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              "expectedVersion": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "action": {
+                "type": "string",
+                "const": "duplicate"
+              },
+              "reason": {
+                "type": "string",
+                "maxLength": 2000,
+                "default": "",
+                "description": "Optional note recorded when the decision changes defect status."
+              },
+              "duplicateOfDefectId": {
+                "$ref": "#/components/schemas/Identifier"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "workspaceId",
+              "projectId",
+              "expectedVersion",
+              "action",
+              "snoozedUntil"
+            ],
+            "properties": {
+              "workspaceId": {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              "projectId": {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              "expectedVersion": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "action": {
+                "type": "string",
+                "const": "snooze"
+              },
+              "reason": {
+                "type": "string",
+                "maxLength": 2000,
+                "default": "",
+                "description": "Optional note recorded when the decision changes defect status."
+              },
+              "snoozedUntil": {
+                "$ref": "#/components/schemas/Timestamp"
+              }
+            }
+          }
+        ]
       },
       "AttachmentKind": {
         "type": "string",

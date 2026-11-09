@@ -23,8 +23,13 @@ test("suite detail passes only the resolved membership to the case list and pres
   const repository = all.find(node => node.type === "SuiteRepository")!;
   assert.deepEqual((repository.props.cases as TestCaseSummary[]).map(value => value.id), ["included"]);
   invoke(repository, "onOpen", item("included"));
-  invoke(all.find(node => node.props["aria-label"] === "Run suite")!, "onClick");
-  assert.deepEqual(events, ["case:included", "run:suite-a"]);
+  const run = all.find(node => node.props["aria-label"] === "Run suite")!;
+  const configure = all.find(node => node.props["aria-label"] === "Configure suite")!;
+  assert.equal(run.props.isIconOnly, true);
+  assert.equal(configure.props.isIconOnly, true);
+  invoke(run, "onPress");
+  invoke(configure, "onPress");
+  assert.deepEqual(events, ["case:included", "run:suite-a", "configure:suite-a"]);
   assert.equal(all.some(node => typeof node.props.children === "string" && node.props.children.includes("1 of 2 cases loaded")), true); h.dispose();
 });
 test("failure states do not present stale membership and retry the correct data source", () => {
@@ -37,8 +42,8 @@ test("failure states do not present stale membership and retry the correct data 
 });
 test("archive restrictions and read-only rights survive the detail presentation", () => {
   const { h, props, render } = setup(); props.suite = { ...detail, status: "archived" }; props.detail = props.suite;
-  let all = render(); assert.equal(all.find(node => node.props["aria-label"] === "Run suite")!.props.disabled, true);
-  assert.equal(all.find(node => node.type === "button" && nodes(node).some(child => child.type === "Settings"))!.props.disabled, true);
+  let all = render(); assert.equal(all.find(node => node.props["aria-label"] === "Run suite")!.props.isDisabled, true);
+  assert.equal(all.find(node => node.props["aria-label"] === "Configure suite")!.props.isDisabled, true);
   props.canManage = false; props.canRun = false; all = render();
   assert.equal(all.some(node => node.props["aria-label"] === "Run suite"), false);
   assert.equal(all.some(node => node.type === "Settings"), false); h.dispose();

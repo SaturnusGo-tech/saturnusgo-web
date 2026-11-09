@@ -4,6 +4,8 @@ import { TmsApiError, type TmsHttpClient } from "../../../../core/tms/transport/
 import {
   mapDefectDrill, mapRunDrill, mapRunItemDrill, mapTestCaseDrill,
 } from "../http/dashboard-drill-mapper";
+import { readDashboardDefectBreakdown } from "./breakdown/readDashboardDefectBreakdown";
+import type { DashboardDefectBreakdownRequest } from "../model/breakdown/dashboard-defect-breakdown";
 import { readDashboardSummary } from "./summary/readDashboardSummary";
 import type {
   DashboardAnalyticsQuery, DashboardAnalyticsSource, DashboardDrillRequest,
@@ -54,6 +56,11 @@ export function createHttpDashboardAnalyticsSource(http: TmsHttpClient,
         fallbackQueries.add(queryKey(query));
         return fallback.summary(query, signal);
       }
+    },
+    async defectBreakdown(request: DashboardDefectBreakdownRequest, signal?: AbortSignal) {
+      if (fallbackQueries.has(queryKey(request.query))) return null;
+      try { return await readDashboardDefectBreakdown(http, request, signal); }
+      catch (error) { if (unavailableRoute(error)) return null; throw error; }
     },
     async drill(request: DashboardDrillRequest, signal?: AbortSignal) {
       if (fallbackQueries.has(queryKey(request.query))) return fallback.drill(request, signal);

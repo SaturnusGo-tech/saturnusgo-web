@@ -22,37 +22,11 @@
 .tabs > button > span { color: var(--falcon-text-muted); font-size: 11px; font-variant-numeric: tabular-nums; }
 .tabs > button[data-action] { margin-left: auto; background: var(--falcon-action); color: var(--falcon-on-action); }
 .tabs > button[data-action] > span { color: inherit; }
-.filterArea { min-width: 0; margin-bottom: 18px; }
-.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; min-width: 0; }
-.search { display: flex; flex: 0 1 280px; min-width: 120px; gap: 9px; align-items: center; border: 1px solid var(--falcon-border-subtle); border-radius: 10px; min-height: 36px; padding: 0 11px; color: var(--falcon-text-muted); background: transparent; }
-.search > svg { flex: none; }
-.search input { flex: 1; min-width: 0; width: 100%; height: 34px; padding: 0; border: 0; border-radius: 0; outline: none; background: transparent; box-shadow: none; color: var(--falcon-text); caret-color: var(--falcon-text); font: inherit; font-size: 12px; }
-.search input::placeholder { color: var(--falcon-text-muted); }
-.page .search input:focus-visible { outline: none; }
-.search:focus-within { outline: 2px solid var(--falcon-focus); outline-offset: 2px; }
-.sort { margin-left: auto; min-width: 130px; max-width: 230px; }
-.sort > button { min-height: 34px; border: 0; background: transparent; font: inherit; font-size: 12px; }
-.filterButton { composes: quiet; }
-.filterButton[aria-expanded="true"] { background: var(--falcon-control); color: var(--falcon-text); }
-.filterButton > span { min-width: 18px; padding: 0 4px; border-radius: 5px; background: var(--falcon-selected); font-size: 11px; font-variant-numeric: tabular-nums; }
-.filterReveal { display: grid; grid-template-rows: 0fr; opacity: 0; visibility: hidden; transition: grid-template-rows 220ms cubic-bezier(.2,.72,.3,1), opacity 150ms ease, visibility 220ms; }
-.filterReveal[data-open="true"] { grid-template-rows: 1fr; opacity: 1; visibility: visible; }
-.filterReveal > div { min-height: 0; overflow: hidden; }
-.filterPanel { display: grid; gap: 18px; padding: 20px 0 18px; border-bottom: 1px solid var(--falcon-border-subtle); }
-.facets { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); align-items: start; gap: 18px; }
-.facets > button { justify-self: start; grid-column: 1 / -1; }
-.applied { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-.applied > button { display: inline-flex; align-items: center; gap: 7px; max-width: 240px; min-height: 26px; padding: 4px 8px; background: var(--falcon-hover); border: 0; border-radius: 6px; color: var(--falcon-text-muted); font: inherit; font-size: 11px; cursor: pointer; }
-.applied > button:hover { background: var(--falcon-selected); color: var(--falcon-text); }
-.applied span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.applied svg { flex: none; }
-.hint { color: var(--falcon-text-muted); font-size: 11px; line-height: 1.5; margin: 12px 0 0; }
 .state { min-height: 260px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: var(--falcon-text-muted); text-align: center; }
 .state strong { font-weight: 500; color: var(--falcon-text); font-size: 15px; }
 .state p { margin: 0; font-size: 12px; max-width: 350px; line-height: 1.6; }
 .failure { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 0; color: var(--falcon-danger); font-size: 12px; }
 .footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; color: var(--falcon-text-muted); font-size: 11px; padding-block: 16px; }
-@container dashboard-detail (max-width: 760px) { .heading { align-items: flex-start; } .facets { grid-template-columns: repeat(2,minmax(0,1fr)); } .sort { min-width: 110px; } }
-@media (max-width: 640px) { .main { padding: 20px 18px 48px; } .heading { flex-wrap: wrap; gap: 10px; margin-bottom: 18px; } .heading h1 { font-size: 22px; } .search { flex: 1 1 180px; } .sort { margin-left: 0; } }
-@media (prefers-reduced-motion: reduce) { .filterReveal { transition: none; } }
+@container dashboard-detail (max-width: 760px) { .heading { align-items: flex-start; } }
+@media (max-width: 640px) { .main { padding: 20px 18px 48px; } .heading { flex-wrap: wrap; gap: 10px; margin-bottom: 18px; } .heading h1 { font-size: 22px; } }
 :global([data-appearance="glass"]) .page.page.page { background: transparent; }

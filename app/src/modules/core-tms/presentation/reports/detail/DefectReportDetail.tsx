@@ -1,28 +1,24 @@
 "use client";
-import { MarkdownField } from "../../cases/inspector/markdown/MarkdownField";
-import { ResponsibleName } from "../../../workspace/members/presentation/ResponsibleName";
 
-import {
-  ArrowLeft, CircleDashed, ExternalLink as ExternalLinkIcon, Link2, Paperclip, X,
-} from "lucide-react";
-import type { ReactNode } from "react";
+import { Link } from "@heroui/react";
+import { ExternalLink as ExternalLinkIcon } from "lucide-react";
+import { useId, type ReactNode } from "react";
 import type { Defect, ExternalLink, TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
-import { ConnectorTargetLinks } from "../../../connectors/presentation/links/ConnectorTargetLinks";
 import { AttachmentLink } from "../../../attachments/presentation/link/AttachmentLink";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
-import { localizedComponentLabel, localizedLabel } from "../../../localization/format/labels";
-import { DefectDiscussion } from "./discussion/DefectDiscussion";
-import { CommentShareItem } from "../../cases/collaboration/sharing/CommentShareItem";
-import { buildCaseDeepLink } from "../../../test-cases/navigation/case-deep-link";
-import { buildDefectDeepLink } from "../../../defects/navigation/defect-deep-link";
 import type { DefectRetest } from "../../../runs/verification/state/defect/useDefectRetest";
-import { DefectRetestPanel } from "./retest/DefectRetestPanel";
+import { buildCaseDeepLink } from "../../../test-cases/navigation/case-deep-link";
+import files from "../../cases/detail/tabs/attachments/case-attachments.module.css";
+import empty from "../../cases/detail/tabs/empty/case-tab-empty.module.css";
+import inspector from "../../cases/inspector/caseInspector.module.css";
+import { MarkdownField } from "../../cases/inspector/markdown/MarkdownField";
 import { DefectRetestMetadata } from "./context/DefectRetestMetadata";
-import { DefectRetestAction } from "./retest/DefectRetestAction";
-import surface from "../reports.module.css";
+import { DefectDiscussion } from "./discussion/DefectDiscussion";
+import { DefectReportHeader, type DetailTab } from "./header/DefectReportHeader";
+import { DefectReportProperties } from "./properties/DefectReportProperties";
 import detail from "./defect-detail.module.css";
 
-export type DetailTab = "overview" | "attachments";
+export type { DetailTab } from "./header/DefectReportHeader";
 
 export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTabChange, onBack, onOpenRun, retest, connected = false, canComment = false }: {
   retest?: DefectRetest;
@@ -36,59 +32,27 @@ export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTab
   onBack: () => void;
   onOpenRun: (runId: string, runItemId: string | null) => void;
 }) {
-  const { locale, languageTag, t } = useTmsLocale();
-  const createdAt = new Intl.DateTimeFormat(languageTag, {
-    day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit",
-  }).format(new Date(defect.createdAt));
-  const evidenceCount = defect.attachmentIds.length + links.length;
+  const { locale, t } = useTmsLocale();
+  const tabsId = useId();
+  const archived = Boolean(defect.archivedAt);
 
-  return <article className={surface.detail} data-testid="defect-report-detail">
-    <header className={surface.detailHeader}>
-      <div className={surface.detailUtility}>
-        <span className={surface.detailEyebrow}>{locale === "ru" ? "Карточка баг-репорта" : "Bug report"}</span>
-        <div className={detail.actions}>
-          <CommentShareItem key={defect.id} compact resource="defect" ru={locale === "ru"}
-            visibleLabel={locale === "ru" ? "Ссылка на дефект" : "Bug report link"} link={() => {
-            const url = new URL(window.location.href); if (workspaceId) url.searchParams.set("workspaceId", workspaceId);
-            return buildDefectDeepLink(url.href, { projectId: defect.projectId, defectId: defect.id });
-          }} />
-          {retest && <DefectRetestAction retest={retest} />}
-          <button className={surface.mobileBack} type="button" onClick={onBack} aria-label={t("reports.backToList")}><ArrowLeft size={17} /></button>
-          <button className={surface.closeButton} type="button" onClick={onBack} aria-label={t("reports.backToList")}><X size={18} /></button>
-        </div>
-      </div>
-      <div className={surface.detailTitle}>
-        <h1>{defect.title}<span>#{defect.key}</span></h1>
-        <p>
-          <span className={surface.statusChip} data-status={defect.status}>
-            {defect.status === "open" ? <CircleDashed size={13} aria-hidden="true" /> : defect.status === "ready_for_retest" ? null : <span aria-hidden="true" />}
-            {localizedLabel(locale, defect.status)}
-          </span>
-          <span>{t("reports.created")} <time dateTime={defect.createdAt}>{createdAt}</time></span>
-          {retest && <DefectRetestMetadata retest={retest} />}
-        </p>
-      </div>
-      {retest && <DefectRetestPanel key={defect.id} retest={retest} />}
-      <nav className={surface.tabs} aria-label={locale === "ru" ? "Разделы баг-репорта" : "Bug report sections"}>
-        <button type="button" data-active={tab === "overview" || undefined} onClick={() => onTabChange("overview")}>{t("reports.overview")}</button>
-        <button type="button" data-active={tab === "attachments" || undefined} onClick={() => onTabChange("attachments")}>{t("reports.attachments")} {evidenceCount > 0 && <span>{evidenceCount}</span>}</button>
-      </nav>
-    </header>
-
-    <div className={surface.detailScroll}>
-      {tab === "overview" ? <div className={`${surface.overviewLayout} ${detail.overview}`}>
-        <main className={surface.primaryColumn}>
+  return <article className={`${inspector.shell} ${detail.shell}`} data-testid="defect-report-detail" data-defect-archived={archived || undefined}>
+    <DefectReportHeader workspaceId={workspaceId} defect={defect} evidenceCount={defect.attachmentIds.length + links.length}
+      retest={archived ? undefined : retest} tabsId={tabsId} tab={tab} onTabChange={onTabChange} onBack={onBack} />
+    <div className={`${inspector.scroll} ${detail.scroll}`} id={`${tabsId}-panel`} role="tabpanel" aria-labelledby={`${tabsId}-${tab}`} tabIndex={0}>
+      {tab === "overview" ? <div className={detail.overview}>
+        <div className={inspector.primaryColumn}>
           <DetailSection title={t("reports.descriptionHeading")}>
             <MarkdownField value={defect.description} label={t("reports.descriptionHeading")} emptyLabel={t("reports.noDescription")} allowAttachments={false} />
           </DetailSection>
-          <DetailSection title={t("reports.actualResult")} accent="danger">
-            <p>{defect.actualResult || t("reports.notProvided")}</p>
+          <DetailSection title={t("reports.actualResult")}>
+            <MarkdownField value={defect.actualResult} label={t("reports.actualResult")} emptyLabel={t("reports.notProvided")} allowAttachments={false} />
           </DetailSection>
-          <DetailSection title={t("reports.expectedResult")} accent="success">
+          <DetailSection title={t("reports.expectedResult")}>
             <MarkdownField value={defect.expectedResult} label={t("reports.expectedResult")} emptyLabel={t("reports.notProvided")} allowAttachments={false} />
           </DetailSection>
           <DetailSection title={t("reports.executionContext")}>
-            {defect.runId ? <dl className={surface.contextList}>
+            {defect.runId ? <dl className={inspector.compactSummary}>
               <div><dt>{locale === "ru" ? "Исходный прогон" : "Original run"}</dt><dd><button type="button" className={detail.originLink}
                 onClick={() => onOpenRun(defect.runId!, defect.runItemId)}>{run ? `${run.key} · ${run.name}` : defect.runId}</button></dd></div>
               <div><dt>{t("reports.runItem")}</dt><dd>{defect.runItemId || "—"}</dd></div>
@@ -97,62 +61,45 @@ export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTab
               typeof window === "undefined" ? "https://tms.saturnusgo.com/" : window.location.href,
               { projectId: defect.projectId, caseId: defect.sourceCaseId })}>
               {locale === "ru" ? "Открыть тест-кейс" : "Open test case"}
-            </a> : <p className={surface.mutedText}>{t("reports.noRunContext")}</p>}
+            </a> : <p className={detail.muted}>{t("reports.noRunContext")}</p>}
+            {!archived && retest && (retest.latest || retest.contextError) && <div className={detail.retestContext}>
+              <DefectRetestMetadata retest={retest} />
+            </div>}
           </DetailSection>
-        </main>
-        <aside className={surface.sideRail} aria-label={t("reports.properties")}>
-          <DetailSection title={t("reports.properties")}>
-            <dl className={surface.propertyList}>
-              <div><dt>{t("reports.status")}</dt><dd><span className={surface.statusChip} data-status={defect.status}>
-                {defect.status === "open" ? <CircleDashed size={13} aria-hidden="true" /> : defect.status === "ready_for_retest" ? null : <span aria-hidden="true" />}
-                {localizedLabel(locale, defect.status)}
-              </span></dd></div>
-              <div><dt>{t("reports.severity")}</dt><dd><span className={surface.severityChip} data-level={defect.severity}>{localizedLabel(locale, defect.severity)}</span></dd></div>
-              <div><dt>{t("reports.priority")}</dt><dd><span className={surface.severityChip} data-level={defect.priority}>{localizedLabel(locale, defect.priority)}</span></dd></div>
-              <div><dt>{t("reports.reproducibility")}</dt><dd>{defect.reproducibility || "—"}</dd></div>
-            </dl>
-          </DetailSection>
-          <DetailSection title={t("reports.location")}>
-            <dl className={surface.propertyList}>
-              <div><dt>{t("reports.component")}</dt><dd>{localizedComponentLabel(locale, defect.component) || "—"}</dd></div>
-              <div><dt>{t("reports.assignee")}</dt><dd>{workspaceId ? <ResponsibleName workspaceId={workspaceId} identityId={defect.assigneeIdentityId} /> : t("common.unassigned")}</dd></div>
-              <div><dt>{t("reports.integration")}</dt><dd>{defect.integrationTarget ? "YouTrack" :
-                locale === "ru" ? "Интеграции проекта" : "Project integrations"}</dd></div>
-            </dl>
-          </DetailSection>
-          {(defect.integrationTarget || defect.externalIssue) && <DetailSection title={t("reports.issueLink")}>
-            {defect.externalIssue ? <a className={surface.issueLink} href={defect.externalIssue.url} target="_blank" rel="noreferrer">
-              <span className={surface.issueProvider}>YouTrack</span>
-              <strong>{defect.externalIssue.key}</strong>
-              <ExternalLinkIcon size={14} aria-hidden="true" />
-            </a> : <p className={surface.mutedText}>{t("reports.noIssueLink")}</p>}
-          </DetailSection>}
-          {workspaceId && <ConnectorTargetLinks workspaceId={workspaceId} projectId={defect.projectId} targetId={defect.id} />}
-          <DetailSection title={t("reports.labels")}>
-            {defect.labels.length > 0 ? <div className={surface.tagList}>{defect.labels.map((label) => <span key={label}>#{label}</span>)}</div> : <p className={surface.mutedText}>{t("reports.noLabels")}</p>}
-          </DetailSection>
-        </aside>
-        <div className={detail.discussion}>
-          <DefectDiscussion key={defect.id} defectId={defect.id} projectId={defect.projectId} connected={connected} canComment={canComment} />
         </div>
-      </div> : <section className={surface.attachmentsPanel}>
-        <header><div><h2>{t("reports.evidence")}</h2><p>{t("reports.evidenceHint")}</p></div><span><Paperclip size={15} />{evidenceCount}</span></header>
-        {evidenceCount > 0 ? <div className={surface.attachmentGallery}>
-          {defect.attachmentIds.map((id) => <AttachmentLink key={id} attachmentId={id} presentation="media" variant="gallery" />)}
-          {links.map((link) => <a className={surface.externalEvidence} key={link.id} href={link.targetUri} target="_blank" rel="noreferrer"><Link2 size={16} /><span>{link.label}</span><ExternalLinkIcon size={14} /></a>)}
-        </div> : <div className={surface.attachmentEmpty}><Paperclip size={24} /><strong>{t("reports.noEvidence")}</strong></div>}
-      </section>}
+        <DefectReportProperties defect={defect} workspaceId={workspaceId} />
+        {!archived && <div className={detail.discussion}>
+          <DefectDiscussion key={defect.id} defectId={defect.id} projectId={defect.projectId} connected={connected} canComment={canComment} />
+        </div>}
+      </div> : <DefectReportAttachments attachmentIds={defect.attachmentIds} links={links} />}
     </div>
   </article>;
 }
 
-function DetailSection({ title, accent, children }: {
-  title: string;
-  accent?: "danger" | "success";
-  children: ReactNode;
-}) {
-  return <section className={surface.detailSection} data-accent={accent}>
-    <header><h2>{title}</h2></header>
-    <div className={surface.sectionBody}>{children}</div>
+function DetailSection({ title, children }: { title: string; children: ReactNode }) {
+  return <section className={inspector.section}>
+    <header><h3>{title}</h3></header>
+    <div className={inspector.sectionBody}>{children}</div>
   </section>;
+}
+
+function DefectReportAttachments({ attachmentIds, links }: { attachmentIds: string[]; links: ExternalLink[] }) {
+  const { locale, t } = useTmsLocale();
+  if (attachmentIds.length === 0 && links.length === 0) return <div className={empty.empty}>
+    <div className={empty.content}>
+      <img className={empty.illustration} src="/falcon/cases/empty-attachments.webp" width={174} height={116} alt="" />
+      <h3>{locale === "ru" ? "Вложений пока нет" : "No attachments yet"}</h3>
+      <p>{t("reports.noEvidence")}</p>
+    </div>
+  </div>;
+  return <div className={files.content}>
+    {attachmentIds.length > 0 && <div className={files.list}>
+      {attachmentIds.map(id => <AttachmentLink key={id} attachmentId={id} presentation="media" variant="gallery" />)}
+    </div>}
+    {links.length > 0 && <div className={files.list}>
+      {links.map(link => <Link key={link.id} className={files.fileRecord} href={link.targetUri} target="_blank" rel="noopener noreferrer">
+        <ExternalLinkIcon size={15} aria-hidden="true" /><span>{link.label}</span>
+      </Link>)}
+    </div>}
+  </div>;
 }

@@ -76,7 +76,11 @@ export function widgetKey(widget: BoardWidget): string {
   return typeof widget.settings.presentation === "string" ? widget.settings.presentation :
     ({ summary: "currentCases", run_progress: "trend", recent_activity: "freshness", defects: "defects", assigned_to_me: "queue" })[widget.type];
 }
+export function dashboardcnEnabled(): boolean {
+  return process.env.NODE_ENV === "production" || process.env.NEXT_PUBLIC_TMS_DASHBOARDCN_PREVIEW === "1";
+}
 export function widgetLayoutWidth(widget: BoardWidget): number {
+  if (dashboardcnEnabled()) return widget.position.width;
   return widgetByKey.get(widgetKey(widget))?.width === 3 ? 3 : widget.position.width;
 }
 export function createBoardWidget(definition: WidgetDefinition, locale: string, id: string): BoardWidget {

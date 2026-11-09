@@ -7,7 +7,7 @@ import { WorkspaceNavigationRestoration } from "../../restoration/workspace-navi
 import { readWorkspaceDeepLink, buildWorkspaceDeepLink } from "../../workspace-deep-link";
 import { isProjectCaseContext } from "../../../../test-cases/navigation/project/project-case-context";
 import { readCaseDeepLink } from "../../../../test-cases/navigation/case-deep-link";
-import { buildDefectDeepLink } from "../../../../defects/navigation/defect-deep-link";
+import { buildDefectDeepLink, readDefectDeepLink } from "../../../../defects/navigation/defect-deep-link";
 import type { useWorkspaceHistory } from "../../browser/useWorkspaceHistory";
 function harness() {
   let href = "https://tms.example/work/?workspaceId=w&projectId=p&view=suites&suiteId=suite-1";
@@ -57,4 +57,20 @@ test("defect navigation is already canonical, without widget, suite or article p
   const href = buildDefectDeepLink("https://tms.example/work/?workspaceId=w&projectId=p&view=dashboard&dashboardDetail=filter&suiteId=s&article=help&integration=slack#title", { projectId: "p", defectId: "bug-1" });
   assert.equal(href, buildWorkspaceDeepLink(href, { workspaceId: "w", projectId: "p", view: "reports", runId: null }));
   assert.equal(new URL(href).searchParams.get("dashboardDetail"), null);
+});
+
+
+test("archived bug report links survive same-project restoration without leaking to other routes", () => {
+  const href = buildDefectDeepLink("https://tms.example/work/?workspaceId=w&projectId=p&view=dashboard", {
+    projectId: "p", defectId: "archived-bug", includeArchived: true,
+  });
+  assert.deepEqual(readDefectDeepLink(href), { projectId: "p", defectId: "archived-bug", includeArchived: true });
+  assert.equal(buildWorkspaceDeepLink(href, { workspaceId: "w", projectId: "p", view: "reports", runId: null }), href);
+  const selected = buildDefectDeepLink(href, { projectId: "p", defectId: "active-bug" });
+  const list = buildDefectDeepLink(href, { projectId: "p", defectId: null });
+  const otherProject = buildWorkspaceDeepLink(href, { workspaceId: "w", projectId: "other", view: "reports", runId: null });
+  const dashboard = buildWorkspaceDeepLink(href, { workspaceId: "w", projectId: "p", view: "dashboard", runId: null });
+  for (const link of [selected, list, otherProject, dashboard]) {
+    assert.equal(readDefectDeepLink(link).includeArchived, undefined);
+  }
 });

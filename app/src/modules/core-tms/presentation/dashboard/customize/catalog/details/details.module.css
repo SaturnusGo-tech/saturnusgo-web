@@ -1,8 +1,21 @@
 .details { margin-top: var(--store-list-heading-height); scroll-margin-top: 16px; position: sticky; top: 20px; max-height: calc(100dvh - 130px); overflow-y: auto; scrollbar-width: thin; min-width: 0; padding: 22px; border: 1px solid var(--line); border-radius: 13px; background: color-mix(in srgb, var(--paper) 86%, var(--control)); }
-.details header h2 { margin: 0 0 7px; color: var(--ink); font-size: 20px; line-height: 1.4; font-weight: 580; letter-spacing: -.4px; overflow-wrap: anywhere; }.details header p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.details header h2 { margin: 0 0 7px; color: var(--ink); font-size: 20px; line-height: 1.4; font-weight: 580; letter-spacing: -.4px; overflow-wrap: break-word; }.details header p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.6; overflow-wrap: break-word; }
 .preview { margin: 20px 0 18px; overflow: auto; max-height: 400px; }
 .purpose { color: var(--muted); font-size: 12px; line-height: 1.8; margin: 0 0 19px; }.section { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 7px; font-size: 12px; }.section > span { color: var(--muted); }.section strong { color: var(--ink); font-weight: 500; }
-.composition { margin: 13px 0; }.details .composition button { display: flex; align-items: center; gap: 9px; width: 100%; padding: 7px 0; border: 0; background: transparent; color: var(--muted); font-size: 11px; line-height: 1.5; text-align: left; cursor: pointer; }.composition button > span { flex: 1; }.composition svg { flex-shrink: 0; }.composition svg[data-open="true"] { transform: rotate(180deg); }.composition ul { margin: 7px 0 0; padding-left: 29px; color: var(--muted); font-size: 11px; line-height: 1.9; }
+.details .composition { margin: 10px 0; padding: 0; }
+.details .compositionTrigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 34px;
+  padding: 5px 0;
+  color: var(--falcon-text-muted);
+  text-align: start;
+}
+.compositionTitle { color: inherit; font-size: 12px; }
+.compositionContent { padding: 0 0 6px; }
+.compositionContent ul { margin: 0; padding-inline-start: 26px; color: var(--falcon-text-muted); font-size: 12px; line-height: 1.7; }
 .details .add { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 47px; margin-top: 18px; padding: 10px 12px; border: 1px solid var(--falcon-border); border-radius: 8px; background: var(--store-blue); color: var(--falcon-on-action); font-size: 12px; cursor: pointer; }.details .add:hover:not(:disabled) { filter: brightness(1.08); }.details .add:disabled { cursor: default; opacity: .55; }
 .details .add[data-added="true"] { color: var(--store-green); border-color: color-mix(in srgb, var(--store-green) 25%, var(--line)); background: color-mix(in srgb, var(--store-green) 8%, var(--paper)); opacity: 1; cursor: default; }
 .explanation { border-top: 1px solid var(--line); margin-top: 21px; padding-top: 16px; }.details h3 { color: var(--ink); font-size: 11px; font-weight: 550; margin: 0 0 7px; line-height: 1.5; }.explanation p { margin: 0 0 15px; color: var(--muted); font-size: 11px; line-height: 1.7; }.explanation p:last-child { margin-bottom: 0; }

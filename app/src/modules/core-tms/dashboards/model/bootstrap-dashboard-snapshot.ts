@@ -27,7 +27,8 @@ export function createDashboardSnapshot(data: Bootstrap, query: DashboardAnalyti
   const scoped = <T extends { projectId: string }>(items: T[]) => query.projectId
     ? items.filter((item) => item.projectId === query.projectId)
     : items;
-  const cases = scoped(data.testCases).filter((item) => !item.archivedAt);
+  const allCases = scoped(data.testCases);
+  const cases = allCases.filter((item) => !item.archivedAt);
   const runs = scoped(data.runs);
   const defects = scoped(data.defects);
   const currentDefects = defects.filter((item) => !["verified", "closed"].includes(item.status));
@@ -69,11 +70,14 @@ export function createDashboardSnapshot(data: Bootstrap, query: DashboardAnalyti
     .map((link) => link.owner.kind === "defect" ? link.owner.defectId : ""));
   const linkedDefects = defects.filter((item) =>
     (item.externalIssue?.syncStatus !== "deleted" && Boolean(item.externalIssue)) || linkedIds.has(item.id)).length;
-  const typeCount = (value: DashboardCaseType) => cases.filter((item) => item.type === value).length;
-  const caseTypes = (["manual", "checklist", "automated"] as const).map((type) => ({
-    key: type, label: type, value: typeCount(type),
-    drill: drill(`cases:type:${type}`, type, { entity: "test_case", basis: "current", type }),
-  }));
+  const generatedAt = time(data.meta.generatedAt);
+  const createdCases = allCases.filter((item) => inRange(item.createdAt, startTime) && time(item.createdAt) <= generatedAt);
+  const caseTypes = (items: typeof allCases, basis: "current" | "created") =>
+    (["manual", "checklist", "automated"] as DashboardCaseType[]).map((type) => ({
+      key: type, label: type, value: items.filter((item) => item.type === type).length,
+      drill: drill(basis === "current" ? `cases:type:${type}` : `cases:created:type:${type}`,
+        type, { entity: "test_case", basis, type }),
+    }));
   const tagCounts = new Map<string, number>();
   for (const item of cases) {
     for (const tag of new Set(item.tags)) tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
@@ -125,7 +129,7 @@ export function createDashboardSnapshot(data: Bootstrap, query: DashboardAnalyti
   return {
     generatedAt: data.meta.generatedAt, query,
     metrics: {
-      currentCases: cases.length, casesCreated: cases.filter((item) => inRange(item.createdAt, startTime)).length,
+      currentCases: cases.length, casesCreated: createdCases.length,
       runsLaunched: runs.filter((item) => inRange(item.startedAt, startTime)).length,
       completedRuns: completedRuns.length, passedRuns, activeRuns: runs.filter((item) => item.status === "active").length,
       currentDefects: defects.length, openDefects: currentDefects.length,
@@ -138,7 +142,7 @@ export function createDashboardSnapshot(data: Bootstrap, query: DashboardAnalyti
       key: outcome, label: outcome, value: outcomeCount(outcome),
       drill: drill(`runs:outcome:${outcome}`, outcome, { entity: "run", basis: "completed", outcome }),
     })),
-    caseTypes, tags,
+    caseTypes: caseTypes(cases, "current"), createdCaseTypes: caseTypes(createdCases, "created"), tags,
     hotspots,
     defects: defectStatuses.map((status) => ({
       key: status, label: status, value: defects.filter((item) => item.status === status).length,

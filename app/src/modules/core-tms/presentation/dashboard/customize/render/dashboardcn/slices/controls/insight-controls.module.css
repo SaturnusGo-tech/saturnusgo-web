@@ -1,0 +1,50 @@
+.panel { padding: 14px 12px; min-width: 0; border-inline-start: 1px solid var(--insight-edge); background: var(--insight-panel); }
+.total { display: flex; align-items: baseline; gap: 4px; margin-block-end: 16px; }
+.total strong { color: var(--insight-text); font-size: 13px; line-height: 1; font-weight: 600; font-variant-numeric: tabular-nums; }
+.total span { font-size: 9px; color: var(--insight-muted); }
+.fields { display: grid; gap: 10px; }
+.field { display: grid; gap: 4px; min-width: 0; color: var(--insight-muted); font-size: 10px; }
+.panel .trigger {
+  min-height: 24px;
+  height: 24px;
+  padding-inline: 7px 5px;
+  border: 1px solid var(--insight-edge);
+  border-radius: 5px !important;
+  color: var(--insight-text);
+  background: var(--insight-subtle);
+  box-shadow: none;
+}
+.panel .trigger:is([data-hover="true"], [aria-expanded="true"]) { background: var(--insight-hover); }
+.panel .trigger[data-disabled="true"] { opacity: 1; }
+.panel .trigger:is(:focus-visible, [data-focus-visible="true"]) { outline: 1px solid var(--insight-text); outline-offset: 1px; }
+.panel .value { font-size: 10px; color: var(--insight-text); }
+.panel .arrow { inset-inline-end: 5px; width: 10px; height: 10px; }
+.menu {
+  --insight-menu-text: var(--dashboard-card-text, var(--falcon-text));
+  --insight-menu-hover: var(--falcon-hover);
+  min-width: 0;
+  padding: 3px !important;
+  border: 1px solid var(--dashboard-card-border, var(--falcon-border));
+  border-radius: 8px !important;
+  color: var(--insight-menu-text);
+  background: var(--falcon-elevated, light-dark(#fff, #212121)) !important;
+  box-shadow: var(--falcon-shadow-popover);
+}
+.menu .options { padding: 0; }
+.menu .optionList { gap: 1px; }
+.menu .option {
+  min-height: 27px;
+  padding: 3px 6px;
+  border-radius: 5px;
+  color: var(--insight-menu-text);
+  background: transparent;
+}
+.menu .option:is([data-hover="true"], [data-selected="true"]) { color: var(--insight-menu-text); background: var(--insight-menu-hover); }
+.menu .option:is(:focus-visible, [data-focus-visible="true"]) { outline: 1px solid var(--insight-menu-text); outline-offset: -1px; }
+.menu .optionTitle { font-size: 11px; }
+.menu .selectedIcon { color: var(--insight-menu-text); }
+@container (max-width: 435px) {
+  .panel { padding: 9px 10px; border-inline-start: 0; border-block-end: 1px solid var(--insight-edge); }
+  .total { margin-block-end: 8px; }
+  .fields { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+}

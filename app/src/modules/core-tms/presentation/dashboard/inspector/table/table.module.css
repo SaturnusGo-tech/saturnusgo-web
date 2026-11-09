@@ -26,3 +26,6 @@
 @container dashboard-records (max-width: 700px) { .dateColumn, .dateCell, .priorityColumn, .priorityCell { display: none; }.statusColumn { width: 122px; }.table[data-entity="run"] .secondaryColumn { width: 145px; } }
 @container dashboard-records (max-width: 520px) { .table[data-entity="run"] :is(.secondaryColumn, .secondaryCell) { display: none; }.table .name button { flex-direction: column; align-items: flex-start; justify-content: center; gap: 1px; }.key { flex: none; max-width: 100%; font-size: 10px; }.title { max-width: 100%; font-size: 13px; }.statusColumn { width: 105px; }.table :is(th, td) { padding-inline: 6px; } }
 @media (prefers-reduced-motion: reduce) { .table td { transition: none; } }
+
+.archivedName { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.archive { display: block; color: var(--muted); font-size: 10px; }

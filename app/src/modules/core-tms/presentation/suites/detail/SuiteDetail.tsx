@@ -1,9 +1,11 @@
 import { ArrowLeft, ArrowRotateCw, Play, Settings, Stack } from "@openai/apps-sdk-ui/components/Icon";
+import { Button } from "@heroui/react";
 import { useEffect, useRef } from "react";
 import type { Suite, SuiteSummary, TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import type { RepositoryFolder } from "../../../folders/model/folder";
 import { useSuitePreview } from "../../../suites/state/preview/useSuitePreview";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
+import { FalconTooltip } from "../../common/tooltip/FalconTooltip";
 import { MarkdownField } from "../../cases/inspector/markdown/MarkdownField";
 import { RunCasesSkeleton } from "../../runs/loading/RunCasesSkeleton";
 import { SuiteRepository } from "./repository/SuiteRepository";
@@ -24,7 +26,9 @@ export function SuiteDetail(props: Props) {
   const { suite, detail } = props;
   const preview = useSuitePreview(props.cases, detail, props.folders); const cases = preview.cases;
   const updated = suite ? new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", year: "numeric" }).format(new Date(suite.updatedAt)) : "";
-  return <div className={shared.page}>
+  const configureLabel = ru ? "Настроить сьют" : "Configure suite";
+  const runLabel = ru ? "Запустить сьют" : "Run suite";
+  return <div className={css.page}>
     <div className={css.topbar}><button type="button" className={shared.quiet} onClick={props.onBack}><ArrowLeft width={18} height={18} />{t("suite.title")}</button></div>
     {!suite ? <div className={shared.empty}><Stack width={30} height={30} /><h2>{ru ? "Сьют недоступен" : "Suite unavailable"}</h2><p>{ru ? "Возможно, набор был удалён или относится к другому проекту." : "This suite may have been removed or belongs to another project."}</p></div> : <>
       <header className={css.header}>
@@ -34,8 +38,18 @@ export function SuiteDetail(props: Props) {
           </div>
         </div>
         <div className={css.actions}>
-          {props.canManage && <button type="button" className={shared.quiet} disabled={!detail || suite.status === "archived"} onClick={() => props.onConfigure(suite.id)}><Settings width={18} height={18} />{ru ? "Настроить" : "Configure"}</button>}
-          {props.canRun && <button type="button" className={shared.primary} aria-label={ru ? "Запустить сьют" : "Run suite"} disabled={suite.status === "archived" || !detail || detail.resolvedCaseCount === 0} onClick={() => props.onRun(suite.id)}><Play width={18} height={18} />{ru ? "Запустить сьют" : "Run suite"}</button>}
+          {props.canManage && <FalconTooltip label={configureLabel}>
+            <Button type="button" size="sm" radius="full" isIconOnly variant="light" disableRipple className={css.action}
+              aria-label={configureLabel} isDisabled={!detail || suite.status === "archived"} onPress={() => props.onConfigure(suite.id)}>
+              <Settings width={18} height={18} aria-hidden="true" />
+            </Button>
+          </FalconTooltip>}
+          {props.canRun && <FalconTooltip label={runLabel}>
+            <Button type="button" size="sm" radius="full" isIconOnly disableRipple className={`${css.action} ${css.runAction}`}
+              aria-label={runLabel} isDisabled={suite.status === "archived" || !detail || detail.resolvedCaseCount === 0} onPress={() => props.onRun(suite.id)}>
+              <Play width={18} height={18} aria-hidden="true" />
+            </Button>
+          </FalconTooltip>}
         </div>
       </header>
       {suite.description.trim() && <div className={css.description}><MarkdownField label={ru ? "Описание" : "Description"} value={suite.description} appearance="plain" allowAttachments={false} /></div>}

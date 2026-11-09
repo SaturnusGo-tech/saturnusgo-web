@@ -1,0 +1,55 @@
+.actions { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.actions svg { flex: none; }
+.form { min-inline-size: 0; }
+.fields, .search { display: grid; min-inline-size: 0; gap: 10px; }
+.fields { padding: 10px 2px 2px; border-block-start: 1px solid var(--triage-line); }
+.fields > :not(.actions) { max-inline-size: min(100%, 460px); }
+.snoozeField { display: grid; gap: 6px; }
+.fields .fieldLabel { color: var(--triage-muted); font-size: 12px; }
+.fields .fieldShell {
+  min-block-size: 34px;
+  border: 1px solid var(--triage-line);
+  border-radius: 7px !important;
+  color: var(--triage-muted);
+  background: var(--triage-surface);
+  box-shadow: none;
+}
+.fields .fieldShell[data-hover="true"] { background: var(--triage-hover); }
+.fields .fieldShell:is([data-focus="true"], [data-focus-visible="true"], :focus-within) {
+  outline: 1px solid var(--triage-muted);
+  outline-offset: 1px;
+  border-color: var(--triage-muted);
+  background: var(--triage-surface);
+  box-shadow: none;
+}
+.fields .fieldInput { color: var(--triage-ink); font-size: 13px; outline: none; box-shadow: none; }
+.fieldIcon { color: var(--triage-muted); }
+.popover {
+  color: var(--dashboard-card-text, var(--falcon-text, light-dark(#242424, #ededed)));
+  border: 1px solid var(--dashboard-card-border, var(--falcon-border-subtle, light-dark(#dedede, #414141)));
+  background-color: var(--dashboard-card-bg, var(--falcon-panel, light-dark(#fff, #222)));
+  border-radius: 8px;
+}
+.popover .option { color: inherit; font-size: 13px; }
+.popover .option:is([data-hover="true"], [data-selected="true"]) {
+  background-color: var(--dashboard-card-subtle, var(--falcon-elevated));
+}
+.popover .option[data-focus-visible="true"] {
+  outline: 1px solid var(--dashboard-card-muted, var(--falcon-text-secondary));
+  outline-offset: -1px;
+}
+.candidates { max-block-size: 11rem; overflow: auto; scrollbar-width: thin; padding: 2px; gap: 3px; }
+.candidates .radio {
+  max-inline-size: 100%;
+  margin: 0;
+  padding: 4px 6px;
+  min-block-size: 29px;
+  border-radius: 6px;
+  overflow-wrap: anywhere;
+}
+.radio:is(:hover, [data-selected="true"]) { background: var(--triage-hover); }
+.radio .radioCircle { border-color: var(--triage-line-strong); }
+.radio[data-focus-visible="true"] { outline: 1px solid var(--triage-muted); outline-offset: -1px; }
+.radio .radioDot { background: var(--triage-ink); }
+.radio .radioLabel { color: var(--triage-ink); font-size: 12px; }
+.radioLabel small { color: var(--triage-muted); }

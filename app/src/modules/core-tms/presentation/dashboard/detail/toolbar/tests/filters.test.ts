@@ -1,37 +1,64 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { componentHarness, invoke, nodes } from "../../../../../portfolios/tests/support/component-harness";
+import type { DashboardDrillRow } from "../../../../../dashboards/model/dashboard-analytics";
 import type { DetailToolbar } from "../DetailToolbar";
+import type { listFacets, updateListFacet, updateProductScope } from "../../../inspector/facets/model/drill-facets";
+
+class ElementStub {}
 const locale = { useTmsLocale: () => ({ locale: "en", t: (key: string) => key }) };
 function setup() {
-  const h = componentHarness();
+  const h = componentHarness("https://tms.example/work/", { requestAnimationFrame: (callback: () => void) => callback(), HTMLElement: ElementStub });
+  const model = h.load<{ listFacets: typeof listFacets; updateListFacet: typeof updateListFacet; updateProductScope: typeof updateProductScope }>(new URL("../../../inspector/facets/model/drill-facets.ts", import.meta.url), name =>
+    name.endsWith("labels") ? { localizedLabel: (_: string, value: string) => value } : name.endsWith("PriorityIcon") ? { priorityLevels: [], priorityLabel: (_: string, value: string) => value } : undefined);
   const { DetailToolbar: Toolbar, emptyDetailFilters } = h.load<{ DetailToolbar: typeof DetailToolbar; emptyDetailFilters: () => Parameters<typeof DetailToolbar>[0]["filters"] }>(new URL("../DetailToolbar.tsx", import.meta.url), name =>
-    name.endsWith("useTmsLocale") ? locale : name.endsWith("labels") ? { localizedLabel: (_: string, value: string) => value } : undefined);
-  let filters = { ...emptyDetailFilters(), status: ["open", "verified"] }; let focused = 0;
-  const render = () => nodes(h.render(() => Toolbar({ rows: [], filters, onFilters: next => { filters = next; }, sort: "recent", onSort() {}, partial: true, scopeCount: 2, scopeFields: "product-fields" })));
-  const trigger = (tree: ReturnType<typeof render>) => tree.find(n => n.type === "button" && n.props["aria-controls"])!;
-  const first = render(); (trigger(first).props.ref as { current: unknown }).current = { focus: () => focused++ };
-  return { h, render, trigger, filters: () => filters, focused: () => focused };
+    name.endsWith("useTmsLocale") ? locale : name.endsWith("drill-facets") ? model : name.endsWith("useDrillScope") ? { useDrillScope: () => ({ facets: [], chips: [] }) } : undefined);
+  let filters = { ...emptyDetailFilters(), status: ["open", "verified"] };
+  let sort: Parameters<typeof Toolbar>[0]["sort"] = "recent";
+  const rows = [{ status: "open", project: "Test" }, { status: "verified", project: "Test", priority: "high" }] as DashboardDrillRow[];
+  const render = () => nodes(h.render(() => Toolbar({ rows, filters, onFilters: next => { filters = next; }, sort, onSort: next => { sort = next; }, partial: true })));
+  return { h, model, render, filters: () => filters };
 }
-test("one inline disclosure retains scope fields and active restrictions while collapsed", t => {
-  const s = setup(); t.after(() => s.h.dispose()); let tree = s.render();
-  assert.equal(s.trigger(tree).props["aria-expanded"], false);
-  assert.equal(tree.find(n => n.props.id === s.trigger(tree).props["aria-controls"])!.props.inert, true);
-  assert.equal(tree.filter(n => n.type === "aside").length, 0);
-  assert.ok(tree.some(n => n.props["aria-label"] === "Applied filters"));
-  invoke(s.trigger(tree), "onClick"); tree = s.render();
-  assert.equal(s.trigger(tree).props["aria-expanded"], true);
-  assert.equal(tree.find(n => n.props.id === s.trigger(tree).props["aria-controls"])!.props.inert, false);
-});
-test("Escape restores focus but respects a nested selector handling its own Escape", t => {
-  const s = setup(); t.after(() => s.h.dispose()); invoke(s.trigger(s.render()), "onClick");
-  let tree = s.render(); const event = { key: "Escape", defaultPrevented: true, preventDefault() {}, stopPropagation() {} };
-  invoke(tree[0], "onKeyDown", event); assert.equal(s.trigger(s.render()).props["aria-expanded"], true);
-  invoke(tree[0], "onKeyDown", { ...event, defaultPrevented: false });
-  assert.equal(s.trigger(s.render()).props["aria-expanded"], false); assert.equal(s.focused(), 1);
+
+test("search remains present while a compact filter control opens the floating menu", t => {
+  const s = setup(); t.after(() => s.h.dispose());
+  const trigger = () => s.render().find(n => n.props["aria-label"] === "Filters")!;
+  assert.equal(trigger().props["aria-expanded"], false);
+  assert.ok(s.render().some(n => n.type === "input" && n.props.type === "search"));
+  assert.ok(!s.render().some(n => n.props.inert));
+  invoke(trigger(), "onPress", { target: new ElementStub() });
+  assert.equal(trigger().props["aria-expanded"], true);
+  assert.ok(s.render().some(n => n.props.isOpen === true));
+  assert.ok(s.render().some(n => n.type === "input" && n.props.type === "search"));
 });
 test("removing one visible filter chip preserves the other selected filters", t => {
   const s = setup(); t.after(() => s.h.dispose());
-  invoke(s.render().find(n => n.props["aria-label"] === "Remove filter: open")!, "onClick");
+  invoke(s.render().find(n => n.props["aria-label"] === "Remove filter: open")!, "onPress", { pointerType: "mouse" });
   assert.deepEqual(s.filters().status, ["verified"]);
+});
+test("an active facet chip is an edit trigger with its own anchor", t => {
+  const s = setup(); t.after(() => s.h.dispose());
+  const chip = () => s.render().find(n => n.props["aria-label"] === "Edit filter: open")!;
+  assert.equal(chip().props["aria-expanded"], false);
+  invoke(chip(), "onPress", { target: new ElementStub() });
+  assert.equal(chip().props["aria-expanded"], true);
+  assert.equal(s.render().find(n => n.props["aria-label"] === "Filters")?.props["aria-expanded"], false);
+});
+
+test("editing a selected list value keeps other selections and avoids duplicates", t => {
+  const s = setup(); t.after(() => s.h.dispose());
+  assert.deepEqual([...s.model.updateListFacet(s.filters(), "status", "closed", "open").status], ["verified", "closed"]);
+  assert.deepEqual([...s.model.updateListFacet(s.filters(), "status", "verified", "open").status], ["verified"]);
+  assert.deepEqual([...s.model.updateListFacet(s.filters(), "status", "open").status], ["verified"]);
+});
+test("group and product selections retain their dependency and independent false regression", t => {
+  const s = setup(); t.after(() => s.h.dispose());
+  const scope = { productGroupId: "g1", productId: "p1", regression: false };
+  assert.deepEqual({ ...s.model.updateProductScope(scope, "productGroupId", "g2") }, { productGroupId: "g2", regression: false });
+  assert.deepEqual({ ...s.model.updateProductScope(scope, "productId", "p2", "g2") },
+    { productGroupId: "g2", productId: "p2", regression: false });
+  assert.deepEqual({ ...s.model.updateProductScope(scope, "productId") },
+    { productGroupId: "g1", productId: undefined, regression: false });
+  assert.deepEqual({ ...s.model.updateProductScope(scope, "regression") },
+    { productGroupId: "g1", productId: "p1", regression: undefined });
 });

@@ -1,10 +1,13 @@
 "use client";
 
+import { Button, Input } from "@heroui/react";
 import { useState } from "react";
 import type { DashboardWorkbenchModel } from "../../../../dashboards/workbench/application/useDashboardWorkbench";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
-import { AnimatedSelect } from "../../../common/select/AnimatedSelect";
-import styles from "../workbench.module.css";
+import { DashboardSelect } from "../../common/select/DashboardSelect";
+import styles from "./contextBar.module.css";
+
+const ALL = "all-context-values";
 
 export function WorkbenchContextBar({ model }: { model: DashboardWorkbenchModel }) {
   const { t } = useTmsLocale();
@@ -21,41 +24,45 @@ export function WorkbenchContextBar({ model }: { model: DashboardWorkbenchModel 
     model.setFilters({ environmentId: "", buildReference: "" });
   };
 
-  return <section className={styles.contextBar} aria-label={t("dashboardWorkbench.context")}>
-    <div className={styles.contextHeading}><strong>{t("dashboardWorkbench.context")}</strong>
-      <p>{t("dashboardWorkbench.contextHint")}</p></div>
-    <form className={styles.filters} onSubmit={(event) => {
-      event.preventDefault();
-      model.setFilters({ environmentId: filters.environmentId, buildReference: filters.buildReference.trim() });
-    }}>
-      <div className={styles.filterField}><span>{t("dashboardWorkbench.environment")}</span>
-        <AnimatedSelect compact className={styles.filterSelect} label={t("dashboardWorkbench.environment")}
-          value={filters.environmentId} disabled={!model.enabled} onChange={(value) => update("environmentId", value)}
-          options={[
-            { value: "", label: t("dashboardWorkbench.allEnvironments") },
-            ...(filters.environmentId && !choices?.environments.some((item) => item.id === filters.environmentId)
-              ? [{ value: filters.environmentId, label: t("dashboardWorkbench.selectedEnvironment") }] : []),
-            ...(choices?.environments.map((item) => ({ value: item.id, label: `${item.projectName} · ${item.name}` })) ?? []),
-          ]} />
-      </div>
-      <div className={styles.filterField}><span>{t("dashboardWorkbench.build")}</span>
-        <AnimatedSelect compact className={styles.filterSelect} label={t("dashboardWorkbench.build")}
-          value={filters.buildReference} disabled={!model.enabled} onChange={(value) => update("buildReference", value)}
-          options={[
-            { value: "", label: t("dashboardWorkbench.allBuilds") },
-            ...(filters.buildReference && !choices?.builds.includes(filters.buildReference)
-              ? [{ value: filters.buildReference, label: filters.buildReference }] : []),
-            ...(choices?.builds.map((build) => ({ value: build, label: build })) ?? []),
-          ]} />
-        {choices?.buildsTruncated && <input value={filters.buildReference} disabled={!model.enabled} maxLength={500}
-          aria-label={t("dashboardWorkbench.exactBuild")} placeholder={t("dashboardWorkbench.exactBuild")}
-          onChange={(event) => update("buildReference", event.target.value)} />}
-      </div>
-      <button type="submit" disabled={!model.enabled || !changed}>{t("dashboardWorkbench.apply")}</button>
+  return <form className={styles.form} aria-label={t("dashboardWorkbench.context")} onSubmit={(event) => {
+    event.preventDefault();
+    model.setFilters({ environmentId: filters.environmentId, buildReference: filters.buildReference.trim() });
+  }}>
+    {model.enabled && <>
+    <div className={styles.field}><span>{t("dashboardWorkbench.environment")}</span>
+      <DashboardSelect className={styles.select} label={t("dashboardWorkbench.environment")}
+        value={filters.environmentId ? `:${filters.environmentId}` : ALL} isDisabled={!model.enabled} onChange={(value) => update("environmentId", value === ALL ? "" : value.slice(1))}
+        options={[
+          { value: ALL, label: t("dashboardWorkbench.allEnvironments") },
+          ...(filters.environmentId && !choices?.environments.some((item) => item.id === filters.environmentId)
+            ? [{ value: `:${filters.environmentId}`, label: t("dashboardWorkbench.selectedEnvironment") }] : []),
+          ...(choices?.environments.map((item) => ({ value: `:${item.id}`, label: `${item.projectName} · ${item.name}` })) ?? []),
+        ]} />
+    </div>
+    <div className={styles.field}><span>{t("dashboardWorkbench.build")}</span>
+      <DashboardSelect className={styles.select} label={t("dashboardWorkbench.build")}
+        value={filters.buildReference ? `:${filters.buildReference}` : ALL} isDisabled={!model.enabled} onChange={(value) => update("buildReference", value === ALL ? "" : value.slice(1))}
+        options={[
+          { value: ALL, label: t("dashboardWorkbench.allBuilds") },
+          ...(filters.buildReference && !choices?.builds.includes(filters.buildReference)
+            ? [{ value: `:${filters.buildReference}`, label: filters.buildReference }] : []),
+          ...(choices?.builds.map((build) => ({ value: `:${build}`, label: build })) ?? []),
+        ]} />
+    </div>
+    {choices?.buildsTruncated && <div className={styles.field}><span>{t("dashboardWorkbench.exactBuild")}</span>
+      <Input size="sm" variant="flat" value={filters.buildReference} isDisabled={!model.enabled} maxLength={500}
+        classNames={{ base: styles.select, inputWrapper: styles.input, input: styles.inputText }}
+        aria-label={t("dashboardWorkbench.exactBuild")} placeholder={t("dashboardWorkbench.exactBuild")}
+        onValueChange={(value) => update("buildReference", value)} />
+    </div>}
+    <div className={styles.actions}>
+      <Button type="submit" size="sm" variant="flat" disableRipple className={styles.apply}
+        isDisabled={!model.enabled || !changed}>{t("dashboardWorkbench.apply")}</Button>
       {(model.filters.environmentId || model.filters.buildReference || changed) &&
-        <button type="button" className={styles.quietButton} onClick={reset}>{t("dashboardWorkbench.reset")}</button>}
-    </form>
+        <Button type="button" size="sm" variant="light" disableRipple className={styles.reset} onPress={reset}>{t("dashboardWorkbench.reset")}</Button>}
+    </div>
+    </>}
     {(choices?.environmentsTruncated || choices?.buildsTruncated) &&
-      <p className={styles.choiceNote}>{t("dashboardWorkbench.choicesLimited")}</p>}
-  </section>;
+      <p className={styles.note}>{t("dashboardWorkbench.choicesLimited")}</p>}
+  </form>;
 }

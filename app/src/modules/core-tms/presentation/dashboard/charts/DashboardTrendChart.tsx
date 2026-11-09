@@ -7,9 +7,10 @@ import { Area, CartesianGrid, ComposedChart, Dot, Line, ResponsiveContainer, Too
 import type { DashboardDrill, DashboardPeriod, DashboardRunOutcome, DashboardSnapshot } from "../../../dashboards/model/dashboard-analytics";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedLabel } from "../../../localization/format/labels";
-import { AnimatedSelect } from "../../common/select/AnimatedSelect";
 import { DashboardChartTooltip } from "../common/DashboardChartTooltip";
 import { DashboardSegments, dashboardTabId } from "../common/segments/DashboardSegments";
+import { DashboardSelect } from "../common/select/DashboardSelect";
+import controlStyles from "./controls/trend-controls.module.css";
 import styles from "./trend.module.css";
 
 const SERIES = ["launched", "passed", "failed", "blocked", "incomplete", "not_started", "aborted"] as const;
@@ -70,13 +71,13 @@ export function DashboardTrendChart({ snapshot, onOpenDrill, onPeriodChange }: {
     <section className={styles.panel} aria-labelledby={titleId} aria-description={t("dashboard.runFlowHint")}>
       <header className={styles.heading}>
         <div><h2 id={titleId}>{t("dashboard.runFlow")}</h2><p>{t(mode === "launched" ? "dashboard.launchTrendHint" : "dashboard.outcomeTrendHint")}</p></div>
-        {onPeriodChange && <AnimatedSelect compact className={styles.periodSelect} label={t("dashboard.historyPeriod")}
+        {onPeriodChange && <DashboardSelect label={t("dashboard.historyPeriod")}
           value={snapshot.query.period} onChange={(value) => onPeriodChange(value as DashboardPeriod)} options={[
             { value: "7d", label: t("dashboard.period7") }, { value: "30d", label: t("dashboard.period30") },
             { value: "90d", label: t("dashboard.period90") },
           ]} />}
       </header>
-      <DashboardSegments label={t("dashboard.runFlow")} panelId={panelId} selectedKey={mode} listClassName={styles.modes}
+      <DashboardSegments label={t("dashboard.runFlow")} panelId={panelId} selectedKey={mode} listClassName={`${styles.modes} ${controlStyles.segments}`}
         items={[{ key: "launched", label: t("dashboard.launchTrend") }, { key: "outcomes", label: t("dashboard.outcomeTrend") }]}
         onSelect={(next) => { setMode(next); setHidden([]); }} />
       <div id={panelId} role="tabpanel" aria-labelledby={dashboardTabId(panelId, mode)}>
@@ -128,9 +129,8 @@ export function DashboardTrendChart({ snapshot, onOpenDrill, onPeriodChange }: {
           })}
         </div>
         <footer className={styles.footer}>
-          <AnimatedSelect compact className={styles.bucketSelect} label={t("dashboard.bucket")}
+          <DashboardSelect label={t("dashboard.bucket")}
             value={selectedPoint ? bucket : "all"} onChange={setBucket} options={bucketOptions} />
-          {onOpenDrill && <span>{t("dashboard.trendDrillHint")}</span>}
         </footer>
       </div>
     </section>

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Bootstrap } from "../../../../../core/tms/contracts/legacy-contract";
 import type {
   DashboardAnalyticsQuery, DashboardAnalyticsSource, DashboardDrill,
-  DashboardDrillPage, DashboardSnapshot,
+  DashboardDrillPage, DashboardDrillRequest, DashboardSnapshot,
 } from "../../../dashboards/model/dashboard-analytics";
 import { createBootstrapDashboardAnalyticsSource } from "../../../dashboards/source/bootstrap-dashboard-analytics-source";
 
@@ -109,6 +109,10 @@ export function useDashboardAnalytics(
       loadDrill(drill.selected, drill.page.nextCursor);
     }
   }, [drill, loadDrill]);
+  const readDrill = useCallback((request: DashboardDrillRequest, signal?: AbortSignal) =>
+    source.drill(request, signal), [source]);
+
+  const readDefectBreakdown = useMemo(() => source.defectBreakdown?.bind(source), [source]);
 
   return {
     snapshot: ownsVisibleState ? snapshot : null,
@@ -117,6 +121,8 @@ export function useDashboardAnalytics(
     refresh: () => setRefreshVersion((value) => value + 1),
     drill: ownsVisibleState ? drill : EMPTY_DRILL,
     openDrill,
+    readDrill,
+    readDefectBreakdown,
     selectRelatedDrill,
     closeDrill: () => {
       drillController.current?.abort();

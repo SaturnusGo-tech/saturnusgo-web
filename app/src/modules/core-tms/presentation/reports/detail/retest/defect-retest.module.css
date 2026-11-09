@@ -1,8 +1,9 @@
-.start { display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:34px; padding:7px 12px; border:0; border-radius:10px; background:var(--falcon-action); color:var(--falcon-on-action); font:inherit; font-size:13px; cursor:pointer; white-space:nowrap; }
+.start { display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:34px; padding:7px 12px; border:0; border-radius:999px; background:var(--falcon-action); color:var(--falcon-on-action); font:inherit; font-size:13px; cursor:pointer; white-space:nowrap; }
 .start svg { flex:none; display:block; }
-.start:hover { filter:brightness(1.08); }
-.start:disabled, .collapse:disabled { opacity:.55; cursor:default; }
+.start:hover:not(:disabled, [aria-disabled=true]) { filter:brightness(1.08); }
+.start:disabled, .start[aria-disabled=true], .collapse:disabled { opacity:.55; cursor:default; }
 .start:focus-visible, .collapse:focus-visible { outline:2px solid var(--falcon-action); outline-offset:3px; }
+.start.retestAction { flex:none; inline-size:34px; min-inline-size:34px; block-size:34px; padding:0; }
 .panel { margin:0 24px 16px; border:1px solid var(--falcon-border); border-radius:10px; background:var(--falcon-surface); overflow:hidden; }
 :global(.dark) .panel { background:var(--falcon-panel); }
 .panel > header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:11px 14px; border-bottom:1px solid var(--falcon-border-subtle); }
@@ -19,5 +20,5 @@
 .scope { min-width:0; display:grid; gap:5px; }
 .scope > span { display:inline-flex; align-items:center; gap:6px; color:var(--falcon-action); font-size:12px; }
 .form .error { color:var(--falcon-danger); }
-@container report-detail (max-width:520px) { .start:not(.submit) > span { display:none; } .panel { margin-inline:18px; } }
-@container report-detail (max-width:380px) { .fields { grid-template-columns:1fr; } .form footer { flex-wrap:wrap; } .submit { margin-left:auto; } }
+@container (max-width:520px) { .panel { margin-inline:18px; } }
+@container (max-width:380px) { .fields { grid-template-columns:1fr; } .form footer { flex-wrap:wrap; } .submit { margin-left:auto; } }

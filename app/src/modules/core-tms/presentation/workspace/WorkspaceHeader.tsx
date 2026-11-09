@@ -3,6 +3,7 @@ import { RepositoryScopeSelector } from "../../repository-scope/presentation/sel
 import { FolderOpen, SidebarMenuMobile } from "@openai/apps-sdk-ui/components/Icon";
 import { Button } from "@heroui/button";
 import { PiUploadSimple } from "react-icons/pi";
+import type { Ref } from "react";
 import { companyViewAvailable } from "../../auth/managed/domain/features/company-features";
 import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
@@ -16,10 +17,12 @@ export function WorkspaceHeader({
   model,
   sidebarCollapsed,
   onToggleSidebar,
+  dashboardActionsRef,
 }: {
   model: WorkspaceModel;
   sidebarCollapsed: boolean;
   onToggleSidebar: () => void;
+  dashboardActionsRef?: Ref<HTMLDivElement>;
 }) {
   const { languageTag, locale, t } = useTmsLocale();
   const session = useOptionalTmsSession();
@@ -76,6 +79,8 @@ export function WorkspaceHeader({
           <PiUploadSimple size={15} aria-hidden="true" />{ru ? "Импорт" : "Import"}
         </Button>
       </div>}
+      {model.view === "dashboard" && dashboardActionsRef && <div ref={dashboardActionsRef}
+        className={shellStyles.headerActions} data-workspace-dashboard-actions />}
     </header>
   );
 }

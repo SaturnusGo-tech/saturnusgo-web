@@ -24,7 +24,7 @@ export function WidgetEntry({ widget, added, active, onAdd, onSelect, renderPrev
       <h3>{title}</h3><p>{locale === "ru" ? widget.hintRu : widget.hintEn}</p>
       <span className={styles.badge}>{sectionLabel(widgetSection(widget.key), locale)}</span>
     </div>
-    <button type="button" className={styles.selectEntry} onClick={onSelect} aria-pressed={active}
+    <Button type="button" variant="light" className={styles.selectEntry} onPress={onSelect} aria-pressed={active}
       aria-label={`${copy.preview}: ${title}`} />
     <Button className={styles.install} type="button" size="sm" variant="light" disableRipple
       isDisabled={added || busy} data-added={added} onPress={onAdd}

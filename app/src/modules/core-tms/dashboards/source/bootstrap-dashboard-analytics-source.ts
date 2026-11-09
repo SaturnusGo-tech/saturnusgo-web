@@ -135,6 +135,9 @@ export function createBootstrapDashboardAnalyticsSource(data: Bootstrap): Dashbo
           if (filter.component !== undefined && defect.component !== filter.component) return false;
           if (filter.componentIsEmpty && defect.component.trim() !== "") return false;
           if (filter.severity && defect.severity !== filter.severity) return false;
+          if (filter.priority && defect.priority !== filter.priority) return false;
+          if (filter.assigneeIdentityId && defect.assigneeIdentityId !== filter.assigneeIdentityId) return false;
+          if (filter.unassigned && defect.assigneeIdentityId) return false;
           if (filter.activeOnly && ["verified", "closed"].includes(defect.status)) return false;
           if (filter.runId && defect.runId !== filter.runId) return false;
           if (filter.testCaseId) return false;

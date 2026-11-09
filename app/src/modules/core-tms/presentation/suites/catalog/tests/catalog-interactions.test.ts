@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import type { Suite, SuiteSummary } from "../../../../../../core/tms/contracts/legacy-contract";
 import { componentHarness, invoke, nodes } from "../../../../portfolios/tests/support/component-harness";
+import { formatCount } from "../../../../localization/format/count";
 import { filterSuiteCatalog, suiteCatalogCount } from "../../../../suites/catalog/suite-catalog";
 import type { SuiteCatalog } from "../SuiteCatalog";
 
@@ -10,7 +11,8 @@ function setup() {
   const h = componentHarness();
   const { SuiteCatalog: View } = h.load<{ SuiteCatalog: typeof SuiteCatalog }>(new URL("../SuiteCatalog.tsx", import.meta.url), name =>
     name.endsWith("useTmsLocale") ? { useTmsLocale: () => ({ locale: "en", t: (key: string) => key }) }
-      : name.endsWith("suite-catalog") ? { filterSuiteCatalog, suiteCatalogCount } : undefined);
+      : name.endsWith("suite-catalog") ? { filterSuiteCatalog, suiteCatalogCount }
+      : name.endsWith("format/count") ? { formatCount } : undefined);
   const events: string[] = [];
   const props = { suites: [suite(), suite({ id: "archived", status: "archived" })], detail: null as Suite | null, projectName: "Web", query: "", filter: "all" as const, sort: "updated" as const,
     canManage: true, canRun: true, onQuery: (value: string) => events.push(`query:${value}`), onFilter: (value: string) => events.push(`filter:${value}`), onSort() {},
@@ -23,10 +25,22 @@ test("suite rows keep distinct open and run actions, return-focus marker, and ar
   const row = all.find(node => node.props["data-suite-id"] === "suite-a")!;
   const open = nodes(row).find(node => node.props["data-open-suite"] !== undefined)!;
   invoke(open, "onClick");
-  invoke(all.find(node => node.props["aria-label"] === "Run suite: Release smoke" && !node.props.disabled)!, "onClick");
-  invoke(all.find(node => node.props["data-testid"] === "new-suite")!, "onClick");
+  invoke(all.find(node => node.props["aria-label"] === "Run suite: Release smoke" && !node.props.isDisabled)!, "onPress");
+  invoke(all.find(node => node.props["data-testid"] === "new-suite")!, "onPress");
   assert.deepEqual(events, ["open:suite-a", "run:suite-a", "create"]);
-  assert.equal(nodes(all.find(node => node.props["data-suite-id"] === "archived")!).find(node => node.props["aria-label"] === "Run suite: Release smoke")!.props.disabled, true);
+  assert.equal(nodes(all.find(node => node.props["data-suite-id"] === "archived")!).find(node => node.props["aria-label"] === "Run suite: Release smoke")!.props.isDisabled, true);
+  h.dispose();
+});
+test("suite rows lead with the membership icon and title before the ID, case count, and date", () => {
+  const { h, render } = setup();
+  const row = nodes(render().find(node => node.props["data-suite-id"] === "suite-a")!);
+  const name = row.find(node => node.props["data-open-suite"] !== undefined)!;
+  const icon = nodes(name).find(node => node.type === "SuiteKindBadge");
+  assert.equal(icon?.props.iconOnly, true);
+  assert.equal(icon?.props.type, "static");
+  const updated = new Intl.DateTimeFormat("en", { day: "numeric", month: "short" }).format(new Date(suite().updatedAt));
+  assert.deepEqual(row.flatMap(node => typeof node.props.children === "string" ? [node.props.children] : []),
+    ["Release smoke", "WEB-TS-1", "4 cases", updated]);
   h.dispose();
 });
 test("read-only viewers can open suites without seeing create or execution actions", () => {
@@ -38,12 +52,12 @@ test("read-only viewers can open suites without seeing create or execution actio
 test("dynamic counts remain unknown until matching detail resolves them; filtered empty state resets the controls", () => {
   const { h, props, render, events } = setup(); props.suites = [suite({ type: "dynamic", caseCount: 0 })];
   let all = render(); assert.equal(all.some(node => node.props.title === "Open this suite to resolve its current membership"), true);
-  invoke(all.find(node => node.props["aria-label"] === "View cases: Release smoke")!, "onClick");
+  invoke(all.find(node => node.props["aria-label"] === "View cases: Release smoke")!, "onPress");
   assert.deepEqual(events, ["open:suite-a"]); events.length = 0;
   props.detail = { ...props.suites[0], caseIds: [], filter: { tags: ["smoke"] }, resolvedCaseCount: 7 };
   all = render(); assert.equal(all.some(node => node.props.title === "Open this suite to resolve its current membership"), false);
   props.query = "not present"; all = render();
-  invoke(all.find(node => node.type === "button" && node.props.children === "Reset search and filter")!, "onClick");
+  invoke(all.find(node => node.props.children === "Reset search and filter")!, "onPress");
   assert.deepEqual(events, ["query:", "filter:all"]); h.dispose();
 });
 

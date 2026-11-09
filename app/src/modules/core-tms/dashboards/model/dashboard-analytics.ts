@@ -1,3 +1,5 @@
+import type { DashboardDefectBreakdown, DashboardDefectBreakdownRequest } from "./breakdown/dashboard-defect-breakdown";
+
 export type DashboardPeriod = "7d" | "30d" | "90d";
 export type DashboardCaseType = "manual" | "checklist" | "automated";
 export type DashboardRunOutcome = "passed" | "failed" | "blocked" | "incomplete" | "not_started" | "aborted";
@@ -45,6 +47,9 @@ export type DashboardDrillFilter = DashboardProductFilters & (
       component?: string;
       componentIsEmpty?: boolean;
       severity?: "low" | "medium" | "high" | "critical";
+      priority?: "low" | "medium" | "high" | "critical";
+      assigneeIdentityId?: string;
+      unassigned?: boolean;
       activeOnly?: boolean;
       runId?: string;
       testCaseId?: string;
@@ -90,6 +95,7 @@ export type DashboardDrillRow = {
   runItemId?: string;
   status?: string;
   occurredAt?: string;
+  archivedAt?: string | null;
   links: Array<{ label: string; url: string }>;
 };
 
@@ -165,6 +171,7 @@ export type DashboardSnapshot = {
   trend: DashboardTrendPoint[];
   runOutcomes: Array<DashboardDimensionDatum<DashboardRunOutcome>>;
   caseTypes: Array<DashboardDimensionDatum<DashboardCaseType>>;
+  createdCaseTypes?: Array<DashboardDimensionDatum<DashboardCaseType>>;
   tags: DashboardDimensionDatum[];
   hotspots: DashboardHotspot[];
   defects: DashboardDimensionDatum[];
@@ -174,4 +181,5 @@ export type DashboardSnapshot = {
 export interface DashboardAnalyticsSource {
   summary(query: DashboardAnalyticsQuery, signal?: AbortSignal): Promise<DashboardSnapshot>;
   drill(request: DashboardDrillRequest, signal?: AbortSignal): Promise<DashboardDrillPage>;
+  defectBreakdown?(request: DashboardDefectBreakdownRequest, signal?: AbortSignal): Promise<DashboardDefectBreakdown | null>;
 }

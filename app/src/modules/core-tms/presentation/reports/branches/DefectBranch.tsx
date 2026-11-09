@@ -21,11 +21,11 @@ export function DefectBranch({ group, branch, expanded, workspaceId, selectedDef
   const loading = !branch || branch.status === "idle" || branch.status === "loading";
   return <li className={styles.branch}>
     <button type="button" className={styles.folder} onClick={onToggle} aria-expanded={expanded} aria-controls={id}>
-      <ChevronRight size={14} className={styles.chevron} data-expanded={expanded || undefined} />
-      {expanded ? <FolderOpen size={18} className={styles.folderIcon} /> : <Folder size={18} className={styles.folderIcon} />}
+      <ChevronRight size={14} className={styles.chevron} data-expanded={expanded || undefined} aria-hidden="true" />
+      {expanded ? <FolderOpen size={15} className={styles.folderIcon} aria-hidden="true" /> : <Folder size={15} className={styles.folderIcon} aria-hidden="true" />}
       <span className={styles.folderLabel} title={label}>{label}</span>
       {group.open > 0 && <span className={styles.openCount}>{group.open} {t("reports.openShort")}</span>}
-      {group.critical > 0 && <span className={styles.critical} title={locale === "ru" ? "Открытые критические баги" : "Open critical bugs"}>{group.critical} !</span>}
+      {group.critical > 0 && <span className={styles.critical} title={locale === "ru" ? "Открытые критические баги" : "Open critical bugs"}>{group.critical} {t("reports.criticalShort")}</span>}
       <span className={styles.count} title={locale === "ru" ? "Всего баг-репортов" : "Total bug reports"}>{group.total}</span>
     </button>
     <AnimatePresence initial={false}>
@@ -34,7 +34,7 @@ export function DefectBranch({ group, branch, expanded, workspaceId, selectedDef
         <ul className={styles.children} aria-label={label} aria-busy={loading}>
           {branch?.items.map((defect) => <DefectRow key={defect.id} defect={defect} workspaceId={workspaceId}
             selected={selectedDefectId === defect.id} onSelect={onSelectDefect} />)}
-          {loading && <li className={styles.skeleton} role="status" aria-label={locale === "ru" ? "Загрузка багов" : "Loading bugs"}>
+          {loading && !branch?.items.length && <li className={styles.skeleton} role="status" aria-label={locale === "ru" ? "Загрузка багов" : "Loading bugs"}>
             <span /><span /><span />
           </li>}
           {branch?.status === "error" && <li className={styles.message} role="alert">

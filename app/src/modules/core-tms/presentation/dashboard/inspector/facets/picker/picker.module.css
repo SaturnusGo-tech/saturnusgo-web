@@ -1,11 +1,37 @@
-.field { display: grid; min-width: 0; gap: 7px; }
-.label { color: var(--falcon-text-muted); font-size: 12px; }
-.trigger { display: flex; align-items: center; justify-content: space-between; min-width: 0; gap: 12px; width: 100%; min-height: 34px; padding: 6px 10px; border: 1px solid var(--falcon-border); border-radius: 8px; background: transparent; color: var(--falcon-text); font: inherit; font-size: 12px; cursor: pointer; }
-.trigger > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }.trigger > svg { flex: none; color: var(--falcon-text-muted); }
-.trigger:hover, .trigger[aria-expanded="true"] { background: var(--falcon-hover); }
-.menu { position: fixed; inset: auto; z-index: 90; display: grid; gap: 2px; margin: 0; padding: 6px; overflow-y: auto; border: 1px solid var(--falcon-border-subtle); border-radius: 12px; background: var(--falcon-elevated); box-shadow: var(--falcon-shadow-popover); color: var(--falcon-text); font: 400 12px/1.45 "Falcon Detail Sans", system-ui, sans-serif; scrollbar-width: thin; }
-.menu label { display: flex; align-items: center; gap: 9px; min-height: 34px; padding: 7px 8px; border-radius: 7px; cursor: pointer; }
-.menu label:hover, .menu label:focus-within { background: var(--falcon-hover); }
-.menu input { flex: none; accent-color: var(--falcon-action); }
-.menu label > span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-.menu small { flex: none; color: var(--falcon-text-muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.positioner { max-width: none; outline: none; }
+.positioner .surface {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: min(208px, calc(100vw - 24px));
+  max-height: min(360px, calc(100dvh - 24px));
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--falcon-border);
+  border-radius: 11px;
+  background: var(--falcon-elevated);
+  color: var(--falcon-text);
+  box-shadow: var(--falcon-shadow-popover);
+  font: 400 13px/1.4 "Falcon Detail Sans", system-ui, sans-serif;
+}
+.menu { display: flex; flex-direction: column; width: 100%; min-height: 0; }
+.menu .search { flex: none; width: 100%; border-bottom: 1px solid var(--falcon-border-subtle); }
+.menu .search .inputShell { display: flex; align-items: center; min-height: 36px; padding: 0 13px; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.menu .search .input { width: 100%; padding: 0; border: 0; outline: 0; background: transparent; color: var(--falcon-text); box-shadow: none; font: inherit; }
+.menu .input::placeholder { color: var(--falcon-text-muted); }
+.menu .listbox { min-height: 0; padding: 4px; overflow: auto; scrollbar-width: thin; }
+.menu .list { display: grid; gap: 1px; margin: 0; padding: 0; list-style: none; }
+.menu .row { display: flex; align-items: center; justify-content: flex-start; gap: 9px; min-width: 0; min-height: 32px; padding: 5px 9px; border: 0; border-radius: 6px; background: transparent; color: var(--falcon-text); font: inherit; cursor: pointer; }
+.menu .row:is([data-hover="true"], [data-focus-visible="true"]) { background: var(--falcon-hover); }
+.menu .row[data-focus-visible="true"], .menu .back:focus-visible, .menu .footerButton:focus-visible { outline: 1px solid var(--falcon-icon-muted); outline-offset: -1px; }
+.menu .row[data-disabled="true"] { opacity: .45; cursor: default; }
+.menu .row > svg, .detail { flex: none; color: var(--falcon-text-muted); }
+.detail { font-variant-numeric: tabular-nums; }
+.menu .title { flex: 1; min-width: 0; white-space: normal; overflow-wrap: anywhere; font: inherit; }
+.menu .empty, .status { padding: 8px 12px; margin: 0; color: var(--falcon-text-muted); font-size: 12px; }
+.menu .back, .menu .footerButton { display: inline-flex; flex: none; justify-content: flex-start; gap: 7px; min-width: 0; min-height: 32px; padding: 0 12px; border-radius: 0; background: transparent; color: var(--falcon-text); font: inherit; }
+.menu .back:hover, .menu .footerButton:hover { background: var(--falcon-hover); }
+@media (pointer: coarse) {
+  .menu .row, .menu .back, .menu .footerButton { min-height: 40px; }
+}
+.positioner .surface > [data-drill-menu] { display: flex; flex-direction: column; width: 100%; min-height: 0; }

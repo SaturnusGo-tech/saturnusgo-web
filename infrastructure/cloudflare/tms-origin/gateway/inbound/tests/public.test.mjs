@@ -59,7 +59,7 @@ test('personal workspace bootstrap can load canonical links through the signed g
 });
 
 const personalFeatureRoutes = [
- ...['summary','test-cases','runs','run-items','defects'].map(name=>['GET',`dashboard-analytics/${name}`]),
+ ...['summary','test-cases','runs','run-items','defects','defect-breakdown','defect-lead-time'].map(name=>['GET',`dashboard-analytics/${name}`]),
  ['GET','execution-history'], ['POST','test-case-import/inspect'], ['POST','test-case-import/normalize'],
  ['GET','impact/repositories'], ['PATCH','impact/repositories/repo_123'],
  ['GET','impact/analyses'], ['GET','impact/analyses/analysis_123'],
@@ -92,7 +92,8 @@ test('personal feature requests retain exact query/body, session isolation and v
 test('personal feature routes reject unsupported paths/methods/hosts and preserve CSRF and backend denial',async t=>{
  const original=globalThis.fetch;t.after(()=>{globalThis.fetch=original;});let calls=0;
  globalThis.fetch=async()=>{calls++;return Response.json({error:{code:'ACCESS_DENIED'}},{status:403});};
- const denied=[['POST','dashboard-analytics/summary'],['GET','dashboard-analytics/admin'],['DELETE','execution-history'],
+ const denied=[['POST','dashboard-analytics/summary'],['POST','dashboard-analytics/defect-breakdown'],
+  ['PATCH','dashboard-analytics/defect-lead-time'],['GET','dashboard-analytics/admin'],['DELETE','execution-history'],
   ['GET','test-case-import/inspect'],['POST','test-case-import/admin'],['DELETE','impact/analyses/analysis_123'],
   ['POST','impact/analyses/analysis_123/delete'],['POST','impact/analyses/analysis_123/gaps/gap_123/delete'],
   ['PUT','impact/repositories/repo_123'],['GET','impact/admin'],['GET','impact-extra/analyses'],

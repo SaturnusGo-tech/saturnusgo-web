@@ -8,7 +8,7 @@ import css from "../../../../folders/presentation/styles/repository.module.css";
 import local from "./selection-tree.module.css";
 
 type Props = {
-  titleMode?: "marquee";
+  titleMode?: "marquee" | "inline";
   cases: TestCaseSummary[]; folders: readonly RepositoryFolder[]; selected: ReadonlySet<string>;
   hideRedundantRootCount?: boolean; preserveCaseOrder?: boolean; ru: boolean; disabled?: boolean; selectable?: boolean; includeArchived?: boolean; activeId?: string; loadingCaseId?: string;
   onToggle: (id: string) => void; onScope: (ids: readonly string[]) => void;

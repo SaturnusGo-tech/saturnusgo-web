@@ -7,8 +7,11 @@
   flex-direction: column;
   gap: 8px;
 }
-.toastMotion {
+.toastRegion .toastMotion {
   position: fixed;
+  inset-inline-start: auto;
+  inline-size: max-content;
+  max-inline-size: calc(100vw - 32px);
   inset-inline-end: max(16px, env(safe-area-inset-right));
   inset-block-end: max(16px, env(safe-area-inset-bottom));
 }

@@ -2,9 +2,10 @@
 
 import { Tab, Tabs } from "@heroui/react";
 import { useReducedMotion } from "framer-motion";
+import type { ReactNode } from "react";
 import styles from "./segments.module.css";
 
-type Segment<Key extends string> = { key: Key; label: string; badge?: number | string };
+type Segment<Key extends string> = { key: Key; label: string; badge?: number | string; icon?: ReactNode };
 type Props<Key extends string> = {
   label: string;
   panelId: string;
@@ -35,8 +36,8 @@ export function DashboardSegments<Key extends string>({
       const item = items.find((option) => option.key === key);
       if (item) onSelect(item.key);
     }}>
-    {items.map(({ key, label: title, badge }) =>
+    {items.map(({ key, label: title, badge, icon }) =>
       <Tab key={key} id={dashboardTabId(panelId, key)} aria-controls={panelId} aria-label={badge === undefined ? title : `${title} ${badge}`}
-        title={badge === undefined ? title : <>{title}<span className={styles.badge}>{badge}</span></>} />)}
+        title={<>{icon}{title}{badge !== undefined && <span className={styles.badge}>{badge}</span>}</>} />)}
   </Tabs>;
 }
