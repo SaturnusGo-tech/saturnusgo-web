@@ -10,12 +10,14 @@
 .file.file {
   display: grid;
   grid-template-columns: 17px minmax(0, 1fr) auto auto;
+  align-items: center;
   justify-items: start;
   flex: 1;
   gap: 8px;
   min-width: 0;
   height: 42px;
   padding: 0 8px;
+  border: 0;
   border-radius: 7px;
   color: var(--cases-secondary-text);
   background: transparent;
@@ -29,7 +31,17 @@
 .chevron { transition: transform 160ms ease; }
 .file[aria-expanded="true"] .chevron { transform: rotate(180deg); }
 .actions { display: flex; align-items: center; gap: 2px; padding-inline-end: 2px; }
-.action.action { min-width: 29px; width: 29px; height: 29px; border-radius: 6px; background: transparent; }
+.action.action {
+  display: grid;
+  place-items: center;
+  min-width: 29px;
+  width: 29px;
+  height: 29px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+}
 .file.file[data-hover="true"],
 .action.action[data-hover="true"] { background: var(--cases-hover); color: var(--cases-strong); }
 .action[data-danger="true"][data-hover="true"] { color: var(--falcon-danger); }
