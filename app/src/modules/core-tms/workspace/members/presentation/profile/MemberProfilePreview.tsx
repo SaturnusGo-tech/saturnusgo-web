@@ -4,7 +4,7 @@ import { FreeSoloPopover } from "@heroui/popover";
 import { Button } from "@heroui/react";
 import { AnimatePresence, useReducedMotion } from "framer-motion";
 import { Bot, Clock3, SquareUserRound } from "lucide-react";
-import { useEffect, useId, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { FalconTooltip } from "../../../../presentation/common/tooltip/FalconTooltip";
 import type { TmsLocale } from "../../../../localization/model/locale";
 import { MemberAvatar } from "../../avatar/MemberAvatar";
@@ -32,6 +32,7 @@ export function MemberProfilePreview({
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const [preview, setPreview] = useState(false);
   const [pinned, setPinned] = useState(false);
+  const [placement, setPlacement] = useState<"left" | "right" | "bottom">("left");
   const cardId = useId();
   const reducedMotion = useReducedMotion();
   const isOpen = !disabled && (preview || pinned);
@@ -46,8 +47,13 @@ export function MemberProfilePreview({
   }, [disabled]);
   useEffect(() => () => clearTimeout(timer.current), []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isOpen) return;
+    function position() {
+      const rect = anchor.current.getBoundingClientRect();
+      const room = Math.min(373, window.innerWidth - 20) + 18;
+      setPlacement(rect.left >= room ? "left" : window.innerWidth - rect.right >= room ? "right" : "bottom");
+    }
     function dismiss(event: globalThis.KeyboardEvent) {
       if (event.key !== "Escape" || event.isComposing) return;
       event.preventDefault();
@@ -58,22 +64,21 @@ export function MemberProfilePreview({
       setPreview(false);
       setPinned(false);
     }
+    position();
+    window.addEventListener("resize", position);
     document.addEventListener("keydown", dismiss, true);
-    return () => document.removeEventListener("keydown", dismiss, true);
+    return () => { window.removeEventListener("resize", position); document.removeEventListener("keydown", dismiss, true); };
   }, [isOpen, cardId]);
-
   function close() {
     clearTimeout(timer.current);
     setPreview(false);
     setPinned(false);
   }
-
   function schedulePreview(visible: boolean, delay: number) {
     clearTimeout(timer.current);
     if (disabled || pinned) return;
     timer.current = setTimeout(() => setPreview(visible), delay);
   }
-
   return <>
     <span ref={anchor} className={styles.anchor}
       onPointerEnter={(event) => { if (event.pointerType !== "touch") schedulePreview(true, 180); }}
@@ -100,7 +105,7 @@ export function MemberProfilePreview({
     </span>
     <AnimatePresence>
       {isOpen && <FreeSoloPopover key={identityId} isOpen disableDialogFocus triggerRef={anchor}
-        placement="left" offset={8} containerPadding={10} shouldBlockScroll={false} disableAnimation={Boolean(reducedMotion)}
+        placement={placement} shouldFlip offset={8} containerPadding={10} shouldBlockScroll={false} disableAnimation={Boolean(reducedMotion)}
         classNames={{ base: styles.positioner, content: styles.surface }}
         dialogProps={{ "aria-label": label }} onOpenChange={(next) => { if (!next) close(); }}>
         <div id={cardId} className={styles.card}
