@@ -36,7 +36,7 @@ type Props = {
   drafts: ProductDocDraftBuffer;
   selection?: ProductDocSelection;
   onSelect(selection: ProductDocSelection | undefined): void;
-  onOpenCase?: (location: { projectId: string; caseId: string }) => void;
+  onOpenCase?: (location: { projectId: string; caseId: string }, selection?: ProductDocSelection) => void;
   onCreateCase?(requirement: DraftProductDocRequirement): void;
 };
 export function ProductDocsView(props: Props) {
@@ -108,6 +108,13 @@ function ProjectDocumentation({ api, scope, locale, projectName, drafts, selecti
       choose({ docId: node.id, sectionId: node.match?.sectionId ?? undefined });
     }
   }
+  function openShelfNode(node: ProductDocNode, caseId?: string) {
+    if (!caseId || !onOpenCase) return selectNode(node);
+    clearSearch();
+    setStructureOpen(false);
+    setTreeOpen(false);
+    onOpenCase({ projectId: scope.projectId, caseId }, { docId: node.id });
+  }
   const refreshDocs = useCallback(() => {
     setDocRefresh((value) => value + 1);
     setTreeRefresh((value) => value + 1);
@@ -175,7 +182,7 @@ function ProjectDocumentation({ api, scope, locale, projectName, drafts, selecti
       <div className={styles.scroll}>
         {!selection && <ProductDocsShelfContents api={api} scope={scope} copy={copy} locale={locale} projectName={projectName}
           shelf={shelf} project={project} recent={library.recent} starred={library.starred} canArchive={canArchive} refresh={treeRefresh}
-          onChanged={refreshDocs} onOpen={selectNode} onBrowseRecent={() => browse("recent")} />}
+          onChanged={refreshDocs} onOpen={openShelfNode} onBrowseRecent={() => browse("recent")} />}
         {selection && resource.status !== "ready" && <ReadState copy={copy}
           status={project.loading ? "loading" : resource.status} retry={resource.retry} />}
         {selection && page && <ProductDocsSelectedPage api={api} scope={scope} page={page} selection={selection} locale={locale}

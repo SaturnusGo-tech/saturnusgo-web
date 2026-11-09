@@ -40,7 +40,7 @@ export function MemberProfilePreview({
     if (!isOpen) return;
     function position() {
       const rect = anchor.current.getBoundingClientRect();
-      const room = Math.min(373, window.innerWidth - 20) + 18;
+      const room = Math.min(276, window.innerWidth - 20) + 18;
       setPlacement(rect.left >= room ? "left" : window.innerWidth - rect.right >= room ? "right" : "bottom");
     }
     function dismiss(event: globalThis.KeyboardEvent) {
@@ -145,7 +145,7 @@ function MemberProfileContent({ workspaceId, identityId, name, locale, offline, 
   const signIn = lastSignedInAt ? new Date(lastSignedInAt) : null;
   const signInText = signIn && Number.isFinite(signIn.getTime())
     ? new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(signIn) : null;
-  const showSignIn = signInText && (!localTime || presence !== "online");
+  const showSignIn = signInText && !localTime;
   const ru = locale === "ru";
   const signInLabel = ru ? "Последний вход" : "Last sign-in";
   return <>
@@ -165,7 +165,7 @@ function MemberProfileContent({ workspaceId, identityId, name, locale, offline, 
         <span>{presence === "online" ? (ru ? "В сети" : "Online") : (ru ? "Не в сети" : "Offline")}</span>
       </div>}
       {localTime && <div className={styles.row}>
-        <Clock3 size={20} aria-hidden="true" />
+        <Clock3 size={15} aria-hidden="true" />
         <FalconTooltip label={`${signInLabel} · ${signInText ?? ""}`} isDisabled={!signInText || Boolean(showSignIn)} className={styles.signInTooltip}>
           <span data-profile-clock={signInText && !showSignIn ? true : undefined}
             tabIndex={signInText && !showSignIn ? 0 : undefined}>
@@ -174,14 +174,14 @@ function MemberProfileContent({ workspaceId, identityId, name, locale, offline, 
         </FalconTooltip>
       </div>}
       {showSignIn && <div className={styles.row}>
-        <Clock3 size={20} aria-hidden="true" />
+        <Clock3 size={15} aria-hidden="true" />
         <span><span className={styles.muted}>{signInLabel}</span>{" "}
           <time dateTime={lastSignedInAt ?? undefined}>{signInText}</time></span>
       </div>}
       {human?.workspaceName && <div className={styles.row} data-workspace>
-        <SquareUserRound size={20} aria-hidden="true" /><span>{human.workspaceName}</span>
+        <SquareUserRound size={15} aria-hidden="true" /><span>{human.workspaceName}</span>
       </div>}
-      {agent && <div className={styles.row}><Bot size={20} aria-hidden="true" /><span>{ru ? "Агент Codex" : "Codex agent"}</span></div>}
+      {agent && <div className={styles.row}><Bot size={15} aria-hidden="true" /><span>{ru ? "Агент Codex" : "Codex agent"}</span></div>}
     </div>}
   </>;
 }

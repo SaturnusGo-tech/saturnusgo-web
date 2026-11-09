@@ -1,6 +1,6 @@
 .system { --nav-row: 44px; --nav-inset: 10px; color: var(--sidebar-strong); }
-.header { position: relative; display: flex; align-items: center; flex: 0 0 60px; padding: 0 16px; overflow: hidden; }
-.brand { display: flex; align-items: center; gap: 11px; width: 176px; height: 44px; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; }
+.header { display: flex; align-items: center; flex: 0 0 var(--workspace-header-height); inline-size: 100%; min-inline-size: 0; padding: 0 16px; contain: paint; }
+.brand { display: flex; align-items: center; gap: 11px; inline-size: min(176px, 100%); min-inline-size: 0; block-size: 100%; overflow: hidden; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; }
 .mark { flex: 0 0 32px; width: 32px; height: 32px; background-color: var(--falcon-text); -webkit-mask: url("../../../assets/falcon/falcon-line-mark.svg") center / contain no-repeat; mask: url("../../../assets/falcon/falcon-line-mark.svg") center / contain no-repeat; mask-mode: alpha; }
 .wordmark { font-size: 17px; font-weight: 700; letter-spacing: 1px; white-space: nowrap; opacity: 1; transition: opacity 120ms ease 80ms; }
 .scroll { flex: 1 1 auto; min-height: 0; overflow: hidden auto; padding: 4px var(--nav-inset) 8px; scrollbar-width: thin; scrollbar-color: var(--sidebar-border) transparent; }
@@ -18,7 +18,7 @@
 .item:disabled { opacity: .45; cursor: default; }
 .system :is(button, a):focus-visible { outline: 2px solid var(--sidebar-focus); outline-offset: -2px; }
 .system[data-collapsed="true"] { --nav-row: 36px; --nav-inset: 8px; }
-.system[data-collapsed="true"] .header { padding-left: 10px; }
+.system[data-collapsed="true"] .header { padding-inline: 9px; }
 .system[data-collapsed="true"] .brand { width: 32px; flex-shrink: 0; }
 .system[data-collapsed="true"] .wordmark { opacity: 0; transition-delay: 0ms; }
 .system[data-collapsed="true"] .label { opacity: 0; transform: translateX(-5px); transition-delay: 0ms; pointer-events: none; }
@@ -54,7 +54,7 @@
 /* Peeking reveals labels while preserving the collapsed icons under the pointer. */
 @media (min-width: 761px) {
   .system[data-peek="true"] { --nav-row: 36px; --nav-inset: 8px; }
-  .system[data-peek="true"] .header { padding-left: 10px; }
+  .system[data-peek="true"] .header { padding-inline: 9px; }
   .system[data-peek="true"] .heading { opacity: 0; height: 0; padding: 0; transition: none; }
   .system[data-peek="true"] .item { padding-inline: 6px; }
   .system[data-peek="true"] .group .item + .item { margin-top: 8px; }

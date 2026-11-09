@@ -106,6 +106,7 @@
 .sectionTile:has([data-section-icon-tone="discovery"]) { --section-glow: color-mix(in srgb, var(--falcon-discovery-solid) 14%, transparent); }
 .sectionTile:has([data-section-icon-tone="success"]) { --section-glow: color-mix(in srgb, var(--falcon-success-solid) 14%, transparent); }
 .sectionTile:hover { border-color: var(--falcon-border-strong); }
+.sectionTile[aria-busy="true"] { cursor: progress; }
 
 .tileTop {
   display: flex;

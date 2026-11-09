@@ -21,7 +21,6 @@ import { useCreateCaseEntrance } from "./motion/create/useCreateCaseEntrance";
 import { caseActivityForKey } from "../collaboration/model";
 import { readyDefectCount } from "../../../test-cases/collaboration/model/test-case-collaboration";
 import styles from "../cases.module.css";
-import { LifecycleBadge } from "../list/CaseBadges";
 import type { CaseDetailPanelProps } from "./model/case-detail-props";
 
 export type { CaseDetailPanelProps } from "./model/case-detail-props";
@@ -96,6 +95,9 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
 
   if (!props.testCase && !creating) return <div ref={panelRef} tabIndex={-1} className={styles.detailPanelInner}><div className={styles.detailEmpty}><ListChecks size={28} /><strong>{ru ? "Выберите тест-кейс" : "Select a test case"}</strong><span>{ru ? "Здесь появятся свойства, шаги и история." : "Properties, steps, and history will appear here."}</span><button className={styles.primaryButton} onClick={() => props.onNew(props.selectedFolder)}>{ru ? "Создать кейс" : "Create case"}</button></div></div>;
   if (!revision) return null;
+  const editingTitle = !archived && Boolean(props.editor && !documentationRetry && headerEditing === "title");
+  const titleLabel = ru ? "Название тест-кейса" : "Test case title";
+  const changeTitle = (title: string) => props.editor?.onChange({ ...revision, title });
   const attachmentIds = caseRevisionAttachmentIds(revision, comments);
   const caseActivity = creating ? [] : caseActivityForKey(props.activity, props.testCase?.key);
   const activeTab: DetailTab = creating ? "overview" : tab;
@@ -149,13 +151,18 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
         <span className={inspector.retestBadge} role="status">{localizedLabel(props.locale, "ready_for_retest")} · {readyDefects}</span>
       </div>}
       <div className={inspector.titleRow}>
-        {!archived && props.editor && !props.editor.documentation?.retry && (creating || headerEditing === "title") ? <input disabled={uploadLocked} data-inline-title={creating ? undefined : true} autoFocus={creating || headerEditing === "title"} aria-invalid={attempted && problem === "title"} aria-label={ru ? "Название тест-кейса" : "Test case title"} className={inspector.titleInput} value={revision.title} onChange={(event) => props.editor?.onChange({ ...revision, title: event.target.value })} placeholder={ru ? "Название тест-кейса" : "Test case title"} /> : <div className={inspector.titleCopy}>
-          <h2>{revision.title}{props.testCase && <span className={inspector.titleKey}>#{props.testCase.key}</span>}</h2>
-          {props.testCase && <p className={inspector.caseByline}>
-            <LifecycleBadge neutral locale={props.locale} lifecycle={revision.lifecycle} archived={Boolean(props.testCase.archivedAt)} />
-          </p>}
+        {creating ? <input disabled={uploadLocked} autoFocus data-case-title-input aria-invalid={attempted && problem === "title"}
+          aria-label={titleLabel} className={inspector.titleInput} value={revision.title}
+          onChange={(event) => changeTitle(event.target.value)} placeholder={titleLabel} /> : <div className={inspector.titleCopy} data-editing={editingTitle}>
+          <h2 aria-hidden={editingTitle || undefined}><span className={inspector.titleText}>{revision.title}</span>{props.testCase && <span className={inspector.titleKey}>#{props.testCase.key}</span>}</h2>
+          {editingTitle && <textarea disabled={uploadLocked} rows={1} autoFocus data-case-title-input data-inline-title
+            aria-invalid={attempted && problem === "title"} aria-label={titleLabel} className={inspector.inlineTitleInput} value={revision.title}
+            onChange={(event) => changeTitle(event.target.value.replace(/[\r\n]+/g, " "))}
+            onKeyDown={(event) => { if (event.key === "Enter" && !event.nativeEvent.isComposing) event.preventDefault(); }} />}
         </div>}
-        {!props.readOnly && !creating && headerEditing !== "title" && <button ref={titleEditButton} type="button" disabled={archived || uploadLocked} className={inspector.iconButton} onClick={() => beginHeaderEdit("title")} aria-label={ru ? "Изменить название" : "Edit title"}><Pencil size={14} /></button>}
+        {!props.readOnly && !creating && <button ref={titleEditButton} type="button" disabled={archived || uploadLocked || editingTitle}
+          className={`${inspector.iconButton} ${inspector.titleEditButton}`} data-hidden={editingTitle} aria-hidden={editingTitle || undefined} onClick={() => beginHeaderEdit("title")}
+          aria-label={ru ? "Изменить название" : "Edit title"}><Pencil size={14} /></button>}
       </div>
       {!creating && props.editor && ((attempted && problemMessage) || ((props.editor.attachmentsPending || documentationRetry) && !props.editor.submitting)) &&
         <div className={inspector.headerFeedback}>{editorFeedback}</div>}
@@ -171,7 +178,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
       validStepIds={new Set(revision.steps.map(({ id }) => id))} validChecklistIds={new Set(revision.checklist.map(({ id }) => id))}>
     <form id={formId} className={inspector.panelForm} onBeforeInput={(event) => { if (uploadLocked) event.preventDefault(); }} onSubmit={(event) => {
       setAttempted(true);
-      if (problem === "title") panelRef.current?.querySelector<HTMLInputElement>(`input[aria-label="${ru ? "Название тест-кейса" : "Test case title"}"]`)?.focus();
+      if (problem === "title") panelRef.current?.querySelector<HTMLElement>("[data-case-title-input]")?.focus();
       if (archived || !props.editor || problem || props.editor.submitting) { event.preventDefault(); return; }
       setFiles((current) => current.map((entry) => entry.phase === "ready" ? entry : { ...entry, phase: "preparing" }));
       props.editor.onSubmit(event, files, uploadProgress);

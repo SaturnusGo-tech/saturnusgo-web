@@ -1,6 +1,6 @@
 import { ApiScopeSelector } from "../../api-sources/scope/selector/ApiScopeSelector";
 import { RepositoryScopeSelector } from "../../repository-scope/presentation/selector/RepositoryScopeSelector";
-import { FolderOpen, PlusSquareAdd, SidebarMenuMobile } from "@openai/apps-sdk-ui/components/Icon";
+import { FolderOpen, SidebarMenuMobile } from "@openai/apps-sdk-ui/components/Icon";
 import { Button } from "@heroui/button";
 import { PiUploadSimple } from "react-icons/pi";
 import { companyViewAvailable } from "../../auth/managed/domain/features/company-features";
@@ -10,9 +10,6 @@ import { workspaceDisplayName } from "../../localization/format/workspace/displa
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
 import { HistoryControls } from "./history/HistoryControls";
 import { ProjectSelector } from "./project-selector/ProjectSelector";
-import { transitionContent } from "./motion/transition/content-transition";
-import { navigateWorkspace } from "../../state/navigation/browser/workspace-history";
-import { ENVIRONMENT_SETTINGS_OPEN, settingsSectionLink } from "../config/navigation/settings-section-route";
 import shellStyles from "./tms-shell.module.css";
 
 export function WorkspaceHeader({
@@ -34,16 +31,8 @@ export function WorkspaceHeader({
   const workspaceReady =
     model.connection === "connected" || model.connection === "demo";
   const ru = locale === "ru";
-  const showImport = model.view === "cases" && !model.repositoryScope.aggregate
+  const showImport = Boolean(model.project) && model.view === "cases" && !model.repositoryScope.aggregate
     && companyViewAvailable("imports", session?.companyCapabilities);
-  function editEnvironment() {
-    transitionContent(() => {
-      model.closeResourceEditors(); model.setDialog(null);
-      navigateWorkspace(settingsSectionLink(window.location.href, "environments"));
-      model.setView("config");
-      window.dispatchEvent(new Event(ENVIRONMENT_SETTINGS_OPEN));
-    });
-  }
   return (
     <header className={shellStyles.header}>
       <button
@@ -78,20 +67,14 @@ export function WorkspaceHeader({
         </div>
       </div>}
 
-      {model.project && (model.view === "dashboard" || model.view === "cases") && <div className={shellStyles.headerActions}>
-        {showImport && <Button type="button" size="sm" radius="full" variant="solid" className={shellStyles.importShortcut}
+      {showImport && <div className={shellStyles.headerActions}>
+        <Button type="button" size="sm" radius="full" variant="solid" className={shellStyles.importShortcut}
           data-testid="open-case-import" onPress={() => model.setView("imports")}
           isDisabled={!workspaceReady || !model.folders.canManage || model.folders.busy || model.dialog === "case"
             || !model.data.meta.authorization.capabilities.includes("attachment:manage")}
           aria-label={ru ? "Импорт тест-кейсов" : "Import test cases"}>
           <PiUploadSimple size={15} aria-hidden="true" />{ru ? "Импорт" : "Import"}
-        </Button>}
-        <button type="button" className={shellStyles.environmentShortcut}
-          onClick={editEnvironment} disabled={!workspaceReady} data-testid="open-environments"
-          title={languageTag.startsWith("ru") ? "Открыть окружения" : "Open environments"}
-          aria-label={languageTag.startsWith("ru") ? "Открыть окружения" : "Open environments"}>
-          <PlusSquareAdd width={23} height={23} aria-hidden="true" />
-        </button>
+        </Button>
       </div>}
     </header>
   );

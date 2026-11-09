@@ -1,5 +1,6 @@
 "use client";
 
+import { Button, Skeleton } from "@heroui/react";
 import { Paperclip, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { AttachmentMetadataResource } from "../../domain/attachment";
@@ -64,14 +65,22 @@ export function AttachmentLink({ attachmentId, presentation = "link", variant = 
     return () => { active = false; };
   }, [attachmentId, presentation, previewRequested, readCache, resource, retry]);
 
-  async function open() {
+  async function open(action: "inline" | "attachment" = disposition) {
     if (!resource || resource.metadata.status !== "ready" || opening) return;
     setOpening(true);
     setFailed(false);
     try {
-      const access = await readCache.createAccess({ attachmentId, disposition });
+      const access = await readCache.createAccess({ attachmentId, disposition: action });
       if (Object.keys(access.headers).length > 0) throw new Error("Unsupported signed headers");
-      window.open(access.url, "_blank", "noopener,noreferrer");
+      if (action === "attachment" && variant === "gallery") {
+        const link = document.createElement("a");
+        link.href = access.url;
+        link.download = resource.metadata.originalFilename;
+        link.rel = "noreferrer";
+        link.click();
+      } else {
+        window.open(access.url, "_blank", "noopener,noreferrer");
+      }
     } catch {
       setFailed(true);
     } finally {
@@ -95,12 +104,27 @@ export function AttachmentLink({ attachmentId, presentation = "link", variant = 
   }
 
   if (visibility.hiddenIds.has(attachmentId)) return null;
-  if (failed) return <button className={styles.retry} type="button" onClick={() => {
+  const retryAttachment = () => {
     setResource(null);
     setPreviewUrl("");
     readCache.invalidate(attachmentId);
     setRetry((value) => value + 1);
-  }}><Paperclip size={14} />{t("common.retry")}</button>;
+  };
+  const unavailable = variant === "gallery" && resource
+    && resource.metadata.status !== "ready" && (resource.metadata.status !== "pending" || retry >= 10);
+  if (failed || unavailable) return variant === "gallery"
+    ? <div className={styles.galleryRow}>
+      <Paperclip size={16} aria-hidden="true" />
+      <span>{resource?.metadata.originalFilename ?? (locale === "ru" ? "Вложение недоступно" : "Attachment unavailable")}</span>
+      <Button size="sm" variant="light" disableRipple onPress={retryAttachment}>{t("common.retry")}</Button>
+    </div>
+    : <button className={styles.retry} type="button" onClick={retryAttachment}><Paperclip size={14} />{t("common.retry")}</button>;
+  if (variant === "gallery" && resource?.metadata.status !== "ready") {
+    return <div className={styles.galleryRow} aria-hidden="true">
+      <Skeleton className={styles.galleryIcon} />
+      <Skeleton className={styles.galleryName} />
+    </div>;
+  }
   if (!resource) return <AttachmentSkeleton media={presentation === "media"} />;
   const isImage = resource.metadata.mimeType.startsWith("image/");
   const isVideo = resource.metadata.mimeType.startsWith("video/");
@@ -116,6 +140,7 @@ export function AttachmentLink({ attachmentId, presentation = "link", variant = 
       loading={opening}
       removing={removing}
       onOpen={() => void open()}
+      onDownload={variant === "gallery" ? () => void open("attachment") : undefined}
       onRemove={canRemove ? onDetach ?? (resource.metadata.owner.kind === "shared_step_revision" ? undefined : () => void remove()) : undefined}
       onExpandedChange={(expanded) => { if (expanded) setPreviewRequested(true); }}
     />;

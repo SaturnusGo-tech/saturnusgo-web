@@ -1,4 +1,5 @@
 .shell.shell {
+  --workspace-header-height: 44px;
   width: 100%;
   height: 100dvh;
   min-width: 0;
@@ -21,7 +22,7 @@
   min-height: 0;
   flex: 1 1 auto;
   display: grid;
-  grid-template-rows: 44px minmax(0, 1fr);
+  grid-template-rows: var(--workspace-header-height) minmax(0, 1fr);
   overflow: hidden;
   background: var(--paper);
 }
@@ -40,7 +41,7 @@
   position: relative;
   z-index: 60;
   min-width: 0;
-  height: 44px;
+  height: var(--workspace-header-height);
   display: flex;
   align-items: center;
   gap: 12px;
@@ -661,7 +662,7 @@ button.headerMetaItem:disabled { cursor: default; opacity: .55; }
   .workspaceColumn {
     width: 100%;
     height: calc(100dvh - 58px);
-    grid-template-rows: 44px minmax(0, 1fr);
+    grid-template-rows: var(--workspace-header-height) minmax(0, 1fr);
   }
 
   .mobileNavigationButton {
@@ -944,10 +945,7 @@ button.headerMetaItem:disabled { cursor: default; opacity: .55; }
 /* Header follows the reference toolbar: history, current scope, one far-edge action. */
 .contextIcon { flex: 0 0 auto; color: var(--ink); margin-inline: 3px; }
 .headerActions { display: flex; flex: 0 0 auto; align-items: center; gap: 8px; margin-inline-start: auto; }
-.environmentShortcut { display: grid; place-items: center; flex: 0 0 36px; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--muted); cursor: pointer; transition: background-color 140ms ease, color 140ms ease; }
-.environmentShortcut:hover:not(:disabled) { background: var(--control-hover); color: var(--ink); }
-.environmentShortcut:focus-visible { outline: 2px solid var(--tms-focus-border); outline-offset: -2px; }
-.environmentShortcut:disabled, .importShortcut:disabled { opacity: .4; cursor: default; }
+.importShortcut:disabled { opacity: .4; cursor: default; }
 .importShortcut { min-width: 0; display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; border: 0; border-radius: 999px; color: var(--falcon-on-action); background: var(--falcon-action); font: inherit; font-size: 12px; font-weight: 550; white-space: nowrap; cursor: pointer; transition: background-color 140ms ease; }
 .importShortcut:hover:not(:disabled) { background: var(--falcon-action-hover); }
 .importShortcut:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 2px; }
@@ -961,14 +959,11 @@ button.headerMetaItem:disabled { cursor: default; opacity: .55; }
 .shell[data-appearance="glass"] .projectSelectorSlot > div > button:first-child { border-radius: 8px; }
 .projectEyebrow { display: none; }
 @media (max-width: 760px) {
-  .shell[data-appearance="glass"] .header { height: 44px; padding-inline: 8px; gap: 4px; }
+  .shell[data-appearance="glass"] .header { padding-inline: 8px; gap: 4px; }
   .contextIcon { display: none; }
   .projectContext { flex: 1 1 auto; }
-  .projectSelectorSlot > div > button:first-child { max-width: calc(100vw - 174px); }
-  .headerActions { gap: 4px; }
-  .header:has(.importShortcut) .projectSelectorSlot > div > button:first-child { max-width: calc(100vw - 225px); }
-  .environmentShortcut { flex-basis: 32px; width: 32px; height: 32px; }
+  .projectSelectorSlot > div > button:first-child { max-width: 100%; }
   .shell[data-appearance="glass"] .navigation { visibility: visible; transition: transform 240ms cubic-bezier(.2, .72, .3, 1), visibility 0s; }
   .shell[data-appearance="glass"] .navigationCollapsed { visibility: hidden; pointer-events: none; transition: transform 240ms cubic-bezier(.2, .72, .3, 1), visibility 0s 240ms; }
 }
-@media (prefers-reduced-motion: reduce) { .environmentShortcut, .importShortcut, .shell[data-appearance="glass"] .navigation { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .importShortcut, .shell[data-appearance="glass"] .navigation { transition: none; } }

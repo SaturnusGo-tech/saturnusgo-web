@@ -704,18 +704,8 @@
 .stepsList p svg { flex: 0 0 auto; margin-top: 1px; color: var(--falcon-icon-muted); }
 
 .contextList { padding-bottom: 22px; }
-.attachmentGallery {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 18px 24px;
-}
-.attachmentGallery > figure { flex: 0 0 auto; }
-.attachmentLinks { border-top: 1px solid var(--falcon-border-subtle); }
 .runRecord,
-.activityRecord,
-.fileRecord {
+.activityRecord {
   min-height: 48px;
   display: flex;
   align-items: center;
@@ -739,9 +729,6 @@
 .activityRecord small { overflow: hidden; color: var(--falcon-text-muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
 .runRecord em { color: var(--falcon-text-muted); font-size: 10px; font-style: normal; }
 .activityRecord > span { width: 26px; height: 26px; display: grid; place-items: center; flex: 0 0 auto; color: var(--falcon-text); background: var(--falcon-control); border-radius: 50%; font-size: 11px; font-weight: 600; }
-.fileRecord { color: var(--falcon-link); text-decoration: none; }
-.fileRecord > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.fileRecord:hover { background: var(--falcon-hover); }
 .tabEmpty { min-height: 240px; padding: 20px; font-size: 12px; }
 
 .workspace :is(button, input, select, [tabindex]):focus-visible {

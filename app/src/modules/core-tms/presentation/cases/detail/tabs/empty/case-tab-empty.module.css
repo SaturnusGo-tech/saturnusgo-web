@@ -69,30 +69,6 @@
   color: var(--falcon-danger);
 }
 
-.attachmentStatus {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 5px 10px;
-  margin: 16px 24px 0;
-  color: var(--falcon-text-muted);
-  font-size: 13px;
-}
-
-.attachmentStatus button {
-  min-block-size: 30px;
-  padding: 4px 9px;
-  border: 1px solid var(--falcon-border);
-  border-radius: 8px;
-  background: transparent;
-  color: var(--falcon-text);
-  font: inherit;
-  cursor: pointer;
-}
-
-.attachmentStatus button:hover:not(:disabled) { background: var(--falcon-hover); }
-.attachmentStatus button:disabled { opacity: .6; cursor: wait; }
-
 @media (pointer: coarse) {
-  .attachmentAction, .attachmentStatus button { min-block-size: 44px; }
+  .attachmentAction { min-block-size: 44px; }
 }

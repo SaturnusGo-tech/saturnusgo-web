@@ -1,11 +1,11 @@
 "use client";
-
 import { ArrowUpRight, Star } from "lucide-react";
 import { useEffect, useId, useState, type ReactNode } from "react";
 import type { TmsLocale } from "../../../localization/model/locale";
 import { isMissingProductDoc } from "../../domain/errors/product-doc-response";
 import type { ProductDocNode, ProductDocsApi, ProductDocScope } from "../../domain/product-docs";
 import type { ProductDocsCopy } from "../../localization/copy";
+import { useProductDocFolderEntry } from "../../state/library/folder-entry/useProductDocFolderEntry";
 import type { ProductDocsShelf } from "../../state/library/useProductDocsLibrary";
 import { ReadState } from "../status/ReadState";
 import { ProductDocSectionIcon } from "./appearance/ProductDocSectionIcon";
@@ -69,7 +69,7 @@ function useShelfNodes(api: ProductDocsApi, scope: ProductDocScope, ids: readonl
 
 export function ProductDocsOverview({
   api, scope, copy, locale, shelf, projectName, rootNodes = [], recent, starred, onOpen, onBrowseRecent,
-  onMoreRoot, loadingMoreRoot,
+  onMoreRoot, loadingMoreRoot, canEdit,
 }: {
   api: ProductDocsApi;
   scope: ProductDocScope;
@@ -80,15 +80,17 @@ export function ProductDocsOverview({
   rootNodes?: readonly ProductDocNode[];
   recent: readonly string[];
   starred: readonly string[];
-  onOpen(node: ProductDocNode): void;
+  onOpen(node: ProductDocNode, caseId?: string): void;
   onBrowseRecent?(): void;
   onMoreRoot?(): void;
   loadingMoreRoot?: boolean;
+  canEdit: boolean;
 }) {
   const titleId = useId();
   const resumeId = useId();
   const labels = shelfCopy[locale];
   const overview = shelf === "overview";
+  const { openNode, openingFolder } = useProductDocFolderEntry(api, scope, shelf, canEdit, onOpen);
   const ids = overview ? recent.slice(0, 4) : shelf === "recent" ? recent : starred;
   const saved = useShelfNodes(api, scope, ids);
   const names = new Map([...rootNodes, ...saved.nodes].map((node) => [node.id, node.title]));
@@ -96,13 +98,11 @@ export function ProductDocsOverview({
   const hasContent = overview ? rootNodes.length > 0 || saved.nodes.length > 0 : saved.nodes.length > 0;
   const title = overview ? copy.libraryHome : shelf === "recent" ? copy.recent : copy.starred;
   const feedback = saved.error ? "error" : saved.loading ? "loading" : undefined;
-  const rowProps = { scope, copy, names, projectName, starredIds, onOpen };
+  const rowProps = { scope, copy, names, projectName, starredIds, onOpen: openNode };
   const recentSection = overview && saved.nodes.length > 0 ? <section className={styles.group} aria-labelledby={resumeId}>
     <header className={styles.groupHeader}>
       <h2 id={resumeId}>{labels.resume}</h2>
-      {onBrowseRecent && <button className={styles.viewAll} type="button" onClick={onBrowseRecent}>
-        {labels.allRecent}
-      </button>}
+      {onBrowseRecent && <button className={styles.viewAll} type="button" onClick={onBrowseRecent}>{labels.allRecent}</button>}
     </header>
     <PageRows {...rowProps} nodes={saved.nodes} showLocation />
   </section> : undefined;
@@ -116,7 +116,7 @@ export function ProductDocsOverview({
       {!hasContent && !feedback && <ProductDocsEmpty key={shelf} copy={copy} shelf={shelf} />}
       {!overview && saved.nodes.length > 0 && <PageRows {...rowProps} nodes={saved.nodes} showLocation />}
       {overview && hasContent && <ProductDocsDirectory scope={scope} copy={copy} locale={locale} nodes={rootNodes}
-        starred={starred} onOpen={onOpen} alongside={recentSection} />}
+        starred={starred} onOpen={openNode} openingFolder={openingFolder} alongside={recentSection} />}
       {overview && onMoreRoot && <button className={styles.more} type="button" disabled={loadingMoreRoot} onClick={onMoreRoot}>
         {loadingMoreRoot ? copy.loading : copy.more}
       </button>}
@@ -125,18 +125,18 @@ export function ProductDocsOverview({
   </section>;
 }
 
-export function ProductDocsDirectory({ scope, copy, locale, nodes, starred = [], onOpen, alongside, showPagesHeading = true }: {
+export function ProductDocsDirectory({ scope, copy, locale, nodes, starred = [], onOpen, openingFolder, alongside, showPagesHeading = true }: {
   scope: ProductDocScope;
   copy: ProductDocsCopy;
   locale: TmsLocale;
   nodes: readonly ProductDocNode[];
   starred?: readonly string[];
   onOpen(node: ProductDocNode): void;
+  openingFolder?: string;
   alongside?: ReactNode;
   showPagesHeading?: boolean;
 }) {
-  const sectionsId = useId();
-  const pagesId = useId();
+  const sectionsId = useId(), pagesId = useId();
   const labels = shelfCopy[locale];
   const sections = nodes.filter((node) => node.kind === "folder");
   const pages = nodes.filter((node) => node.kind === "page");
@@ -147,7 +147,8 @@ export function ProductDocsDirectory({ scope, copy, locale, nodes, starred = [],
       <h2 id={sectionsId}>{labels.sections}</h2>
       <ul className={styles.sectionTiles}>
         {sections.map((node) => <li key={node.id}>
-          <button className={styles.sectionTile} type="button" onClick={() => onOpen(node)}>
+          <button className={styles.sectionTile} type="button"
+            aria-busy={openingFolder === node.id || undefined} onClick={() => onOpen(node)}>
             <span className={styles.tileTop}>
               <ProductDocSectionIcon scope={scope} node={node} size={28} />
               <ArrowUpRight className={styles.tileArrow} size={15} aria-hidden="true" />
@@ -164,8 +165,7 @@ export function ProductDocsDirectory({ scope, copy, locale, nodes, starred = [],
         <PageRows scope={scope} copy={copy} nodes={pages} starredIds={new Set(starred)} onOpen={onOpen} />
       </PagesGroup>}
       {alongside}
-    </div>}
-  </div>;
+    </div>}</div>;
 }
 
 function PageRows({ scope, copy, nodes, names, projectName, starredIds, showLocation, onOpen }: {

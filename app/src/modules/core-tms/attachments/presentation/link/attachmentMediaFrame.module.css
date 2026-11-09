@@ -9,7 +9,13 @@
 }
 
 .frame[data-resizing="true"] { transition: none; }
-.frame[data-variant="gallery"] { --media-max-height: 560px; }
+.frame[data-variant="gallery"] { --media-max-height: 560px; width: 100%; }
+.frame[data-variant="gallery"] .collapseInner { padding: 0; }
+.frame[data-variant="gallery"] .mediaBody {
+  width: min(var(--attachment-media-width), 100%);
+  margin-bottom: 10px;
+  margin-inline: auto;
+}
 
 .header {
   min-width: 0;

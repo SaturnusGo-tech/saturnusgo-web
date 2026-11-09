@@ -23,7 +23,7 @@ export function ProductDocsShelfContents({ api, scope, copy, locale, projectName
   canArchive: boolean;
   refresh: number;
   onChanged(): void;
-  onOpen(node: ProductDocNode): void;
+  onOpen(node: ProductDocNode, caseId?: string): void;
   onBrowseRecent(): void;
 }) {
   if (shelf === "archive" && canArchive) return <ProductDocsArchive api={api} scope={scope} copy={copy} refresh={refresh} onChanged={onChanged} />;
@@ -32,6 +32,6 @@ export function ProductDocsShelfContents({ api, scope, copy, locale, projectName
   }
   if (shelf === "archive") return null;
   return <ProductDocsOverview api={api} scope={scope} copy={copy} locale={locale} projectName={projectName}
-    shelf={shelf} rootNodes={project.data.nodes} recent={recent} starred={starred} onOpen={onOpen} onBrowseRecent={onBrowseRecent}
+    shelf={shelf} rootNodes={project.data.nodes} recent={recent} starred={starred} onOpen={onOpen} onBrowseRecent={onBrowseRecent} canEdit={project.data.canEdit}
     onMoreRoot={project.data.nextCursor ? (project.error ? project.retry : project.more) : undefined} loadingMoreRoot={project.loading} />;
 }

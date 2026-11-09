@@ -1,12 +1,11 @@
 import { Plus, Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { Environment } from "../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { EnvironmentEditor } from "../environments/editor/EnvironmentEditor";
 import { EnvironmentExpansion } from "../environments/motion/EnvironmentExpansion";
 import { EnvironmentRow } from "../environments/row/EnvironmentRow";
 import { transitionEnvironmentLayout } from "../environments/motion/layout-transition";
-import { ENVIRONMENT_SETTINGS_OPEN } from "../navigation/settings-section-route";
 import css from "../environments/environments.module.css";
 
 export function EnvironmentSettings({ environments, projectId, projectName, offline, onSaved, onToggle }: {
@@ -17,11 +16,6 @@ export function EnvironmentSettings({ environments, projectId, projectName, offl
   const [copied, setCopied] = useState(""); const [error, setError] = useState("");
   const [query, setQuery] = useState(""); const [editing, setEditing] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  useEffect(() => {
-    const reset = () => { if (!busy) setEditing(null); };
-    window.addEventListener(ENVIRONMENT_SETTINGS_OPEN, reset);
-    return () => window.removeEventListener(ENVIRONMENT_SETTINGS_OPEN, reset);
-  }, [busy]);
   const select = (id: string | null) => { if (!busy) transitionEnvironmentLayout(() => setEditing(id)); };
   async function copy(environment: Environment) {
     try { await navigator.clipboard.writeText(environment.baseUrl); setCopied(environment.id); setError(""); }

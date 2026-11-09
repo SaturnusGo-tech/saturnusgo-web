@@ -56,16 +56,19 @@ export function ProductDocsWorkspace({api, scope, children, visible, enabled, pr
   const selectedRun = runPanel?.href === href ? runPanel.selection : undefined;
   const selectedCase = casePanel?.href === href ? casePanel : undefined;
   const currentPanel = panel?.scope === scope && panel.href === href ? panel : undefined;
+  function documentHref(selection?: ProductDocSelection) {
+    const url = new URL(buildWorkspaceDeepLink(window.location.href, {...scope, view: "product-docs", runId: null}));
+    return writeProductDocSelection(url, selection).href;
+  }
   function select(selection?: ProductDocSelection) {
-    const current = window.location.href;
-    const url = new URL(buildWorkspaceDeepLink(current, {...scope, view: "product-docs", runId: null}));
-    const next = writeProductDocSelection(url, selection).href;
+    const next = documentHref(selection);
     if (visible) navigateWorkspace(next);
     else visitWorkspace(next);
   }
-  function openCase(caseId: string, trigger?: HTMLElement) {
+  function openCase(caseId: string, trigger?: HTMLElement, selection?: ProductDocSelection) {
     setRunPanel(undefined);
-    setCasePanel({href, id: caseId, trigger});
+    setCasePanel({href: selection ? documentHref(selection) : href, id: caseId, trigger});
+    if (selection) select(selection);
   }
   function openDocument(selection: ProductDocSelection, trigger: HTMLElement) {
     setCasePanel(undefined);
@@ -76,7 +79,8 @@ export function ProductDocsWorkspace({api, scope, children, visible, enabled, pr
   const context = api && enabled ? {api, scope, openCase, openDocument, openRun, open: openDocument} : null;
   return <ProductDocsContext.Provider value={context}>
     {visible ? (context ? <ProductDocsView api={context.api} scope={scope} locale={locale} projectName={projectName} drafts={drafts.current}
-      selection={href ? readProductDocSelection(href) : undefined} onSelect={select} onCreateCase={onCreateCase} onOpenCase={({caseId}) => openCase(caseId, document.activeElement instanceof HTMLElement ? document.activeElement : undefined)} /> : fallback) : children}
+      selection={href ? readProductDocSelection(href) : undefined} onSelect={select} onCreateCase={onCreateCase}
+      onOpenCase={({caseId}, selection) => openCase(caseId, document.activeElement instanceof HTMLElement ? document.activeElement : undefined, selection)} /> : fallback) : children}
     {context && <ProductDocsPanel api={context.api} scope={scope} locale={locale} projectName={projectName} selection={currentPanel?.selection} trigger={currentPanel?.trigger}
       contentRef={contentRef} onClose={() => setPanel(undefined)}
       onOpenFull={(selection: ProductDocSelection) => { setPanel(undefined); select(selection); }} />}

@@ -6,6 +6,7 @@ import {
 import {
   useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode,
 } from "react";
+import { AttachmentGalleryHeader } from "./gallery/AttachmentGalleryHeader";
 import css from "./attachmentMediaFrame.module.css";
 
 type Props = {
@@ -20,6 +21,7 @@ type Props = {
   loading?: boolean;
   removing?: boolean;
   onOpen?: () => void;
+  onDownload?: () => void;
   onRemove?: () => void;
   onExpandedChange?: (expanded: boolean) => void;
 };
@@ -28,16 +30,19 @@ const MIN_WIDTH = 220;
 
 export function AttachmentMediaFrame({
   name, detail, progress, source, mediaType, locale, variant = "scenario", defaultExpanded = false,
-  loading = false, removing = false, onOpen, onRemove, onExpandedChange,
+  loading = false, removing = false, onOpen, onDownload, onRemove, onExpandedChange,
 }: Props) {
   const [expanded, setExpanded] = useState(defaultExpanded);
   const [width, setWidth] = useState(variant === "gallery" ? 520 : 430);
   const [resizing, setResizing] = useState(false);
   const frameRef = useRef<HTMLElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
+  const gallery = variant === "gallery";
   const ru = locale === "ru";
 
   function clampWidth(next: number) {
-    const available = frameRef.current?.parentElement?.getBoundingClientRect().width ?? next;
+    const container = gallery ? previewRef.current?.parentElement : frameRef.current?.parentElement;
+    const available = container?.getBoundingClientRect().width ?? next;
     return Math.max(Math.min(MIN_WIDTH, available), Math.min(next, available));
   }
 
@@ -49,7 +54,7 @@ export function AttachmentMediaFrame({
     if (event.button !== 0) return;
     event.preventDefault();
     const startX = event.clientX;
-    const startWidth = frameRef.current?.getBoundingClientRect().width ?? width;
+    const startWidth = (gallery ? previewRef.current : frameRef.current)?.getBoundingClientRect().width ?? width;
     setResizing(true);
     const move = (moveEvent: globalThis.PointerEvent) => {
       const rawDelta = moveEvent.clientX - startX;
@@ -74,17 +79,19 @@ export function AttachmentMediaFrame({
   }
 
   function toggleExpanded() {
-    setExpanded((current) => {
-      const next = !current;
-      onExpandedChange?.(next);
-      return next;
-    });
+    const next = !expanded;
+    setExpanded(next);
+    onExpandedChange?.(next);
   }
 
   const style = { "--attachment-media-width": `${width}px` } as CSSProperties;
   return <figure ref={frameRef} className={css.frame} style={style}
     data-variant={variant} data-collapsed={!expanded || undefined} data-resizing={resizing || undefined}>
-    <figcaption className={css.header}>
+    {gallery ? <AttachmentGalleryHeader
+      name={name} detail={detail} mediaType={mediaType} locale={locale} expanded={expanded}
+      loading={loading} removing={removing} togglePreview={toggleExpanded}
+      onOpen={onOpen} onDownload={onDownload} onRemove={onRemove} />
+      : <figcaption className={css.header}>
       <button type="button" className={css.disclosure} onClick={toggleExpanded}
         aria-expanded={expanded} aria-label={expanded
           ? (ru ? "Скрыть вложение" : "Collapse attachment")
@@ -109,10 +116,10 @@ export function AttachmentMediaFrame({
           <Trash2 size={14} />
         </button>}
       </span>
-    </figcaption>
-    <div className={css.collapse} aria-hidden={!expanded}>
+    </figcaption>}
+    {(!gallery || mediaType !== "file") && <div className={css.collapse} aria-hidden={!expanded} inert={!expanded}>
       <div className={css.collapseInner}>
-        <div className={css.mediaBody}>
+        <div className={css.mediaBody} ref={previewRef}>
           {source && mediaType === "image" && <img src={source} alt={name} />}
           {source && mediaType === "video" && <video src={source} controls preload="metadata" aria-label={name} />}
           {source && mediaType === "pdf" && <iframe src={`${source}#toolbar=0&navpanes=0`}
@@ -137,6 +144,6 @@ export function AttachmentMediaFrame({
           </button></>}
         </div>
       </div>
-    </div>
+    </div>}
   </figure>;
 }

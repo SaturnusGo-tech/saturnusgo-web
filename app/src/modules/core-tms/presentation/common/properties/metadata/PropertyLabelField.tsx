@@ -76,7 +76,7 @@ export function PropertyLabelField({
   }
   return <PropertyPopover label={action} triggerLabel={triggerLabel} trigger={trigger}
     compact={compact} disabled={disabled} open={open} onOpenChange={setMenu}
-    placement={tag ? "left-start" : undefined} narrow={tag}>
+    placement={tag ? "left-start" : undefined} menuClassName={tag ? styles.tagMenu : undefined}>
     <form className={styles.labelForm} onSubmit={(event) => {
       event.preventDefault();
       event.stopPropagation();

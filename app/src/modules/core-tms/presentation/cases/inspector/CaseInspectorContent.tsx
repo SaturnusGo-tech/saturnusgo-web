@@ -35,9 +35,7 @@ export function CaseInspectorContent({
   const attachmentDraft = useCaseAttachmentDraft();
   const [visible, setVisible] = useState(() => copyInspectorRevision(revision));
   const [editing, setEditing] = useState<ReadonlySet<InspectorSection>>(() => new Set());
-  const [inlineComponent, setInlineComponent] = useState(false);
   const snapshots = useRef<Partial<Record<InspectorSection, TestCaseRevision>>>({});
-  const folderSnapshots = useRef<Partial<Record<InspectorSection, string>>>({});
   const editorMode = editor?.mode;
   const creating = editorMode === "create";
   const readOnly = Boolean(archived || previewOnly) && !creating;
@@ -47,15 +45,12 @@ export function CaseInspectorContent({
   useEffect(() => {
     if (editor) return;
     setEditing(new Set());
-    setInlineComponent(false);
     snapshots.current = {};
-    folderSnapshots.current = {};
   }, [editor]);
   function begin(section: InspectorSection) {
     if (readOnly || linksPending) return;
     if (snapshots.current[section]) return;
     snapshots.current[section] = copyInspectorRevision(value);
-    folderSnapshots.current[section] = editor?.folderPath ?? "";
     setEditing((current) => new Set(current).add(section));
     if (!editor) onRequestEdit();
   }
@@ -66,17 +61,12 @@ export function CaseInspectorContent({
     const snapshot = snapshots.current[section];
     if (editor && snapshot) {
       editor.onChange(restoreInspectorSection(editor.value, snapshot, section));
-      if (section === "component") {
-        editor.onFolderPath(folderSnapshots.current[section] ?? editor.folderPath);
-      }
     }
     attachmentDraft?.removeFields((fieldKey) => attachmentBelongsToSection(section, fieldKey));
     closeSection(section);
   }
   function closeSection(section: InspectorSection) {
-    if (section === "component") setInlineComponent(false);
     delete snapshots.current[section];
-    delete folderSnapshots.current[section];
     setEditing((current) => {
       const next = new Set(current);
       next.delete(section);
@@ -98,10 +88,8 @@ export function CaseInspectorContent({
     hideEdit: previewOnly,
     disabled: readOnly || linksPending || editor?.submitting || editor?.attachmentsPending,
   });
-  const requestField = (section: InspectorSection) => !readOnly && !linksPending && !editor?.submitting && !editor?.attachmentsPending ? () => {
-    if (section === "component") setInlineComponent(true);
-    begin(section);
-  } : undefined;
+  const requestField = (section: InspectorSection) => !readOnly && !linksPending && !editor?.submitting && !editor?.attachmentsPending
+    ? () => begin(section) : undefined;
   const sectionEditing = (section: InspectorSection) => (
     !readOnly && !linksPending && Boolean(editor) && isInspectorSectionEditing(editorMode, editing, section)
   );
@@ -143,11 +131,12 @@ export function CaseInspectorContent({
         <InspectorDetails tagSuggestions={tagSuggestions} onRequestEdit={requestField("details")} disabled={editor?.submitting || editor?.attachmentsPending} testCaseId={testCaseId} revision={value} editing={sectionEditing("details")} ru={ru} onPatch={patch}
           documentation={testCaseId && <Requirements projectId={projectId} subject={{caseId: testCaseId, readOnly, disabled: Boolean(editor)}} ru={ru} />} />
       </InspectorSectionView>
-      <InspectorSectionView title={ru ? "Поля" : "Custom fields"} actionsInHeader {...controls("component")}>
-        <CaseCustomFields onRequestEdit={requestField("component")} projectId={editor?.projectId} revision={value} editing={sectionEditing("component")}
+      <InspectorSectionView title={ru ? "Поля" : "Custom fields"} {...controls("component")} persistentEditing>
+        <CaseCustomFields onRequestEdit={requestField("component")} projectId={editor?.projectId ?? projectId} revision={value} editing={sectionEditing("component")}
           requiredFields={editor?.requiredFields} canCreate={editor?.canCreateFieldValues} disabled={editor?.submitting || editor?.attachmentsPending} ru={ru} onPatch={patch} />
-        {sectionEditing("component") && !inlineComponent && editor && <FolderPathPicker value={editor.folderPath} folders={editor.folders} onChange={editor.onFolderPath} ru={ru} disabled={editor.submitting} />}
       </InspectorSectionView>
+      {editor && !readOnly && !linksPending && <FolderPathPicker value={editor.folderPath} folders={editor.folders}
+        onChange={editor.onFolderPath} ru={ru} disabled={editor.submitting || editor.attachmentsPending} />}
     </aside>
   </div>;
 }

@@ -171,8 +171,29 @@
 .popover .option .selectedIcon { margin-inline-start: auto; color: var(--falcon-text); }
 .popover .option[data-hover="true"],
 .popover .options:not(:has(.option[data-hover="true"])) .option[data-focus-visible="true"],
-.popover .options:not(:has(.option:is([data-hover="true"], [data-focus-visible="true"]):not([data-selected="true"]))) .option[data-selected="true"],
+.popover:where(:not(.tagMenu)) .options:not(:has(.option:is([data-hover="true"], [data-focus-visible="true"]):not([data-selected="true"]))) .option[data-selected="true"],
 .popover .add:is([data-hover="true"], [data-focus-visible="true"]) { background: var(--falcon-selected); }
+.popover.tagMenu {
+  --property-list-max: 256px;
+  inline-size: min(244px, calc(100vw - 24px));
+}
+.popover.tagMenu .list { overflow-x: hidden; }
+.popover.tagMenu .options { grid-template-columns: minmax(0, 1fr); }
+.popover.tagMenu .options ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.popover.tagMenu .options .option {
+  min-block-size: 29px;
+  margin-block: 1px;
+  background: transparent;
+}
+.popover.tagMenu .optionTitle { white-space: nowrap; }
+.popover.tagMenu .options .option[data-hover="true"],
+.popover.tagMenu .options:not(:has(.option[data-hover="true"])) .option[data-focus-visible="true"] {
+  background: var(--falcon-selected);
+}
 .labelForm { display: grid; }
 .labelForm .labels { padding: 6px; }
 .add { justify-content: flex-start; margin: 5px 6px; }

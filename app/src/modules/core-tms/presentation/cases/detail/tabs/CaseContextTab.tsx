@@ -1,3 +1,4 @@
+import { Button, Link, Spinner } from "@heroui/react";
 import { ExternalLink } from "lucide-react";
 import type {
   Activity,
@@ -12,7 +13,7 @@ import { InspectorPendingAttachments } from "../../inspector/attachments/Inspect
 import { useCaseAttachmentDraft } from "../../inspector/attachments/CaseAttachmentDraftContext";
 import { MarkdownAttachmentButton } from "../../inspector/markdown/attachments/MarkdownAttachmentUi";
 import type { InspectorTabId } from "../../inspector/model";
-import styles from "../../cases.module.css";
+import styles from "./attachments/case-attachments.module.css";
 import { CaseTabEmpty } from "./empty/CaseTabEmpty";
 import emptyStyles from "./empty/case-tab-empty.module.css";
 
@@ -68,38 +69,39 @@ export function CaseContextTab(props: Props) {
     </p>}
   </CaseTabEmpty>;
 
-  return <div className={styles.contextList}>
+  return <div className={styles.content}>
     {pending?.enabled && <InspectorPendingAttachments locale={props.locale} includeStepFiles showPicker={false} />}
-    {props.attachmentIds.length > 0 && <div className={styles.attachmentGallery}>
+    {props.attachmentIds.length > 0 && <div className={styles.list}>
       {props.attachmentIds.map((id) => <AttachmentLink key={id} attachmentId={id}
         presentation="media" variant="gallery" canRemove={Boolean(props.removableAttachmentIds?.has(id))} />)}
     </div>}
-    {(props.linkIds.length > 0 || Boolean(props.externalImages?.length)) && <div className={styles.attachmentLinks}>
+    {(props.linkIds.length > 0 || Boolean(props.externalImages?.length)) && <div className={styles.list}>
       {props.linkIds.map((id) => <span className={styles.fileRecord} key={id}>
         <ExternalLink size={15} aria-hidden="true" /><span>{id}</span>
       </span>)}
-      {props.externalImages?.map(({ url, label }) => <a className={styles.fileRecord} key={url}
+      {props.externalImages?.map(({ url, label }) => <Link className={styles.fileRecord} key={url}
         href={url} target="_blank" rel="noopener noreferrer">
         <ExternalLink size={15} aria-hidden="true" /><span>{label}</span>
-      </a>)}
+      </Link>)}
     </div>}
-    {(comments.status === "loading" || comments.refreshing) && <p role="status" className={emptyStyles.attachmentStatus}>
+    {(comments.status === "loading" || comments.refreshing) && <p role="status" className={styles.status}>
+      <Spinner size="sm" className={styles.spinner} aria-hidden="true" />
       {ru ? "Загружаем вложения из комментариев…" : "Loading attachments from comments…"}
     </p>}
-    {(comments.status === "error" || comments.refreshFailed) && <div className={emptyStyles.attachmentStatus}>
+    {(comments.status === "error" || comments.refreshFailed) && <div className={styles.status}>
       <span role="alert">{ru ? "Не удалось загрузить вложения из комментариев." : "Could not load attachments from comments."}</span>
-      <button type="button" onClick={comments.status === "error" ? retryComments : refreshComments}>
+      <Button size="sm" variant="light" disableRipple onPress={comments.status === "error" ? retryComments : refreshComments}>
         {ru ? "Повторить" : "Retry"}
-      </button>
+      </Button>
     </div>}
-    {comments.status === "ready" && (comments.hasMore || comments.loadMoreFailed) && <div className={emptyStyles.attachmentStatus}>
+    {comments.status === "ready" && (comments.hasMore || comments.loadMoreFailed) && <div className={styles.status}>
       {comments.loadMoreFailed && <span role="alert">{ru ? "Не удалось загрузить более ранние вложения." : "Could not load earlier attachments."}</span>}
-      <button type="button" disabled={comments.loadingMore || comments.refreshing}
-        aria-busy={comments.loadingMore || undefined} onClick={comments.hasMore ? loadMoreComments : refreshComments}>
+      <Button size="sm" variant="light" disableRipple isDisabled={comments.loadingMore || comments.refreshing}
+        aria-busy={comments.loadingMore || undefined} onPress={comments.hasMore ? loadMoreComments : refreshComments}>
         {comments.loadingMore ? (ru ? "Загрузка…" : "Loading…")
           : comments.loadMoreFailed ? (ru ? "Повторить" : "Retry")
           : (ru ? "Загрузить вложения из ранних комментариев" : "Load attachments from earlier comments")}
-      </button>
+      </Button>
     </div>}
   </div>;
 }

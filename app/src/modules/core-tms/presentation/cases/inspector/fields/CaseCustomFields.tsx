@@ -35,8 +35,9 @@ function fieldRows(revision: TestCaseRevision, definitions: readonly CustomField
   }
   const visible = new Set(rows.flatMap(row => row.definition ? [row.definition.id] : []));
   for (const definition of definitions) {
-    if (visible.has(definition.id) || (inlineEdit && !(requiredFields && definition.required))) continue;
-    rows.push({ key: rowKey(definition.id, definition.systemKey), definition, snapshot: snapshots.find(snapshot => snapshot.fieldId === definition.id) });
+    const key = rowKey(definition.id, definition.systemKey);
+    if (visible.has(definition.id) || (inlineEdit && !position.has(key) && !(requiredFields && definition.required))) continue;
+    rows.push({ key, definition, snapshot: snapshots.find(snapshot => snapshot.fieldId === definition.id) });
   }
   return position.size ? rows.sort((a, b) => (position.get(a.key) ?? order.length) - (position.get(b.key) ?? order.length)) : rows;
 }
@@ -51,11 +52,13 @@ export function CaseCustomFields({ projectId = "", revision, editing, creating =
   const fieldList = useRef<HTMLDListElement>(null);
   const editFields = useRef<HTMLButtonElement>(null);
   const fallbackError = useRef<HTMLParagraphElement>(null);
-  const catalog = useCustomFieldCatalog(workspaceId, projectId, editing && !offline);
+  const showAvailable = Boolean(projectId && onRequestEdit) && !offline;
+  const useCatalog = !offline && (editing || showAvailable);
+  const catalog = useCustomFieldCatalog(workspaceId, projectId, useCatalog);
   useEffect(() => { if (!editing) setInlineEdit(null); }, [editing, workspaceId, projectId]);
-  useEffect(() => { if (editing && catalog.cursor && !catalog.pending && !catalog.loading && !catalog.failure) void catalog.more(); },
-    [editing, catalog.cursor, catalog.pending, catalog.loading, catalog.failure, catalog.more]);
-  const definitions = editing ? catalog.items : [];
+  useEffect(() => { if (useCatalog && catalog.cursor && !catalog.pending && !catalog.loading && !catalog.failure) void catalog.more(); },
+    [useCatalog, catalog.cursor, catalog.pending, catalog.loading, catalog.failure, catalog.more]);
+  const definitions = useCatalog ? catalog.items : [];
   const rows = fieldRows(revision, definitions, editing ? inlineEdit : null, creating, requiredFields);
   const catalogReady = editing && !catalog.loading && !catalog.cursor;
   const showFallback = requiredFields && (!definitions.some(field => field.required) || Boolean(catalog.failure));
@@ -94,7 +97,7 @@ export function CaseCustomFields({ projectId = "", revision, editing, creating =
           : !stored ? label : systemKey ? stored : `${label}: ${stored}`;
         const display = field?.required && !stored ? `${text} *` : text;
         return <div key={key} className={css.field}><dt className={css.visuallyHidden}>{label}{field?.required && <b aria-label={ru ? "Обязательное поле" : "Required"}> *</b>}</dt><dd>
-          {field && active ? <CustomFieldPicker workspaceId={workspaceId} projectId={projectId} field={field} selected={selected}
+          {editing && field && active ? <CustomFieldPicker workspaceId={workspaceId} projectId={projectId} field={field} selected={selected}
             autoOpen={explicitlyActive} invalid={missing} errorId={validationId}
             canCreate={canCreate} disabled={disabled || offline} placeholder={placeholder} displayValue={display}
             parentValueId={systemKey === "product" ? revision.productGroupId ?? undefined : undefined}
@@ -107,7 +110,7 @@ export function CaseCustomFields({ projectId = "", revision, editing, creating =
       })}
     </dl>
     {editing && catalog.loading && <p role="status" className={css.loading}>{ru ? "Загрузка полей…" : "Loading fields…"}</p>}
-    {editing && Boolean(catalog.failure) && <p role="alert" className={css.error}>{ru ? "Не удалось загрузить поля." : "Could not load fields."} <button type="button" onClick={catalog.refresh}>{ru ? "Повторить" : "Retry"}</button></p>}
+    {useCatalog && Boolean(catalog.failure) && <p role="alert" className={css.error}>{ru ? "Не удалось загрузить поля." : "Could not load fields."} <button type="button" onClick={catalog.refresh}>{ru ? "Повторить" : "Retry"}</button></p>}
     {showFallback && <p ref={fallbackError} tabIndex={-1} role="alert" className={css.error}>
       {ru ? "Выберите значения обязательных полей." : "Choose a value for each required field."}
       {!editing && canEdit && <button ref={editFields} type="button" onClick={onRequestEdit}>

@@ -139,3 +139,25 @@ test("a required field failure points to Product while leaving optional fields u
   assert.equal(Boolean(byType(view, "custom-picker")[1].props.invalid), false);
   act(() => view.unmount());
 });
+
+test("an unfilled configured field opens directly and keeps the rail order in the draft", () => {
+  const Fields = loadFieldComponent("../../fields/CaseCustomFields.tsx", "CaseCustomFields", [
+    { id: "product", name: "Product", systemKey: "product" },
+    { id: "regression", name: "Regression", systemKey: "regression" },
+    { id: "platform", name: "Platform" },
+  ]);
+  let view!: ReactTestRenderer;
+  let edits = 0;
+  const props = { projectId: "project", revision, ru: false, editing: false, onPatch: () => {}, onRequestEdit: () => { edits++; } };
+  act(() => { view = create(<Fields {...props} />); });
+  const fieldOrder = byType(view, "dt").map(node => node.children[0]);
+  const platform = byType(view, "field-value").find(node => node.props.label === "Platform")!;
+  act(() => { platform.props.onEdit(); view.update(<Fields {...props} editing />); });
+  assert.equal(edits, 1);
+  assert.deepEqual(byType(view, "dt").map(node => node.children[0]), fieldOrder);
+  const [picker] = byType(view, "custom-picker");
+  assert.equal(byType(view, "custom-picker").length, 1);
+  assert.equal(picker.props.field.id, "platform");
+  assert.equal(picker.props.autoOpen, true);
+  act(() => view.unmount());
+});

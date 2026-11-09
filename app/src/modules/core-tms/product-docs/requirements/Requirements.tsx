@@ -93,7 +93,7 @@ function ScopedRequirements({docs, subject, ru}: {
       <span>{ru ? "Не удалось загрузить требования." : "Could not load requirements."}</span>
       <button type="button" onClick={() => { setFailed(false); setReload(value => value + 1); }}>{ru ? "Повторить" : "Retry"}</button>
     </div>}
-    {mutationFailed && <p className={styles.feedback} role="alert">{ru ? "Не удалось изменить связь." : "Could not update the link."}</p>}
+    {mutationFailed && !pickerOpen && <p className={styles.feedback} role="alert">{ru ? "Не удалось изменить связь." : "Could not update the link."}</p>}
     {result?.requirements.length ? caseId ? <CaseRequirementLinks requirements={result.requirements} ru={ru}
       onOpen={(requirement, source) => docs.open({
         docId: requirement.docId, sectionId: requirement.sectionId ?? undefined,
@@ -113,7 +113,7 @@ function ScopedRequirements({docs, subject, ru}: {
     </ul> : caseId && !failed && !canLink && result && <span>{ru ? "Не привязана" : "None linked"}</span>}
     {result?.nextCursor && <button type="button" className={styles.more} disabled={moreBusy || busy} onClick={() => void more()}>{ru ? "Показать ещё" : "Show more"}</button>}
     {canLink && <CaseRequirementPicker api={api} scope={scope} ru={ru} disabled={linkDisabled || busy || moreBusy}
-      open={pickerOpen && !linkDisabled} onOpenChange={open => { setPickerOpen(open); setMutationFailed(false); }}
+      open={pickerOpen && !linkDisabled} linkFailed={mutationFailed} onOpenChange={open => { setPickerOpen(open); setMutationFailed(false); }}
       onLink={({docId, sectionId}) => void update(docId, sectionId)} />}
   </>;
   if (caseId) return <div className={styles.field} data-documentation-field data-testid="case-requirements">

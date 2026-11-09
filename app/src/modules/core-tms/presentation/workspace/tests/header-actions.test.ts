@@ -19,27 +19,16 @@ function header(view: View, project: object | null = { id: "project-a" }, connec
   return nodes(h.render(() => component({ model, sidebarCollapsed: true, onToggleSidebar() {} })));
 }
 
-test("the global environment shortcut belongs only to dashboard and test cases", () => {
+test("environment management stays out of the global header", () => {
   for (const view of workspaceViews) {
-    const shortcuts = header(view).filter(node => node.props["data-testid"] === "open-environments");
-    assert.equal(shortcuts.length, view === "dashboard" || view === "cases" ? 1 : 0, view);
-  }
-});
-
-test("environment shortcut still requires project context and respects connection readiness", () => {
-  for (const view of ["dashboard", "cases"] as const) {
-    assert.equal(header(view, null).some(node => node.props["data-testid"] === "open-environments"), false);
-    const ready = header(view).find(node => node.props["data-testid"] === "open-environments");
-    const offline = header(view, { id: "project-a" }, "disconnected").find(node => node.props["data-testid"] === "open-environments");
-    assert.equal(ready?.props.disabled, false);
-    assert.equal(offline?.props.disabled, true);
+    assert.equal(header(view).some(node => node.props["data-testid"] === "open-environments"), false, view);
   }
 });
 
 test("the test case import shortcut lives in the repository header and keeps import permissions", () => {
   const shortcut = (items: ReturnType<typeof header>) => items.find(node => node.props["data-testid"] === "open-case-import");
   const actions = header("cases").filter(node => ["open-case-import", "open-environments"].includes(String(node.props["data-testid"])));
-  assert.equal(actions.map(node => node.props["data-testid"]).join(","), "open-case-import,open-environments");
+  assert.equal(actions.map(node => node.props["data-testid"]).join(","), "open-case-import");
   assert.equal(shortcut(header("cases"))?.props.isDisabled, false);
   assert.equal(shortcut(header("cases", { id: "project-a" }, "connected", false))?.props.isDisabled, true);
   assert.equal(shortcut(header("cases", { id: "project-a" }, "connected", true, false))?.props.isDisabled, true);
