@@ -81,6 +81,27 @@ function redirectToCanonicalPath(url, pathname) {
   return secureResponse(Response.redirect(url.toString(), 302));
 }
 
+function redirectLegacyCompanyInvitation(url, env) {
+  if (url.pathname !== "/cloud-login/" && url.pathname !== "/cloud-login") return null;
+  const companies = url.searchParams.getAll("company");
+  const [company] = companies;
+  if (companies.length !== 1 || /[^a-z0-9.-]/.test(company) || company === TMS_HOST || companyHost(company, env) !== "tenant") return null;
+  const suffix = `-falcon.${env.FALCON_COMPANY_DOMAIN_SUFFIX}`;
+  const slug = company.slice(0, -suffix.length);
+  if (["sandbox", "admin", "www", "api", "mail", "support"].includes(slug)) return null;
+
+  const languages = url.searchParams.getAll("lang");
+  const [lang] = languages;
+  if (languages.length > 1 || (lang !== undefined && lang !== "en" && lang !== "ru")) return null;
+  const target = new URL(`https://${TMS_HOST}/cloud-login/`);
+  target.searchParams.set("company", company);
+  if (lang) target.searchParams.set("lang", lang);
+  const response = secureResponse(Response.redirect(target, 302), true);
+  response.headers.set("cache-control", "private, no-store");
+  response.headers.set("referrer-policy", "no-referrer");
+  return response;
+}
+
 function secureResponse(response, managed = false, consentPolicy = null) {
   const headers = new Headers(response.headers);
   for (const [name, value] of Object.entries(SECURITY_HEADERS)) headers.set(name, value);
@@ -289,6 +310,10 @@ export default {
       const verified = await verifyCompanyDocument(request, env, audience);
       if (!verified.ok) return secureResponse(unavailableCompanyDocument(verified.status, request.method === "HEAD"), true);
       if (!verified.authOnly && incoming.hostname !== TMS_HOST && ["/", "/login/", "/login", "/signup/", "/signup", "/cloud-login/", "/cloud-login"].includes(incoming.pathname)) {
+        if (audience === "platform") {
+          const invitation = redirectLegacyCompanyInvitation(incoming, env);
+          if (invitation) return invitation;
+        }
         return redirectToCanonicalPath(incoming, audience === "platform" ? "/sandbox/" : APP_PATH);
       }
     }

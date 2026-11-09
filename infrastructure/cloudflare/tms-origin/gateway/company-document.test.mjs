@@ -57,6 +57,75 @@ test("company root directs to its workspace; the operator root directs to Sandbo
   assert.equal(asset.status, 200); assert.match(asset.headers.get("cache-control"), /public/);
 });
 
+test("verified Sandbox routes legacy employee invitations to central company sign-in", async (t) => {
+  const platform = env.FALCON_PLATFORM_HOSTNAME;
+  let calls = 0;
+  replaceFetch(t, async (request) => {
+    calls++;
+    assert.equal(new URL(request.url).pathname, "/api/v1/auth/entrypoint");
+    assert.equal(request.headers.has("cookie"), false);
+    return Response.json({ data: { hostname: platform, audience: "platform", available: true } });
+  });
+  for (const [method, path, query, expected] of [
+    ["GET", "/cloud-login/", `company=${host}&lang=ru`, `company=${host}&lang=ru`],
+    ["HEAD", "/cloud-login", `company=${host}`, `company=${host}`],
+    ["GET", "/cloud-login/", `company=${host}&lang=en&returnTo=https://outside.example&token=fixture`, `company=${host}&lang=en`],
+  ]) {
+    const result = await worker.fetch(new Request(`https://${platform}${path}?${query}`, {
+      method, headers: { cookie: "__Host-falcon_platform_session=fixture" },
+    }), env);
+    assert.equal(result.status, 302);
+    assert.equal(result.headers.get("location"), `https://tms.saturnusgo.com/cloud-login/?${expected}`);
+    assert.equal(result.headers.has("set-cookie"), false);
+    assert.match(result.headers.get("cache-control"), /no-store/);
+    assert.equal(result.headers.get("referrer-policy"), "no-referrer");
+  }
+  assert.equal(calls, 3);
+});
+
+test("unverified hosts, ordinary Sandbox routes and invalid invitation hints keep their original handling", async (t) => {
+  const platform = env.FALCON_PLATFORM_HOSTNAME;
+  let available = true;
+  replaceFetch(t, async (request) => {
+    const url = new URL(request.url);
+    if (url.pathname !== "/api/v1/auth/entrypoint") {
+      return new Response("<html><head></head><body>Sandbox</body></html>", { headers: { "content-type": "text/html" } });
+    }
+    const hostname = request.headers.get("x-falcon-host");
+    const audience = hostname === platform ? "platform" : "tenant";
+    return Response.json({ data: { hostname, audience, available } });
+  });
+  for (const query of [
+    "lang=en", "company=acme", `company=${platform}`, "company=admin-falcon.example.test",
+    `company=${host}.outside.example`, `company=${host}%40outside.example`, `company=https%3A%2F%2F${host}`,
+    `company=${host.replace("-falcon", "%0A-falcon")}`, `company=${host}&company=${host}`,
+    `company=${host}&lang=de`, `company=${host}&lang=en&lang=ru`,
+  ]) {
+    const result = await worker.fetch(new Request(`https://${platform}/cloud-login/?${query}`), env);
+    assert.equal(result.headers.get("location"), `https://${platform}/sandbox/?${query}`, query);
+  }
+  const query = `company=${host}&lang=en`;
+  for (const path of ["/", "/login/", "/signup/"]) {
+    const result = await worker.fetch(new Request(`https://${platform}${path}?${query}`), env);
+    assert.equal(result.headers.get("location"), `https://${platform}/sandbox/?${query}`, path);
+  }
+  for (const path of [`/sandbox/?${query}`, "/admin/?lang=en"]) {
+    const result = await worker.fetch(new Request(`https://${platform}${path}`), env);
+    assert.equal(result.status, 200, path);
+    assert.equal(result.headers.has("location"), false, path);
+  }
+  const tenant = await worker.fetch(new Request(`https://${host}/cloud-login/?${query}`), env);
+  assert.equal(tenant.headers.get("location"), `https://${host}/work/?${query}`);
+  const post = await worker.fetch(new Request(`https://${platform}/cloud-login/?${query}`, { method: "POST" }), env);
+  assert.equal(post.status, 404);
+  const lookalike = await worker.fetch(new Request(`https://${platform}.outside.example/cloud-login/?${query}`), env);
+  assert.equal(lookalike.status, 404);
+  available = false;
+  const unavailable = await worker.fetch(new Request(`https://${platform}/cloud-login/?${query}`), env);
+  assert.equal(unavailable.status, 404);
+  assert.equal(unavailable.headers.has("location"), false);
+});
+
 test('unpaid or disabled domains never receive an application document',async t=>{
  let calls=0;replaceFetch(t,async()=>{calls++;return Response.json({data:{hostname:host,audience:'tenant',available:false,authOnly:false}});});
  for(const path of ['/','/cloud-login/','/testcases/umbrella-home/work/','/admin/']) {
