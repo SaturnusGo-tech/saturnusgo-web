@@ -27,11 +27,11 @@
   transition: opacity 140ms ease;
 }
 
+.mark[data-intro]:not([data-static])::before,
 .mark[data-assembling]::before { opacity: 0; }
 .mark[data-assembling] .canvas { opacity: 1; }
 
 @media (prefers-reduced-motion: reduce) {
-  .mark::before,
-  .mark[data-assembling]::before { opacity: 1; transition: none; }
+  .mark::before { opacity: 1 !important; transition: none; }
   .mark .canvas { display: none; }
 }

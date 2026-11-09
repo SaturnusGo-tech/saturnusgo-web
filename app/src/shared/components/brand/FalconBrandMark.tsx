@@ -22,9 +22,13 @@ export function FalconBrandMark({
 
   useEffect(() => {
     const canvasNode = canvasRef.current;
-    if (!canvasNode?.parentElement || typeof window.matchMedia !== "function") return;
+    if (!canvasNode?.parentElement) return;
     const canvas = canvasNode;
     const mark = canvasNode.parentElement;
+    if (typeof window.matchMedia !== "function") {
+      mark.dataset.static = "";
+      return;
+    }
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let visible = typeof IntersectionObserver === "undefined";
@@ -72,9 +76,11 @@ export function FalconBrandMark({
         void import("./falconAssembly").then(({ createFalconAssembly }) => createFalconAssembly(canvas, asset))
           .then(result => {
             renderer = result;
-            if (renderer && canAnimate()) play();
+            if (!mounted) return;
+            if (renderer) play();
+            else mark.dataset.static = "";
           }).catch(() => {
-            // The same SVG stays visible when canvas or the engine is unavailable.
+            if (mounted) mark.dataset.static = "";
           });
       }
     }
@@ -118,6 +124,7 @@ export function FalconBrandMark({
       mounted = false;
       stop();
       delete mark.dataset.assembling;
+      delete mark.dataset.static;
       intersection?.disconnect();
       resize?.disconnect();
       theme?.disconnect();
@@ -127,7 +134,8 @@ export function FalconBrandMark({
   }, [animated, intervalMs, intro]);
 
   return (
-    <span aria-hidden="true" data-falcon-brand-mark="" className={[styles.mark, className].filter(Boolean).join(" ")} style={markStyle}>
+    <span aria-hidden="true" data-falcon-brand-mark="" data-intro={intro && animated ? "" : undefined}
+      className={[styles.mark, className].filter(Boolean).join(" ")} style={markStyle}>
       {animated && <canvas ref={canvasRef} className={styles.canvas} />}
     </span>
   );
