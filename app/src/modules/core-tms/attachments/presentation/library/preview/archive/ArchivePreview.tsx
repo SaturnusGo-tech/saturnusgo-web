@@ -1,8 +1,8 @@
 "use client";
 
-import { Button } from "@heroui/react";
-import { ChevronRight, File, FileArchive, FileCode, Folder, FolderOpen } from "lucide-react";
-import { lazy, Suspense, useEffect, useId, useMemo, useState } from "react";
+import { Button, Input } from "@heroui/react";
+import { ChevronRight, File, Folder, FolderOpen, PanelLeft, Search } from "lucide-react";
+import { lazy, Suspense, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { LoadingOrb } from "../../../../../../../shared/components/loading/LoadingOrb";
 import { WorkspaceBreadcrumbs } from "../../../../../presentation/common/breadcrumbs/WorkspaceBreadcrumbs";
 import type { ArchiveEntry, ParsedFilePreview } from "../model/file-preview-format";
@@ -51,13 +51,13 @@ function ArchiveTreeRow({ node, depth, childrenByPath, expanded, current, onOpen
 }) {
   const groupId = useId();
   const opened = expanded.has(node.path);
-  const Icon = node.directory ? opened ? FolderOpen : Folder : node.entry?.previewable ? FileCode : File;
+  const Icon = node.directory ? Folder : File;
   const children = childrenByPath.get(node.path);
   return <li>
     <Button size="sm" variant="light" disableRipple className={styles.treeRow} onPress={() => onOpen(node.path, node.directory)}
       aria-current={current === node.path ? "location" : undefined}
       aria-expanded={node.directory ? opened : undefined} aria-controls={opened && children?.length ? groupId : undefined}
-      style={{ paddingInlineStart: 8 + Math.min(depth, 10) * 14 }} title={node.label}>
+      style={{ paddingInlineStart: 4 + Math.min(depth, 10) * 16 }} title={node.label}>
       {node.directory ? <ChevronRight size={12} aria-hidden="true" data-expanded={opened} className={styles.treeChevron} /> : <span className={styles.treeChevron} />}
       <Icon size={16} className={node.directory ? styles.folderIcon : undefined} aria-hidden="true" />
       <span>{node.label}</span>
@@ -87,7 +87,7 @@ function EntrySource({ entry, openEntry, ru }: { entry: ArchiveEntry; openEntry:
       <p>{ru ? "Предпросмотр этого файла недоступен" : "This file can’t be previewed"}</p></div>;
   }
   const loading = <div className={styles.archiveEmpty}><LoadingOrb size="md" label={ru ? "Открываем файл" : "Opening file"} /></div>;
-  return source ? <Suspense fallback={loading}><SourceFilePreview {...source} filename={entry.name} ru={ru} /></Suspense> : loading;
+  return source ? <Suspense fallback={loading}><SourceFilePreview {...source} filename={entry.name} size={entry.size} ru={ru} /></Suspense> : loading;
 }
 
 export function ArchivePreview({ entries, filename, limited, openEntry, ru }: {
@@ -96,11 +96,28 @@ export function ArchivePreview({ entries, filename, limited, openEntry, ru }: {
   const { nodes, children } = useMemo(() => archiveIndex(entries, ru ? "ru" : "en"), [entries, ru]);
   const [current, setCurrent] = useState("");
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
+  const [treeVisible, setTreeVisible] = useState(true);
+  const [query, setQuery] = useState("");
+  const treeToggle = useRef<HTMLButtonElement>(null);
+  const restoreTreeFocus = useRef(false);
+  const searchInput = useRef<HTMLInputElement>(null);
   const selection = nodes.get(current);
   const directory = selection?.entry ? current.slice(0, current.lastIndexOf("/") + 1) : current;
   const topLevel = children.get("") ?? [];
   const folderRows = children.get(directory) ?? [];
   const treeLabel = ru ? "Файлы архива" : "Archive files";
+  const searchLabel = ru ? "Перейти к файлу" : "Go to file";
+  const treeId = useId();
+  const search = query.trim().toLocaleLowerCase();
+  const matches = useMemo(() => search
+    ? Array.from(nodes.values()).filter(node => !node.directory && node.path.toLocaleLowerCase().includes(search)).slice(0, 100)
+    : [], [nodes, search]);
+
+  useLayoutEffect(() => {
+    if (!restoreTreeFocus.current) return;
+    restoreTreeFocus.current = false;
+    treeToggle.current?.focus();
+  }, [treeVisible]);
 
   function open(path: string, toggle = false) {
     setCurrent(path);
@@ -126,23 +143,44 @@ export function ArchivePreview({ entries, filename, limited, openEntry, ru }: {
   }
   if (selection?.entry) crumbs.push({ id: current, label: selection.label, onPress: undefined });
 
-  return <div className={styles.archive}>
-    <nav className={styles.archiveSidebar} aria-label={treeLabel}>
-      <h2><FileArchive size={16} aria-hidden="true" />{treeLabel}</h2>
-      <ul>{topLevel.map(node => <ArchiveTreeRow key={node.path} node={node} depth={0}
-        childrenByPath={children} expanded={expanded} current={current} onOpen={open} />)}</ul>
+  const toggleTree = <Button ref={treeToggle} size="sm" isIconOnly disableRipple className={styles.treeToggle}
+    aria-label={treeVisible ? (ru ? "Скрыть дерево файлов" : "Collapse file tree") : (ru ? "Показать дерево файлов" : "Expand file tree")}
+    aria-expanded={treeVisible} aria-controls={treeId} onPress={() => {
+      restoreTreeFocus.current = true;
+      setTreeVisible(visible => !visible);
+    }}><PanelLeft size={16} aria-hidden="true" /></Button>;
+
+  return <div className={styles.archive} data-tree-hidden={!treeVisible || undefined}>
+    <nav className={styles.archiveSidebar} aria-label={treeLabel} hidden={!treeVisible} id={treeId}>
+      <div className={styles.treeHeader}>
+        <div className={styles.treeTitle}>{treeVisible && toggleTree}<h2>{ru ? "Файлы" : "Files"}</h2></div>
+        <Input ref={searchInput} aria-label={searchLabel} placeholder={searchLabel} value={query} onValueChange={setQuery} size="sm" radius="sm" isClearable
+          startContent={<Search size={16} aria-hidden="true" />}
+          classNames={{ inputWrapper: styles.treeSearch, innerWrapper: styles.treeSearchContent, input: styles.treeSearchInput }} />
+      </div>
+      {search ? <ul>{matches.map(node => <li key={node.path}>
+        <Button size="sm" variant="light" disableRipple className={styles.treeRow} title={node.path}
+          onPress={() => {
+            open(node.path);
+            setQuery("");
+            searchInput.current?.focus();
+          }}><File size={16} aria-hidden="true" /><span>{node.path}</span></Button>
+      </li>)}</ul> : <ul>{topLevel.map(node => <ArchiveTreeRow key={node.path} node={node} depth={0}
+        childrenByPath={children} expanded={expanded} current={current} onOpen={open} />)}</ul>}
+      {search && !matches.length && <p className={styles.archiveLimit} role="status">{ru ? "Файлы не найдены" : "No matching files"}</p>}
       {limited && <p className={styles.archiveLimit}>{ru ? "Показана часть архива" : "Partial archive listing"}</p>}
     </nav>
     <div className={styles.archivePane}>
       <div className={styles.archivePath}>
-        <WorkspaceBreadcrumbs label={ru ? "Путь в архиве" : "Archive path"} overflowLabel={ru ? "Показать полный путь" : "Show full path"} items={crumbs} />
-        {selection?.entry && <span>{entrySize(selection.entry.size, ru)}</span>}
+        {!treeVisible && toggleTree}
+        <WorkspaceBreadcrumbs label={ru ? "Путь в архиве" : "Archive path"} overflowLabel={ru ? "Показать полный путь" : "Show full path"}
+          separator={<span aria-hidden="true">/</span>} items={crumbs} />
       </div>
       {selection?.entry
         ? <EntrySource key={current} entry={selection.entry} openEntry={openEntry} ru={ru} />
         : folderRows.length ? <div className={styles.archiveListing} aria-label={ru ? "Содержимое папки" : "Folder contents"}>
           <ul>{folderRows.map(node => {
-            const Icon = node.directory ? Folder : node.entry?.previewable ? FileCode : File;
+            const Icon = node.directory ? Folder : File;
             return <li key={node.path}><Button size="sm" variant="light" disableRipple className={styles.archiveItem}
               onPress={() => open(node.path)} title={node.label}>
               <Icon size={16} className={node.directory ? styles.folderIcon : undefined} aria-hidden="true" /><span>{node.label}</span>

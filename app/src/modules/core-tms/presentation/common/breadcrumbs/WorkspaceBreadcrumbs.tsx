@@ -1,11 +1,13 @@
 import { BreadcrumbItem, Breadcrumbs, Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
 import { ChevronRight, Ellipsis } from "lucide-react";
-import { useRef } from "react";
+import { type ReactNode, useRef } from "react";
 import styles from "./workspace-breadcrumbs.module.css";
 
 type Crumb = { id: string; label: string; onPress?: () => void };
 
-export function WorkspaceBreadcrumbs({ label, items, overflowLabel }: { label: string; items: readonly Crumb[]; overflowLabel?: string }) {
+export function WorkspaceBreadcrumbs({ label, items, overflowLabel, separator = <ChevronRight size={12} aria-hidden="true" /> }: {
+  label: string; items: readonly Crumb[]; overflowLabel?: string; separator?: ReactNode;
+}) {
   const hidden = overflowLabel && items.length > 4 ? items.slice(1, -2) : [];
   const overflowButton = useRef<HTMLButtonElement>(null);
   return <Breadcrumbs aria-label={label} size="sm" maxItems={hidden.length ? 5 : items.length + 1}
@@ -28,7 +30,7 @@ export function WorkspaceBreadcrumbs({ label, items, overflowLabel }: { label: s
       </Dropdown>
       {separator}
     </li> : undefined}
-    isDisabled={!items.some((item) => item.onPress)} separator={<ChevronRight size={12} aria-hidden="true" />}
+    isDisabled={!items.some((item) => item.onPress)} separator={separator}
     classNames={{ base: styles.root, list: styles.list }}
     itemClasses={{ base: styles.crumb, item: styles.item, separator: styles.separator }}>
     {items.map((item) => <BreadcrumbItem key={item.id} onPress={item.onPress}>

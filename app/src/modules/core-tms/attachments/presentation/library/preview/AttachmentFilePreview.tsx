@@ -75,7 +75,7 @@ function PreviewContent({ preview, blob, file, zoom, ru, onFailure }: {
   if (preview.kind === "text") return <Suspense fallback={<div className={styles.unavailable}>
     <LoadingOrb size="md" label={ru ? "Открываем файл" : "Opening file"} />
   </div>}>
-    <SourceFilePreview {...preview} filename={file.filename} mimeType={file.mimeType} ru={ru} />
+    <SourceFilePreview {...preview} filename={file.filename} mimeType={file.mimeType} size={file.sizeBytes} ru={ru} />
   </Suspense>;
   if (preview.kind === "document") return <div className={styles.document} tabIndex={0} aria-label={file.filename}>
     {preview.paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}

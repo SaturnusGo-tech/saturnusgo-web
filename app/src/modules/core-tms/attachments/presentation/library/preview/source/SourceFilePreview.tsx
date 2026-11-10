@@ -9,11 +9,16 @@ import { useEffect, useRef } from "react";
 import { isJsonFile } from "../model/file-preview-format";
 import styles from "../attachment-file-preview.module.css";
 
-export default function SourceFilePreview({ text, filename, mimeType, limited, ru }: {
-  text: string; filename: string; mimeType?: string; limited: boolean; ru: boolean;
+export default function SourceFilePreview({ text, filename, mimeType, limited, size, ru }: {
+  text: string; filename: string; mimeType?: string; limited: boolean; size?: number | null; ru: boolean;
 }) {
   const container = useRef<HTMLDivElement>(null);
   const label = ru ? "Содержимое файла" : "File contents";
+  const lines = text ? (text.match(/\n/g)?.length ?? 0) + 1 : 0;
+  const locale = ru ? "ru" : "en";
+  const lineCount = new Intl.NumberFormat(locale).format(lines);
+  const fileSize = size == null ? "" : new Intl.NumberFormat(locale, { style: "unit", unit: "byte", unitDisplay: "long" }).format(size);
+  const metadata = ru ? `Строк: ${lineCount}` : `${lineCount} ${lines === 1 ? "line" : "lines"}`;
 
   useEffect(() => {
     if (!container.current) return;
@@ -43,6 +48,10 @@ export default function SourceFilePreview({ text, filename, mimeType, limited, r
   }, [filename, label, mimeType, text]);
 
   return <div className={styles.sourcePreview}>
+    <div className={styles.sourceToolbar}>
+      <span>{ru ? "Код" : "Code"}</span>
+      <span>{metadata}{fileSize ? ` · ${fileSize}` : ""}</span>
+    </div>
     <div className={styles.sourceEditor} ref={container} />
     {limited && <p className={styles.sourceLimit}>{ru ? "Показано начало файла" : "Showing the beginning of the file"}</p>}
   </div>;
