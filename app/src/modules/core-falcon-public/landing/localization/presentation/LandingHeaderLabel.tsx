@@ -28,8 +28,8 @@ export function LandingHeaderLabel({ en, ru }: Record<LandingLocale, string>) {
     const currentWidth = isAnimating
       ? label.getBoundingClientRect().width
       : outgoing.getBoundingClientRect().width;
-    const outgoingOpacity = isAnimating ? getComputedStyle(outgoing).opacity : 1;
-    const incomingOpacity = isAnimating ? getComputedStyle(incoming).opacity : 0;
+    const outgoingOpacity = isAnimating ? Number(getComputedStyle(outgoing).opacity) : 1;
+    const incomingOpacity = isAnimating ? Number(getComputedStyle(incoming).opacity) : 0;
     for (const animation of animations.current) animation.cancel();
     animations.current = [];
 
