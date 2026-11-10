@@ -95,7 +95,7 @@ if (process.argv.slice(2).join(" ") === "run clean") {
   process.exit(0);
 }
 if (process.argv.slice(2).join(" ") !== "run build") process.exit(2);
-for (const name of ["privacy", "trial-terms", "sandbox", "admin", "profile"]) write("out/" + name + "/index.html", "FALCON MANAGED ACCESS");
+for (const name of ["privacy", "terms", "billing-terms", "trial-terms", "sandbox", "admin", "profile"]) write("out/" + name + "/index.html", "FALCON MANAGED ACCESS");
 write("out/ru/index.html", "FALCON RUSSIAN LANDING");
 write("out/docs/index.html", "FALCON PUBLIC DOCUMENTATION");
 write("out/ru/docs/index.html", "FALCON RUSSIAN PUBLIC DOCUMENTATION");
