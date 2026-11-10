@@ -4,7 +4,7 @@ import { applyListType$, convertSelectionToNode$, insertCodeBlock$, insertDirect
 import { $createHeadingNode, $createQuoteNode } from "@lexical/rich-text";
 import type { RangeSelection } from "lexical";
 import {
-  ChartNoAxesColumnIncreasing, ChevronsUpDown, CircleAlert, CircleDot, CirclePlay, CodeXml, Film, Heading1, Heading2, Heading3,
+  ChartNoAxesColumnIncreasing, ChartScatter, ChevronsUpDown, CircleAlert, CircleDot, CirclePlay, CodeXml, Film, Heading1, Heading2, Heading3,
   Heading4, Image, Info, Lightbulb, List, ListChecks, ListOrdered, Minus, Paperclip, Quote, Radical, Route, Table2, TriangleAlert,
   FileUp, type LucideIcon,
 } from "lucide-react";
@@ -12,6 +12,7 @@ import type { TmsLocale } from "../../../../../localization/model/locale";
 import { useDashboardPicker } from "../../../dashboard/editor/dashboardEditor";
 import { useRunEvidencePicker } from "../../../run/editor/runEditor";
 import { productDocRadioName } from "../../blocks/radio/radioOptions";
+import { productDocChartLanguage } from "../../blocks/structured/chart/model/product-doc-chart";
 import { productDocOpenAttachmentPicker$ } from "../../media/input/ProductDocImageInput";
 import { useProductDocGif } from "../../media/gif/ProductDocGif";
 
@@ -70,6 +71,9 @@ export function useProductDocInsertCommands(locale: TmsLocale, onImport?: () => 
     { id: "code", label: ru ? "Блок кода" : "Code block", group: "blocks", Icon: CodeXml, run: () => code({}) },
     { id: "diagram", label: ru ? "Диаграмма" : "Diagram", group: "blocks", Icon: Route,
       terms: "mermaid диаграмма схема", run: () => code({ language: "mermaid", code: "" }) },
+    { id: "lead-time", label: ru ? "Срок решения по приоритетам" : "Lead time by priority", group: "blocks", Icon: ChartScatter,
+      terms: "chart scatter график точечная диаграмма", run: () => code({ language: productDocChartLanguage,
+        code: JSON.stringify({ version: 1, kind: "lead-time", title: ru ? "Срок решения по приоритетам" : "Lead time by priority", points: [] }, null, 2) }) },
     { id: "math", label: ru ? "Формула LaTeX" : "LaTeX math block", group: "blocks", Icon: Radical,
       terms: "math latex equation математика", run: () => code({ language: "latex", code: "" }) },
     { id: "collapse", label: ru ? "Сворачиваемый раздел" : "Collapsible section", group: "blocks", Icon: ChevronsUpDown,

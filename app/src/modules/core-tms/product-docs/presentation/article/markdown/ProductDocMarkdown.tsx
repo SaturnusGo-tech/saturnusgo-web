@@ -26,6 +26,8 @@ import { ProductDocRadioReader } from "../../draft/blocks/radio/ProductDocRadio"
 import { productDocRadioName, readRadioOptions } from "../../draft/blocks/radio/radioOptions";
 import { ProductDocCodeSnippet } from "../../draft/blocks/snippet/ProductDocCodeSnippet";
 import { ProductDocCollapseReader } from "../../draft/blocks/collapse/ProductDocCollapse";
+import { ProductDocChart } from "../../draft/blocks/structured/chart/ProductDocChart";
+import { isProductDocChartLanguage } from "../../draft/blocks/structured/chart/model/product-doc-chart";
 import { ProductDocStructuredBlockReader } from "../../draft/blocks/structured/reader/ProductDocStructuredBlockReader";
 import { markProductDocCollapse, productDocCollapseName, structuredBlockKind } from "../../../domain/structured/structuredMarkdown";
 import { ProductDocCallout, isProductDocCalloutTone } from "../../draft/blocks/callout/surface/ProductDocCallout";
@@ -131,6 +133,7 @@ const markdownComponents: Components = {
     const language = Array.isArray(classes) ? classes.find((value) => String(value).startsWith("language-")) : "";
     const code = block.children.map((child) => child.type === "text" ? child.value : "").join("").replace(/\n$/, "");
     const languageName = String(language ?? "").slice(9);
+    if (isProductDocChartLanguage(languageName)) return <ProductDocChart source={code} />;
     const kind = structuredBlockKind(languageName);
     if (kind) return <ProductDocStructuredBlockReader kind={kind} source={code} />;
     const meta = block.data?.meta;

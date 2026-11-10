@@ -78,7 +78,6 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
     });
     return () => cancelAnimationFrame(frame);
   }, [editorOpen]);
-
   function beginHeaderEdit(section: "title") {
     if (archived || uploadLocked) return;
     headerReturnFocus.current = section;
@@ -87,12 +86,10 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
   }
   const requestEdit = () => { if (!archived) props.onEdit(); };
   const runCase = () => { if (!archived) props.onRunCase(); };
-
   function cancelEditor() {
     if (props.editor?.submitting) return;
     closeWithMotion(() => { setHeaderEditing(null); props.editor?.onCancel(); });
   }
-
   if (!props.testCase && !creating) return <div ref={panelRef} tabIndex={-1} className={styles.detailPanelInner}><div className={styles.detailEmpty}><ListChecks size={28} /><strong>{ru ? "Выберите тест-кейс" : "Select a test case"}</strong><span>{ru ? "Здесь появятся свойства, шаги и история." : "Properties, steps, and history will appear here."}</span><button className={styles.primaryButton} onClick={() => props.onNew(props.selectedFolder)}>{ru ? "Создать кейс" : "Create case"}</button></div></div>;
   if (!revision) return null;
   const editingTitle = !archived && Boolean(props.editor && !documentationRetry && headerEditing === "title");
@@ -118,7 +115,21 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
   const editorActions = props.editor && <div id="case-editor-actions" tabIndex={-1} className={creating ? `${inspector.createActions} ${inspector.creationFooter}` : inspector.headerEditActions}>
     {creating ? <>{editorFeedback}{cancel}{save}</> : <>{save}{cancel}</>}
   </div>;
-
+  const headerActions = <CaseDetailHeaderActions
+    locale={props.locale} testCase={props.testCase} creating={creating} editorOpen={editorOpen}
+    readOnly={props.readOnly} fullscreen={props.fullscreen}
+    leadingAction={props.compactHeader?.repositoryAction}
+    onRunCase={runCase}
+    onToggleFullscreen={props.onToggleFullscreen}
+    onClone={props.onClone}
+    onCreateDefect={props.onCreateDefect}
+    onArchive={props.onArchive}
+    onClose={props.onClose ? () => { if (!props.editor?.submitting) closeWithMotion(() => props.onClose?.()); } : undefined}
+  >{!creating && editorActions}</CaseDetailHeaderActions>;
+  const location = props.location && <div className={inspector.caseLocation}>{props.location}</div>;
+  const retest = readyDefects > 0 && <div className={inspector.metaRow}>
+    <span className={inspector.retestBadge} role="status">{localizedLabel(props.locale, "ready_for_retest")} · {readyDefects}</span>
+  </div>;
   return <div
     ref={panelRef}
     data-case-inspector-overlay-root
@@ -131,25 +142,9 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
       cancelEditor();
     }}
   >
-    <header className={`${inspector.caseHeader} ${creating ? inspector.creationHeader : ""}`}>
-      <CaseDetailHeaderActions
-        locale={props.locale}
-        testCase={props.testCase}
-        creating={creating}
-        editorOpen={editorOpen}
-        readOnly={props.readOnly}
-        fullscreen={props.fullscreen}
-        onRunCase={runCase}
-        onToggleFullscreen={props.onToggleFullscreen}
-        onClone={props.onClone}
-        onCreateDefect={props.onCreateDefect}
-        onArchive={props.onArchive}
-        onClose={props.onClose ? () => { if (!props.editor?.submitting) closeWithMotion(() => props.onClose?.()); } : undefined}
-      >{!creating && editorActions}</CaseDetailHeaderActions>
-      {props.location && <div className={inspector.caseLocation}>{props.location}</div>}
-      {readyDefects > 0 && <div className={inspector.metaRow}>
-        <span className={inspector.retestBadge} role="status">{localizedLabel(props.locale, "ready_for_retest")} · {readyDefects}</span>
-      </div>}
+    <header className={`${inspector.caseHeader} ${creating ? inspector.creationHeader : ""}`}
+      data-compact={props.compactHeader ? "true" : undefined}>
+      {!props.compactHeader && <>{headerActions}{location}{retest}</>}
       <div className={inspector.titleRow}>
         {creating ? <input disabled={uploadLocked} autoFocus data-case-title-input aria-invalid={attempted && problem === "title"}
           aria-label={titleLabel} className={inspector.titleInput} value={revision.title}
@@ -163,7 +158,9 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
         {!props.readOnly && !creating && <button ref={titleEditButton} type="button" disabled={archived || uploadLocked || editingTitle}
           className={`${inspector.iconButton} ${inspector.titleEditButton}`} data-hidden={editingTitle} aria-hidden={editingTitle || undefined} onClick={() => beginHeaderEdit("title")}
           aria-label={ru ? "Изменить название" : "Edit title"}><Pencil size={14} /></button>}
+        {props.compactHeader && headerActions}
       </div>
+      {props.compactHeader && <>{location}{retest}</>}
       {!creating && props.editor && ((attempted && problemMessage) || ((props.editor.attachmentsPending || documentationRetry) && !props.editor.submitting)) &&
         <div className={inspector.headerFeedback}>{editorFeedback}</div>}
       {!creating && <CaseDetailTabs locale={props.locale} active={activeTab} tabsId={tabsId} creating={creating}

@@ -35,6 +35,10 @@
 .titleCopy { position: relative; min-width: 0; }
 .titleRow h2, .inlineTitleInput { margin: 0; color: var(--falcon-text); font: inherit; font-size: var(--case-title-size); font-weight: 650; line-height: 1.25; letter-spacing: -.025em; overflow-wrap: anywhere; white-space: pre-wrap; }
 .titleKey { display: inline-block; margin-inline-start: 8px; color: var(--falcon-text-muted); font-size: .74em; font-weight: 450; letter-spacing: 0; white-space: nowrap; transition: opacity 160ms ease; }
+.caseHeader[data-compact] .titleRow { min-height: auto; gap: 12px; padding: 16px 16px 4px 24px; }
+.caseHeader[data-compact] .utilityRow { min-height: 0; padding: 0; }
+.caseHeader[data-compact] .headerActions { gap: 2px; }
+.caseHeader[data-compact] .caseLocation { min-inline-size: 0; padding-block-end: 6px; }
 .titleCopy[data-editing="true"] .titleText { visibility: hidden; }
 .titleEditButton[data-hidden="true"] { opacity: 0; pointer-events: none; }
 .titleCopy[data-editing="true"] .titleKey { opacity: 0; }

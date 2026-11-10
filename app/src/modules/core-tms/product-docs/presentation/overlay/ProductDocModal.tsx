@@ -5,7 +5,7 @@ import { X } from "lucide-react";
 import { useRef, type ReactNode } from "react";
 import styles from "./product-doc-overlay.module.css";
 
-export function ProductDocModal({ title, subtitle, closeLabel, onClose, busy, children, className, bodyClassName, isOpen = true }: {
+export function ProductDocModal({ title, subtitle, closeLabel, onClose, busy, children, className, bodyClassName, wrapperClassName, hideHeader = false, isOpen = true }: {
   title: string;
   subtitle?: string;
   closeLabel: string;
@@ -15,6 +15,8 @@ export function ProductDocModal({ title, subtitle, closeLabel, onClose, busy, ch
   children: ReactNode | ((dismiss: () => void) => ReactNode);
   className?: string;
   bodyClassName?: string;
+  wrapperClassName?: string;
+  hideHeader?: boolean;
 }) {
   const dialog = useRef<HTMLElement>(null);
   const exit = useRef<Animation | null>(null);
@@ -39,12 +41,12 @@ export function ProductDocModal({ title, subtitle, closeLabel, onClose, busy, ch
 
   return <Modal ref={dialog} isOpen={isOpen} onClose={dismiss} isDismissable={!busy} isKeyboardDismissDisabled={busy}
     hideCloseButton disableAnimation backdrop="transparent"
-    classNames={{ wrapper: styles.wrapper, base: `${styles.dialog} ${className ?? ""}` }}>
+    classNames={{ wrapper: `${styles.wrapper} ${wrapperClassName ?? ""}`, base: `${styles.dialog} ${className ?? ""}` }}>
     <ModalContent>
-      <ModalHeader className={styles.header}>
+      <ModalHeader className={hideHeader ? "sr-only" : styles.header}>
         <div><h2>{title}</h2>{subtitle && <p>{subtitle}</p>}</div>
-        <Button size="sm" radius="full" isIconOnly variant="light" isDisabled={busy} className={styles.close}
-          aria-label={closeLabel} onPress={dismiss}><X size={17} aria-hidden="true" /></Button>
+        {!hideHeader && <Button size="sm" radius="full" isIconOnly variant="light" isDisabled={busy} className={styles.close}
+          aria-label={closeLabel} onPress={dismiss}><X size={17} aria-hidden="true" /></Button>}
       </ModalHeader>
       <ModalBody className={`${styles.body} ${bodyClassName ?? ""}`}>{typeof children === "function" ? children(dismiss) : children}</ModalBody>
     </ModalContent>

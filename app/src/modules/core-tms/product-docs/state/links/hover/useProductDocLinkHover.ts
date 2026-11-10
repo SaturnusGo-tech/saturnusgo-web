@@ -3,32 +3,46 @@ import { useCallback, useEffect, useRef, useState } from "react";
 export function useProductDocLinkHover() {
   const [anchor, setAnchor] = useState<HTMLAnchorElement | null>(null);
   const trigger = useRef<HTMLAnchorElement | null>(null);
-  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const retain = useCallback(() => clearTimeout(timer.current), []);
+  const pending = useRef<{ element: HTMLAnchorElement; timer: ReturnType<typeof setTimeout> } | null>(null);
+  const closing = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const retain = useCallback(() => clearTimeout(closing.current), []);
+  const cancelOpening = useCallback(() => {
+    clearTimeout(pending.current?.timer);
+    pending.current = null;
+  }, []);
   const close = useCallback(() => {
     retain();
+    cancelOpening();
     trigger.current = null;
     setAnchor(null);
-  }, [retain]);
+  }, [cancelOpening, retain]);
   const show = useCallback((element: HTMLAnchorElement, delay = 170) => {
-    retain();
-    if (trigger.current === element) return;
+    cancelOpening();
+    if (trigger.current === element) {
+      retain();
+      return;
+    }
     function open() {
+      pending.current = null;
       if (!element.isConnected) return;
+      retain();
       trigger.current = element;
       setAnchor(element);
     }
-    if (delay) timer.current = setTimeout(open, delay);
+    if (delay) pending.current = { element, timer: setTimeout(open, delay) };
     else open();
-  }, [retain]);
+  }, [cancelOpening, retain]);
   const hide = useCallback((element: HTMLAnchorElement | null = trigger.current) => {
+    if (pending.current?.element === element) cancelOpening();
+    if (!element || trigger.current !== element) return;
     retain();
-    timer.current = setTimeout(() => {
-      if (element?.matches(":focus-visible")) return;
-      close();
+    closing.current = setTimeout(() => {
+      if (trigger.current !== element || element.matches(":focus-visible")) return;
+      trigger.current = null;
+      setAnchor(null);
     }, 110);
-  }, [close, retain]);
-  useEffect(() => retain, [retain]);
+  }, [cancelOpening, retain]);
+  useEffect(() => () => { retain(); cancelOpening(); }, [cancelOpening, retain]);
   useEffect(() => {
     if (!anchor) return;
     function dismiss(event: KeyboardEvent) {

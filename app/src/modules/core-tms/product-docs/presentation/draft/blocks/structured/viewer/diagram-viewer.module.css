@@ -1,12 +1,14 @@
 .viewer {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  border-radius: 12px;
+  background: var(--falcon-panel);
   min-inline-size: 0;
   min-block-size: 0;
   color: var(--falcon-text-secondary);
 }
-.viewer[data-expanded] { flex: 1; }
+.viewer[data-expanded] { flex: 1; border-radius: 0; }
 .viewport {
   min-inline-size: 0;
   min-block-size: 0;
@@ -28,12 +30,23 @@
   box-sizing: border-box;
   inline-size: max-content;
   min-inline-size: 100%;
-  padding: 12px;
+  padding: 40px 12px;
 }
 .viewer[data-expanded] .stage { min-block-size: 100%; align-items: center; }
 .stage img.graphic { display: block; flex: none; max-inline-size: none; max-width: none; max-height: none; margin: 0; }
 :global(.dark) .graphic { filter: invert(.91); }
-.toolbar { display: flex; flex: none; align-items: center; justify-content: flex-end; gap: 2px; }
+.toolbar {
+  position: absolute;
+  z-index: 1;
+  inset: auto 12px 12px auto;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--falcon-border);
+  border-radius: 8px;
+  background: var(--falcon-elevated);
+}
 .scale { min-inline-size: 38px; text-align: center; font-size: 11px; font-variant-numeric: tabular-nums; }
 .toolbar .button {
   display: grid;

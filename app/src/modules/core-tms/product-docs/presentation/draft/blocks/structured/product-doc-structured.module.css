@@ -156,14 +156,38 @@
   white-space: pre-wrap;
 }
 .readSource { padding-inline-end: 56px; }
-.expanded.expanded { width: 100%; height: calc(100dvh - 32px); }
+.surface[data-kind="diagram"][data-diagram-canvas] { padding: 0; border: 0; background: transparent; }
+.fullscreenWrapper.fullscreenWrapper { padding: 0; }
+.expanded.expanded {
+  width: 100dvw;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--falcon-panel);
+}
+.expanded .expandedClose {
+  position: absolute;
+  z-index: 6;
+  inset-block-start: 12px;
+  inset-inline-end: 12px;
+  inline-size: 32px;
+  block-size: 32px;
+  min-inline-size: 0;
+  padding: 0;
+  border: 1px solid var(--falcon-border);
+  border-radius: 8px;
+  background: var(--falcon-elevated);
+  color: var(--falcon-text);
+}
 .expandedFormula.expandedFormula { width: max-content; min-width: min(440px, 100%); max-width: 100%; }
 .expandedBody { min-height: 0; padding: 0 16px 14px; }
 .expanded .expandedContent { display: flex; flex: 1; min-block-size: 0; overflow: hidden; }
-.expanded .expandedBody { display: flex; flex: 1; flex-direction: column; min-inline-size: 0; }
+.expanded .expandedBody { display: flex; flex: 1; flex-direction: column; min-inline-size: 0; padding: 0; }
 .expandedPreview { position: relative; display: flex; flex: 1; flex-direction: column; min-inline-size: 0; min-block-size: 56px; }
 .expanded .invalid { overflow: auto; }
-:global(html:not(.dark)) .expandedBody > :not(pre) {
+:global(html:not(.dark)) .expandedBody:not(.expanded .expandedBody) > :not(pre) {
   padding: 8px;
   border: 1px solid var(--falcon-border-strong);
   border-radius: 7px;

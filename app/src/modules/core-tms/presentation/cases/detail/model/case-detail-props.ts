@@ -18,6 +18,7 @@ export type CaseDetailPanelProps = {
   onResolveSharedStep: (id: string) => Promise<SharedStep | null>;
   selectedFolder: string;
   location?: ReactNode;
+  compactHeader?: { repositoryAction: ReactNode };
   editor?: CaseInspectorEditor;
   tagSuggestions?: readonly string[];
   canAttach?: boolean;

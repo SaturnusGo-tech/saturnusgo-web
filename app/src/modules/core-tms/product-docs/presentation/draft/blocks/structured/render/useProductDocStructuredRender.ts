@@ -3,11 +3,14 @@
 import { useEffect, useId, useState } from "react";
 import { canRenderDiagram, maximumFormulaSource } from "../../../../../domain/structured/structuredMarkdown";
 import type { DiagramImage } from "../viewer/ProductDocDiagramViewer";
+import type { FlowchartLayout } from "../flow/layout/flowchart-layout";
+import { readMermaidFlowchart } from "../flow/mermaid/read-mermaid-flowchart";
 
 type Kind = "diagram" | "math";
-type Rendered = { diagram: DiagramImage } | { formula: string } | { invalid: true };
+type Rendered = { diagram: DiagramImage } | { flowchart: FlowchartLayout } | { formula: string } | { invalid: true };
 
 let mermaidModule: Promise<typeof import("mermaid").default> | undefined;
+let mermaidWork = Promise.resolve();
 let katexModule: Promise<typeof import("katex").default> | undefined;
 
 function loadMermaid() {
@@ -21,6 +24,13 @@ function loadMermaid() {
     mermaidModule = undefined;
     throw error;
   });
+}
+
+function queueMermaid<Result>(work: () => Promise<Result>) {
+  // Mermaid shares parser state across its diagram API and fallback renderer.
+  const result = mermaidWork.then(work);
+  mermaidWork = result.then(() => {}, () => {});
+  return result;
 }
 
 function loadKatex() {
@@ -80,7 +90,18 @@ export function useProductDocStructuredRender(kind: Kind, source: string, visibl
         if (!canRenderDiagram(source)) throw new Error("Invalid Mermaid source");
         const mermaid = await loadMermaid();
         if (disposed) return;
-        const { svg } = await mermaid.render("falcon-diagram-" + id, source);
+        const flowchart = await queueMermaid(() => readMermaidFlowchart(mermaid, source)).catch(() => undefined);
+        if (disposed) return;
+        if (flowchart) {
+          const layout = await import("../flow/layout/flowchart-layout")
+            .then(({ layoutFlowchart }) => layoutFlowchart(flowchart)).catch(() => undefined);
+          if (disposed) return;
+          if (layout) {
+            show({ flowchart: layout });
+            return;
+          }
+        }
+        const { svg } = await queueMermaid(() => mermaid.render("falcon-diagram-" + id, source));
         if (disposed) return;
         image = diagramImage(svg);
         show({ diagram: image });

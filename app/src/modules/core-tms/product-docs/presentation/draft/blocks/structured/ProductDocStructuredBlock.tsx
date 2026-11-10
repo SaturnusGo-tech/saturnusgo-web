@@ -57,10 +57,10 @@ export function ProductDocStructuredBlock({ language, code, nodeKey, focusEmitte
   const mayGenerate = diagram && !readOnly && !isSource && Boolean(code.trim() && generateDiagram && scope);
   const activity = useStructuredBlockActivity(pending, generating || preview || (mayGenerate && !showSource));
   const surface = useStructuredBlockFootprint(!activity.reveal);
-  // Keep the generating prompt and its button until the saved source has a preview to reveal.
-  const keepPrompt = preview && generationSource !== null;
+  const keepPrompt = preview && generationSource !== null; // Keep the prompt until the saved source can be shown.
   const showPreview = preview && activity.reveal && !keepPrompt;
-  const title = diagram ? (ru ? "Диаграмма Mermaid" : "Mermaid diagram") : (ru ? "Формула LaTeX" : "LaTeX formula");
+  const hasDiagram = diagram && showPreview && rendered && !("invalid" in rendered);
+  const title = diagram ? (ru ? "Диаграмма" : "Diagram") : (ru ? "Формула LaTeX" : "LaTeX formula");
   const placeholder = diagram ? (ru ? "Опишите диаграмму…" : "Describe your diagram…")
     : (ru ? "Введите LaTeX, чтобы вставить формулу" : "Type LaTeX to insert a formula");
   const copyLabel = ru ? "Копировать исходник" : "Copy source";
@@ -173,7 +173,7 @@ export function ProductDocStructuredBlock({ language, code, nodeKey, focusEmitte
       requestAnimationFrame(() => { input.current?.focus(); input.current?.select(); });
     }} />}
     <div ref={surface} tabIndex={-1} className={styles.surface} data-kind={kind}
-      data-preview={preview && !keepPrompt || undefined}>
+      data-preview={preview && !keepPrompt || undefined} data-diagram-canvas={hasDiagram || undefined}>
       {toolbar}
       {showPreview && <div className={styles.previewReveal}>
         <ProductDocStructuredPreview kind={kind} source={code} result={rendered} />

@@ -17,7 +17,7 @@ export function ProductDocStructuredBlockReader({ kind, source }: { kind: "diagr
   const ru = locale === "ru";
   const [expanded, setExpanded] = useState(false);
   const [showSource, setShowSource] = useState(false);
-  const label = kind === "diagram" ? (ru ? "Диаграмма Mermaid" : "Mermaid diagram") : (ru ? "Формула LaTeX" : "LaTeX formula");
+  const label = kind === "diagram" ? (ru ? "Диаграмма" : "Diagram") : (ru ? "Формула LaTeX" : "LaTeX formula");
   const rendered = useProductDocStructuredRender(kind, source, true);
   const preview = !showSource && Boolean(source.trim());
   const activity = useStructuredBlockActivity(preview && !rendered, preview);
@@ -25,7 +25,8 @@ export function ProductDocStructuredBlockReader({ kind, source }: { kind: "diagr
   const ViewIcon = !showSource ? Braces : kind === "diagram" ? Workflow : SquareFunction;
   const viewLabel = showSource ? (ru ? "Предпросмотр" : "Preview") : (ru ? "Показать исходник" : "Show source");
   if (!source.trim()) return null;
-  return <div ref={surface} className={styles.surface} data-kind={kind} data-preview data-structured-block={kind}>
+  return <div ref={surface} className={styles.surface} data-kind={kind} data-preview data-structured-block={kind}
+    data-diagram-canvas={kind === "diagram" && preview && rendered && !("invalid" in rendered) || undefined}>
     <StructuredBlockActions phase={activity.phase} label={ru ? "Готовим предпросмотр" : "Preparing preview"}>
       <StructuredAction label={viewLabel} pressed={!showSource} inactive={Boolean(activity.phase)} onPress={() => setShowSource(!showSource)}>
         <ViewIcon size={14} aria-hidden="true" />

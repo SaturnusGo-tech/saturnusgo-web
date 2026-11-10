@@ -15,6 +15,8 @@ import { RunEvidencePickerProvider, productDocRunDescriptor } from "../run/edito
 import { productDocRadio } from "./blocks/radio/ProductDocRadio";
 import { ProductDocCodeEditor } from "./blocks/ProductDocCodeEditor";
 import { ProductDocStructuredBlock } from "./blocks/structured/ProductDocStructuredBlock";
+import { ProductDocChartEditor } from "./blocks/structured/chart/ProductDocChartEditor";
+import { isProductDocChartLanguage } from "./blocks/structured/chart/model/product-doc-chart";
 import { productDocCollapseDescriptor, productDocCollapsePlugin } from "./blocks/collapse/ProductDocCollapse";
 import { structuredBlockKind } from "../../domain/structured/structuredMarkdown";
 import blockStyles from "./blocks/productDocBlocks.module.css";
@@ -94,6 +96,7 @@ export default function RichProductSection({
     productDocImageInputPlugin({ onMediaBusy }),
     thematicBreakPlugin(),
     codeBlockPlugin({ codeBlockEditorDescriptors: [
+      { priority: 10, match: isProductDocChartLanguage, Editor: ProductDocChartEditor },
       { priority: 10, match: (language) => Boolean(structuredBlockKind(language)), Editor: ProductDocStructuredBlock },
       { priority: 0, match: () => true, Editor: ProductDocCodeEditor },
     ] }),

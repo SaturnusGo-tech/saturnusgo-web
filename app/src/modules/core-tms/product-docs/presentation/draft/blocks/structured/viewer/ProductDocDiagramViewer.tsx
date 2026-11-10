@@ -33,7 +33,7 @@ export function ProductDocDiagramViewer({ image, label, ru, expanded }: {
   const heightRatio = expanded && size.height ? (size.height - padding) / image.height : 1;
   const fitScale = Math.min(1, widthRatio, heightRatio);
   const displayScale = clamp(
-    zoom === "fit" ? fitScale : zoom ?? Math.max(0.75, fitScale),
+    zoom === "fit" ? fitScale : zoom ?? (expanded ? fitScale : Math.max(0.75, fitScale)),
     minZoom, maxZoom,
   );
 

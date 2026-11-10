@@ -9,8 +9,10 @@ export function useProductDocLinkPreview(href: string | undefined) {
   const workspace = useProductDocsWorkspace();
   const client = useOptionalTmsHttpClient();
   const scope = workspace?.scope;
-  const target = useMemo(() => href && scope && typeof window !== "undefined"
-    ? readProductDocSmartTarget(href, window.location.href, scope) : null, [href, scope]);
+  const [currentUrl, setCurrentUrl] = useState<string>();
+  useEffect(() => setCurrentUrl(window.location.href), [href, scope]);
+  const target = useMemo(() => href && scope && currentUrl
+    ? readProductDocSmartTarget(href, currentUrl, scope) : null, [href, scope, currentUrl]);
   const [loaded, setLoaded] = useState<{ target: typeof target; value: ProductDocLinkPreview | null }>();
   useEffect(() => {
     if (!client || !scope || !target) return;
@@ -31,5 +33,6 @@ export function useProductDocLinkPreview(href: string | undefined) {
       workspace.openDocument({ docId: target.id, sectionId: target.sectionId, version: target.version }, event.currentTarget);
     }
   }
-  return { target, preview: loaded?.target === target ? loaded?.value : undefined, workspace, follow };
+  const previewPending = Boolean(client && scope && target && loaded?.target !== target);
+  return { target, preview: loaded?.target === target ? loaded?.value : undefined, previewPending, workspace, follow };
 }

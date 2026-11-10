@@ -1,6 +1,6 @@
 "use client";
 
-import { Drawer, DrawerContent } from "@heroui/react";
+import { Button, Drawer, DrawerContent } from "@heroui/react";
 import { AnimatePresence, motion, useIsPresent, useReducedMotion } from "framer-motion";
 import { ArrowUpRight, X } from "lucide-react";
 import { useLayoutEffect, useRef, useState, type CSSProperties, type RefObject } from "react";
@@ -8,6 +8,7 @@ import { useGuidePanelWidth } from "../../../../documentation/panel/resize/useGu
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import { CaseLocationBreadcrumbs } from "../../../../presentation/cases/detail/location/CaseLocationBreadcrumbs";
 import { CaseDetailPanel } from "../../../../presentation/cases/detail/CaseDetailPanel";
+import inspector from "../../../../presentation/cases/inspector/caseInspector.module.css";
 import { AppOverlay } from "../../../../presentation/common/overlay/AppOverlay";
 import { useSharedSteps } from "../../../../shared-steps/state/useSharedSteps";
 import { useCaseCollaboration } from "../../../../state/case-collaboration/useCaseCollaboration";
@@ -144,26 +145,28 @@ function CasePreview({ caseId, scope, projectName, onClose, onOpenDefect, activi
   repository?.searchParams.set("view", "cases");
   if (record?.data.folderId) repository?.searchParams.set("folderId", record.data.folderId);
 
+  const repositoryAction = repository && <Button as="a" isIconOnly variant="light" disableRipple
+    className={inspector.iconButton} href={repository.href} aria-label={ru ? "Открыть в репозитории" : "Open in repository"}
+    onClick={(event) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      visitWorkspace(repository.href);
+    }}><ArrowUpRight size={15} aria-hidden="true" /></Button>;
+
   return <>
-    <header className={caseStyles.header}>
-      {record
-        ? <CaseLocationBreadcrumbs ru={ru} projectName={projectName} path={record.data.folderPath} title={record.data.current.title} />
-        : <span className={caseStyles.placeholder}>{projectName || title}</span>}
-      {repository && <a className={styles.iconButton} href={repository.href} aria-label={ru ? "Открыть в репозитории" : "Open in repository"}
-        title={ru ? "Открыть в репозитории" : "Open in repository"} onClick={(event) => {
-          if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-          event.preventDefault();
-          visitWorkspace(repository.href);
-        }}><ArrowUpRight size={16} aria-hidden="true" /></a>}
-      {!record && <button className={styles.iconButton} type="button" aria-label={copy.close} onClick={onClose}>
+    {!record && <header className={caseStyles.header}>
+      <span className={caseStyles.placeholder}>{projectName || title}</span>
+      <button className={styles.iconButton} type="button" aria-label={copy.close} onClick={onClose}>
         <X size={17} aria-hidden="true" />
-      </button>}
-    </header>
+      </button>
+    </header>}
     <div className={caseStyles.body}>
       {record ? <CaseDetailPanel locale={locale} languageTag={languageTag} testCase={{ ...record.data, etag: record.etag ?? "" }}
         revision={record.data.current} linkIds={record.data.linkIds} activity={activity} collaboration={collaboration}
         onOpenDefect={onOpenDefect ?? (() => {})} sharedSteps={sharedSteps.items} onResolveSharedStep={sharedSteps.resolve}
         selectedFolder={record.data.folderPath} readOnly canAttach={false} onNew={() => {}} onEdit={() => {}} onClone={() => {}}
+        location={<CaseLocationBreadcrumbs ru={ru} projectName={projectName} path={record.data.folderPath} />}
+        compactHeader={{ repositoryAction }}
         onArchive={() => {}} onRunCase={() => {}} fullscreen={expanded} onToggleFullscreen={onExpand}
         onClose={onClose} />
         : <ReadState copy={copy} status={resource.status === "ready" ? "error" : resource.status} retry={resource.retry} />}

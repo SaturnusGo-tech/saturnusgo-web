@@ -10,7 +10,7 @@ import styles from "./smart-link.module.css";
 
 export function ProductDocSmartLink({ href, title, children }: { href?: string; title?: string; children?: ReactNode }) {
   const { locale } = useTmsLocale();
-  const { target, preview, workspace, follow } = useProductDocLinkPreview(href);
+  const { target, preview, previewPending, workspace, follow } = useProductDocLinkPreview(href);
   const hover = useProductDocLinkHover();
   const previewId = useId();
   if (!href) return <a>{children}</a>;
@@ -33,8 +33,8 @@ export function ProductDocSmartLink({ href, title, children }: { href?: string; 
       }}>
       <Icon size={14} data-link-status={preview?.status} aria-hidden="true" /><span>{label}</span>
     </a>
-    {hover.anchor && <ProductDocLinkHoverCard trigger={hover.trigger} id={previewId} href={href} authoredText={authoredText} hint={title}
-      target={target} preview={preview} workspaceId={workspace?.scope.workspaceId}
+    {hover.anchor && <ProductDocLinkHoverCard anchor={hover.anchor} trigger={hover.trigger} id={previewId} href={href} authoredText={authoredText} hint={title}
+      target={target} preview={preview} previewPending={previewPending} workspaceId={workspace?.scope.workspaceId}
       onPointerEnter={hover.retain} onPointerLeave={() => hover.hide()} onClose={hover.close} />}
   </>;
 }

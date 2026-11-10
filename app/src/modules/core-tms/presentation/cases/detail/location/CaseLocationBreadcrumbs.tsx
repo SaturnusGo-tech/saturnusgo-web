@@ -4,7 +4,7 @@ export function CaseLocationBreadcrumbs({ ru, projectName, path, title, onFolder
   ru: boolean;
   projectName?: string;
   path: string;
-  title: string;
+  title?: string;
   onFolder?: (path: string) => void;
 }) {
   const folders = path.split("/").filter(Boolean);
@@ -14,7 +14,7 @@ export function CaseLocationBreadcrumbs({ ru, projectName, path, title, onFolder
       const folder = "/" + folders.slice(0, index + 1).join("/");
       return { id: folder, label, onPress: onFolder && (() => onFolder(folder)) };
     }),
-    { id: "case", label: title },
+    ...(title ? [{ id: "case", label: title }] : []),
   ];
   return <WorkspaceBreadcrumbs label={ru ? "Путь тест-кейса" : "Test case path"} items={items} />;
 }

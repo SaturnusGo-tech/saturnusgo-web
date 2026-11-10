@@ -1,0 +1,214 @@
+.canvas {
+  --flow-paper: #f3f6f8;
+  --flow-grid: #bec7cf;
+  --flow-card: #fff;
+  --flow-ink: #18212a;
+  --flow-muted: #52606d;
+  --flow-line: #dce4ea;
+  --flow-shadow: 0 2px 6px rgb(26 39 52 / 8%), 0 1px 2px rgb(26 39 52 / 5%);
+  --flow-neutral: #657785;
+  --flow-blue: #2965b1;
+  --flow-teal: #127773;
+  --flow-green: #237948;
+  --flow-amber: #946308;
+  --flow-red: #ae4247;
+  --flow-violet: #6b50ae;
+  position: relative;
+  min-inline-size: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--flow-paper);
+  color: var(--flow-ink);
+  isolation: isolate;
+}
+:global(.dark) .canvas {
+  --flow-paper: #161616;
+  --flow-grid: #383838;
+  --flow-card: #232323;
+  --flow-ink: #f1f1f1;
+  --flow-muted: #b7b7b7;
+  --flow-line: #383838;
+  --flow-shadow: 0 2px 8px rgb(0 0 0 / 27%);
+  --flow-neutral: #a0abb7;
+  --flow-blue: #84b1f3;
+  --flow-teal: #66c8be;
+  --flow-green: #7ac997;
+  --flow-amber: #e2bc6b;
+  --flow-red: #f09699;
+  --flow-violet: #b7a0ef;
+}
+.canvas[data-expanded] { flex: 1; min-block-size: 0; border-radius: 0; }
+.canvas :global(.react-flow__pane) { cursor: grab; }
+.canvas :global(.react-flow__pane.dragging) { cursor: grabbing; }
+.canvas :global(.react-flow__node) { cursor: inherit; }
+.canvas :global(.react-flow__node):focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 3px; border-radius: 14px; }
+
+.canvas [data-tone="blue"], .blue { --flow-accent: var(--flow-blue); }
+.canvas [data-tone="teal"], .teal { --flow-accent: var(--flow-teal); }
+.canvas [data-tone="green"], .green { --flow-accent: var(--flow-green); }
+.canvas [data-tone="amber"], .amber { --flow-accent: var(--flow-amber); }
+.canvas [data-tone="red"], .red { --flow-accent: var(--flow-red); }
+.canvas [data-tone="violet"], .violet { --flow-accent: var(--flow-violet); }
+.canvas [data-tone="neutral"], .neutral { --flow-accent: var(--flow-neutral); }
+
+.card {
+  box-sizing: border-box;
+  inline-size: 100%;
+  block-size: 100%;
+  padding: 11px 12px;
+  border: 1px solid var(--flow-line);
+  border-radius: 14px;
+  background: var(--flow-card);
+  box-shadow: var(--flow-shadow);
+  color: var(--flow-ink);
+  font-family: system-ui, sans-serif;
+  cursor: grab;
+}
+.cardHeader { display: flex; align-items: flex-start; gap: 10px; }
+.cardIcon {
+  flex: none;
+  margin-block-start: 3px;
+  color: var(--flow-muted);
+}
+.cardText { flex: 1; min-inline-size: 0; overflow-wrap: anywhere; }
+.cardTitle { display: block; font-size: 14px; font-weight: 650; line-height: 18px; }
+.cardDetail { display: block; margin-block-start: 4px; color: var(--flow-muted); font-size: 12px; font-weight: 400; line-height: 16px; }
+.canvas .handle { inline-size: 1px; block-size: 1px; min-inline-size: 0; min-block-size: 0; opacity: 0; }
+.group {
+  box-sizing: border-box;
+  inline-size: 100%;
+  block-size: 100%;
+  padding: 10px 13px;
+  border: 1px solid var(--flow-line);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--flow-card) 68%, transparent);
+  color: var(--flow-muted);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 16px;
+}
+.canvas .edge { stroke: var(--flow-accent); stroke-width: 2; stroke-dasharray: 2 5; stroke-linecap: round; }
+.edgeLabel {
+  position: absolute;
+  max-inline-size: 160px;
+  padding: 2px 7px;
+  border: 1px solid color-mix(in srgb, var(--flow-accent) 30%, var(--flow-card));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--flow-accent) 11%, var(--flow-card));
+  color: var(--flow-accent);
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 16px;
+  text-align: center;
+  overflow-wrap: anywhere;
+  pointer-events: none;
+}
+.canvas .tools {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  margin: 10px;
+  padding: 2px;
+  border: 1px solid var(--flow-line);
+  border-radius: 8px;
+  background: var(--flow-card);
+  box-shadow: var(--flow-shadow);
+  color: var(--flow-ink);
+}
+.tools .tool { min-inline-size: 0; inline-size: 26px; block-size: 26px; border-radius: 5px; color: var(--flow-ink); }
+.tools .tool[aria-disabled="true"] { opacity: .4; }
+.scale { min-inline-size: 33px; color: var(--flow-muted); text-align: center; font-size: 11px; font-variant-numeric: tabular-nums; }
+
+.canvas[data-preset="procedure"] {
+  --flow-paper: #f8f9fa;
+  --flow-grid: #d4d9df;
+  --flow-shadow: 0 1px 2px rgb(26 39 52 / 5%);
+}
+:global(.dark) .canvas[data-preset="procedure"] {
+  --flow-paper: #181818;
+  --flow-grid: #3a3a3a;
+  --flow-shadow: 0 1px 3px rgb(0 0 0 / 16%);
+}
+.canvas[data-preset="procedure"] .card {
+  border-radius: 10px;
+}
+.canvas[data-preset="procedure"] .card[data-kind="terminal"] {
+  border-color: color-mix(in srgb, var(--flow-accent) 45%, var(--flow-line));
+}
+.canvas[data-preset="procedure"] .cardIcon {
+  margin-block-start: 0;
+  box-sizing: content-box;
+  inline-size: 14px;
+  block-size: 14px;
+  padding: 3px;
+  border-radius: 5px;
+  color: var(--flow-accent);
+  background: color-mix(in srgb, var(--flow-accent) 12%, transparent);
+}
+.canvas[data-preset="procedure"] .cardDetail {
+  margin-block-start: 5px;
+  padding-block-start: 5px;
+  border-block-start: 1px solid var(--flow-line);
+}
+.canvas[data-preset="procedure"] .edge {
+  stroke-width: 1.5;
+  stroke-dasharray: none;
+}
+.canvas[data-preset="procedure"] .edgeLabel { border-radius: 5px; }
+
+.canvas[data-preset="pipeline"] {
+  --flow-paper: #eff1f3;
+  --flow-grid: #c8ced4;
+  --flow-card: #fbfcfd;
+}
+:global(.dark) .canvas[data-preset="pipeline"] {
+  --flow-paper: #111;
+  --flow-grid: #292929;
+  --flow-card: #1c1c1c;
+  --flow-line: #343434;
+}
+.canvas[data-preset="pipeline"] .card {
+  padding-block: 10px;
+  border-radius: 7px;
+}
+.canvas[data-preset="pipeline"] .cardTitle { font-size: 13px; }
+.canvas[data-preset="pipeline"] .edge { stroke-width: 1.75; stroke-dasharray: none; }
+.canvas[data-preset="pipeline"] .edgeLabel {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--flow-paper);
+  font: 11px/16px ui-monospace, SFMono-Regular, monospace;
+}
+.canvas .ports {
+  fill: var(--flow-accent);
+  stroke: var(--flow-paper);
+  stroke-width: 1.1px;
+  pointer-events: none;
+}
+
+.canvas[data-preset="metrics"] .card {
+  border-radius: 8px;
+}
+.canvas[data-preset="metrics"] .cardIcon { color: var(--flow-accent); }
+.cardMetrics {
+  display: grid;
+  gap: 8px;
+  margin: 8px 0 0;
+  padding-block-start: 7px;
+  border-block-start: 1px solid var(--flow-line);
+}
+.cardMetrics > div { min-inline-size: 0; overflow-wrap: anywhere; }
+.cardMetrics dt { margin: 0; color: var(--flow-muted); font-size: 11px; line-height: 14px; }
+.cardMetrics dd {
+  margin: 2px 0 0;
+  color: var(--flow-ink);
+  font-size: 13px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  line-height: 17px;
+}
+.canvas[data-preset="metrics"] .edge { stroke-width: 2.2; stroke-dasharray: 1.25 4; }
+.canvas[data-preset="metrics"] .edgeLabel { border-radius: 5px; }
+
+.canvas :global(.react-flow__attribution) { inset: auto auto 0 0; background: transparent; }
+.canvas :global(.react-flow__attribution) a { color: var(--flow-muted); font-size: 9px; text-decoration: none; }

@@ -21,6 +21,7 @@ type Props = {
   editorOpen: boolean;
   readOnly?: boolean;
   children?: ReactNode;
+  leadingAction?: ReactNode;
   fullscreen: boolean;
   onRunCase: () => void;
   onToggleFullscreen: () => void;
@@ -128,6 +129,7 @@ export function CaseDetailHeaderActions(props: Props) {
       <span className={inspector.caseKey}>{ru ? "Новый тест-кейс" : "New test case"}</span>
     </div>}
     <div className={inspector.headerActions}>
+      {props.leadingAction}
       {!props.creating && (props.children || !props.readOnly) && <div className={inspector.headerPrimarySlot}>
         <div key={props.editorOpen ? "edit" : "run"} className={inspector.headerPrimaryContent}>
           {props.children ?? (!props.editorOpen && !props.readOnly &&
