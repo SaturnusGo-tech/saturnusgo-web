@@ -13,7 +13,7 @@ Object.defineProperty(globalThis, "window", {
   value: Object.assign(new EventTarget(), { location: { href: "https://company.test/work/?workspaceId=w&projectId=p&view=hooks" } }),
   configurable: true,
 });
-test("AI category and search expose a working Codex tile to managed users", () => {
+test("AI category exposes a working Codex tile without a catalog playbook link", () => {
   let opened = false;
   const view = create(<IntegrationCatalog russian={false} copy={hooksCopy(false)} configuration={null} status={null} statusFailed={false}
     onRefresh={() => {}} onOpenYouTrack={() => {}} onOpenCodex={() => { opened = true; }} codexStatus="available" showCodex
@@ -21,8 +21,7 @@ test("AI category and search expose a working Codex tile to managed users", () =
   act(() => view.root.findByProps({ "aria-label": "Catalog options" }).props.onClick());
   const ai = view.root.findAllByType("button").find(node => node.children.includes("AI"))!;
   act(() => ai.props.onClick());
-  assert.equal(view.root.findByType("a").props.href, "/work/?workspaceId=w&projectId=p&view=help&article=codex-prompts");
-  assert.deepEqual(view.root.findByType("a").children, ["Codex playbook"]);
+  assert.equal(view.root.findAllByType("a").some(node => String(node.props.href).includes("article=codex-prompts")), false);
   const codex = view.root.findAllByType("button").find(node => node.findAllByType("strong").some(strong => strong.children.includes("Codex")));
   assert.ok(codex);
   act(() => codex.props.onClick());

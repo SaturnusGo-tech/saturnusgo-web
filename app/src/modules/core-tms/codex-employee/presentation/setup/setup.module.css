@@ -1,4 +1,17 @@
-.detailActions a.playbook, .detailActions a.playbook:hover { border-radius: 999px; padding-inline: 14px; color: var(--plugin-on-action); }
+.detailActions a.playbook {
+  --yt-link: #fff;
+  border-radius: 999px;
+  padding-inline: 14px;
+  background: linear-gradient(115deg, #5c43bb, #9c367f);
+  color: #fff;
+}
+
+.detailActions a.playbook:hover {
+  --yt-link: #fff;
+  color: #fff;
+  opacity: 1;
+  filter: brightness(.92);
+}
 .description { margin: 30px 0 0; font-size: 15px; line-height: 25px; color: var(--plugin-text); }
 .connection { display: flex; align-items: center; gap: 16px; width: 100%; min-height: 84px; padding: 16px; background: transparent; border: 0; border-top: 1px solid var(--plugin-line); border-bottom: 1px solid var(--plugin-line); border-radius: 12px; color: var(--plugin-text); text-align: left; cursor: pointer; }
 .connection:hover { background: var(--plugin-panel); }
