@@ -27,7 +27,7 @@ Falcon exchanges information with the following services when an authorized user
 
 | Connected service | Information that may be exchanged |
 | --- | --- |
-| **JetBrains YouTrack, Atlassian Jira, Linear and Trello** | Defect titles and descriptions, identifiers, priorities, statuses, reproduction details, expected and actual results, and links to Falcon records, as needed to create or synchronize issues or cards. |
+| **JetBrains YouTrack, Atlassian Jira, Linear and Trello** | Defect titles and descriptions, identifiers, priorities, statuses, reproduction details, expected and actual results, and links to Falcon records, as needed to create or synchronize issues or cards. Evidence files may also be sent to YouTrack when evidence synchronization is enabled. |
 | **Slack and Telegram** | Slack can receive configured notifications about runs, defects or comments, including relevant text, results and links. Telegram can receive notifications you enable, including relevant titles, summaries and links. Falcon uses your linked chat identifier to deliver them. |
 | **Atlassian Confluence** | Published run reports, which may include run names and identifiers, environments, builds, results, descriptions and links to Falcon. |
 | **GitHub** | Falcon can receive configured repository and workflow events and request repository metadata and change information, such as commit identifiers and changed paths, to match runs to changes or perform impact analysis. |
@@ -107,7 +107,7 @@ Falcon обменивается данными с указанными ниже 
 
 | Подключённый сервис | Какие данные могут передаваться |
 | --- | --- |
-| **JetBrains YouTrack, Atlassian Jira, Linear и Trello** | Названия и описания дефектов, идентификаторы, приоритеты, статусы, шаги воспроизведения, ожидаемые и фактические результаты, ссылки на записи Falcon. Эти данные используются для создания и синхронизации задач или карточек. |
+| **JetBrains YouTrack, Atlassian Jira, Linear и Trello** | Названия и описания дефектов, идентификаторы, приоритеты, статусы, шаги воспроизведения, ожидаемые и фактические результаты, ссылки на записи Falcon. Эти данные используются для создания и синхронизации задач или карточек. Если включена синхронизация материалов проверки, в YouTrack также могут передаваться файлы с этими материалами. |
 | **Slack и Telegram** | Slack может получать настроенные уведомления о прогонах, дефектах или комментариях, включая соответствующий текст, результаты и ссылки. Telegram может получать уведомления, которые вы включили, включая заголовки, краткие сведения и ссылки. Для доставки используется идентификатор привязанного чата. |
 | **Atlassian Confluence** | Отчёты о прогонах, которые могут содержать названия и идентификаторы прогонов, окружения, сборки, результаты, описания и ссылки на Falcon. |
 | **GitHub** | Falcon может получать настроенные события репозитория и рабочих процессов, а также запрашивать сведения о репозитории и изменениях, например идентификаторы коммитов и пути изменённых файлов, для связи изменений с прогонами и анализа влияния. |
