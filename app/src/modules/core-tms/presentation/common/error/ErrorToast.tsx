@@ -1,6 +1,5 @@
 "use client";
 
-import { addToast, closeToast } from "@heroui/toast";
 import { CircleAlert } from "lucide-react";
 import React, { useEffect, useRef, type ReactNode } from "react";
 import styles from "../../workspace/ui/workspace-ui.module.css";
@@ -13,7 +12,9 @@ type ErrorToastProps = {
   onRetry?: () => void;
 };
 
-export function showErrorToast({ message, title, brand, retryLabel, onRetry }: ErrorToastProps): string | null {
+type ToastApi = typeof import("@heroui/toast");
+
+function addErrorToast({ addToast, closeToast }: ToastApi, { message, title, brand, retryLabel, onRetry }: ErrorToastProps): string | null {
   if (!message?.trim()) return null;
 
   const description = title && title !== message ? message : undefined;
@@ -42,15 +43,32 @@ export function showErrorToast({ message, title, brand, retryLabel, onRetry }: E
   return key;
 }
 
+export function showErrorToast(options: ErrorToastProps): () => void {
+  if (!options.message?.trim()) return () => {};
+
+  let disposed = false;
+  let dismiss: (() => void) | undefined;
+  // Load HeroUI in the browser; this component is also used by statically exported entry pages.
+  void import("@heroui/toast").then(api => {
+    if (disposed) return;
+    const key = addErrorToast(api, options);
+    if (key) dismiss = () => api.closeToast(key);
+  });
+  return () => {
+    disposed = true;
+    dismiss?.();
+  };
+}
+
 /** Report an operation failure without replacing the content or shifting the layout. */
 export function ErrorToast({ message, title, brand, retryLabel, onRetry }: ErrorToastProps) {
   const options = useRef({ brand, onRetry });
   useEffect(() => { options.current = { brand, onRetry }; }, [brand, onRetry]);
   const canRetry = Boolean(onRetry && retryLabel);
 
-  useEffect(() => {
-    const key = showErrorToast({ message, title, brand: options.current.brand, retryLabel, onRetry: canRetry ? () => options.current.onRetry?.() : undefined });
-    return () => { if (key) closeToast(key); };
-  }, [message, title, retryLabel, canRetry]);
+  useEffect(() => showErrorToast({
+    message, title, brand: options.current.brand, retryLabel,
+    onRetry: canRetry ? () => options.current.onRetry?.() : undefined,
+  }), [message, title, retryLabel, canRetry]);
   return null;
 }
