@@ -4,7 +4,7 @@ import { englishCopy, russianCopy } from "../content/copy";
 import { isLandingLocale, LANDING_LOCALE_KEY, resolveLandingLocale, requestedLandingLocale, landingLanguageURL, type LandingLocale } from "../model/locale";
 
 const Context = createContext({ locale: "en" as LandingLocale, preference: null as LandingLocale | null,
-  copy: englishCopy, setLocale: (_locale: LandingLocale | null) => {} });
+  copy: englishCopy, ready: false, setLocale: (_locale: LandingLocale | null) => {} });
 const useClientLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 export function LandingLocaleProvider({ children, initialLocale = 'en' }: { children: ReactNode; initialLocale?: LandingLocale }) {
   const [locale, setResolved] = useState<LandingLocale>(initialLocale);
@@ -52,6 +52,6 @@ export function LandingLocaleProvider({ children, initialLocale = 'en' }: { chil
     setResolved(resolveLandingLocale(next, navigator.language));
     try { if (next) localStorage.setItem(LANDING_LOCALE_KEY, next); else localStorage.removeItem(LANDING_LOCALE_KEY); } catch { /* Session preference still applies. */ }
   };
-  return <Context.Provider value={{ locale, preference, copy, setLocale }}>{children}</Context.Provider>;
+  return <Context.Provider value={{ locale, preference, copy, ready, setLocale }}>{children}</Context.Provider>;
 }
 export const useLandingLocale = () => useContext(Context);

@@ -32,11 +32,12 @@ export type DocumentationReaderProps = {
   onLocaleChange?: (locale: PublicDocLocale) => void;
   aiHref?: string;
   appHref?: string;
+  supportHref?: string;
   embedded?: boolean;
   panelLocation?: { id: string; section?: string };
 };
 
-export function DocumentationReader({ catalog: { articles, groups }, locale, activeId, href, onNavigate, renderArticle, renderHome, onAskAI, onLocaleChange, aiHref, appHref, embedded = false, panelLocation }: DocumentationReaderProps) {
+export function DocumentationReader({ catalog: { articles, groups }, locale, activeId, href, onNavigate, renderArticle, renderHome, onAskAI, onLocaleChange, aiHref, appHref, supportHref, embedded = false, panelLocation }: DocumentationReaderProps) {
   const labels = publicDocLabels(locale);
   const panel = Boolean(panelLocation);
   const panelNavigationId = useId();
@@ -187,7 +188,7 @@ export function DocumentationReader({ catalog: { articles, groups }, locale, act
       </div>
       <div className={styles.sidebarScroll}><PublicDocsNavigation folders={folders} articles={articles} activeId={active.id} href={href} onNavigate={navigate} /></div>
       <footer className={styles.sidebarFooter}>
-        <a href={href("contact-support")} onClick={event => navigate(event, "contact-support")}>{labels.support}<PublicDocsIcon name="arrow" /></a>
+        <a href={supportHref ?? href("contact-support")} onClick={supportHref ? undefined : event => navigate(event, "contact-support")}>{labels.support}<PublicDocsIcon name="arrow" /></a>
         {!panel && <a href={locale === "ru" ? "/ru/" : "/"}>{labels.website}<PublicDocsIcon name="external" /></a>}
         {!panel && <div className={styles.languages} aria-label={labels.language}><a href={`/docs/?article=${active.id}`} aria-current={locale === "en" ? "page" : undefined} lang="en" onClick={onLocaleChange ? event => { event.preventDefault(); onLocaleChange("en"); } : undefined}>English</a><span>/</span><a href={`/ru/docs/?article=${active.id}`} aria-current={locale === "ru" ? "page" : undefined} lang="ru" onClick={onLocaleChange ? event => { event.preventDefault(); onLocaleChange("ru"); } : undefined}>Русский</a></div>}
       </footer>
@@ -227,5 +228,5 @@ export function PublicDocumentation({ articles, groups, locale }: PublicDocCatal
     if (!section) window.scrollTo({ top: 0, behavior: "instant" });
     window.requestAnimationFrame(() => section ? document.getElementById(section)?.scrollIntoView() : document.getElementById("docs-article-title")?.focus({ preventScroll: true }));
   }
-  return <DocumentationReader catalog={{ articles, groups }} locale={locale} activeId={active.id} href={href} onNavigate={navigate} />;
+  return <DocumentationReader catalog={{ articles, groups }} locale={locale} activeId={active.id} href={href} onNavigate={navigate} supportHref={locale === "ru" ? "/ru/contact-support/" : "/contact-support/"} />;
 }

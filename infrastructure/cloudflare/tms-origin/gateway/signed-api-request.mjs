@@ -58,7 +58,7 @@ export async function signedApiRequest(request, env, audience) {
   }
   const cookieName = audience === "personal" ? "__Host-falcon_cloud_session" : audience === "platform" ? "__Host-falcon_platform_session" : "__Host-falcon_tenant_session";
   const accountSpaceCookies = accountSpaceRequestCookieNames(request, audience);
-  const cookie = (request.headers.get("cookie") ?? "").split(";").map((part) => part.trim())
+  const cookie = (protocol?.kind === "public-support" ? "" : request.headers.get("cookie") ?? "").split(";").map((part) => part.trim())
     .filter((part) => part.startsWith(`${cookieName}=`) || (audience === "tenant" && part.startsWith("__Host-falcon_cloud_session=")) ||
       (audience === "personal" && !incoming.pathname.startsWith("/api/v1/auth/") && !incoming.pathname.startsWith("/api/v1/cloud-auth/") && part.startsWith("__Host-falcon_tenant_session=")) ||
       protocol?.cookieNames.includes(part.slice(0, part.indexOf("="))) ||

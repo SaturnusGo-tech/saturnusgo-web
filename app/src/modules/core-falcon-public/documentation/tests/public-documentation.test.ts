@@ -86,6 +86,17 @@ test("public documentation has its own route language, independent of account pr
   assert.equal(isFalconPublicPath("/testcases/umbrella-home/work/"), false);
 });
 
+test("public support follows the route language without changing the SaturnusGo support route", () => {
+  for (const [path, locale] of [
+    ["/contact-support", "en"], ["/contact-support/", "en"],
+    ["/ru/contact-support", "ru"], ["/ru/contact-support/", "ru"],
+  ] as const) {
+    assert.ok(isFalconPublicPath(path), path);
+    assert.equal(htmlLanguageForPath(path, locale === "en" ? "ru" : "en"), locale);
+  }
+  assert.equal(isFalconPublicPath("/support/"), false);
+});
+
 test("article images follow the reader language using authenticated production captures at their native dimensions", async () => {
   const { publicDocumentationCatalog } = await import("../catalog");
   const { documentationArticleImage } = await import("../../../core-tms/documentation/model/library");

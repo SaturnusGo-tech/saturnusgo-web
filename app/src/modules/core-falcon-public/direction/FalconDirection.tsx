@@ -4,6 +4,7 @@ import { useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { FalconBrandMark } from '../../../shared/components/brand/FalconBrandMark';
 import { useLandingLocale } from '../landing/localization/context/LandingLocaleProvider';
+import { LandingHeaderLabel } from '../landing/localization/presentation/LandingHeaderLabel';
 import { LanguageSelector } from '../landing/localization/presentation/LanguageSelector';
 import { DirectionMarquee } from './DirectionMarquee';
 import { ProductScene } from './scenes/ProductScene';
@@ -11,6 +12,15 @@ import { directionCopy } from './content/copy';
 import { AchievementStory } from './achievements/AchievementStory';
 import { FalconPricing } from './pricing/FalconPricing';
 import styles from './direction.module.css';
+
+const { en, ru } = directionCopy;
+const navigation = [
+  { href: '#repository', en: en.product, ru: ru.product },
+  { href: '#documentation', en: en.documentation.nav, ru: ru.documentation.nav },
+  { href: '#falcon-ai', en: en.integrations, ru: ru.integrations },
+  { href: '#plans', en: 'Plans', ru: 'Тарифы' },
+  { href: '#resources', en: en.resources, ru: ru.resources },
+];
 
 function ResponsiveCopy({ desktop, phone }: { desktop: ReactNode; phone: string }) {
   return <><span className={styles.desktopCopy}>{desktop}</span><span className={styles.phoneCopy}>{phone}</span></>;
@@ -23,16 +33,8 @@ export function FalconDirection() {
   const c = directionCopy[locale];
   const phone = c.phone;
   const docs = locale === 'ru' ? '/ru/docs/' : '/docs/';
-  const ru = locale === 'ru';
-  const plansLabel = ru ? 'Тарифы' : 'Plans';
+  const plansLabel = locale === 'ru' ? 'Тарифы' : 'Plans';
   const open = `/cloud-login/?lang=${locale}`;
-  const navigation = [
-    [c.product, '#repository'],
-    [c.documentation.nav, '#documentation'],
-    [c.integrations, '#falcon-ai'],
-    [plansLabel, '#plans'],
-    [c.resources, '#resources'],
-  ] as const;
   return <div className={styles.page} lang={locale}>
     <a href="#main-content" className={styles.skipLink}>{c.skip}</a>
     <header className={styles.navigation} onKeyDown={event => {
@@ -47,19 +49,19 @@ export function FalconDirection() {
           <span>Falcon</span>
         </a>
         <nav className={styles.desktopNav} aria-label={c.product}>
-          {navigation.map(([label, href]) => <a key={href} href={href}>{label}</a>)}
+          {navigation.map(({ href, ...labels }) => <a key={href} href={href}><LandingHeaderLabel {...labels} /></a>)}
         </nav>
         <div className={styles.navActions}>
           <LanguageSelector />
-          <a className={styles.docsLink} href={docs}>{c.docs}</a>
-          <a className={styles.primary} href={open}>{c.open}</a>
+          <a className={styles.docsLink} href={docs}><LandingHeaderLabel en={en.docs} ru={ru.docs} /></a>
+          <a className={styles.primary} href={open}><LandingHeaderLabel en={en.open} ru={ru.open} /></a>
           <button type="button" ref={menuTrigger} className={styles.menuButton} onClick={() => setMenu(value => !value)} aria-label={menu ? c.closeMenu : c.menu} aria-expanded={menu} aria-controls="landing-menu">
             {menu ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
           </button>
         </div>
         <nav id="landing-menu" className={styles.mobileNav} aria-label={c.menu} data-open={menu} inert={!menu}>
-          {navigation.map(([label, href]) => <a key={href} href={href} onClick={() => setMenu(false)}>{label}</a>)}
-          <a href={docs} onClick={() => setMenu(false)}>{c.docs}</a>
+          {navigation.map(({ href, ...labels }) => <a key={href} href={href} onClick={() => setMenu(false)}><LandingHeaderLabel {...labels} /></a>)}
+          <a href={docs} onClick={() => setMenu(false)}><LandingHeaderLabel en={en.docs} ru={ru.docs} /></a>
         </nav>
       </div>
     </header>

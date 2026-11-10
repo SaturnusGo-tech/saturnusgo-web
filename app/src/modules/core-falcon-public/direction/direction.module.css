@@ -106,8 +106,9 @@
 }
 
 @media(min-width:1600px){.heroCopy{padding-top:200px}.hero h1{font-size:76px}}
-@media(max-width:1000px){.navigationInner{gap:18px}.desktopNav{gap:18px}.navActions{gap:14px}.heroCopy{padding-top:144px}.chapterHeading{gap:50px}.closing{margin-inline:40px}.hero>.productScene{height:520px}.productScene{height:560px}.sceneOverlay{top:170px}.hero .sceneOverlay{top:250px}.principleGrid article{padding-inline:20px}}
-@media (max-width: 900px) {
+@media(max-width:1140px){.navigationInner{gap:18px}.desktopNav{gap:18px}.navActions{gap:14px}}
+@media(max-width:1000px){.heroCopy{padding-top:144px}.chapterHeading{gap:50px}.closing{margin-inline:40px}.hero>.productScene{height:520px}.productScene{height:560px}.sceneOverlay{top:170px}.hero .sceneOverlay{top:250px}.principleGrid article{padding-inline:20px}}
+@media (max-width: 1080px) {
   .navigationInner { padding-inline: 24px; }
   .desktopNav, .docsLink { display: none; }
   .navActions { margin-left: auto; }

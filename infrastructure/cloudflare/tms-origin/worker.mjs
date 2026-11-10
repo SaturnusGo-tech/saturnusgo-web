@@ -17,6 +17,7 @@ import { companyHost } from "./gateway/company-host.mjs";
 import { proxyCompanyApi } from "./gateway/proxy-company-api.mjs";
 import { verifyCompanyDocument, unavailableCompanyDocument } from "./gateway/company-document.mjs";
 import { readConsentPolicy } from "./gateway/protocol/security/read-consent-policy.mjs";
+import { PUBLIC_SUPPORT_PATH } from "./gateway/protocol/route-policy.mjs";
 
 const APP_PATH_NO_SLASH = APP_PATH.slice(0, -1);
 const FORWARDED_HEADERS = [
@@ -287,6 +288,12 @@ export default {
     }
     if (incoming.pathname === "/api/falcon-demo/request") {
       return incoming.hostname === TMS_HOST ? secureResponse(await proxyDemo(request, env)) : notFoundResponse();
+    }
+    if (incoming.pathname === PUBLIC_SUPPORT_PATH) {
+      if (incoming.hostname !== TMS_HOST || request.method !== "POST" || incoming.search) return notFoundResponse();
+      const response = await proxyCompanyApi(request, env, "personal");
+      response.headers.delete("set-cookie");
+      return secureResponse(response, true);
     }
     if (incoming.pathname.startsWith("/api/v1/")) {
       if (!audience && !(publicPersonal && publicApiAllowed(incoming.pathname,request.method))) return notFoundResponse();

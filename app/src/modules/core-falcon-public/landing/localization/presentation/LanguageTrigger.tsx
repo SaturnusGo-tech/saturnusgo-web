@@ -3,6 +3,7 @@
 import { ChevronDown, Globe2 } from "lucide-react";
 import { forwardRef, type ComponentPropsWithoutRef } from "react";
 import { useLandingLocale } from "../context/LandingLocaleProvider";
+import { LandingHeaderLabel } from "./LandingHeaderLabel";
 import styles from "./language.module.css";
 
 export const LanguageTrigger = forwardRef<HTMLButtonElement, ComponentPropsWithoutRef<"button">>(
@@ -13,7 +14,7 @@ export const LanguageTrigger = forwardRef<HTMLButtonElement, ComponentPropsWitho
     return <button {...props} ref={ref} type="button" className={styles.trigger}
       aria-label={`${copy.language}: ${languageName}`}>
       <Globe2 size={17} aria-hidden="true" />
-      <span lang={locale}>{languageName}</span>
+      <LandingHeaderLabel en="English" ru="Русский" />
       <ChevronDown size={13} aria-hidden="true" className={styles.chevron} />
     </button>;
   },

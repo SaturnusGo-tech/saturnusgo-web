@@ -99,6 +99,8 @@ for (const name of ["privacy", "terms", "billing-terms", "trial-terms", "sandbox
 write("out/ru/index.html", "FALCON RUSSIAN LANDING");
 write("out/docs/index.html", "FALCON PUBLIC DOCUMENTATION");
 write("out/ru/docs/index.html", "FALCON RUSSIAN PUBLIC DOCUMENTATION");
+write("out/contact-support/index.html", "FALCON PUBLIC SUPPORT");
+write("out/ru/contact-support/index.html", "FALCON RUSSIAN PUBLIC SUPPORT");
 write("out/index.html", "FALCON LANDING\\n");
 write("out/index.txt", "FALCON LANDING DATA\\n");
 if (process.env.OMIT_SIGNUP !== "1") {
