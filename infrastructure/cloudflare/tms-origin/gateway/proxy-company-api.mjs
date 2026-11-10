@@ -5,6 +5,7 @@ import { federationResponsePolicy } from "./inbound/federation-policy.mjs";
 import { signedApiRequest, GatewayRequestError } from "./signed-api-request.mjs";
 import { gatewayError } from "./company-host.mjs";
 import { protocolResponsePolicy } from "./protocol/response-policy.mjs";
+import { isSessionCookieExpiry } from "./session-cookie-expiry.mjs";
 
 const RESPONSE_HEADERS = ["content-type", "content-disposition", "content-length", "content-range", "accept-ranges",
   "etag", "x-request-id", "x-next-cursor", "idempotency-replayed", "retry-after"];
@@ -24,15 +25,18 @@ export async function proxyCompanyApi(request, env, audience, send = fetch) {
       typeof response.headers.getAll === "function" ? response.headers.getAll("set-cookie") :
         response.headers.has("set-cookie") ? [response.headers.get("set-cookie")] : [];
     const name = audience === "personal" ? "__Host-falcon_cloud_session" : audience === "platform" ? "__Host-falcon_platform_session" : "__Host-falcon_tenant_session";
+    const path = new URL(request.url).pathname;
     const desktopCompletion=request.method==='POST'&&response.status===204&&['personal','tenant'].includes(audience)&&
-      ['/api/v1/auth/desktop/exchange','/api/v1/auth/desktop/redeem'].includes(new URL(request.url).pathname);
+      ['/api/v1/auth/desktop/exchange','/api/v1/auth/desktop/redeem'].includes(path);
+    const tenantLogin = audience === "tenant" && request.method === "POST" && path === "/api/v1/auth/login" && response.status === 200;
     for (const cookie of cookies) {
       const hostSession=!/;\s*domain\s*=/i.test(cookie) &&
         /;\s*path=\/(?:;|$)/i.test(cookie) && /;\s*secure(?:;|$)/i.test(cookie) &&
         /;\s*httponly(?:;|$)/i.test(cookie) && /;\s*samesite=lax(?:;|$)/i.test(cookie);
       const ordinary=cookie.startsWith(`${name}=`)&&hostSession;
       const desktopTarget=desktopCompletion&&hostSession&&/^__Host-falcon_(?:cloud|tenant)_session=[A-Za-z0-9_-]{43}(?:;|$)/.test(cookie);
-      if (!ordinary && !desktopTarget && !protocol.permitsCookie(cookie) && !accountSpaceCookieAllowed(request,audience,cookie,response.status)) {
+      const tenantLoginExpiry = tenantLogin && isSessionCookieExpiry(cookie, "__Host-falcon_cloud_session");
+      if (!ordinary && !desktopTarget && !tenantLoginExpiry && !protocol.permitsCookie(cookie) && !accountSpaceCookieAllowed(request,audience,cookie,response.status)) {
         return gatewayError(502, "INVALID_SESSION_COOKIE");
       }
       headers.append("set-cookie", cookie);

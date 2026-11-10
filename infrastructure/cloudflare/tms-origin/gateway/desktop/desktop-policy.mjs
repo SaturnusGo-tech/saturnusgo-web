@@ -1,3 +1,5 @@
+import {isSessionCookieExpiry} from '../session-cookie-expiry.mjs';
+
 const root='/api/v1/auth/desktop/';
 const methods=new Map([['start',['POST']],['authorize',['GET']],['exchange',['POST']],['redeem',['POST']],['cancel',['POST']]]);
 export function desktopRoutePolicy(pathname,audience) {
@@ -19,5 +21,7 @@ export function desktopResponsePolicy(request,response,audience) {
     /^[A-Za-z0-9_-]{22,128}$/.test(target.searchParams.get('state')??'');
   }catch{}
  }
- return {allowRedirect,headers:allowRedirect?['location']:[],permitsCookie:()=>false};
+ const completesSession=request.method==='POST'&&response.status===204&&(path===root+'exchange'||path===root+'redeem');
+ return {allowRedirect,headers:allowRedirect?['location']:[],permitsCookie:cookie=>completesSession&&
+  ['__Host-falcon_cloud_session','__Host-falcon_tenant_session'].some(name=>isSessionCookieExpiry(cookie,name))};
 }

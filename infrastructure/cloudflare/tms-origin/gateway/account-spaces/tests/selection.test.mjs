@@ -26,7 +26,7 @@ const proxy = (path, cookie, status=200, method='POST', audience='personal') =>
 
 test('successful neutral company selection expires stale tenant state without forwarding it or issuing a session', async t => {
  const previous = globalThis.fetch; t.after(() => {globalThis.fetch = previous;});
- for (const path of ['/api/v1/auth/company/resolve', '/api/v1/auth/spaces/select']) {
+ for (const path of ['/api/v1/auth/company/resolve', '/api/v1/auth/spaces/select', '/api/v1/auth/email/verify']) {
   let incoming;
   const payload = {data:{redirectUrl:'https://jev-falcon.saturnusgo.com/cloud-login/'}};
   globalThis.fetch = async value => {
@@ -51,7 +51,7 @@ test('successful neutral company selection expires stale tenant state without fo
 });
 
 test('neutral selection allows only a successful exact-route empty tenant expiry', async () => {
- for (const path of ['/api/v1/auth/company/resolve', '/api/v1/auth/spaces/select']) {
+ for (const path of ['/api/v1/auth/company/resolve', '/api/v1/auth/spaces/select', '/api/v1/auth/email/verify']) {
   for (const cookie of [
    `${tenant}; Path=/; Max-Age=300; HttpOnly; Secure; SameSite=Lax`,
    tenantExpiry.replace('Max-Age=0', 'Max-Age=300'),
@@ -68,7 +68,7 @@ test('neutral selection allows only a successful exact-route empty tenant expiry
   assert.equal((await proxy(path, tenantExpiry, 200, 'GET')).status, 502);
   assert.equal((await proxy(path, tenantExpiry, 200, 'POST', 'platform')).status, 502);
  }
- for (const path of ['/api/v1/auth/email/verify', '/api/v1/auth/company/resolve/extra', '/api/v1/projects']) {
+ for (const path of ['/api/v1/auth/email/resend', '/api/v1/auth/company/resolve/extra', '/api/v1/projects']) {
   assert.equal((await proxy(path, tenantExpiry)).status, 502, path);
  }
 });
@@ -133,6 +133,7 @@ test('email company chooser can carry its two browser proofs through listing and
   if (path === '/api/v1/auth/email/verify') {
    headers.append('set-cookie', chooserCookie);
    headers.append('set-cookie', emailCookie);
+   headers.append('set-cookie', tenantExpiry);
   } else {
    assert.equal(incoming.headers.get('cookie'), [chooser, emailProof].join('; '));
    if (path.endsWith('/select')) for (const cookie of [
@@ -143,7 +144,7 @@ test('email company chooser can carry its two browser proofs through listing and
  };
  const verified = await worker.fetch(request('/api/v1/auth/email/verify', 'POST', ''), env);
  assert.equal(verified.status, 200);
- assert.deepEqual(verified.headers.getSetCookie(), [chooserCookie, emailCookie]);
+ assert.deepEqual(verified.headers.getSetCookie(), [chooserCookie, emailCookie, tenantExpiry]);
  const browser = [chooser, emailProof, tenant].join('; ');
  assert.equal((await worker.fetch(request('/api/v1/auth/spaces', 'GET', browser), env)).status, 200);
  const selected = await worker.fetch(request('/api/v1/auth/spaces/select', 'POST', browser), env);

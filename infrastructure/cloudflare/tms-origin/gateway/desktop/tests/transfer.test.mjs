@@ -63,3 +63,43 @@ test('desktop target cookies cannot set a Domain or weaken the existing Secure H
   assert.equal(response.status,502,unsafe);assert.equal(response.headers.get('set-cookie'),null);
  }
 });
+
+test('successful desktop completion forwards the new session and the host-only expiry of its sibling',async()=>{
+ const cloud='__Host-falcon_cloud_session',tenant='__Host-falcon_tenant_session';
+ const expiry=name=>`${name}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax`;
+ for(const [origin,audience,name,siblingExpiry] of [
+  [publicOrigin,'personal',cloud,expiry(tenant)],
+  [companyOrigin,'tenant',tenant,expiry(cloud)+'; Expires=Thu, 01 Jan 1970 00:00:00 GMT'],
+ ]){
+  for(const operation of ['exchange','redeem']){
+   const headers=new Headers(); headers.append('set-cookie',cookie(name)); headers.append('set-cookie',siblingExpiry);
+   const result=await proxyCompanyApi(request(origin,root+operation),env,audience,async()=>new Response(null,{status:204,headers}));
+   assert.equal(result.status,204);assert.deepEqual(result.headers.getSetCookie(),[cookie(name),siblingExpiry]);
+  }
+  for(const [path,status,value] of [
+   [root+'start',204,siblingExpiry],[root+'redeem',400,siblingExpiry],
+   [root+'redeem',204,siblingExpiry.replace('Max-Age=0','Max-Age=600')],
+   [root+'redeem',204,siblingExpiry+'; Domain=example.test'],
+   [root+'redeem',204,siblingExpiry+'; Path=/private'],
+  ]){
+   const response=await proxyCompanyApi(request(origin,path),env,audience,async()=>new Response(null,{status,headers:{'set-cookie':value}}));
+   assert.equal(response.status,502,value);
+  }
+ }
+});
+
+test('only successful tenant password login can expire a previous cloud session',async()=>{
+ const expiry='__Host-falcon_cloud_session=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT';
+ const scoped=()=>new Headers([['set-cookie',cookie('__Host-falcon_tenant_session')],['set-cookie',expiry]]);
+ const login='/api/v1/auth/login';
+ const response=await proxyCompanyApi(request(companyOrigin,login),env,'tenant',async()=>Response.json({},{headers:scoped()}));
+ assert.equal(response.status,200);
+ assert.deepEqual(response.headers.getSetCookie(),[cookie('__Host-falcon_tenant_session'),expiry]);
+ for(const [path,status,method,value] of [
+  [login,401,'POST',expiry],[login,200,'GET',expiry],[login+'/extra',200,'POST',expiry],
+  [login,200,'POST',cookie('__Host-falcon_cloud_session')],[login,200,'POST',expiry+'; Domain=example.test'],
+ ]){
+  const result=await proxyCompanyApi(request(companyOrigin,path,method),env,'tenant',async()=>Response.json({},{status,headers:{'set-cookie':value}}));
+  assert.equal(result.status,502,value);
+ }
+});

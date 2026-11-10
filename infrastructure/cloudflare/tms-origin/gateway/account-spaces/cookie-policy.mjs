@@ -24,8 +24,8 @@ function boundedHostCookie(cookie, name, expires) {
 function selectionCookieAllowed(request, audience, cookie, status) {
  if (audience !== 'personal' || request.method !== 'POST' || status < 200 || status >= 300) return false;
  const path = new URL(request.url).pathname;
- // Neutral discovery clears stale tenant state; it cannot grant a tenant session.
- if (['/api/v1/auth/company/resolve', '/api/v1/auth/spaces/select'].includes(path) &&
+ // Neutral discovery and verified email can clear stale tenant state, never grant it.
+ if (['/api/v1/auth/company/resolve', '/api/v1/auth/spaces/select', '/api/v1/auth/email/verify'].includes(path) &&
   boundedHostCookie(cookie, '__Host-falcon_tenant_session', true)) return true;
  if (path === '/api/v1/auth/email/verify') return boundedHostCookie(cookie, '__Host-falcon_space_email', false);
  return ['/api/v1/auth/spaces/select', '/api/v1/auth/federation/cancel'].includes(path) &&
