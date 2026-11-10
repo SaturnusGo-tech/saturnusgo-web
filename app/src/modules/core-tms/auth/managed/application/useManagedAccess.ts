@@ -19,7 +19,7 @@ export interface ManagedAccessState {
 const initial: ManagedAccessState = { loading: true, pending: false, entrypoint: null,
   session: null, error: null, enrollment: null, recoveryCodes: [] };
 
-export function useManagedAccess(client: ManagedAccessPort, locale: "en" | "ru" = "en") {
+export function useManagedAccess(client: ManagedAccessPort, locale: "en" | "ru" = "en", requireFreshSignIn = false) {
   const [state, setState] = useState(initial);
   const current = useRef<AbortController | null>(null);
   const pending = useRef(false);
@@ -30,7 +30,9 @@ export function useManagedAccess(client: ManagedAccessPort, locale: "en" | "ru" 
     setState((value) => ({ ...value, loading: true, error: null }));
     try {
       const entrypoint = await client.entrypoint(controller.signal);
-      const session = entrypoint.available ? await client.session(controller.signal) : null;
+      // A desktop sign-in entry must wait for a login in this flow rather than authorize a cached account.
+      const session = !entrypoint.available ? null : requireFreshSignIn && entrypoint.audience === "tenant"
+        ? { authenticated: false, stage: "anonymous" } as const : await client.session(controller.signal);
       if (!controller.signal.aborted) setState((value) => ({ ...value, entrypoint, session, loading: false }));
     } catch (error) {
       if (!controller.signal.aborted) setState((value) => ({ ...value, loading: false,
@@ -38,7 +40,7 @@ export function useManagedAccess(client: ManagedAccessPort, locale: "en" | "ru" 
         ...(error instanceof CompanyAccessError && error.code === "SESSION_REQUIRED"
           ? { session: { authenticated: false, stage: "anonymous" } as const, enrollment: null, recoveryCodes: [] } : {}) }));
     }
-  }, [client]);
+  }, [client, requireFreshSignIn]);
 
   useEffect(() => { void refresh(); return () => { current.current?.abort(); pending.current = false; }; }, [refresh]);
 

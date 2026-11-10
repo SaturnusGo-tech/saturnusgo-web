@@ -81,13 +81,16 @@ void test("company auth Worker redirect preserves the desktop entry through MFA 
   Object.defineProperty(globalThis, "React", { configurable: true, value: React });
   const signedIn: Extract<CompanySession, { authenticated: true }> = { authenticated: true, stage: "authenticated", audience: "tenant", workspaceId: "alpha", capabilities: [], expiresAt: new Date(Date.now() + 60000).toISOString(),
     identity: { id: "qa", name: "QA", login: "qa", email: "qa@example.test", emailVerified: true, phone: "", role: "tester", owner: false, hasAvatar: false, version: 1 } };
-  let session: CompanySession = { authenticated: false, stage: "anonymous" };
+  const previousAdmin: CompanySession = { ...signedIn, identity: { ...signedIn.identity, id: "admin", role: "workspace_admin", owner: true } };
+  let session: CompanySession = previousAdmin;
+  let sessionReads = 0;
   globalThis.fetch = async input => {
     const path = new URL(String(input instanceof Request ? input.url : input), origin).pathname;
     if (path.endsWith("/entrypoint")) return Response.json({ data: { name: "Alpha", hostname: "alpha-falcon.example.test", audience: "tenant", available: true, accessContact: "" } });
     if (path.endsWith("/methods")) return Response.json({ data: { google: true, email: true, saml: true, signup: true } });
     if (path.endsWith("/google/start")) return Response.json({ data: { authorizationUrl: "https://accounts.google.com/authorize" } });
     if (path.endsWith("/mfa/verify")) { session = signedIn; return Response.json({ data: { stage: "authenticated", expiresAt: signedIn.expiresAt, recoveryCodes: ["recovery-fixture"] } }); }
+    if (path.endsWith("/session")) sessionReads += 1;
     return Response.json({ data: session });
   };
   const { default: worker } = await import(new URL("../../../../../../../../infrastructure/cloudflare/tms-origin/worker.mjs", import.meta.url).href);
@@ -96,7 +99,13 @@ void test("company auth Worker redirect preserves the desktop entry through MFA 
     FALCON_MANAGED_GATEWAY_KEY: "07".repeat(32), FALCON_API_ORIGIN: "https://api.example.test",
   });
   assert.equal(response.status, 302);
-  assert.equal(response.headers.get("location"), `${origin}/work/?desktopAttempt=${attempt}`);
+  assert.equal(response.headers.get("location"), `${origin}/work/?desktopAttempt=${attempt}&desktopFresh=1`);
+  assert.equal(response.headers.get("cache-control"), "no-store");
+  const ordinary = await worker.fetch(new Request(`${origin}/cloud-login/`), {
+    FALCON_MANAGED_AUTH_ENABLED: "true", FALCON_COMPANY_DOMAIN_SUFFIX: "example.test", FALCON_PLATFORM_HOSTNAME: "sandbox-falcon.example.test",
+    FALCON_MANAGED_GATEWAY_KEY: "07".repeat(32), FALCON_API_ORIGIN: "https://api.example.test",
+  });
+  assert.equal(ordinary.headers.get("location"), `${origin}/work/`);
   browser.location = location(response.headers.get("location")!);
   const { ManagedAccessBoundary } = await import("../../../managed/composition/ManagedAccessBoundary");
   const { MfaForm } = await import("../../../managed/presentation/mfa/MfaForm");
@@ -110,7 +119,10 @@ void test("company auth Worker redirect preserves the desktop entry through MFA 
     if (css) require.extensions[".css"] = css; else delete require.extensions[".css"];
   });
   await act(async () => { view = create(content()); });
-  assert.equal(browser.location.search, ""); assert.ok(values.has(DESKTOP_ATTEMPT_KEY));
+  assert.equal(browser.location.search, "?desktopFresh=1"); assert.ok(values.has(DESKTOP_ATTEMPT_KEY));
+  assert.equal(sessionReads, 0, "the desktop sign-in entry must not reuse the previous administrator's browser session");
+  assert.deepEqual(destinations, []);
+  assert.equal(view.root.findAllByProps({ "data-testid": "protected" }).length, 0);
   await act(async () => view.root.findAllByType("button").find(button => button.children.includes("Continue with Google"))!.props.onClick());
   await act(async () => view.unmount()); destinations.length = 0; browser.location = location("/testcases/umbrella-home/work/");
   session = { authenticated: false, stage: "mfa_challenge", expiresAt: signedIn.expiresAt };

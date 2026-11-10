@@ -321,6 +321,16 @@ export default {
           const invitation = redirectLegacyCompanyInvitation(incoming, env);
           if (invitation) return invitation;
         }
+        const attempts = incoming.searchParams.getAll("desktopAttempt");
+        if (audience === "tenant" && /^\/cloud-login\/?$/.test(incoming.pathname)
+          && attempts.length === 1 && /^[A-Za-z0-9_-]{43}$/.test(attempts[0])) {
+          incoming.pathname = APP_PATH;
+          incoming.searchParams.set("desktopFresh", "1");
+          const redirect = secureResponse(Response.redirect(incoming.toString(), 302), true);
+          redirect.headers.set("cache-control", "no-store");
+          redirect.headers.set("referrer-policy", "no-referrer");
+          return redirect;
+        }
         return redirectToCanonicalPath(incoming, audience === "platform" ? "/sandbox/" : APP_PATH);
       }
     }
