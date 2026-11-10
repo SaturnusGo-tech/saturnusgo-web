@@ -7,6 +7,7 @@ import { ProfileLink } from "../../profile/presentation/ProfileLink";
 import { BillingLink } from "../../billing/presentation/link/BillingLink";
 import { BillingPlanLink } from "../../billing/composition/menu/BillingPlanLink";
 import { CompanyAdministrationLink } from "../../company-administration/composition/menu/CompanyAdministrationLink";
+import { memberRoleLabel } from "../../company-administration/presentation/permissions/member-role-label";
 import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
 import { ManagedAvatarImage } from "../../auth/managed/presentation/avatar/ManagedAvatarImage";
 import { SupportContact } from "../../support/composition/SupportContact";
@@ -24,6 +25,8 @@ export function NavigationProfile({ collapsed, workspaceId, onOpenSettings, onOp
   const [downloadsOpen, setDownloadsOpen] = useState(false);
   const downloadsAvailable = useDesktopDownloadsAvailable();
   const label = session?.label || t("auth.account");
+  const workspaceRole = session?.workspaceId === workspaceId ? session.workspaceRole : null;
+  const canViewBilling = workspaceRole === "workspace_admin";
   const navigate = (action: () => void) => { popup.dismiss(); action(); };
   return <div ref={popup.root} className={css.root} data-sidebar-independent data-collapsed={collapsed} onPointerEnter={event => { if (!downloadsOpen && event.pointerType !== "touch" && event.currentTarget.contains(event.target as Node)) popup.openHover(); }} onPointerLeave={popup.leave}>
     <button ref={popup.trigger} type="button" className={css.profile} data-collapsed={collapsed} data-active={popup.open}
@@ -40,7 +43,12 @@ export function NavigationProfile({ collapsed, workspaceId, onOpenSettings, onOp
       onBlur={event => { if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget as Node) && !popup.root.current?.contains(event.relatedTarget as Node)) popup.dismiss(); }}>
       <div className={css.identity}>
         <ManagedAvatarImage className={css.avatar} name={label} hasAvatar={Boolean(session?.hasAvatar)} load={session?.avatarLoader} version={session?.avatarVersion} />
-        <div><strong>{label}</strong>{session && <BillingPlanLink role="menuitem" workspaceId={workspaceId} enabled={popup.open} className={css.plan} onClick={popup.dismiss} />}</div>
+        <div>
+          <strong>{label}</strong>
+          {canViewBilling
+            ? <BillingPlanLink role="menuitem" workspaceId={workspaceId} enabled={popup.open} className={css.plan} onClick={popup.dismiss} />
+            : workspaceRole && <span className={css.plan}>{memberRoleLabel(workspaceRole, locale)}</span>}
+        </div>
       </div>
       <div className={css.separator} role="separator"/>
       {session && <ProfileLink role="menuitem" className={css.action} onClick={popup.dismiss}>
@@ -49,7 +57,7 @@ export function NavigationProfile({ collapsed, workspaceId, onOpenSettings, onOp
       <button role="menuitem" type="button" className={css.action} data-testid="nav-config" onClick={() => navigate(onOpenSettings)}>
         <Settings width={20} height={20} aria-hidden="true"/><span>{t("nav.config")}</span>
       </button>
-      {session && <BillingLink role="menuitem" workspaceId={workspaceId} className={css.action} data-testid="nav-billing" onClick={popup.dismiss}>
+      {canViewBilling && <BillingLink role="menuitem" workspaceId={workspaceId} className={css.action} data-testid="nav-billing" onClick={popup.dismiss}>
         <CreditCard size={20} strokeWidth={1.7} aria-hidden="true"/><span>{ru ? "Тариф и оплата" : "Plan and billing"}</span>
       </BillingLink>}
       {session && downloadsAvailable && <button role="menuitem" type="button" className={css.action} data-testid="account-download-app" onClick={() => { popup.close(true); setDownloadsOpen(true); }}>

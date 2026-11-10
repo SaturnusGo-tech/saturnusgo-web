@@ -2,11 +2,12 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import type { NavigationProfile } from "../NavigationProfile";
 import type { TmsSessionIdentity } from "../../../auth/presentation/session/TmsSessionContext";
+import { memberRoleLabel } from "../../../company-administration/presentation/permissions/member-role-label";
 import { componentHarness, invoke, nodes } from "../../../portfolios/tests/support/component-harness";
 
-function setup(session: Partial<TmsSessionIdentity> | null = {}, downloadsAvailable = true) {
+function setup(session: Partial<TmsSessionIdentity> | null = {}, downloadsAvailable = true, locale: "en" | "ru" = "en") {
   let dismissed = 0, closed = 0, settings = 0, help = 0;
-  const identity = session === null ? null : { label: "Mercury", kind: "cloud", subject: "u", signOut: async () => {}, ...session };
+  const identity = session === null ? null : { label: "Mercury", kind: "cloud", subject: "u", workspaceId: "w", signOut: async () => {}, ...session };
   const h = componentHarness(undefined, { document: { body: {} } });
   const popup = { root: { current: null }, trigger: { current: null }, panel: { current: null }, open: true,
     position: { left: 64, top: 80 }, openHover() {}, leave() {}, cancelClose() {}, toggle() {},
@@ -16,7 +17,8 @@ function setup(session: Partial<TmsSessionIdentity> | null = {}, downloadsAvaila
     if (name.endsWith("TmsSessionContext")) return { useOptionalTmsSession: () => identity };
     if (name.endsWith("useRailPopup")) return { useRailPopup: () => popup };
     if (name.endsWith("useDesktopDownloadsAvailable")) return { useDesktopDownloadsAvailable: () => downloadsAvailable };
-    if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en", t: (key: string) => key }) };
+    if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale, t: (key: string) => key }) };
+    if (name.endsWith("member-role-label")) return { memberRoleLabel };
   });
   const props = { collapsed: true, workspaceId: "w", onOpenSettings() { settings++; }, onOpenHelp() { help++; } };
   const all = () => nodes(h.render(() => render(props)));
@@ -50,20 +52,38 @@ test("managed account preserves profile and administration destinations inside t
   const all = h.all();
   assert.ok(all.some(node => node.type === "ProfileLink" && node.props.role === "menuitem"));
   assert.ok(all.some(node => node.type === "a" && node.props.href === "/company/" && node.props.role === "menuitem"));
-  assert.ok(all.some(node => node.type === "BillingPlanLink" && node.props.workspaceId === "w"));
+  assert.ok(all.some(node => node.type === "span" && node.props.children === "QA manager"));
 });
 
-test("all membership roles can open billing while authorization stays unchanged", () => {
-  for (const workspaceRole of ["workspace_admin", "qa_manager", "tester", "reporter", "viewer"] as const) {
-    const h = setup({ workspaceRole });
-    const link = h.all().find(node => node.type === "BillingLink" && node.props.role === "menuitem");
-    assert.ok(link, `${workspaceRole} can view billing`);
+test("only the active workspace administrator can open billing from the avatar menu", () => {
+  const h = setup({ workspaceRole: "workspace_admin" });
+  const links = h.all().filter(node => node.type === "BillingLink" || node.type === "BillingPlanLink");
+  assert.equal(links.length, 2);
+  for (const link of links) {
+    assert.equal(link.props.role, "menuitem");
     assert.equal(link.props.workspaceId, "w");
-    invoke(link, "onClick"); assert.equal(h.dismissed(), 1);
-    const plan = h.all().find(node => node.type === "BillingPlanLink");
-    assert.ok(plan); invoke(plan, "onClick"); assert.equal(h.dismissed(), 2);
+    invoke(link, "onClick");
   }
-  assert.equal(setup(null).all().some(node => node.type === "BillingLink" || node.type === "BillingPlanLink"), false);
+  assert.equal(h.dismissed(), 2);
+  for (const identity of [null, { workspaceRole: null }, { workspaceId: "other", workspaceRole: "workspace_admin" }] as const) {
+    assert.equal(setup(identity).all().some(node => node.type === "BillingLink" || node.type === "BillingPlanLink"), false);
+  }
+});
+
+test("other workspace members see a localized role as plain text under their name", () => {
+  for (const [workspaceRole, en, ru] of [
+    ["qa_manager", "QA manager", "QA-менеджер"], ["tester", "Tester", "Тестировщик"],
+    ["reporter", "Reporter", "Репортёр"], ["viewer", "Viewer", "Наблюдатель"],
+  ] as const) {
+    for (const [locale, label] of [["en", en], ["ru", ru]] as const) {
+      const all = setup({ workspaceRole }, true, locale).all();
+      const subtitle = all.find(node => node.type === "span" && node.props.children === label);
+      assert.ok(subtitle, label);
+      assert.equal(subtitle.props.role, undefined);
+      assert.equal(subtitle.props.onClick, undefined);
+      assert.equal(all.some(node => node.type === "BillingLink" || node.type === "BillingPlanLink"), false);
+    }
+  }
 });
 
 test("personal accounts replace role copy with the authoritative plan link", () => {
@@ -116,7 +136,7 @@ test("logout prevents duplicate requests and reports a failure without dropping 
   assert.equal(button().props.disabled, true); assert.equal(calls, 1);
   reject(new Error("network")); await Promise.resolve(); await Promise.resolve();
   assert.equal(button().props.disabled, false);
-  assert.ok(h.all().some(node => node.props.role === "alert" && node.props.children === "auth.logoutError"));
+  assert.ok(h.all().some(node => node.type === "ErrorToast" && node.props.message === "auth.logoutError"));
   assert.equal(h.dismissed(), 0);
 });
 

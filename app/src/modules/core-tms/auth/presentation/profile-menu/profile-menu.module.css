@@ -5,8 +5,8 @@
 .menu a:hover,.menu button:hover,.menu :focus-visible { background:var(--falcon-hover); outline:none; }
 .menu button:disabled { opacity:.5; }
 .menu .plan { display:block; width:fit-content; max-width:100%; margin:2px 0 0; padding:0; border-radius:3px; overflow:hidden; text-overflow:ellipsis; font-size:12px; text-underline-offset:3px; }
-.menu .plan:hover { background:transparent; text-decoration:underline; }
-.menu .plan:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
+.menu a.plan:hover { background:transparent; text-decoration:underline; }
+.menu a.plan:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
 .error { color:var(--falcon-danger); font-size:12px; margin:10px 12px; }
 @keyframes appear { from { opacity:0; transform:translateY(3px); } to { opacity:1; transform:none; } }
 @media(prefers-reduced-motion:reduce) { .menu { animation:none; } }

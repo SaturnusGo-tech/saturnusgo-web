@@ -2,6 +2,7 @@
 import { ProfileLink } from "../../../profile/presentation/ProfileLink";
 import { BillingLink } from "../../../billing/presentation/link/BillingLink";
 import { BillingPlanLink } from "../../../billing/composition/menu/BillingPlanLink";
+import { memberRoleLabel } from "../../../company-administration/presentation/permissions/member-role-label";
 import { CompanyAdministrationLink } from "../../../company-administration/composition/menu/CompanyAdministrationLink";
 import { Building2, CreditCard, Download, LogOut, ShieldCheck, UserRound } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -24,6 +25,7 @@ export function ManagedProfileMenu({ session }: { readonly session: TmsSessionId
   const trigger = useRef<HTMLButtonElement>(null);
   const menu = useRef<HTMLDivElement>(null);
   const ru = locale === "ru";
+  const billingWorkspaceId = session.workspaceRole === "workspace_admin" ? session.workspaceId : null;
   useEffect(() => {
     if (!anchor) return;
     menu.current?.querySelector<HTMLElement>('[role="menuitem"]')?.focus();
@@ -56,10 +58,15 @@ export function ManagedProfileMenu({ session }: { readonly session: TmsSessionId
         const next = event.key === "Home" ? 0 : event.key === "End" ? items.length - 1 : (index + (event.key === "ArrowDown" ? 1 : -1) + items.length) % items.length;
         items[next]?.focus();
       }}>
-      <div className={styles.name}><strong>{session.label}</strong><BillingPlanLink role="menuitem" workspaceId={session.workspaceId ?? undefined} className={styles.plan} onClick={() => setAnchor(null)} /></div>
+      <div className={styles.name}>
+        <strong>{session.label}</strong>
+        {billingWorkspaceId
+          ? <BillingPlanLink role="menuitem" workspaceId={billingWorkspaceId} className={styles.plan} onClick={() => setAnchor(null)} />
+          : session.workspaceRole && <span className={styles.plan}>{memberRoleLabel(session.workspaceRole, locale)}</span>}
+      </div>
       <ProfileLink role="menuitem" onClick={() => setAnchor(null)}><UserRound size={17} />{ru ? "Мой профиль" : "My profile"}</ProfileLink>
       <ProfileLink role="menuitem" section="security" onClick={() => setAnchor(null)}><ShieldCheck size={17} />{ru ? "Безопасность" : "Security"}</ProfileLink>
-      <BillingLink role="menuitem" workspaceId={session.workspaceId ?? undefined} onClick={() => setAnchor(null)}><CreditCard size={17} />{ru ? "Тариф и оплата" : "Plan and billing"}</BillingLink>
+      {billingWorkspaceId && <BillingLink role="menuitem" workspaceId={billingWorkspaceId} onClick={() => setAnchor(null)}><CreditCard size={17} />{ru ? "Тариф и оплата" : "Plan and billing"}</BillingLink>}
       {downloadsAvailable && <button role="menuitem" type="button" onClick={() => { setAnchor(null); trigger.current?.focus({ preventScroll: true }); setDownloadsOpen(true); }}><Download size={17} strokeWidth={1.7} />{ru ? "Скачать приложение" : "Download app"}</button>}
       {session.administrationPath && <a role="menuitem" href={session.administrationPath}><Building2 size={17} />{ru ? "Управление компанией" : "Company administration"}</a>}
       {!session.administrationPath && <CompanyAdministrationLink role="menuitem" workspaceId={session.workspaceId ?? undefined} onClick={() => setAnchor(null)}><Building2 size={17} />{ru ? "Управление компанией" : "Company administration"}</CompanyAdministrationLink>}
