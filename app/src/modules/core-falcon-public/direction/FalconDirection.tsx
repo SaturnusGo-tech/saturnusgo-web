@@ -26,8 +26,6 @@ export function FalconDirection() {
   const ru = locale === 'ru';
   const plansLabel = ru ? 'Тарифы' : 'Plans';
   const open = `/cloud-login/?lang=${locale}`;
-  const docsGuidePath = '?article=product-docs-authoring';
-  const guideLocales = ru ? ['ru', 'en'] as const : ['en', 'ru'] as const;
   const navigation = [
     [c.product, '#repository'],
     [c.documentation.nav, '#documentation'],
@@ -88,19 +86,7 @@ export function FalconDirection() {
       <section id="documentation" className={styles.chapter} aria-labelledby="documentation-title">
         <div className={styles.chapterHeading}>
           <h2 id="documentation-title">{c.documentation.title}</h2>
-          <div>
-            <p>{c.documentation.body}</p>
-            <div className={styles.documentationLinks}>
-              {guideLocales.map(language => <a
-                key={language}
-                className={styles.textLink}
-                href={`${language === 'ru' ? '/ru/docs/' : '/docs/'}${docsGuidePath}`}
-                hrefLang={language}
-              >
-                {c.documentation.guides[language]}<ArrowRight size={16} aria-hidden="true" />
-              </a>)}
-            </div>
-          </div>
+          <p>{c.documentation.body}</p>
         </div>
         <ProductScene kind="documentation" locale={locale} descriptionId="documentation-caption" />
         <p className={styles.documentationCaption} id="documentation-caption">{c.documentation.caption}</p>
@@ -173,7 +159,7 @@ export function FalconDirection() {
           <nav className={styles.footerGroup} aria-labelledby="footer-resources">
             <h2 id="footer-resources">{c.resources}</h2>
             <ul>
-              <li><a href={docs}>{c.docs}</a></li>
+              <li><a href={docs}>{c.footerDocs}</a></li>
               <li><a href="https://t.me/falcon_tms">Telegram</a></li>
             </ul>
           </nav>
@@ -182,7 +168,8 @@ export function FalconDirection() {
           <small>© 2026 Falcon · SaturnusGo</small>
           <nav aria-label={c.legal}>
             <a href={`/privacy/?lang=${locale}`}>{c.privacy}</a>
-            <a href={`/trial-terms/?lang=${locale}`}>{c.terms}</a>
+            <a href={`/terms/?lang=${locale}`}>{c.terms}</a>
+            <a href={`/billing-terms/?lang=${locale}`}>{c.billing}</a>
           </nav>
           <a className={styles.backToTop} href="#top"><ArrowUp size={15} aria-hidden="true" />{c.back}</a>
         </div>
