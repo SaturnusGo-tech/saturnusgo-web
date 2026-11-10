@@ -26,7 +26,7 @@ export function LanguageModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
           </Button>
         </ModalHeader>
         <ModalBody className={styles.content}>
-          <Listbox autoFocus="selected" aria-label={copy.language} classNames={{ base: styles.listbox, list: styles.options }}
+          <Listbox autoFocus aria-label={copy.language} classNames={{ base: styles.listbox, list: styles.options }}
             itemClasses={{ base: styles.option, title: styles.label, selectedIcon: styles.check }}
             selectionMode="single" disallowEmptySelection selectedKeys={[locale]}>
             {languages.map(({ value, label }) => <ListboxItem key={value} textValue={label}
