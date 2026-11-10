@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../../../../common/error/ErrorToast";
 import { Button } from "@heroui/react";
 import { ArrowLeft, ArrowUpRight, X } from "lucide-react";
 import type { Ref } from "react";
@@ -66,7 +67,7 @@ export function DefectDetails({ id, panelRef, row, workspaceId, view, canManage,
     </ul>}
     <div className={styles.decision}>
       {saving && <p className={shared.context} role="status">{copy.saving}</p>}
-      {error && <p className={shared.error} role="alert">{error}</p>}
+      <ErrorToast message={error} />
       {canManage ? <DefectDecision key={`${row.id}:${row.rowVersion}`} row={row} view={view} saving={saving}
         source={source} onReset={onReset} onDecide={onDecide} /> : <p className={shared.context}>{copy.managePermission}</p>}
     </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { useState } from "react";
 import type { Profile } from "../../domain/administration";
 import type { AdministrationPort } from "../../application/ports/administration-port";
@@ -45,7 +46,7 @@ export function ProfilePasswordForm({ profile, client, onSaved }: { readonly pro
         <label className={passwordStyles.recovery}><input type="checkbox" checked={recovery} onChange={(event) => setRecovery(event.target.checked)} />{copy.useRecovery}</label></>}
     </div>
     {mismatch && <p className={styles.error} role="alert">{locale === "ru" ? "Пароли не совпадают." : "Passwords do not match."}</p>}
-    {command.error && <p className={styles.error} role="alert">{administrationError(command.error, locale)}</p>}
+    <ErrorToast message={command.error ? administrationError(command.error, locale) : null} />
     {saved && <p className={styles.success} role="status">{copy.passwordSaved}</p>}
     <div className={passwordStyles.actions}><button type="submit" className={passwordStyles.save} disabled={command.pending}>{copy.updatePassword}</button></div>
   </form>;

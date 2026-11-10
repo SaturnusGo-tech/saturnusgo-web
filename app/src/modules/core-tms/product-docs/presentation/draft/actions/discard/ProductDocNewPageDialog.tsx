@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorToast } from "../../../../../presentation/common/error/ErrorToast";
 import { Button } from "@heroui/react";
 import type { ProductDocsCopy } from "../../../../localization/copy";
 import { ProductDocModal } from "../../../overlay/ProductDocModal";
@@ -16,7 +17,7 @@ export function ProductDocNewPageDialog({ copy, busy, canSave, error, onCancel, 
 }) {
   return <ProductDocModal title={copy.saveBeforeCreate} subtitle={copy.saveBeforeCreateDetail}
     closeLabel={copy.cancel} busy={busy} onClose={onCancel}>
-    {error && <p className={overlay.error} role="alert">{error}</p>}
+    <ErrorToast message={error} />
     <div className={overlay.confirmActions}>
       <Button autoFocus type="button" variant="light" className={chrome.action} isDisabled={busy} onPress={onCancel}>
         {copy.keepEditing}

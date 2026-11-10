@@ -1,6 +1,6 @@
 import { TmsApiError } from "../../../../core/tms/transport/http";
 import { connectorFailureLabel } from "../localization/connector-failure-copy";
-export const connectorError = (error: unknown, russian: boolean): string => {
+export const connectorError = (error: unknown, russian: boolean, linearDiscovery = false): string => {
   const text: Record<string, [string, string]> = {
     SPECIFICATION_CONTAINS_CREDENTIALS: ["Ответ сервера содержит данные доступа. Уберите их из спецификации перед подключением.", "The server response contains access credentials. Remove them from the specification before connecting."],
     SPECIFICATION_URL_REQUIRED: ["Укажите прямой URL спецификации OpenAPI.", "Enter a direct OpenAPI specification URL."],
@@ -38,10 +38,32 @@ export const connectorError = (error: unknown, russian: boolean): string => {
   };
   if (error instanceof TmsApiError) {
     const guidance = connectorFailureLabel(error.code, russian);
-    const message = text[error.code]?.[russian ? 0 : 1] ??
+    const message = (linearDiscovery ? linearDiscoveryMessage(error, russian) : undefined) ??
+      text[error.code]?.[russian ? 0 : 1] ??
       (guidance !== error.code ? guidance :
         (russian ? "Не удалось выполнить действие. Код: " : "The operation failed. Code: ") + error.code);
     return message + (error.requestId ? ` · ${error.requestId}` : "");
   }
   return russian ? "Не удалось связаться с Falcon. Проверьте соединение и повторите." : "Unable to reach Falcon. Check your connection and retry.";
 };
+
+function linearDiscoveryMessage(error: TmsApiError, russian: boolean): string | undefined {
+  const code: string = error.code;
+  if (code === "UPSTREAM_ACCESS_DENIED" || code === "LINEAR_ACCESS_DENIED") {
+    return russian ? "Linear отклонил доступ. Проверьте API-ключ и его права на выбранную команду."
+      : "Linear denied access. Check the API key and its permissions for the selected team.";
+  }
+  if (code === "UPSTREAM_RATE_LIMITED") {
+    return russian ? "Linear ограничил частоту запросов. Повторите проверку позже."
+      : "Linear reached its rate limit. Try verifying access again later.";
+  }
+  if (code === "REMOTE_NOT_FOUND") {
+    return russian ? "Команда Linear не найдена или недоступна. Проверьте её ID или ключ и доступ в Linear."
+      : "The Linear team was not found or is inaccessible. Check its ID or key and your access in Linear.";
+  }
+  if (code === "UPSTREAM_UNAVAILABLE" || code === "UPSTREAM_TIMEOUT" || code === "UPSTREAM_INVALID_RESPONSE" ||
+    (code === "HTTP_ERROR" && error.status >= 500)) {
+    return russian ? "Не удалось проверить доступ к Linear. Повторите проверку через минуту."
+      : "Could not verify access to Linear. Try again in a minute.";
+  }
+}

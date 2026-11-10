@@ -12,6 +12,8 @@ import { ConnectorActivityFreshness } from "./activity/connector-activity-freshn
 import { RepublishOperationKeys } from "./republish/republish-operation-keys";
 import { republishReport } from "./republish/republish-report";
 
+type RetryOperation = "load" | "discover" | "activity" | "more";
+
 export function useConnector(scope: Scope, provider: Provider, russian: boolean, onSaved: () => void,
   activityActive: boolean) {
   const http = useTmsHttpClient();
@@ -21,10 +23,9 @@ export function useConnector(scope: Scope, provider: Provider, russian: boolean,
   const [draft, setDraft] = useState(() => connectionDraft(provider, null));
   const [discovery, setDiscovery] = useState<Discovery | null>(null);
   const [pending, setPending] = useState<string | null>("load");
-  const [error, setError] = useState<string | null>(null);
+  const [failure, setFailure] = useState<{ message: string; retry: RetryOperation | null } | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [activityFailed, setActivityFailed] = useState(false);
-  const [configurationReloadRequired, setConfigurationReloadRequired] = useState(false);
   const requests = useRef(new ConnectorRequestOwner());
   const freshness = useRef(new ConnectorActivityFreshness());
   const republishKeys = useRef(new RepublishOperationKeys());
@@ -32,18 +33,20 @@ export function useConnector(scope: Scope, provider: Provider, russian: boolean,
     [scope.workspaceId, scope.projectId]);
   const act = useCallback(async (name: string, work: (signal: AbortSignal) => Promise<void>) => {
     const signal = requests.current.begin();
-    setPending(name); setError(null); setNotice(null);
+    setPending(name); setFailure(null); setNotice(null);
     if (name === "activity" || name === "load") setActivityFailed(false);
     try { await work(signal); }
-    catch (failure) { if (requests.current.current(signal)) {
-      setError(connectorError(failure, russian));
-      if (failure instanceof TmsApiError && failure.status === 412) setConfigurationReloadRequired(true);
+    catch (error) { if (requests.current.current(signal)) {
+      const needsReload = error instanceof TmsApiError && error.status === 412;
+      const retry = needsReload || name === "load" ? "load" :
+        name === "discover" || name === "activity" || name === "more" ? name : null;
+      setFailure({ message: connectorError(error, russian, provider === "linear" && name === "discover"), retry });
       if (name === "activity") setActivityFailed(true);
     } }
     finally { if (requests.current.current(signal)) { requests.current.finish(signal); setPending(null); } }
-  }, [russian]);
+  }, [provider, russian]);
   const publishSnapshot = useCallback((result: Snapshot) => {
-    setSnapshot(result); freshness.current.loaded(); setActivityFailed(false); setConfigurationReloadRequired(false);
+    setSnapshot(result); freshness.current.loaded(); setActivityFailed(false);
   }, []);
   const load = useCallback(() => act("load", async (signal) => {
     const result = await api.load(stableScope, provider, signal);
@@ -118,6 +121,6 @@ export function useConnector(scope: Scope, provider: Provider, russian: boolean,
     setDraft(value);
     if (provider === "swagger") { setDiscovery(null); setNotice(null); }
   };
-  return { snapshot, draft, setDraft: updateDraft, discovery, pending, error, notice, activityFailed, configurationReloadRequired,
+  return { snapshot, draft, setDraft: updateDraft, discovery, pending, failure, notice, activityFailed,
     load, refreshActivity, discover, save, disconnect, recover, more, republish };
 }

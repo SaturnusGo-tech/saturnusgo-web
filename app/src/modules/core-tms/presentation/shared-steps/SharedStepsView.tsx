@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorToast } from "../common/error/ErrorToast";
 import { transitionContent } from "../workspace/motion/transition/content-transition";
 import { DeferredPane } from "../common/loading/feedback/DeferredPane";
 import { Plus } from "lucide-react";
@@ -53,8 +54,7 @@ export function SharedStepsView({ resource }: { resource: Resource }) {
           <button type="button" className={styles.primaryButton} onClick={create}><Plus size={16} />{ru ? "Общий шаг" : "Shared step"}</button>
         </div>
       </header>
-      {resource.status === "error" ? <div className={styles.state} role="alert"><strong>{ru ? "Не удалось загрузить общие шаги" : "Could not load shared steps"}</strong>
-        <button type="button" className={styles.secondaryButton} onClick={() => void resource.refresh()}>{ru ? "Повторить" : "Retry"}</button></div>
+      {resource.status === "error" ? <ErrorToast message={ru ? "Не удалось загрузить общие шаги" : "Could not load shared steps"} retryLabel={ru ? "Повторить" : "Retry"} onRetry={resource.refresh} />
         : <DeferredPane pending={resource.status === "loading" && !resource.items.length} variant="list" label={ru ? "Загрузка общих шагов" : "Loading shared steps"}>
           {rows.length > 0 && <SharedStepList items={rows} ru={ru} locale={locale} archiveEnabled={resource.archiveEnabled}
             openingId={openingId} onOpen={id => void beginEdit(id)} onRemove={setRemoving} />}

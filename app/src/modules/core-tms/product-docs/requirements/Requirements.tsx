@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../presentation/common/error/ErrorToast";
 import { useEffect, useState } from "react";
 import { FileText } from "lucide-react";
 import { useProductDocsWorkspace } from "../composition/context/ProductDocsContext";
@@ -89,11 +90,9 @@ function ScopedRequirements({docs, subject, ru}: {
   }
 
   const content = <>
-    {failed && <div className={styles.feedback} role="alert">
-      <span>{ru ? "Не удалось загрузить требования." : "Could not load requirements."}</span>
-      <button type="button" onClick={() => { setFailed(false); setReload(value => value + 1); }}>{ru ? "Повторить" : "Retry"}</button>
-    </div>}
-    {mutationFailed && !pickerOpen && <p className={styles.feedback} role="alert">{ru ? "Не удалось изменить связь." : "Could not update the link."}</p>}
+    <ErrorToast message={failed ? (ru ? "Не удалось загрузить требования." : "Could not load requirements.") : null}
+      retryLabel={ru ? "Повторить" : "Retry"} onRetry={() => { setFailed(false); setReload(value => value + 1); }} />
+    <ErrorToast message={mutationFailed && !pickerOpen ? (ru ? "Не удалось изменить связь." : "Could not update the link.") : null} />
     {result?.requirements.length ? caseId ? <CaseRequirementLinks requirements={result.requirements} ru={ru}
       onOpen={(requirement, source) => docs.open({
         docId: requirement.docId, sectionId: requirement.sectionId ?? undefined,

@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { LayoutGrid } from "lucide-react";
 import { useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { Button } from "@heroui/react";
@@ -81,7 +82,7 @@ export function MoveProductDoc({ api, scope, document: page, path, copy, onMoved
         </div>
       </div>
       {draft.status === "error" && <ReadState copy={copy} status="error" retry={draft.retry} />}
-      {error && <p role="alert" className={styles.error}>{error}</p>}
+      <ErrorToast message={error} />
       <footer className={styles.footer}>
         <Button autoFocus type="button" className={shared.action} isDisabled={saving} onPress={onClose}>{copy.cancel}</Button>
         <Button type="submit" className={shared.primary}

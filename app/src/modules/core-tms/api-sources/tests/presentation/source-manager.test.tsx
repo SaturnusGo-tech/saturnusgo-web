@@ -29,7 +29,7 @@ test("project loading or failure never exposes an incomplete connection form", (
   assert.equal(f.render().some(node => node.type === "SourceEditor"), false);
   f.projects.loading = false; f.projects.error = true;
   const all = f.render(); assert.equal(all.some(node => node.type === "SourceEditor"), false);
-  assert.ok(all.some(node => node.props.role === "alert"));
+  assert.ok(all.some(node => node.type === "ErrorToast" && Boolean(node.props.message)));
 });
 test("saved API appears in the real connection list and can be reopened or reloaded", () => {
   const f = fixture(); const editor = f.render().find(node => node.type === "SourceEditor")!;

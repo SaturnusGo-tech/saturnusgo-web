@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../../../presentation/common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../../../shared/components/loading/LoadingOrb";
 import { FileJson, Inbox } from "lucide-react";
 import { useRef } from "react";
@@ -28,8 +29,9 @@ export function ImportHistory({ scope, revision, canManage }: { scope: ImportSco
         label={ru ? "Найти файл в истории" : "Find a file in history"} placeholder={ru ? "Найти файл" : "Find a file"}
         closeLabel={ru ? "Закрыть поиск" : "Close search"}/>}</header>
     {actions.notice && <p className={css.notice} role="status">{actions.notice}</p>}
-    {actions.error && !actions.deletion && !actions.preview && <p className={css.error} role="alert">{actions.error}</p>}
-    {history.error && <p className={css.error} role="alert">{ru ? "Не удалось загрузить историю." : "Could not load history."} <button type="button" onClick={history.reload}>{ru ? "Повторить" : "Retry"}</button></p>}
+    <ErrorToast message={!actions.deletion && !actions.preview ? actions.error : null} />
+    <ErrorToast message={history.error ? (ru ? "Не удалось загрузить историю." : "Could not load history.") : null}
+      retryLabel={ru ? "Повторить" : "Retry"} onRetry={history.reload} />
     <div aria-busy={history.loading || history.searching}>
       {groups.map(group => <section className={css.day} key={group.key} aria-label={`${group.label} ${group.date}`}>
         <h3>{group.label && <strong>{group.label}</strong>}<span>{group.date}</span></h3>

@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
 import {
@@ -164,7 +165,7 @@ export function CaseDetailHeaderActions(props: Props) {
       <ProductDocModal title={confirmTitle} subtitle={confirmDescription} closeLabel={ru ? "Закрыть" : "Close"}
         busy={archivePending} onClose={closeConfirmation}>
         {(dismiss) => <>
-          {archiveFailed && <p className={overlays.confirmError} role="alert">{ru ? "Не удалось обновить тест-кейс. Повторите попытку." : "Could not update this test case. Try again."}</p>}
+          <ErrorToast message={archiveFailed ? (ru ? "Не удалось обновить тест-кейс. Повторите попытку." : "Could not update this test case. Try again.") : null} />
           <div className={overlays.confirmActions}>
             <Button type="button" size="sm" variant="light" disableRipple autoFocus isDisabled={archivePending}
               onPress={dismiss}>{ru ? "Отмена" : "Cancel"}</Button>

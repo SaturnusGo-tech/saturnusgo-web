@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../../presentation/common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
 import { Download, ExternalLink, Smartphone } from "lucide-react";
 import type { RunPlatformBuild } from "../../model/platform-build";
@@ -23,7 +24,7 @@ function AndroidBuild({ build, ru, disabled }: { build: Extract<RunPlatformBuild
       {pending ? <LoadingOrb /> : <Download size={15} aria-hidden="true" />}
       <span>{label}</span>
     </button>
-    {error && <span className={css.error} role="alert">{error}</span>}
+    <ErrorToast message={error} />
   </div>;
 }
 

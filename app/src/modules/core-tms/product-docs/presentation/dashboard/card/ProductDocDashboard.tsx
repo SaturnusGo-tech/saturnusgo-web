@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorToast } from "../../../../presentation/common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
 import { ProductDocTooltip } from "../../overlay/ProductDocTooltip";
 
@@ -75,21 +76,18 @@ function DashboardEmbedCard({ snapshotId, onRemove, scope }: CardProps & { scope
     setSelection((previous) => previous.mode === next ? previous : { mode: next, request: previous.request + 1 });
   }
 
-  const status = failed ? <div className={styles.state} data-overlay={Boolean(value)} role="alert">
-    {value && visible?.mode === "snapshot" && mode === "current"
-      ? ru ? "Не удалось обновить. Показан снимок." : "Couldn’t refresh. Showing the snapshot."
-      : ru ? "Данные дашборда недоступны." : "Dashboard data is unavailable."}
-    {valid && resolved === null && <Button type="button" size="sm" variant="light" disableRipple
-      onPress={() => setSelection((previous) => ({ ...previous, request: previous.request + 1 }))}>
-      {ru ? "Повторить" : "Retry"}
-    </Button>}
-  </div> : pending ? <div className={styles.state} data-overlay={Boolean(value)} role="status">
+  const failureMessage = !failed ? null : value && visible?.mode === "snapshot" && mode === "current"
+    ? ru ? "Не удалось обновить. Показан снимок." : "Couldn’t refresh. Showing the snapshot."
+    : ru ? "Данные дашборда недоступны." : "Dashboard data is unavailable.";
+  const status = pending ? <div className={styles.state} data-overlay={Boolean(value)} role="status">
     {value && <LoadingOrb />}
     {ru ? "Загружаем данные…" : "Loading dashboard data…"}
   </div> : undefined;
 
   return <div className={`${theme.widgetTheme} ${styles.card}`} role="group" aria-label={title}
     data-doc-dashboard="" data-width={definition?.width} contentEditable={onRemove ? false : undefined}>
+    <ErrorToast message={failureMessage} retryLabel={ru ? "Повторить" : "Retry"}
+      onRetry={valid && resolved === null ? () => setSelection((previous) => ({ ...previous, request: previous.request + 1 })) : undefined} />
     <div className={styles.header}>
       <div className={styles.caption}>
         {observedAt && <time dateTime={observedAt} title={`${modeLabel(visible.mode)} · ${formattedDate}`}>{formattedDate}</time>}

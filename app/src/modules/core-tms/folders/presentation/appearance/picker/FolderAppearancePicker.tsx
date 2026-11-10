@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../../presentation/common/error/ErrorToast";
 import { useId, useState } from "react";
 import { PiArrowCounterClockwise } from "react-icons/pi";
 import type { FolderAppearance, FolderIconId } from "../../../model/appearance/folder-appearance";
@@ -38,8 +39,8 @@ export function FolderAppearancePicker({ folder, ru, editor, defaultIcon, defaul
       {tab === "emoji" && <EmojiPicker locale={ru ? "ru" : "en"} dynamicWidth onSelect={emoji => editor.choose({ kind: "emoji", emoji })} />}
       {tab === "upload" && <FolderUpload editor={editor} ru={ru} />}
     </div>
-    {editor.error ? <div role="alert" className={css.error}><span>{editor.error}</span>{(editor.failed || editor.uploadFailed) && <button type="button" onClick={editor.uploadFailed ? editor.retryUpload : editor.retry}>{ru ? "Повторить" : "Retry"}</button>}</div>
-      : <p role="status" className={css.status}>{editor.uploading ? (ru ? "Загрузка изображения…" : "Uploading image…")
+    <ErrorToast message={editor.error} retryLabel={ru ? "Повторить" : "Retry"} onRetry={editor.uploadFailed ? editor.retryUpload : editor.failed ? editor.retry : undefined} />
+    {!editor.error && <p role="status" className={css.status}>{editor.uploading ? (ru ? "Загрузка изображения…" : "Uploading image…")
         : editor.busy ? (ru ? "Сохранение…" : "Saving…") : (ru ? "Изменения сохраняются автоматически" : "Changes save automatically")}</p>}
   </div>;
 }

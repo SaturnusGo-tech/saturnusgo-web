@@ -27,6 +27,7 @@ runInNewContext(ts.transpileModule(readFileSync(new URL("../../presentation/Main
       Textarea: ({ onValueChange, value }: { onValueChange(value: string): void; value: string }) =>
         <textarea value={value} onChange={event => onValueChange(event.target.value)} />,
     };
+    if (name.endsWith("/ErrorToast")) return { ErrorToast: () => null };
     if (name.endsWith("/ResponsibleName")) return { ResponsibleName: () => null };
     if (name.endsWith(".css")) return { default: {} };
     return require(name);

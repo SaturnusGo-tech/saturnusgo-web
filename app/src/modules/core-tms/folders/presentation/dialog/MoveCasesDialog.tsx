@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { PiArrowLeft, PiArrowRight } from "react-icons/pi";
 import { ParentFolderPicker } from "../../../presentation/dialogs/folder/parent/ParentFolderPicker";
@@ -43,7 +44,7 @@ export function MoveCasesDialog({ resource, ids, ru, onClose, onMoved }: {
           searchLabel={ru ? "Найти папку" : "Find folder"} emptyLabel={ru ? "Папки не найдены" : "No matching folders"}
           onChange={path => { setTarget({ path, id: resource.items.find(item => item.path === path && !item.archivedAt)?.id ?? null }); setError(""); }} />
       </fieldset>
-      {error && <p role="alert" className={css.error}>{error}</p>}
+      <ErrorToast message={error} />
       <footer className={css.footer}>
         <span className={css.destination}><FolderBreadcrumb path={target.path} root={ru ? "Без папки" : "Unfiled"} /></span>
         <button type="submit" disabled={busy || !resource.canManage || !ids.length}>{busy ? (ru ? "Перемещение…" : "Moving…") : (ru ? "Переместить" : "Move")}<PiArrowRight size={15} /></button>

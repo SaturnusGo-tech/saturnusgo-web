@@ -1,5 +1,6 @@
 import type { ImpactScope } from "../../model/impact-types";
 import { useImpactCases } from "../../application/cases/useImpactCases";
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { ReviewCollection } from "../review/ReviewCollection";
 import css from "../styles/impact.module.css";
 export function CasePicker({ scope, ru, included, disabled, onAdd }: { scope: ImpactScope; ru: boolean; included: string[]; disabled: boolean; onAdd: (id: string) => Promise<void> }) {
@@ -7,7 +8,7 @@ export function CasePicker({ scope, ru, included, disabled, onAdd }: { scope: Im
   return <div className={css.panel} style={{ marginTop: 12 }}>
     <label className={css.field}>{ru ? "Поиск готовых тестов проекта" : "Search ready project tests"}
       <input type="search" maxLength={300} value={state.query} onChange={(event) => state.setQuery(event.target.value)} /></label>
-    {state.error && <p role="alert" className={css.error}>{state.error}</p>}
+    <ErrorToast message={state.error} retryLabel={ru ? "Повторить" : "Retry"} onRetry={() => void state.more()} />
     {state.loading && <p role="status">{ru ? "Загружаем тесты…" : "Loading tests…"}</p>}
     <ReviewCollection items={state.items} ru={ru} searchable={false} label={ru ? "Готовые тесты" : "Ready tests"} text={(item) => item.title}>{(item) => <li key={item.id} className={css.row}>
       <div className={css.rowHeading}><span><strong>{item.key}</strong> {item.title}</span>

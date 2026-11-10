@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { useState } from "react";
 import type { Profile } from "../../domain/administration";
 import type { AdministrationPort } from "../../application/ports/administration-port";
@@ -29,7 +30,7 @@ export function ProfileDetailsForm({ profile, client, onSaved }: { readonly prof
       <div className={profileStyles.identity}><span>{copy.login}</span><p>{profile.login}</p>{profile.role && <small>{copy.loginHint}</small>}</div>
       <div className={profileStyles.identity}><span>{copy.email}</span><p>{profile.email}</p>{profile.role && <small>{copy.emailHint}</small>}</div>
     </div>
-    {command.error && <p className={styles.error} role="alert">{administrationError(command.error, locale)}</p>}
+    <ErrorToast message={command.error ? administrationError(command.error, locale) : null} />
     <div className={profileStyles.actions}><button className={profileStyles.save} type="submit" disabled={command.pending}>{copy.save}</button></div>
   </form>;
 }

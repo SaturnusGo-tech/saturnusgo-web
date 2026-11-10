@@ -13,6 +13,7 @@ const previous = require.extensions[".css"];
 require.extensions[".css"] = module => { module.exports = {}; };
 const { CodexPluginManager } = require("../../presentation/plugin-management/CodexPluginManager") as typeof import("../../presentation/plugin-management/CodexPluginManager");
 const { CodexPluginPreview } = require("../../presentation/plugin-preview/CodexPluginPreview") as typeof import("../../presentation/plugin-preview/CodexPluginPreview");
+const { ErrorToast } = require("../../../presentation/common/error/ErrorToast") as typeof import("../../../presentation/common/error/ErrorToast");
 if (previous) require.extensions[".css"] = previous; else delete require.extensions[".css"];
 const state = { employee: { ...status, etag: '"3"' }, connections: [], loading: false, pending: false, error: null, connectionsError: null, refresh: () => {}, deactivate: async () => {}, revoke: async () => {} } satisfies ReturnType<typeof useCodexEmployee>;
 const render = (value: ReturnType<typeof useCodexEmployee> = state, locale: "en" | "ru" = "en") => create(<CodexPluginManager state={value} locale={locale} onBack={() => {}} onViewDetails={() => {}} />);
@@ -113,8 +114,10 @@ test("unavailable company connection gives one short admin instruction without q
 test("denied status offers retry without asserting a specific cause", () => {
   let retries = 0;
   const view = render({ ...state, employee: null, error: "FORBIDDEN", refresh: () => { retries++; } });
-  assert.match(text(view), /company feature or your account permissions may be the cause/);
-  act(() => view.root.findAllByType("button").find(button => button.children.includes("Retry"))!.props.onClick()); assert.equal(retries, 1);
+  const toast = view.root.findByType(ErrorToast);
+  assert.match(toast.props.message, /company feature or your account permissions may be the cause/);
+  assert.equal(toast.props.retryLabel, "Retry");
+  act(() => toast.props.onRetry()); assert.equal(retries, 1);
   act(() => view.unmount());
 });
 test("workspace manager never exposes company activation or connection revocation", () => {

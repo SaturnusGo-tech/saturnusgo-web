@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../common/error/ErrorToast";
 import { Plus, Search } from "lucide-react";
 import { useState } from "react";
 import type { Environment } from "../../../../../core/tms/contracts/legacy-contract";
@@ -30,7 +31,7 @@ export function EnvironmentSettings({ environments, projectId, projectName, offl
       <button className={css.create} type="button" onClick={() => select("new")} disabled={busy || editing === "new"} data-testid="new-environment"><Plus size={14}/>{t("config.newEnvironment")}</button></header>
     <label className={css.search} data-input-shell><Search size={16} strokeWidth={1.6} aria-hidden="true"/><input type="search" aria-label={ru ? "Найти окружение" : "Find an environment"}
       placeholder={ru ? "Найти окружение" : "Find an environment"} value={query} disabled={busy} onChange={event => setQuery(event.target.value)} /></label>
-    {error && <p role="alert" className={css.error}>{error}</p>}
+    <ErrorToast message={error} />
     <div className={`${css.row} ${css.columns}`} aria-hidden="true"><span>{ru ? "Окружение" : "Environment"}</span><span>{ru ? "Ключ" : "Key"}</span><span>{ru ? "Адрес стенда" : "Base URL"}</span><span/></div>
     <div style={{ viewTransitionName: "environment-create" }}><EnvironmentExpansion>{editing === "new" && editor()}</EnvironmentExpansion></div>
     <ul className={css.list}>{matching.map(environment => <EnvironmentRow key={environment.id} environment={environment}

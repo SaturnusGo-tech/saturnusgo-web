@@ -63,18 +63,18 @@ test("an uncertain command only retries the original command instead of sending 
   let replays = 0; let refreshes = 0;
   const all = nodes(h.render(() => view({ ...props(), canRetryCommand: true, error: { code: "SERVICE_UNAVAILABLE", retryable: true, requestId: null },
     retryCommand: async () => { replays++; }, reload: () => refreshes++ })));
-  const alert = all.find(node => node.props.role === "alert")!;
-  invoke(nodes(alert).find(node => node.type === "button")!, "onClick");
+  const toast = all.find(node => node.type === "ErrorToast")!;
+  invoke(toast, "onRetry");
   assert.equal(replays, 1); assert.equal(refreshes, 0);
   assert.equal(all.find(node => node.type === "BillingPlans")!.props.busy, true);
 });
-test("a revoked checkout capability blocks a retained retry even when its handler is invoked", () => {
+test("a revoked checkout capability removes the retry action from the error toast", () => {
   const h = componentHarness(); let replays = 0;
   const { BillingScreen: view } = h.load<{ BillingScreen: typeof BillingScreen }>(new URL("../../presentation/screen/BillingScreen.tsx", import.meta.url));
   const all = nodes(h.render(() => view({ ...props(), paymentsAvailable: false, canRetryCommand: true,
     error: { code: "SERVICE_UNAVAILABLE", retryable: true, requestId: null }, retryCommand: async () => { replays++; } })));
-  const retry = nodes(all.find(node => node.props.role === "alert")!).find(node => node.type === "button")!;
-  assert.equal(retry.props.disabled, true); invoke(retry, "onClick"); assert.equal(replays, 0);
+  const toast = all.find(node => node.type === "ErrorToast")!;
+  assert.equal(toast.props.onRetry, undefined); assert.equal(replays, 0);
 });
 
 test("an unsubscribed company sees one offer without redundant billing scaffolding", () => {

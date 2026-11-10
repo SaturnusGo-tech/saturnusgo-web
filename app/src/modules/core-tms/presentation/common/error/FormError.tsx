@@ -1,16 +1,12 @@
-import { XCircle } from "lucide-react";
+import React from "react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
-import styles from "../../../tms.module.css";
+import { ErrorToast } from "./ErrorToast";
 
-export function FormError({ message }: { message: string }) {
+export function FormError({ message, onRetry, retryLabel }: {
+  message: string;
+  onRetry?: () => void;
+  retryLabel?: string;
+}) {
   const { t } = useTmsLocale();
-  return (
-    <div className={styles.formError} role="alert">
-      <XCircle size={17} />
-      <span>
-        <strong>{t("form.couldNotSave")}</strong>
-        <small>{message}</small>
-      </span>
-    </div>
-  );
+  return <ErrorToast title={t("form.couldNotSave")} message={message} onRetry={onRetry} retryLabel={retryLabel} />;
 }

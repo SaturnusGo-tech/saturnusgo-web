@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../../presentation/common/error/ErrorToast";
 import { Button, Input, Select, SelectItem } from "@heroui/react";
 import { Check, ChevronDown, Search } from "lucide-react";
 import { useRef, useState } from "react";
@@ -67,9 +68,7 @@ export function ProductDocReviewRequestForm({ workspaceId, sections, copy, busy,
         ))}
         {members.loading && <p className={styles.message} role="status">{copy.membersLoading}</p>}
         {!members.loading && !members.error && people.length === 0 && <p className={styles.message}>{copy.membersEmpty}</p>}
-        {members.error && <div className={styles.message} role="alert">{copy.membersError}
-          <Button className={styles.textButton} onPress={members.retry}>{copy.retry}</Button>
-        </div>}
+        <ErrorToast message={members.error ? copy.membersError : null} retryLabel={copy.retry} onRetry={members.retry} />
         {members.cursor && <Button className={styles.textButton} onPress={members.more}
           isDisabled={busy || members.loading}>{copy.more}</Button>}
       </div>

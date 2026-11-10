@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { useRef, useState } from "react";
 import { Search, X } from "lucide-react";
 import type { FolderAppearance } from "../../model/appearance/folder-appearance";
@@ -38,8 +39,7 @@ export function KlipyGallery({ ru, onChoose, selected, apiKey = process.env.NEXT
           </div>)}
         </div>}
         {gallery.loading && <p className={css.message} role="status">{ru ? "Загрузка GIF…" : "Loading GIFs…"}</p>}
-        {gallery.error && <div className={css.failure} role="alert"><span>{error}</span>
-          <button type="button" disabled={gallery.blockedUntil > 0} onClick={gallery.retry}>{ru ? "Повторить" : "Retry"}</button></div>}
+        <ErrorToast message={gallery.error ? error : null} retryLabel={ru ? "Повторить" : "Retry"} onRetry={gallery.blockedUntil > 0 ? undefined : gallery.retry} />
         {!gallery.loading && !gallery.error && !gallery.items.length && <p className={css.message} role="status">{ru ? "Ничего не найдено." : "No GIFs found."}</p>}
         {!!gallery.next && !gallery.error && <button type="button" className={css.more} disabled={gallery.loading} onClick={gallery.more}>{ru ? "Ещё GIF" : "More GIFs"}</button>}
       </>}

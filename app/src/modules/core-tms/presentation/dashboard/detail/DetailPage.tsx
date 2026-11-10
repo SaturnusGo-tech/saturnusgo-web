@@ -1,6 +1,7 @@
+import { ErrorToast } from "../../common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { DeferredPane } from "../../common/loading/feedback/DeferredPane";
-import { ArrowUpRight, ListChecks, SearchX, RefreshCw } from "lucide-react";
+import { ArrowUpRight, ListChecks, SearchX } from "lucide-react";
 import { useEffect, useRef, type ReactNode } from "react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import surface from "../dashboard.module.css";
@@ -39,8 +40,7 @@ export function DetailState({ error, empty, filtered, onRetry }: {
   error?: string | null; empty: boolean; filtered?: boolean; onRetry: () => void;
 }) {
   const { locale, t } = useTmsLocale();
-  if (error) return <div className={styles.failure} role="alert"><span>{error}</span>
-    <button type="button" className={styles.quiet} onClick={onRetry}><RefreshCw size={14} />{t("dashboard.retry")}</button></div>;
+  if (error) return <ErrorToast message={error} retryLabel={t("dashboard.retry")} onRetry={onRetry} />;
   if (!empty) return null;
   return <div className={styles.state}>{filtered ? <SearchX size={27} strokeWidth={1.25} /> : <ListChecks size={27} strokeWidth={1.25} />}
     <strong>{locale === "ru" ? filtered ? "Совпадений нет" : "Здесь пока нет записей" : filtered ? "No matches" : "No records yet"}</strong>

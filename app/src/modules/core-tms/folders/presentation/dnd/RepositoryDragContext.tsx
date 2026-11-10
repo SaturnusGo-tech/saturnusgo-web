@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { FolderVisual } from "../appearance/visual/FolderVisual";
 import { DndContext, DragOverlay, PointerSensor, pointerWithin, useSensor, useSensors, type CollisionDetection, type DragEndEvent } from "@dnd-kit/core";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -74,6 +75,6 @@ export function RepositoryDragContext({ children, resource, selected, ru, locked
         {drag.kind === "folder" ? <FolderVisual folderId={drag.folderId} appearance={resource.items.find(item => item.id === drag.folderId)?.appearance} /> : <PiListChecks size={18} />}
         <span>{label}</span>{count > 1 && <b>{count}</b>}
       </div>)}</DragOverlay>
-      {error && <div className={css.errorToast} role="alert">{error}<button onClick={() => setError("")} aria-label={ru ? "Закрыть" : "Dismiss"}>×</button></div>}
+      <ErrorToast message={error} />
     </DndContext></RepositoryDragSelectionContext.Provider></DragClickContext.Provider>;
 }

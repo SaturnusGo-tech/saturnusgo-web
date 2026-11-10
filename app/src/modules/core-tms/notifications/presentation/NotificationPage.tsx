@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../presentation/common/error/ErrorToast";
 import { useId, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import type { NotificationsState } from "../application/useNotifications";
@@ -41,18 +42,10 @@ export function NotificationPage({ model: m, ru, embedded = false }: {
         </div>
       ) : (
         <>
-          {m.error && (
-            <div className={styles.error} role="alert">
-              <span>
-                {m.error === "denied"
-                  ? ru ? "Браузер не разрешил уведомления." : "Browser permission was not granted."
-                  : m.error === "load"
-                    ? ru ? "Не удалось загрузить уведомления." : "Notifications could not be loaded."
-                    : ru ? "Не удалось обновить уведомления." : "Notifications could not be updated."}
-              </span>
-              <button type="button" onClick={() => void m.retry()} disabled={m.busy}>{ru ? "Повторить" : "Retry"}</button>
-            </div>
-          )}
+          <ErrorToast message={m.error === "denied" ? (ru ? "Браузер не разрешил уведомления." : "Browser permission was not granted.")
+            : m.error === "load" ? (ru ? "Не удалось загрузить уведомления." : "Notifications could not be loaded.")
+            : m.error ? (ru ? "Не удалось обновить уведомления." : "Notifications could not be updated.") : null}
+            retryLabel={ru ? "Повторить" : "Retry"} onRetry={m.busy ? undefined : m.retry} />
           {settings && (
             <>
               <NotificationChannels model={m} ru={ru} />

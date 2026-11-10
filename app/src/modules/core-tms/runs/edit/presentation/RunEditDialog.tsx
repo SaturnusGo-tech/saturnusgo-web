@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { Button, Drawer, DrawerContent, DrawerHeader, Input, Textarea } from "@heroui/react";
 import { X } from "lucide-react";
@@ -81,7 +82,7 @@ export function RunEditDialog({ run, workspaceId, onClose, onSaved }: {
             <div className={css.builds}><RunPlatformBuildFields controller={state.platformBuilds} projects={[{ id: run.projectId, name: "" }]}
               disabled={!state.fieldsEnabled} ru={ru} /></div>
           </>}
-          {state.error && <p role="alert" className={css.error}>{state.error}</p>}
+          <ErrorToast message={state.error} />
           {(state.phase === "error" || state.conflict) && <Button type="button" size="sm" variant="light" disableRipple className={css.textButton}
             isDisabled={state.busy} onPress={() => ask("reload")}>{ru ? "Загрузить актуальные данные" : "Reload current data"}</Button>}
           {confirm && <div className={css.confirm} role="alertdialog" aria-label={ru ? "Несохранённые изменения" : "Unsaved changes"}>

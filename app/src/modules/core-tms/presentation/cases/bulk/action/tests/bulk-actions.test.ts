@@ -28,7 +28,7 @@ test("a rejected bulk update retains selection, disables concurrent actions and 
   assert.equal(app.menu().disabled, true); assert.ok(app.buttons().every((button) => button.props.disabled));
   await tick();
   assert.equal(app.props.selectedCount, 83); assert.deepEqual(app.calls, []);
-  assert.equal(elements(app.render(), (item) => item.props.role === "alert")[0].props.children, message);
+  assert.equal(elements(app.render(), (item) => item.type === "ErrorToast")[0].props.message, message);
   assert.equal(app.menu("bulk-priority").disabled, false);
 });
 test("permissions, mutation limits and folder activity preserve their separate restrictions", () => {

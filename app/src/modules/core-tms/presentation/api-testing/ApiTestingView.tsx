@@ -1,4 +1,5 @@
 "use client";
+import { ErrorToast } from "../common/error/ErrorToast";
 import dynamic from "next/dynamic";
 import { Braces, Database, FileJson2, Server } from "lucide-react";
 import { visitWorkspace } from "../../state/navigation/browser/workspace-history";
@@ -39,7 +40,7 @@ export function ApiTestingView({ scope, canManage }: { scope: Scope; canManage: 
     </header>
     <div className={surface.webview}>
       <DeferredPane pending={list.loading || state.loading} variant="list" label={t("common.loading")}>
-        {!list.loading && !state.loading && Boolean(error) && <div className={surface.state} role="alert"><h2>{ru ? "Не удалось загрузить API" : "Unable to load API"}</h2><p>{apiSourceError(error, ru)}</p><button type="button" onClick={retry}>{ru ? "Повторить" : "Retry"}</button></div>}
+        <ErrorToast message={!list.loading && !state.loading && error ? apiSourceError(error, ru) : null} title={ru ? "Не удалось загрузить API" : "Unable to load API"} retryLabel={ru ? "Повторить" : "Retry"} onRetry={retry} />
         {!list.loading && !list.error && !list.items.length && <div className={`${surface.state} ${surface.empty}`}>
           <div className={surface.network} aria-hidden="true"><svg viewBox="0 0 192 116"><path d="M42 29H72Q96 29 96 53V63M42 87H72Q96 87 96 63M96 58H153"/></svg>
             <span className={surface.service}><Braces size={23}/></span><span className={surface.database}><Database size={23}/></span>

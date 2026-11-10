@@ -1,7 +1,8 @@
 "use client";
 
+import { showErrorToast } from "../../../../presentation/common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
-import { addToast, Button, Modal, ModalContent, ModalHeader } from "@heroui/react";
+import { Button, Modal, ModalContent, ModalHeader } from "@heroui/react";
 import { X } from "lucide-react";
 import { useContext, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import type { WidgetDefinition } from "../../../../dashboards/layout/model/widget-catalog";
@@ -81,7 +82,7 @@ function DashboardPickerContent({ capture, onChoose, onClose, onExited }: Picker
     } catch {
       if (!controller.signal.aborted) {
         setBusy(false);
-        addToast({ title: ru ? "Не удалось сохранить снимок. Попробуйте ещё раз." : "Couldn’t save the snapshot. Try again.", severity: "danger" });
+        showErrorToast({ message: ru ? "Не удалось сохранить снимок. Попробуйте ещё раз." : "Couldn’t save the snapshot. Try again." });
       }
     } finally {
       request.current = null;

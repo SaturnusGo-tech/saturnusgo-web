@@ -1,7 +1,7 @@
 "use client";
 
+import { ErrorToast } from "../common/error/ErrorToast";
 import { useNavigationValue } from "../../state/navigation/context/useNavigationValue";
-import { Bug } from "lucide-react";
 import { useCallback } from "react";
 import type { Defect, ExternalLink, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
@@ -66,7 +66,8 @@ export function ReportsView({ workspaceId, projectId, projectName = "", defects,
             onOpenRun={onOpenRun} retest={defectRetest}
           />
         : selectedDefectStatus === "error"
-          ? <div className={surface.detailError} role="alert"><Bug size={22} /><strong>{locale === "ru" ? "Не удалось открыть баг-репорт" : "Could not open the bug report"}</strong><span>{locale === "ru" ? "Проверьте подключение и повторите." : "Check the connection and try again."}</span><button type="button" onClick={onRetrySelectedDefect}>{locale === "ru" ? "Повторить" : "Retry"}</button></div>
+          ? <ErrorToast message={locale === "ru" ? "Не удалось открыть баг-репорт" : "Could not open the bug report"}
+            retryLabel={locale === "ru" ? "Повторить" : "Retry"} onRetry={onRetrySelectedDefect} />
           : <TessiqLoader pane label={locale === "ru" ? "Загрузка баг-репорта" : "Loading bug report"} testId="defect-detail-loading" />}
     </motion.aside>}</AnimatePresence>
   </div>;

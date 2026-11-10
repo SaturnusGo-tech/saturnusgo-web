@@ -1,7 +1,8 @@
+import { ErrorToast } from "../../../common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
 import { useCaseHistory } from "../../../../test-cases/history/state/useCaseHistory";
 import { MemberAvatar } from "../../../../workspace/members/avatar/MemberAvatar";
-import { AlertCircle, Bug, FileClock, RotateCw } from "lucide-react";
+import { Bug, FileClock, RotateCw } from "lucide-react";
 import type { Activity, TestCaseSummary } from "../../../../../../core/tms/contracts/legacy-contract";
 import { activityLabel } from "../../../../localization/activity/label";
 import type { TmsLocale } from "../../../../localization/model/locale";
@@ -34,7 +35,8 @@ export function CaseActivityTab(props: Props) {
 
   return <div className={styles.contextList}>
     {history.loading && <div role="status" aria-label={ru ? "Загрузка истории" : "Loading history"} aria-busy="true" className={css.historySkeleton}><i /><i /><i /></div>}
-    {history.error && <div role="alert" className={css.refreshError}>{ru ? "Не удалось загрузить историю." : "Could not load history."}<button type="button" onClick={history.retry}>{ru ? "Повторить" : "Retry"}</button></div>}
+    <ErrorToast message={history.error ? (ru ? "Не удалось загрузить историю." : "Could not load history.") : null}
+      retryLabel={ru ? "Повторить" : "Retry"} onRetry={history.retry} />
     {(props.model.defects.status !== "ready" || props.model.defects.items.length > 0
       || props.model.defects.refreshFailed) && <section aria-labelledby="case-defect-history-title">
       <header className={css.groupHeading}>
@@ -52,22 +54,14 @@ export function CaseActivityTab(props: Props) {
           >{props.model.defects.refreshing ? <LoadingOrb size="xs" /> : <RotateCw size={13} />}</button>
         </div>}
       </header>
-      {props.model.defects.status === "ready" && props.model.defects.refreshFailed && <div
-        className={css.refreshError} role="alert"
-      ><AlertCircle size={13} />
-        {ru ? "Не удалось обновить статусы. Повторите загрузку." : "Could not refresh statuses. Try again."}
-      </div>}
+      <ErrorToast message={props.model.defects.status === "ready" && props.model.defects.refreshFailed
+        ? (ru ? "Не удалось обновить статусы." : "Could not refresh statuses.") : null}
+        retryLabel={ru ? "Повторить" : "Retry"} onRetry={props.model.refreshDefects} />
       {props.model.defects.status === "loading" && <div
         className={`${css.loadState} ${css.sectionLoadState}`} role="status" aria-busy="true"
       >{ru ? "Загрузка истории багов…" : "Loading bug history…"}</div>}
-      {props.model.defects.status === "error" && <div
-        className={`${css.loadState} ${css.sectionLoadState}`} role="alert"
-      ><AlertCircle size={20} />
-        <strong>{ru ? "Не удалось загрузить историю багов" : "Could not load bug history"}</strong>
-        <button type="button" onClick={props.model.retryDefects}>
-          <RotateCw size={14} />{ru ? "Повторить" : "Retry"}
-        </button>
-      </div>}
+      <ErrorToast message={props.model.defects.status === "error" ? (ru ? "Не удалось загрузить историю багов" : "Could not load bug history") : null}
+        retryLabel={ru ? "Повторить" : "Retry"} onRetry={props.model.retryDefects} />
       {props.model.defects.status === "unavailable" && <div
         className={`${css.loadState} ${css.sectionLoadState}`}
       ><span>{ru ? "История багов доступна после подключения к серверу" : "Bug history is available when connected to the server"}</span></div>}
@@ -84,9 +78,7 @@ export function CaseActivityTab(props: Props) {
       {props.model.defects.status === "ready"
         && (props.model.defects.hasMore || props.model.defects.loadMoreFailed)
         && <div className={css.pagination}>
-          {props.model.defects.loadMoreFailed && <span role="alert">
-            {ru ? "Не удалось загрузить более ранние баг-репорты." : "Could not load older bug reports."}
-          </span>}
+          <ErrorToast message={props.model.defects.loadMoreFailed ? (ru ? "Не удалось загрузить более ранние баг-репорты." : "Could not load older bug reports.") : null} />
           <button
             type="button"
             disabled={props.model.defects.loadingMore || props.model.defects.refreshing}

@@ -1,5 +1,4 @@
-import { RefreshCw } from "lucide-react";
-
+import { ErrorToast } from "../../../common/error/ErrorToast";
 import surface from "../../hooks.module.css";
 import type { HooksCopy } from "../../shared/hooks-copy";
 
@@ -15,13 +14,5 @@ export function YouTrackSettingsFailure({ copy, onRetry }: {
   copy: HooksCopy;
   onRetry: () => void;
 }) {
-  return (
-    <div className={surface.settingsFailure} role="alert">
-      <strong>{copy.loadError}</strong>
-      <p>{copy.loadErrorHint}</p>
-      <button type="button" className={surface.secondaryButton} onClick={onRetry}>
-        <RefreshCw size={15} aria-hidden="true" />{copy.retry}
-      </button>
-    </div>
-  );
+  return <ErrorToast title={copy.loadError} message={copy.loadErrorHint} retryLabel={copy.retry} onRetry={onRetry} />;
 }

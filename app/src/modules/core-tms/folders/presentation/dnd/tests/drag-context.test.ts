@@ -45,7 +45,7 @@ test("failed moves retain selection, show the server error and clear the drag pr
   h.moves[0].resolve({ ok: false, message: "Selection changed. Refresh and retry." });
   await setImmediate();
   assert.deepEqual([...selected], ["payments-1", "profile-2"]);
-  assert.equal((h.alerts()[0].props.children as unknown[])[0], "Selection changed. Refresh and retry.");
+  assert.equal(h.alerts()[0].props.message, "Selection changed. Refresh and retry.");
   assert.equal(elements(h.render(), (element) => element.props.role === "status").length, 0);
   assert.equal(h.updates.length, 0);
   h.start(active); h.drop(active, "target");
@@ -86,7 +86,7 @@ test("folder failure and drag cancellation never display a successful drop", asy
   const active = folderDrag("source", "Pay");
   h.start(active); h.drop(active, "target");
   h.updates[0].resolve(false); await setImmediate();
-  assert.match(String((h.alerts()[0].props.children as unknown[])[0]), /Папка не перемещена/);
+  assert.match(String(h.alerts()[0].props.message), /Папка не перемещена/);
   h.start(active); h.context().onDragCancel();
   assert.equal(h.preview().length, 0);
   assert.equal(h.alerts().length, 0);
@@ -150,7 +150,7 @@ test("only one mutation runs at a time and an unexpected transport rejection is 
   h.props.resource.moveCases = async () => { throw new Error("network"); };
   h.start(active); h.drop(active, "target"); await setImmediate();
   assert.equal(h.selection().active, false); assert.equal(h.preview().length, 0);
-  assert.match(String((h.alerts()[0].props.children as unknown[])[0]), /Could not move/);
+  assert.match(String(h.alerts()[0].props.message), /Could not move/);
 });
 
 test("closed folders expand after deliberate hover; leaving, opening and unmounting cancel the timer", context => {

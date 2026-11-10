@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../../presentation/common/error/ErrorToast";
 import { PiArrowsDownUp, PiFolderSimple, PiX } from "react-icons/pi";
 import type { RepositoryFolder } from "../../../model/folder";
 import { buildFolderTree } from "../../../model/tree";
@@ -21,7 +22,7 @@ export function FolderMovePanel({ folders, editing, disabled, ru }: {
       <ul className={css.tree}>{buildFolderTree(folders, []).roots.map(node => <FolderDestinationBranch key={node.folder.id} node={node}
         folders={folders} editing={editing} disabled={disabled} ru={ru} />)}</ul>
     </div>
-    {editing.error && <p role="alert" className={css.error}>{editing.error}</p>}
+    <ErrorToast message={editing.error} />
     <footer className={css.footer}><span>{ru ? `Папок: ${editing.count}` : `${editing.count} folder${editing.count === 1 ? "" : "s"}`}</span>
       <button type="button" className={css.cancel} disabled={editing.saving} onClick={editing.closeMove}>{ru ? "Отмена" : "Cancel"}</button>
       <button type="button" className={css.confirm} disabled={disabled || !editing.canMove} onClick={() => void editing.move()}>

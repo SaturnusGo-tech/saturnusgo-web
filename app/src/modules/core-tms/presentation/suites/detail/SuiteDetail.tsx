@@ -1,4 +1,5 @@
-import { ArrowLeft, ArrowRotateCw, Play, Settings, Stack } from "@openai/apps-sdk-ui/components/Icon";
+import { ErrorToast } from "../../common/error/ErrorToast";
+import { ArrowLeft, Play, Settings, Stack } from "@openai/apps-sdk-ui/components/Icon";
 import { Button } from "@heroui/react";
 import { useEffect, useRef } from "react";
 import type { Suite, SuiteSummary, TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
@@ -54,7 +55,11 @@ export function SuiteDetail(props: Props) {
       </header>
       {suite.description.trim() && <div className={css.description}><MarkdownField label={ru ? "Описание" : "Description"} value={suite.description} appearance="plain" allowAttachments={false} /></div>}
       {suite.status === "archived" && <p className={css.rule}>{ru ? "Этот сьют в архиве. Его можно просматривать, но нельзя изменять и запускать." : "This suite is archived. You can review it, but editing and runs are unavailable."}</p>}
-      {(props.error && !detail) || preview.error ? <div className={shared.empty} data-testid="suite-detail-error" role="status"><h2>{ru ? "Не удалось загрузить состав" : "Could not load suite cases"}</h2><p>{ru ? "Повторите попытку, чтобы увидеть актуальный список кейсов." : "Try again to see the current suite membership."}</p><button type="button" className={shared.quiet} onClick={preview.error ? preview.retry : props.onRetry}><ArrowRotateCw width={18} height={18} />{ru ? "Повторить" : "Retry"}</button></div>
+      {(props.error && !detail) || preview.error ? <div className={css.rule} data-testid="suite-detail-error">
+          <ErrorToast message={ru ? "Не удалось загрузить состав сьюта" : "Could not load suite cases"}
+            retryLabel={ru ? "Повторить" : "Retry"} onRetry={preview.error ? preview.retry : props.onRetry} />
+          <button type="button" className={shared.quiet} onClick={preview.error ? preview.retry : props.onRetry}>{ru ? "Повторить" : "Retry"}</button>
+        </div>
         : !detail || preview.loading ? <div data-testid="suite-detail-loading" role="status"><p className={css.rule}>{ru ? "Загружаем состав сьюта…" : "Loading suite membership…"}</p><RunCasesSkeleton /></div> : <>
           <SuiteCriteria suite={detail} folders={props.folders} ru={ru} />
           {cases.length < detail.resolvedCaseCount && <p className={css.rule} role="status">{ru ? `Загружено ${cases.length} из ${detail.resolvedCaseCount}. При запуске используется полный состав сьюта.` : `${cases.length} of ${detail.resolvedCaseCount} cases loaded. Runs use the full resolved suite.`}</p>}

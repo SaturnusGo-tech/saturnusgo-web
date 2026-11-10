@@ -2,6 +2,7 @@ import React from "react";
 import type { useExecutionHistory } from "../application/useExecutionHistory";
 import { ResponsibleName } from "../../../workspace/members/presentation/ResponsibleName";
 import { localizedLabel } from "../../../localization/format/labels";
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import styles from "./execution-history.module.css";
 
 export function ExecutionHistory({ state, locale, workspaceId, steps, filtered = false }: {
@@ -11,8 +12,8 @@ export function ExecutionHistory({ state, locale, workspaceId, steps, filtered =
   const ru = locale === "ru";
   return <div className={styles.body} aria-busy={state.loading}>
     {state.loading && <p className={styles.hint} role="status">{ru ? "Загрузка истории…" : "Loading history…"}</p>}
-    {state.error && <div className={styles.error} role="alert"><span>{ru ? "Не удалось загрузить историю." : "Could not load history."}</span>
-      <button type="button" onClick={state.refresh}>{ru ? "Повторить" : "Retry"}</button></div>}
+    <ErrorToast message={state.error ? (ru ? "Не удалось загрузить историю." : "Could not load history.") : null}
+      retryLabel={ru ? "Повторить" : "Retry"} onRetry={state.refresh} />
     {!state.loading && !state.error && !state.items.length && <p className={styles.hint}>{ru
       ? filtered ? "Подходящих записей нет." : "Записей выполнения пока нет."
       : filtered ? "No matching records." : "No execution activity yet."}</p>}

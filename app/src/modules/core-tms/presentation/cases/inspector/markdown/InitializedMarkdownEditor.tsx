@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorToast } from "../../../common/error/ErrorToast";
 import {
   MDXEditor,
   headingsPlugin,
@@ -185,6 +186,6 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
         onChange={(event) => props.onChange(event.target.value)}
       />
     </div>}
-    {problem && <span className={css.editorError} role="alert">{problem}</span>}
+    <ErrorToast message={problem} />
   </>;
 }

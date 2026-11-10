@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { useState } from "react";
 import { Button, Tooltip } from "@heroui/react";
 import { Pencil, Plus, Search } from "lucide-react";
@@ -32,8 +33,8 @@ export function CustomFieldsPage({ workspaceId, projectId, canManageFields, canM
     <div className={css.toolbar}><label className={css.search} data-input-shell><Search size={15} aria-hidden="true"/><input value={page.search}
       aria-label={ru ? "Найти поле" : "Find a field"} placeholder={ru ? "Найти поле" : "Find a field"} onChange={event => page.setSearch(event.target.value)} /></label>
       <label><input type="checkbox" checked={page.status === "all"} onChange={event => page.setStatus(event.target.checked ? "all" : "active")} />{ru ? "Показать архивные" : "Include archived"}</label></div>
-    {write.error && <p className={css.error} role="alert">{write.error}</p>}
-    {!!page.failure && <p className={css.error} role="alert">{customFieldError(page.failure, ru)} <button type="button" className={css.secondary} onClick={page.refresh}>{ru ? "Повторить" : "Retry"}</button></p>}
+    <ErrorToast message={write.error} />
+    <ErrorToast message={page.failure ? customFieldError(page.failure, ru) : null} retryLabel={ru ? "Повторить" : "Retry"} onRetry={page.refresh} />
     <div className={css.scroll} aria-busy={page.loading}>
       <DeferredPane pending={page.loading} variant="list" label={ru ? "Загрузка полей…" : "Loading fields…"}>
         <table className={css.table}><thead><tr>{[ru ? "Поле" : "Custom field", ru ? "Идентификатор" : "Identifier", ru ? "Тип" : "Type",

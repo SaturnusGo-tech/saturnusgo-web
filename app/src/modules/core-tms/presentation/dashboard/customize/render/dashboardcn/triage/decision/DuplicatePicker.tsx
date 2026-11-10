@@ -1,4 +1,5 @@
-import { Button, Input, Radio, RadioGroup } from "@heroui/react";
+import { ErrorToast } from "../../../../../../common/error/ErrorToast";
+import { Input, Radio, RadioGroup } from "@heroui/react";
 import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { DefectTriageCandidate, DefectTriageRow, DefectTriageSource } from "../../../../../../../defects/triage/defect-triage-source";
@@ -49,13 +50,8 @@ export function DuplicatePicker({ row, source, disabled, selectedId, onSelect }:
       }} />
     {query && !current && <p className={shared.context} role="status">{copy.searchPending}</p>}
     {query && current && (current.failed
-      ? <div role="alert" className={shared.error}>
-        <span>{copy.searchFailed}</span>
-        <Button type="button" size="sm" variant="light" disableRipple className={shared.button}
-          onPress={() => { setResults(null); setAttempt(value => value + 1); }}>
-          {t("dashboardWorkbench.retry")}
-        </Button>
-      </div>
+      ? <ErrorToast message={copy.searchFailed} retryLabel={t("dashboardWorkbench.retry")}
+        onRetry={() => { setResults(null); setAttempt(value => value + 1); }} />
       : <>
         {current.rows.length > 0 ? <RadioGroup aria-label={copy.search} value={selectedId} onValueChange={onSelect}
           isDisabled={disabled} classNames={{ wrapper: styles.candidates }}>

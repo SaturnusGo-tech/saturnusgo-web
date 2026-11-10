@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../../common/error/ErrorToast";
 import { Paperclip, X } from "lucide-react";
 import { useRef } from "react";
 import { AttachmentUploadProgress } from "../../../../../attachments/presentation/progress/AttachmentUploadProgress";
@@ -15,10 +16,12 @@ export function CommentAttachmentList({ state, pending, ru }: { state: State; pe
   return <div className={css.files}>
     {state.entries.map(item => <div key={item.key} className={css.file}>
       <Paperclip size={14} /><div><span>{item.name}</span><AttachmentUploadProgress name={item.name} phase={item.phase === "ready" ? undefined : item.phase} locale={ru ? "ru" : "en"} />
-        {item.error && <span role="alert" className={css.error}>{item.error}</span>}</div>
+        <ErrorToast message={item.error} retryLabel={ru ? "Повторить" : "Retry"}
+          onRetry={item.phase === "error" && !pending && !state.uploading ? () => state.retry(item.key) : undefined} />
+      </div>
       {item.phase === "error" && <button type="button" disabled={pending || state.uploading} onClick={() => state.retry(item.key)}>{ru ? "Повторить" : "Retry"}</button>}
       <button type="button" disabled={pending || state.uploading} onClick={() => state.remove(item.key)} aria-label={`${ru ? "Убрать вложение" : "Remove attachment"} ${item.name}`}><X size={14} /></button>
     </div>)}
-    {state.problem && <p role="alert" className={css.error}>{state.problem}</p>}
+    <ErrorToast message={state.problem} />
   </div>;
 }

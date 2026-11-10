@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { DiscussionComment } from "./comment/DiscussionComment";
 import { ContentSkeleton } from "../../../presentation/common/skeleton/ContentSkeleton";
 import { MarkdownField } from "../../../presentation/cases/inspector/markdown/MarkdownField";
@@ -42,8 +43,7 @@ export function OrganizationDiscussion({ canPost, workflowPhase = "new", phaseDi
     </form>}
     {state.command.error && <FormError message={formatTmsMutationFailure(state.command.error, copy.sendError)} />}
     {state.loading && !state.items.length && <ContentSkeleton compact variant="list" label={copy.loading} />}
-    {state.error && <div className={shared.error}><FormError message={formatTmsMutationFailure(state.error, copy.loadError)} />
-      <button type="button" className={shared.secondary} onClick={state.reload}>{copy.retry}</button></div>}
+    <ErrorToast message={state.error ? formatTmsMutationFailure(state.error, copy.loadError) : null} retryLabel={copy.retry} onRetry={state.reload} />
     <ol className={css.comments}>{state.items.map((item) => <DiscussionComment key={item.id} item={item}
       canEdit={canPost && Boolean(item.canEdit)} pending={state.command.pending} onSave={state.edit} />)}</ol>
     {state.cursor && <button type="button" className={shared.textButton} disabled={state.loading} onClick={state.loadMore}>{copy.more}</button>}

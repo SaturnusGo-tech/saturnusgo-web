@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorToast, showErrorToast } from "../../../../../presentation/common/error/ErrorToast";
 import { addToast, Button, Textarea } from "@heroui/react";
 import { $isCodeBlockNode, readOnly$, useCellValue, useCodeBlockEditorContext, type CodeBlockEditorProps } from "@mdxeditor/editor";
 import { $createParagraphNode, $getNodeByKey, $setSelection } from "lexical";
@@ -113,7 +114,7 @@ export function ProductDocStructuredBlock({ language, code, nodeKey, focusEmitte
       await writeClipboardText(code);
       addToast({ title: ru ? "Исходник скопирован" : "Source copied", severity: "success" });
     } catch {
-      addToast({ title: ru ? "Выделите и скопируйте исходник вручную" : "Select and copy the source", severity: "danger" });
+      showErrorToast({ message: ru ? "Выделите и скопируйте исходник вручную" : "Select and copy the source" });
     }
   }
 
@@ -187,7 +188,7 @@ export function ProductDocStructuredBlock({ language, code, nodeKey, focusEmitte
           onPaste={pasteSource}
           onFocus={() => { setEditingSource(true); parentEditor.update(() => $setSelection(null)); }} /></div>}
       {(diagram && !isSource && !readOnly || keepPrompt) && <div className={styles.footer}>
-        {activity.reveal && error && <p role="alert">{error}</p>}
+        <ErrorToast message={activity.reveal && error ? error : null} />
         {(mayGenerate || keepPrompt) && <Button ref={generateButton} type="button" size="sm" variant="light" radius="full" disableRipple className={styles.generate}
           aria-disabled={generating || keepPrompt || undefined} onPress={() => void generate()}
           startContent={<Send size={13} aria-hidden="true" />}>{ru ? "Сгенерировать" : "Generate"}</Button>}

@@ -1,3 +1,4 @@
+import { ErrorToast } from "../common/error/ErrorToast";
 import { LoadingOrb } from "../../../../shared/components/loading/LoadingOrb";
 import { Requirements } from "../../product-docs/requirements/Requirements";
 import { CaseMaintenanceFeature } from "../../test-cases/maintenance/composition/CaseMaintenanceFeature";
@@ -106,8 +107,9 @@ export function RunsView({ embedded = false, executionPending = false, emptyFilt
       {runNavigator}{panelHandle}
       <div className={runStyles.emptyPane} data-has-run={Boolean(selectedRun) || undefined}>
         {selectedRun && <RunSelectionContext run={selectedRun} />}
-        {itemLoadError ? <div className={runStyles.itemLoadError} role="alert" data-testid="run-item-error">
-          <p>{locale === "ru" ? "Не удалось открыть тест-кейс прогона." : "Could not open the test case in this run."}</p>
+        {itemLoadError ? <div className={runStyles.itemLoadError} data-testid="run-item-error">
+          <ErrorToast message={locale === "ru" ? "Не удалось открыть тест-кейс прогона." : "Could not open the test case in this run."}
+            retryLabel={t("common.retry")} onRetry={onRetryItem} />
           <button type="button" className={styles.secondaryButton} onClick={onRetryItem}>{t("common.retry")}</button>
         </div> : loadingPane ? <div className={runStyles.itemLoading} role="status" aria-label={t("common.loading")} data-testid="run-item-loading">
           {showCaseLoader && <LoadingOrb size="lg" />}

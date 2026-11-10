@@ -1,5 +1,6 @@
+import { ErrorToast } from "../../../common/error/ErrorToast";
 import {
-  AlertTriangle, Bug, CheckCircle2, Clock3, ExternalLink, Play, ShieldCheck,
+  Bug, CheckCircle2, Clock3, ExternalLink, Play, ShieldCheck,
 } from "lucide-react";
 import type { MouseEvent } from "react";
 import { localizedLabel } from "../../../../localization/format/labels";
@@ -151,11 +152,8 @@ export function CaseDefectRecord(props: Props) {
         : (ru ? "Баг исправлен после ретеста" : "Confirm fixed after retest")}</button>
       {blocked && <span id={`defect-block-${(defect.occurrence?.id ?? defect.defectId)}`} className={css.srOnly}>{blocked}</span>}
     </footer>}
-    {mutationFailure && <div className={css.inlineError} role="alert">
-      {collaborationFailureLabel(props.locale, mutationFailure)}
-    </div>}
-    {syncWarning && <div className={css.syncWarning} role="alert">
-      <AlertTriangle size={14} />{creation
+    <ErrorToast message={mutationFailure ? collaborationFailureLabel(props.locale, mutationFailure) : null} />
+    <ErrorToast message={syncWarning ? (creation
         ? youTrackCreationLabel(props.locale, creation)
         : defect.youTrack?.syncStatus === "deleted"
         ? (ru
@@ -163,8 +161,7 @@ export function CaseDefectRecord(props: Props) {
             : "The linked YouTrack issue was deleted or is no longer available. Contact the integration administrator.")
         : (ru
             ? "Синхронизация с YouTrack не завершена. Проверьте интеграцию и повторите её либо обратитесь к администратору."
-            : "YouTrack sync did not complete. Check and retry the integration, or contact an administrator.")}
-    </div>}
+            : "YouTrack sync did not complete. Check and retry the integration, or contact an administrator.")) : null} />
     {terminal && hasObservedYouTrackAcceptance(defect) && transition && <div className={css.verifiedStatus} role="status">
       <CheckCircle2 size={14} />{ru
         ? `YouTrack подтвердил переход «${transitionTarget}».`

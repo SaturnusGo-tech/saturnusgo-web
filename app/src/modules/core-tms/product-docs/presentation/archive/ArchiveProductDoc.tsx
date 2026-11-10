@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@heroui/react";
 import { ProductDocModal } from "../overlay/ProductDocModal";
@@ -53,10 +54,8 @@ export function ArchiveProductDoc({ api, scope, node, copy, onArchived, onClose 
   return <ProductDocModal title={copy.archiveItem} subtitle={current?.title ?? node.title} closeLabel={copy.close} busy={busy} onClose={dismiss}>
     <div className={styles.confirmation} aria-busy={busy || draft.status === "loading"}>
       {draft.status !== "ready" ? <ReadState copy={copy} status={draft.status} retry={draft.retry} />
-        : current ? <p>{copy.archiveHint}</p> : <p role="alert">{copy.unavailable}</p>}
-      {failure && <p role="alert" className={shared.error}>
-        {failure.stale ? copy.lifecycleStale : copy.archiveError}
-      </p>}
+        : current ? <p>{copy.archiveHint}</p> : <ErrorToast message={copy.unavailable} />}
+      <ErrorToast message={failure ? (failure.stale ? copy.lifecycleStale : copy.archiveError) : null} />
       <div className={styles.actions}>
         <Button autoFocus type="button" className={shared.action} isDisabled={busy} onPress={dismiss}>
           {copy.cancel}

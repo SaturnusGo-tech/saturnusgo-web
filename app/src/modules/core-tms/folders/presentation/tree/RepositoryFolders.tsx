@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { Button } from "@heroui/button";
 import { useDroppable } from "@dnd-kit/core";
 import { useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
@@ -126,7 +127,7 @@ export function RepositoryFolders(props: {
       {props.selectionMode && !moving.active && <div className={css.selectionActions}>{props.selectionActions}</div>}
     </div>
     <div className={css.treeScroll} aria-busy={resource.loading}>
-      {resource.error && <div className={css.loadError} role="alert"><span>{resource.error}</span><button onClick={resource.reload}>{ru ? "Обновить" : "Refresh"}</button></div>}
+      <ErrorToast message={resource.error} retryLabel={ru ? "Обновить" : "Refresh"} onRetry={resource.reload} />
       {resource.loading && !resource.items.length ? <div className={css.skeleton} role="status" aria-label={ru ? "Загрузка папок" : "Loading folders"}><i /><i /><i /><i /></div> : <ul className={css.tree}>
         {roots.map((node) => <RepositoryFolderBranch key={node.folder.id} node={node} depth={0} expanded={expanded} selected={props.selected} titleMode="inline"
           customize={!props.selectionMode} creation={creation} selectedFolder={props.selectedFolder} selectedFolderId={props.selectedFolderId} activeCaseId={props.activeCaseId} loadingCaseId={props.loadingCaseId} ru={ru} locked={props.locked || resource.busy || resource.loading}

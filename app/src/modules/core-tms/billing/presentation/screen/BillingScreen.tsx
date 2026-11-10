@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { CreditCard } from "lucide-react";
 import type { BillingAccount, BillingCheckout, BillingCheckoutMode, BillingFailure, BillingInvoice, BillingOutcome, BillingPlanId, BillingSummary } from "../../domain/billing";
@@ -86,11 +87,13 @@ export function BillingScreen(props: Props) {
     {!summary && !loading && <div className={css.empty}><CreditCard size={28} strokeWidth={1.5} aria-hidden="true" /><h3>{ru ? "Биллинг пока недоступен" : "Billing is not available yet"}</h3>
       <p>{ru ? "Не удалось получить сведения о подписке этого рабочего пространства." : "Subscription details are not available for this workspace."}</p>
       <button type="button" className={css.secondary} onClick={props.reload}>{ru ? "Повторить" : "Try again"}</button></div>}
-    {error && summary && <div className={css.error} role="alert"><span>{failureText(error.code, ru)}</span>
-      <button type="button" className={css.secondary} disabled={busy || (props.canRetryCommand && !(props.paymentsAvailable ?? billingPaymentsAvailable))} onClick={() => {
-        if (props.canRetryCommand) { if (props.paymentsAvailable ?? billingPaymentsAvailable) void props.retryCommand(); } else props.reload();
-      }}>{ru ? "Повторить" : "Try again"}</button>
-      {props.canRetryCommand && <span>{ru ? "Проверим то же действие, чтобы не создать повторный платёж." : "We will retry the same action to avoid a duplicate payment."}</span>}</div>}
+    <ErrorToast message={error && summary ? failureText(error.code, ru) : null}
+      retryLabel={ru ? "Повторить" : "Try again"}
+      onRetry={busy || (props.canRetryCommand && !(props.paymentsAvailable ?? billingPaymentsAvailable)) ? undefined
+        : props.canRetryCommand ? props.retryCommand : props.reload} />
+    {error && summary && props.canRetryCommand && <p className={css.note}>{ru
+      ? "Повторная проверка использует ту же операцию, чтобы избежать повторного платежа."
+      : "Retrying checks the same operation to avoid a duplicate payment."}</p>}
     {!canManage && <div className={css.readOnly}>{current}</div>}
     {canManage && !account && loading && <p className={css.loading} role="status">{ru ? "Загружаем тарифы…" : "Loading plans…"}</p>}
     {canManage && account && <>

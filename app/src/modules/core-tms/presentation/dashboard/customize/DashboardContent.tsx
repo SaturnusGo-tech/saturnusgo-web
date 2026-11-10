@@ -1,4 +1,5 @@
 "use client";
+import { ErrorToast } from "../../common/error/ErrorToast";
 import { AnimatedSelect } from "../../common/select/AnimatedSelect";
 import { WorkspaceHeaderActions } from "../../workspace/header-actions/WorkspaceHeaderActions";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
@@ -69,10 +70,10 @@ export function DashboardContent({ onOpenRow, data, layout, model, projectName }
         </motion.div>}
       </AnimatePresence>
     </div>}
-    {analytics.summaryError && <p className={surface.syncError} role="alert">{t(snapshot ? "dashboard.staleAnalytics" : "dashboard.summaryError")}
-      <button onClick={analytics.refresh}>{t("dashboard.retry")}</button></p>}
-    {!preferences.stored && <p className={surface.syncError} role="alert">{t("dashboardLayout.personalSyncError")}
-      <button type="button" onClick={() => void preferences.refresh()}>{t("dashboardLayout.retry")}</button></p>}
+    <ErrorToast message={analytics.summaryError ? t(snapshot ? "dashboard.staleAnalytics" : "dashboard.summaryError") : null}
+      retryLabel={t("dashboard.retry")} onRetry={analytics.refresh} />
+    <ErrorToast message={!preferences.stored ? t("dashboardLayout.personalSyncError") : null}
+      retryLabel={t("dashboardLayout.retry")} onRetry={() => void preferences.refresh()} />
     <div ref={sectionsRef} className={styles.sections} id={workflow ? panelId : undefined}
       role={workflow ? "tabpanel" : undefined} aria-labelledby={workflow ? dashboardTabId(panelId, selected) : undefined}>
       {sections.filter(section => workflow || selected === "all" || section === selected).map(section =>

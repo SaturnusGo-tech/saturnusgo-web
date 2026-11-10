@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { PiCaretRight, PiPlus } from "react-icons/pi";
 import type { FolderResource, RepositoryFolder } from "../../model/folder";
@@ -105,8 +106,7 @@ export function FolderStructurePage({ resource, ru, onBack, focusFolderId, onFoc
       {resource.canManage && <FolderStructureToolbar editing={editing} disabled={disabled} ru={ru}
         onSelect={() => { if (!disabled) { setDraftParent(undefined); editing.toggleSelecting(); } }} />}
       {editing.moveOpen && <FolderMovePanel folders={folders} editing={editing} disabled={disabled} ru={ru} />}
-      {resource.error && <div className={css.error} role="alert"><span>{resource.error}</span>
-        <button type="button" disabled={busy || resource.loading} onClick={() => { if (!busy && !resource.loading) resource.reload(); }}>{ru ? "Повторить" : "Retry"}</button></div>}
+      <ErrorToast message={resource.error} retryLabel={ru ? "Повторить" : "Retry"} onRetry={!busy && !resource.loading ? resource.reload : undefined} />
       {resource.canManage && draftParent === null && <div className={css.rootDraft} ref={rootDraft}>
         <InlineFolderForm parentId={null} parentName={ru ? "Репозиторий" : "Repository"} creation={creation} disabled={disabled} ru={ru}
           restoreFocus={() => requestAnimationFrame(() => newFolder.current?.focus({ preventScroll: true }))} />

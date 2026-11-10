@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import type { Catalog } from "../../../connectors/model/connector-types";
 import type { ImpactPermissions, ImpactRepository, ImpactScope, RepositoryInput } from "../../model/impact-types";
 import { useImpactRepositories } from "../../application/repositories/useImpactRepositories";
@@ -16,7 +17,7 @@ export function RepositorySettings({ scope, connectionId, catalog, ru, permissio
       <div className={css.actions}><button type="button" disabled={state.pending} onClick={() => void state.refresh()}>{ru ? "Обновить" : "Refresh"}</button>
         {permissions.configure && connectionId && <button type="button" disabled={state.pending || !state.loaded || Boolean(editing)} onClick={() => setEditing(crypto.randomUUID())}>{ru ? "Добавить репозиторий" : "Add repository"}</button>}</div></header>
     {!connectionId && <p className={css.notice}>{ru ? "Сначала сохраните подключение GitHub на вкладке «Подключение»." : "Save a GitHub connection in the Connection tab first."}</p>}
-    {state.error && <p role="alert" className={css.error}>{state.error}</p>}
+    <ErrorToast message={state.error} />
     {state.pending && <p role="status">{ru ? "Проверяем и сохраняем…" : "Loading or verifying repository…"}</p>}
     <ul className={css.list}>{state.rows.map((row) => <li className={css.row} key={row.id}>
       <div className={css.rowHeading}><strong>{row.repository}</strong><span className={css.badge}>{row.enabled ? (ru ? "Включён" : "Enabled") : (ru ? "Приостановлен" : "Paused")}</span></div>

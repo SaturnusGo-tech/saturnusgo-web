@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { Monitor, Smartphone } from "lucide-react";
 import { useCallback, useEffect } from "react";
 import type { AdministrationPort } from "../../application/ports/administration-port";
@@ -32,7 +33,7 @@ export function ProfileSessions({ client, version, showHeading = true }: { reado
         }}>{copy.endSession}</button>}
       </div>; })}
     </div>}
-    {(list.error || command.error) && <p className={styles.error} role="alert">{administrationError(command.error ?? list.error!, locale)}</p>}
+    <ErrorToast message={list.error || command.error ? administrationError(command.error ?? list.error!, locale) : null} />
     {list.cursor && <button className={styles.button} disabled={list.pending} onClick={() => void list.more()}>{copy.more}</button>}
   </section>;
 }

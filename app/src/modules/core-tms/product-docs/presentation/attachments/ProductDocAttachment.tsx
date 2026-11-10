@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorToast, showErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { addToast, Button, Modal, ModalBody, ModalContent, ModalHeader } from "@heroui/react";
 import { useReducedMotion } from "framer-motion";
@@ -61,7 +62,7 @@ export function ProductDocAttachment({ attachment, width, onWidthChange, onRemov
     try {
       await writeClipboardText(url.href);
       addToast({ title: ru ? "Ссылка на файл скопирована" : "File link copied", severity: "success" });
-    } catch { addToast({ title: ru ? "Не удалось скопировать ссылку" : "Couldn’t copy the file link", severity: "danger" }); }
+    } catch { showErrorToast({ message: ru ? "Не удалось скопировать ссылку" : "Couldn’t copy the file link" }); }
   }
 
   async function print() {
@@ -71,8 +72,7 @@ export function ProductDocAttachment({ attachment, width, onWidthChange, onRemov
     setPrinting(true);
     try { await printProductDocPdf(pdf.current, controller.signal); }
     catch {
-      if (!controller.signal.aborted) addToast({ severity: "danger",
-        title: ru ? "Не удалось подготовить печать. Скачайте PDF." : "Couldn’t prepare to print. Download the PDF to print it." });
+      if (!controller.signal.aborted) showErrorToast({ message: ru ? "Не удалось подготовить печать. Скачайте PDF." : "Couldn’t prepare to print. Download the PDF to print it." });
     } finally { printRequest.current = null; setPrinting(false); }
   }
 
@@ -85,7 +85,7 @@ export function ProductDocAttachment({ attachment, width, onWidthChange, onRemov
       link.download = access.filename;
       link.rel = "noreferrer";
       link.click();
-    } catch { addToast({ title: ru ? "Не удалось скачать файл" : "Couldn’t download the file", severity: "danger" }); }
+    } catch { showErrorToast({ message: ru ? "Не удалось скачать файл" : "Couldn’t download the file" }); }
   }
 
   const Icon = file ? icons[file.kind] : FileText;
@@ -115,10 +115,8 @@ export function ProductDocAttachment({ attachment, width, onWidthChange, onRemov
         </div>
       </figcaption>
       {file ? <div className={styles.preview}><ProductDocAttachmentPreview file={file} ru={ru} onDocument={setDocument} onRenew={resource.retry} /></div>
-        : !request || resource.status === "error" ? <div role="status" className={styles.message}>
-          {ru ? "Вложение недоступно" : "Attachment unavailable"}
-          {request && <Button type="button" size="sm" variant="light" onPress={resource.retry}>{ru ? "Повторить" : "Retry"}</Button>}
-        </div> : <div role="status" className={styles.message} aria-label={ru ? "Загрузка вложения" : "Loading attachment"}><LoadingOrb size="md" /></div>}
+        : !request || resource.status === "error" ? <ErrorToast message={ru ? "Вложение недоступно" : "Attachment unavailable"}
+          retryLabel={ru ? "Повторить" : "Retry"} onRetry={request ? resource.retry : undefined} /> : <div role="status" className={styles.message} aria-label={ru ? "Загрузка вложения" : "Loading attachment"}><LoadingOrb size="md" /></div>}
       {canResize && onWidthChange && <ProductDocMediaResize media={card} className={styles.resize} canvasSelector="[data-doc-resize-canvas]"
         centered minWidth={file?.kind === "image" ? 120 : 180} label={ru ? "Изменить размер вложения" : "Resize attachment"} onResize={setResized} onCommit={onWidthChange} />}
     </figure>

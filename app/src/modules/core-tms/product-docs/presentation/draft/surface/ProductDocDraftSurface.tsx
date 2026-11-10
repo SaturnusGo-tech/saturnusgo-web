@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorToast } from "../../../../presentation/common/error/ErrorToast";
 import type { MDXEditorMethods } from "@mdxeditor/editor";
 import dynamic from "next/dynamic";
 import type { ReactNode, RefObject } from "react";
@@ -9,7 +10,6 @@ import type { ProductDocDetail, ProductDocScope, ProductDocTitleHighlight } from
 import type { ProductDocProperties } from "../../../domain/properties/product-doc-properties";
 import type { ProductDocsCopy } from "../../../localization/copy";
 import { ProductDocDraftEmbedScope } from "../../embeds/context/productDocEmbedContext";
-import chrome from "../../product-docs.module.css";
 import { ProductDocPropertiesPanel } from "../../properties/ProductDocPropertiesPanel";
 import styles from "../editor.module.css";
 import { ProductDocTitleInput } from "../title/ProductDocTitleInput";
@@ -60,7 +60,7 @@ export function ProductDocDraftSurface({
       placeholder={folder ? copy.name : copy.untitledPage} disabled={busy} autoFocus={isFreshPage} folder={folder}
       onTitle={onTitle} onHighlight={onHighlight}
       onEnter={folder ? onFolderSave : () => editorRef.current?.focus(undefined, { defaultSelection: "rootStart" })} />
-    {error && <p className={styles.error} role="alert">{error}</p>}
+    <ErrorToast message={error} />
     {!withinLimits && <p className={styles.error} role="alert">{copy.draftTooLong}</p>}
   </div>;
   if (folder) return heading;
@@ -75,12 +75,10 @@ export function ProductDocDraftSurface({
       </ProductDocDraftEmbedScope>
       <input ref={importInput} type="file" hidden accept=".md,.markdown,.txt,text/markdown,text/plain"
         onChange={(event) => { void onImportText(event.target.files?.[0]); event.target.value = ""; }} />
-      {!validMarkup && <div className={styles.recovery}>
-        <p className={styles.error} role="alert">{ru
-          ? "Редактор не смог прочитать часть форматирования. Предыдущий черновик остаётся доступен."
-          : "The editor couldn’t read some formatting. Your last complete draft is still available."}</p>
-        <button className={chrome.action} type="button" disabled={busy} onClick={onRecover}>{copy.retry}</button>
-      </div>}
+      <ErrorToast message={!validMarkup ? (ru
+        ? "Редактор не смог прочитать часть форматирования. Предыдущий черновик остаётся доступен."
+        : "The editor couldn’t read some formatting. Your last complete draft is still available.") : null}
+        retryLabel={copy.retry} onRetry={busy ? undefined : onRecover} />
       {subdocs}
     </div>
     <aside className={styles.properties}>

@@ -1,7 +1,8 @@
 "use client";
 
+import { ErrorToast } from "../../../../presentation/common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
-import { Accordion, AccordionItem, Alert, Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@heroui/react";
+import { Accordion, AccordionItem, Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@heroui/react";
 import { useReducedMotion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, X } from "lucide-react";
@@ -93,11 +94,10 @@ export function ProductDocPublishPreview({ api, scope, docId, version, locale, i
         {current?.nextCursor && <Button className={chrome.action}
           onPress={() => setHistory({ cases, cursor: current.nextCursor ?? undefined })}>{ru ? "Показать ещё" : "Show more"}</Button>}
         {resource.status === "loading" && <div className={styles.loading} role="status"><LoadingOrb />{ru ? "Проверяем связи…" : "Checking links…"}</div>}
-        {resource.status === "error" && <Alert color="danger" isVisible description={stale
+        <ErrorToast message={resource.status === "error" ? (stale
             ? (ru ? "Черновик изменился. Откройте его актуальную версию." : "The draft changed. Reopen the latest version.")
-            : (ru ? "Не удалось проверить этот черновик." : "Could not check this draft.")}
-          classNames={{ base: styles.failure, iconWrapper: styles.alertIcon }}
-          endContent={!stale && <Button className={chrome.action} onPress={resource.retry}>{ru ? "Повторить" : "Retry"}</Button>} />}
+            : (ru ? "Не удалось проверить этот черновик." : "Could not check this draft.")) : null}
+          retryLabel={ru ? "Повторить" : "Retry"} onRetry={stale ? undefined : resource.retry} />
       </div>
       <ModalFooter as="footer">
         <Button className={chrome.action} onPress={onClose}>{ru ? "К редактору" : "Back to editor"}</Button>

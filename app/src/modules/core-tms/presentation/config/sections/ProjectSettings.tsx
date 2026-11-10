@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../common/error/ErrorToast";
 import { Archive, ArrowRotateCcw, EditPencil, ChevronUp } from "@openai/apps-sdk-ui/components/Icon";
 import { useEffect, useId, useRef, useState } from "react";
 import type { Project } from "../../../../../core/tms/contracts/legacy-contract";
@@ -66,8 +67,7 @@ export function ProjectSettings({ project, workspaceId, offline, canManage, onUp
       <div className={css.property}><dt>{copy.portfolio}</dt><dd><PortfolioName id={project.portfolioId ?? null} offline={offline} /></dd></div>
       <div className={css.property}><dt>{copy.status}</dt><dd><span className={css.state} data-archived={archived}>{t(archived ? "common.archived" : "common.active")}</span></dd></div>
     </dl>
-    {editor.error && <div role="alert" className={css.error}>{editor.error}
-      <button type="button" className={css.textAction} onClick={edit}>{ru ? "Повторить" : "Try again"}</button></div>}
+    <ErrorToast message={editor.error} retryLabel={ru ? "Повторить" : "Try again"} onRetry={edit} />
     {expansion.present && <div id={`${id}-editor`} data-project-expansion aria-hidden={!open || undefined}
       ref={element => { expansion.ref.current = element; if (element) element.inert = !open; }}>
       <div className={css.editorSpace}>{editor.resource && <ProjectInlineEditor workspaceId={workspaceId}

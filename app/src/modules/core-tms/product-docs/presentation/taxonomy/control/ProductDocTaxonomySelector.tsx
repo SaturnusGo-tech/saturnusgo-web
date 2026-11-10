@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorToast } from "../../../../presentation/common/error/ErrorToast";
 import { Button, Input, Listbox, ListboxItem, Skeleton, Tab, Tabs } from "@heroui/react";
 import { useReducedMotion } from "framer-motion";
 import { Search, X } from "lucide-react";
@@ -109,9 +110,8 @@ function TaxonomyValues({ scope, dimension, filter, value, labels, onSelect, cat
     {!waiting && !failure && !items.length && <p className={styles.hint}>{needsGroup
       ? (ru ? "Выберите группу, чтобы увидеть её продукты." : "Choose a group to see its products.")
       : (ru ? "Значения не найдены." : "No values found.")}</p>}
-    {Boolean(failure) && <p className={styles.hint} role="alert">{customFieldError(failure, ru)}{" "}
-      <Button disableRipple variant="light" size="sm" className={styles.catalogAction} onPress={catalog.failure ? catalog.refresh : page.refresh}>{ru ? "Повторить" : "Retry"}</Button>
-    </p>}
+    <ErrorToast message={failure ? customFieldError(failure, ru) : null}
+      retryLabel={ru ? "Повторить" : "Retry"} onRetry={catalog.failure ? catalog.refresh : page.refresh} />
     {(!fieldId ? catalog.cursor : page.cursor) && <Button disableRipple variant="light" size="sm" className={styles.catalogAction}
       isDisabled={catalog.pending || page.pending} onPress={() => void (fieldId ? page.more() : catalog.more())}>
       {ru ? "Показать ещё" : "Load more"}

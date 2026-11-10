@@ -1,11 +1,11 @@
 "use client";
 
+import { ErrorToast } from "../../../../../presentation/common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../../../shared/components/loading/LoadingOrb";
-import { Button } from "@heroui/react";
 import { activeEditor$, currentSelection$, readOnly$, rootEditor$ } from "@mdxeditor/editor";
 import { Cell, Signal, useCellValues, useRealm } from "@mdxeditor/gurx";
 import { getNearestEditorFromDOMNode, type RangeSelection } from "lexical";
-import { File as FileIcon, X } from "lucide-react";
+import { File as FileIcon } from "lucide-react";
 import { useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useTmsLocale } from "../../../../../localization/context/useTmsLocale";
 import { attachmentFileName, maxProductDocAttachmentBytes, productDocAttachmentAccept, productDocMediaAccept } from "../../../../domain/attachments/productDocAttachment";
@@ -163,10 +163,6 @@ export function ProductDocImageInput() {
         </div>
       </div>
     </div>}
-    {!pending && error && <div className={styles.feedback} role="alert">
-      {failure[error]}
-      <Button size="sm" variant="light" isIconOnly onPress={() => setError(null)} aria-label={ru ? "Закрыть" : "Dismiss"}>
-        <X size={14} aria-hidden="true" /></Button>
-    </div>}
+    <ErrorToast message={!pending && error ? failure[error] : null} />
   </>;
 }

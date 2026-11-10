@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../common/error/ErrorToast";
 import { useEffect, useRef } from "react";
 import type { Project } from "../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -46,7 +47,7 @@ export function ProjectInlineEditor({ project, etag, workspaceId, offline, onBus
     <div className={`${css.field} ${css.selectField}`}><span>{catalog.responsible}</span>
       <ResponsiblePicker workspaceId={workspaceId} value={form.responsibleIdentityId} onChange={form.setResponsibleIdentityId} disabled={disabled} offline={offline} />
     </div>
-    {form.error && <p className={`${css.error} ${css.full}`} role="alert">{form.error}</p>}
+    <ErrorToast message={form.error} />
     {!etag && <p className={`${css.error} ${css.full}`} role="alert">{ru ? "Не удалось получить версию проекта. Закройте форму и повторите попытку." : "Could not load the project version. Close the form and try again."}</p>}
     <footer className={`${css.actions} ${css.full}`}>
       <button type="button" className={css.cancel} disabled={form.pending} onClick={onCancel}>{copy.cancel}</button>

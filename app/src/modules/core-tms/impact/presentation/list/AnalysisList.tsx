@@ -4,6 +4,7 @@ import { useImpactList } from "../../application/list/useImpactList";
 import type { ImpactScope } from "../../model/impact-types";
 import { analysisCatalog, type AnalysisFilter } from "../../model/catalog/analysis-catalog";
 import { AnimatedSelect } from "../../../presentation/common/select/AnimatedSelect";
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { ImpactAiBanner } from "../banner/ImpactAiBanner";
 import { AnalysisRow } from "./AnalysisRow";
 import css from "./catalog.module.css";
@@ -45,7 +46,7 @@ export function AnalysisList({ scope, ru, enabled, onSelect }: {
       <AnimatedSelect className={css.filter} compact label={ru ? "Статус анализа" : "Analysis status"} value={filter} options={options}
         onChange={value => { setFilter(value as AnalysisFilter); setPage(1); }} />
     </div>
-    {state.error && <div role="alert" className={css.error}><p>{state.error}</p><button type="button" className={css.quiet} disabled={state.loading} onClick={() => void state.refresh()}>{ru ? "Повторить" : "Retry"}</button></div>}
+    <ErrorToast message={state.error} retryLabel={ru ? "Повторить" : "Retry"} onRetry={() => void state.refresh()} />
     {state.loading && !state.ready && <p className={css.empty} role="status">{ru ? "Загружаем анализы…" : "Loading analyses…"}</p>}
     {rows.items.length > 0 && <>
       <div className={css.columns} aria-hidden="true"><span>{ru ? "Изменение" : "Change"}</span><span>{ru ? "Статус" : "Status"}</span><span>{ru ? "Риск" : "Risk"}</span><span>{ru ? "Покрытие" : "Coverage"}</span><span className={css.date}>{ru ? "Создан" : "Created"}</span><span /></div>

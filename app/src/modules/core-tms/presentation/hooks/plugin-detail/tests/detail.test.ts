@@ -24,5 +24,9 @@ test("registration is account and project scoped, and both setup controls open M
   invoke(action(), "onInstall"); assert.equal(installed, 1); prepared = true; phase = "ready"; assert.equal(action().props.installed, true);
   invoke(action(), "onManage"); assert.equal(managed, 1);
   const connection = nodes(render()).find(node => node.type === "button" && text(node).includes("Authorization, rules"))!; invoke(connection, "onClick"); assert.equal(managed, 2);
-  phase = "error"; assert.ok(nodes(render()).some(node => node.props.role === "alert")); h.dispose();
+  phase = "error";
+  const toast = nodes(render()).find(node => node.type === "ErrorToast");
+  assert.match(String(toast?.props.message), /Could not prepare the plugin/);
+  assert.equal(typeof toast?.props.onRetry, "function");
+  h.dispose();
 });

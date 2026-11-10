@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../common/error/ErrorToast";
 import { useState } from "react";
 import { Pencil, Reply } from "lucide-react";
 import { MemberAvatar } from "../../../../workspace/members/avatar/MemberAvatar";
@@ -62,7 +63,7 @@ export function CaseCommentRecord({ comment, ru, languageTag, model, onReply, on
         <span>{ru ? "Удалить комментарий? Ответы сохранятся." : "Delete this comment? Replies will remain."}</span>
         <button type="button" disabled={pending} onClick={() => setConfirming(false)}>{ru ? "Отмена" : "Cancel"}</button>
         <button type="button" disabled={pending} onClick={async () => { if (await model.changeComment?.(comment, null)) setConfirming(false); }}>{ru ? "Удалить" : "Delete"}</button>
-        {error && <span role="alert">{error}</span>}
+        <ErrorToast message={error} />
       </div>}
     </div>
   </article>;

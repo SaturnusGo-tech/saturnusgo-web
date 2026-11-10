@@ -316,18 +316,6 @@
 .webhookFoot small { max-width: 470px; color: var(--muted); font-size: 9px; line-height: 1.45; }
 .webhookFoot a { flex: none; display: inline-flex; align-items: center; gap: 5px; color: var(--teal); font-size: 10px; font-weight: 620; text-decoration: none; }
 
-.settingsFailure {
-  min-height: calc(100% - 85px);
-  display: grid;
-  place-content: center;
-  justify-items: center;
-  padding: 30px;
-  text-align: center;
-}
-
-.settingsFailure strong { font-size: 14px; }
-.settingsFailure p { max-width: 390px; margin: 6px 0 16px; color: var(--muted); font-size: 12px; }
-
 .disconnectDialog { width: min(460px, calc(100vw - 32px)); border-radius: 14px; }
 .disconnectBody { display: grid; gap: 22px; padding: 20px; }
 .disconnectBody p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.55; }

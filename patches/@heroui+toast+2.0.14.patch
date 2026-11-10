@@ -1,0 +1,39 @@
+diff --git a/node_modules/@heroui/toast/dist/chunk-U2DWYKGQ.mjs b/node_modules/@heroui/toast/dist/chunk-U2DWYKGQ.mjs
+index 629468b..e1a123a 100644
+--- a/node_modules/@heroui/toast/dist/chunk-U2DWYKGQ.mjs
++++ b/node_modules/@heroui/toast/dist/chunk-U2DWYKGQ.mjs
+@@ -30,7 +30,7 @@ var ToastProvider = ({
+   const toastQueue = useToastQueue(getToastQueue());
+   const globalContext = useProviderContext();
+   const disableAnimation = (_a = disableAnimationProp != null ? disableAnimationProp : globalContext == null ? void 0 : globalContext.disableAnimation) != null ? _a : false;
+-  return /* @__PURE__ */ jsx(LazyMotion, { features: loadFeatures, children: toastQueue.visibleToasts.length > 0 && /* @__PURE__ */ jsx(
++  return /* @__PURE__ */ jsx(LazyMotion, { features: loadFeatures, children: /* @__PURE__ */ jsx(
+     ToastRegion,
+     {
+       disableAnimation,
+diff --git a/node_modules/@heroui/toast/dist/index.js b/node_modules/@heroui/toast/dist/index.js
+index 02649e7..8739a0c 100644
+--- a/node_modules/@heroui/toast/dist/index.js
++++ b/node_modules/@heroui/toast/dist/index.js
+@@ -1267,7 +1267,7 @@ var ToastProvider = ({
+   const toastQueue = (0, import_toast4.useToastQueue)(getToastQueue());
+   const globalContext = (0, import_system5.useProviderContext)();
+   const disableAnimation = (_a = disableAnimationProp != null ? disableAnimationProp : globalContext == null ? void 0 : globalContext.disableAnimation) != null ? _a : false;
+-  return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_framer_motion5.LazyMotion, { features: loadFeatures, children: toastQueue.visibleToasts.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
++  return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_framer_motion5.LazyMotion, { features: loadFeatures, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+     ToastRegion,
+     {
+       disableAnimation,
+diff --git a/node_modules/@heroui/toast/dist/toast-provider.js b/node_modules/@heroui/toast/dist/toast-provider.js
+index eed9c6a..dde3976 100644
+--- a/node_modules/@heroui/toast/dist/toast-provider.js
++++ b/node_modules/@heroui/toast/dist/toast-provider.js
+@@ -1265,7 +1265,7 @@ var ToastProvider = ({
+   const toastQueue = (0, import_toast4.useToastQueue)(getToastQueue());
+   const globalContext = (0, import_system5.useProviderContext)();
+   const disableAnimation = (_a = disableAnimationProp != null ? disableAnimationProp : globalContext == null ? void 0 : globalContext.disableAnimation) != null ? _a : false;
+-  return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_framer_motion5.LazyMotion, { features: loadFeatures, children: toastQueue.visibleToasts.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
++  return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_framer_motion5.LazyMotion, { features: loadFeatures, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+     ToastRegion,
+     {
+       disableAnimation,

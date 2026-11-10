@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../../../../common/error/ErrorToast";
 import { Button } from "@heroui/react";
 import { Box, Clock3, FlaskConical, Inbox } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
@@ -54,13 +55,9 @@ export function DefectIntake({ scope, view, canManage, onChange, onOpenRow }: Pr
   return <section className={styles.layout} data-detail={Boolean(selected) || undefined} aria-label={copy.intake}>
     <div className={styles.listPane} ref={queueRef} tabIndex={-1} aria-busy={list.loading || saving}>
       {completed && <p className={styles.notice} role="status">{copy.completed[completed]}</p>}
-      {error && !selected && <p className={styles.notice} role="alert">{copy[error]}</p>}
-      {list.error && <div className={styles.notice} role="alert">
-        <span>{copy[list.error]}</span>
-        <Button size="sm" variant="light" className={shared.button} onPress={() => void intake.load(list.failedCursor)}>
-          {t("dashboardWorkbench.retry")}
-        </Button>
-      </div>}
+      <ErrorToast message={error && !selected ? copy[error] : null} />
+      <ErrorToast message={list.error ? copy[list.error] : null} retryLabel={t("dashboardWorkbench.retry")}
+        onRetry={() => void intake.load(list.failedCursor)} />
       {list.loading && list.rows.length === 0 && <p className={styles.notice} role="status">{copy.loading}</p>}
       {!list.loading && !list.error && list.rows.length === 0 && <div className={styles.empty} role="status">
         <span className={styles.emptyIcon} aria-hidden="true">

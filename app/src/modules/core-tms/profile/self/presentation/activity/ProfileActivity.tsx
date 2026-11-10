@@ -1,4 +1,5 @@
 "use client";
+import { ErrorToast } from "../../../../presentation/common/error/ErrorToast";
 import { RefreshCw } from "lucide-react";
 import type { ProfilePeriod, SelfProfileActivity } from "../../domain/profile-model";
 import { profileCopy } from "../copy/profile-copy";
@@ -15,7 +16,7 @@ export function ProfileActivity({ value, loading, error, workspaceId, days, ru, 
       <div className={styles.period} role="group" aria-label={copy.period}>{([30, 90, 365] as const).map(period =>
         <button key={period} type="button" aria-pressed={days === period} onClick={() => onPeriod(period)}>{ru ? `${period} дн.` : `${period}d`}</button>)}</div>
     </header>
-    {error ? <div className={styles.empty} role="alert"><p>{copy.activityError}</p><button type="button" onClick={retry}><RefreshCw size={14} />{copy.retry}</button></div>
+    {error ? <ErrorToast message={copy.activityError} retryLabel={copy.retry} onRetry={retry} />
       : !workspaceId ? <div className={styles.empty}><p>{copy.noWorkspace}</p></div>
       : <div className={styles.charts}>{(["executedCases", "authoredCases", "defects", "runs"] as const).map(metric => <article key={metric} className={styles.metric} data-metric={metric}>
         <header><div><h3>{copy.metrics[metric]}</h3><strong>{value ? numbers.format(value.totals[metric]) : "—"}</strong></div><span>{copy.count(days)}</span></header>

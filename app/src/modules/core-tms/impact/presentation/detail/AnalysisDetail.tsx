@@ -1,5 +1,6 @@
 import { useId, useRef, useState, type KeyboardEvent } from "react";
 import { ArrowLeft, RefreshCw } from "lucide-react";
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { useImpactAnalysis } from "../../application/detail/useImpactAnalysis";
 import type { ImpactPermissions, ImpactScope } from "../../model/impact-types";
 import { ScopeReview } from "../scope/ScopeReview";
@@ -37,7 +38,7 @@ export function AnalysisDetail({ scope, id, ru, permissions, onBack }: {
       <button type="button" className={css.icon} title={ru ? "Обновить" : "Refresh"} aria-label={ru ? "Обновить анализ" : "Refresh analysis"}
         disabled={state.pending || state.loading} onClick={() => void state.refresh()}><RefreshCw size={15} /></button></div>
     {data?.aiEnabled === false && <ImpactAiBanner ru={ru} />}
-    {state.error && <p className={shared.error} role="alert">{state.error}</p>}
+    <ErrorToast message={state.error} />
     {!state.identityReady && <p className={shared.notice}>{ru ? "Для сохранения решений войдите в аккаунт повторно." : "Sign in again to save review decisions."}</p>}
     {data && !state.etag && <p className={shared.notice}>{ru ? "Обновите анализ перед сохранением: его версия не подтверждена." : "Reload before saving: the analysis version could not be verified."}</p>}
     {state.loading && !data && <p role="status">{ru ? "Загружаем анализ…" : "Loading analysis…"}</p>}

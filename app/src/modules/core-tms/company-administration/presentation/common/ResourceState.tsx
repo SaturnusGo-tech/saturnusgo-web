@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { administrationCopy } from "../copy/administration-copy";
 import { administrationError } from "../copy/administration-errors";
@@ -8,6 +9,5 @@ export function ResourceState({ loading, error, retry }: { readonly loading: boo
   const copy = administrationCopy(locale);
   return loading ? <div className={styles.loading} role="status" aria-label={locale === "ru" ? "Загрузка" : "Loading"}>
     <div className={styles.skeleton} /><div className={styles.skeleton} /><div className={styles.skeleton} />
-  </div> : <div><p role="alert" className={styles.error}>{administrationError(error ?? "SERVICE_UNAVAILABLE", locale)}</p>
-    <button className={styles.button} onClick={retry}>{copy.retry}</button></div>;
+  </div> : <ErrorToast message={administrationError(error ?? "SERVICE_UNAVAILABLE", locale)} retryLabel={copy.retry} onRetry={retry} />;
 }

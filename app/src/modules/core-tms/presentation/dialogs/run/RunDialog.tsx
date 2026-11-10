@@ -84,7 +84,7 @@ export function RunDialog(props: Props) {
             disabled={state.busy || props.offline} ru={ru} />
         </aside>
       </div>
-      {state.error && <div className={styles.feedback}><FormError message={state.error} /></div>}
+      {state.error && <FormError message={state.error} />}
       <footer className={styles.footer}><span>{ru ? "Выбрано кейсов" : "Selected cases"}: {state.caseIds.length}{suite ? ` + ${suite.name}` : ""}</span>
         <button className={styles.primary} type="submit" disabled={state.busy || state.platformBuilds.uploading || state.loading || state.loadFailed || (!state.caseIds.length && !suite) || (!state.iterationId && !state.name.trim())}>
           <Plus size={15} />{state.busy ? (ru ? "Создаём…" : "Creating…") : (ru ? "Создать прогон" : "Create run")}</button></footer>

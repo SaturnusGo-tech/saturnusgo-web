@@ -35,9 +35,9 @@ test("suite detail passes only the resolved membership to the case list and pres
 test("failure states do not present stale membership and retry the correct data source", () => {
   const { h, props, render, events, failPreview } = setup(); props.detail = null; props.error = true;
   let all = render(); assert.equal(all.some(node => node.type === "SuiteRepository"), false);
-  invoke(all.find(node => node.type === "button" && nodes(node).some(child => child.type === "ArrowRotateCw"))!, "onClick");
+  invoke(all.find(node => node.type === "ErrorToast" && typeof node.props.onRetry === "function")!, "onRetry");
   props.detail = detail; props.error = false; failPreview(); all = render();
-  invoke(all.find(node => node.type === "button" && nodes(node).some(child => child.type === "ArrowRotateCw"))!, "onClick");
+  invoke(all.find(node => node.type === "ErrorToast" && typeof node.props.onRetry === "function")!, "onRetry");
   assert.deepEqual(events, ["detail-retry", "preview-retry"]); h.dispose();
 });
 test("archive restrictions and read-only rights survive the detail presentation", () => {

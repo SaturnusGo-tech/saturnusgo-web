@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ArrowUpRight, ChevronRight, X } from "lucide-react";
 import { useOptionalTmsSession } from "../../../auth/presentation/session/TmsSessionContext";
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import type { useImpactList } from "../../application/list/useImpactList";
 import type { ImpactAnalysis, ImpactScope } from "../../model/impact-types";
 import { impactLabel } from "../../model/impact-copy";
@@ -26,9 +27,8 @@ export function RunImpactSummary({ state, scope, ru }: {
     setDismissed(previous => new Set([...previous, key]));
     try { if (subject) window.localStorage.setItem(key, "1"); } catch { /* Dismissal still works in this view when storage is unavailable. */ }
   };
-  if (state.error) return <div className={`${css.root} ${css.error}`} role="alert">
-    <span>{ru ? "Не удалось проверить предложение для этого прогона." : "Could not check the proposal for this run."}</span>
-    <button type="button" onClick={() => void state.refresh()}>{ru ? "Повторить" : "Retry"}</button></div>;
+  if (state.error) return <ErrorToast message={ru ? "Не удалось проверить предложение для этого прогона." : "Could not check the proposal for this run."}
+    retryLabel={ru ? "Повторить" : "Retry"} onRetry={() => void state.refresh()} />;
   if (!state.ready) return null;
   const visible = state.items.filter(item => !hidden(item));
   if (!visible.length) return null;

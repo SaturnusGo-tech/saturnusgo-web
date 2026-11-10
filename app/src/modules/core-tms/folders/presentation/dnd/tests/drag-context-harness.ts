@@ -66,6 +66,7 @@ export function dragHarness(selected = new Set<string>()) {
       if (name.endsWith("repository-drop")) return { canDropRepositoryDrag, repositoryDrag };
       if (name.endsWith("drag-click")) return { DragClickContext: { Provider: "DragClickProvider" }, RepositoryDragSelectionContext: { Provider: "DragSelectionProvider" } };
       if (name.endsWith("row-snapshot")) return { captureRepositoryRow: () => null };
+      if (name.endsWith("ErrorToast")) return { ErrorToast: "ErrorToast" };
       if (name.endsWith("RepositoryRowPreview")) return { RepositoryRowPreview: "RepositoryRowPreview" };
       if (name.endsWith(".css")) return { default: new Proxy({}, { get: (_target, key) => key }) };
       throw new Error(`Unexpected import ${name}`);
@@ -85,7 +86,7 @@ export function dragHarness(selected = new Set<string>()) {
   const preview = () => elements(render(), (element) => element.props.className === "dragPreview");
   const label = () => elements(preview(), element => element.type === "span")[0]?.props.children;
   const selection = () => elements(render(), element => element.type === "DragSelectionProvider")[0].props.value as { active: boolean; caseIds: ReadonlySet<string>; folderId: string | null };
-  const alerts = () => elements(render(), (element) => element.props.role === "alert");
+  const alerts = () => elements(render(), (element) => element.type === "ErrorToast" && Boolean(element.props.message));
   return { props, moves, updates, render, context, start, drop, preview, label, selection, alerts,
     suppressUntil: () => (elements(render(), (element) => element.type === "DragClickProvider")[0].props.value as { current: number }).current };
 }

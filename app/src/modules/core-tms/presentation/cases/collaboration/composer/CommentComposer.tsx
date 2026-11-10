@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../common/error/ErrorToast";
 import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Send, X, Reply } from "lucide-react";
@@ -57,7 +58,7 @@ export function CommentComposer({ ru, projectId, initial, reply, pending, failur
       </div>}
     </div>
     {serialized.length > 10_000 && <p role="alert">{ru ? "Максимум 10 000 символов" : "Maximum 10,000 characters"}</p>}
-    {failure && <p className={css.error} role="alert">{failure}</p>}
+    <ErrorToast message={failure} />
     <CommentAttachmentList state={files} pending={pending} ru={ru} />
     <footer><div className={css.mentions} ref={(element) => { if (element) element.inert = pending; }}><span ref={setEmojiHost} /><CommentAttachmentButton state={files} pending={pending} ru={ru} /><CommentMentions value={mentions} onChange={setMentions} ru={ru} /></div>
       <div className={css.submitActions}>{!persistent && <button type="button" disabled={pending} onClick={onCancel}>{ru ? "Отмена" : "Cancel"}</button>}

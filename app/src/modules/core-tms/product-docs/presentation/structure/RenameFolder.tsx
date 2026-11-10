@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { Button, Input } from "@heroui/react";
 import { ProductDocTooltip } from "../overlay/ProductDocTooltip";
@@ -62,6 +63,6 @@ export function RenameFolder({ api, scope, copy, node, onSaved, onClose }: {
     <ProductDocTooltip label={copy.cancel}><Button size="sm" isIconOnly type="button" className={repository.add} aria-label={copy.cancel} isDisabled={saving} onPress={onClose}>
       <X size={15} aria-hidden="true" />
     </Button></ProductDocTooltip>
-    {error && <p className={repository.error} role="alert">{error}</p>}
+    <ErrorToast message={error} />
   </form>;
 }

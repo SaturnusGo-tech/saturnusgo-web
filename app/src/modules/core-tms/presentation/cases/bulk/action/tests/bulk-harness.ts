@@ -41,6 +41,7 @@ export function harness<T extends object>(file: string, exportName: string, prop
       };
       if (name === "lucide-react" || name === "react-icons/pi") return new Proxy({}, { get: (_, key) => key });
       if (name.endsWith(".css")) return { default: new Proxy({}, { get: (_, key) => key }) };
+      if (name.endsWith("/ErrorToast")) return { ErrorToast: "ErrorToast" };
       if (name === "./BulkActionMenu") return { BulkActionMenu: "BulkActionMenu" };
       throw new Error(`Unexpected import ${name}`);
     },

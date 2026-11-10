@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../common/error/ErrorToast";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { Environment } from "../../../../../../core/tms/contracts/legacy-contract";
 import { useTmsHttpClient } from "../../../../auth/http/TmsHttpClientContext";
@@ -50,6 +51,6 @@ export function EnvironmentEditor({ projectId, environment, offline, onClose, on
       <div className={css.actions}><button type="button" onClick={onClose} disabled={pending}>{copy.cancel}</button>
         <button className={css.save} disabled={loading || pending || Boolean(environment && !resource) || !draft.name.trim() || !draft.key.trim() || !draft.baseUrl.trim()}>
           {pending ? copy.creating : locale === "ru" ? "Сохранить" : "Save"}</button></div></div>
-    {error && <p role="alert" className={css.error}>{copy.error}</p>}
+    <ErrorToast message={error ? copy.error : null} />
   </form>;
 }

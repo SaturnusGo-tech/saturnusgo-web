@@ -1012,10 +1012,6 @@
 .snapshotNote { display: flex; align-items: center; gap: 9px; padding: 10px; color: var(--falcon-text); background: var(--falcon-surface); border: 1px solid var(--line); }
 .snapshotNote span { display: flex; flex-direction: column; }
 .snapshotNote small { color: var(--muted); }
-.formError { display: flex; align-items: flex-start; gap: 9px; margin-top: 14px; padding: 10px 12px; color: var(--falcon-danger); background: var(--falcon-danger-bg); border: 1px solid var(--falcon-danger-border); }
-.formError > svg { flex: 0 0 auto; margin-top: 1px; }
-.formError > span { display: flex; flex-direction: column; gap: 2px; }
-.formError small { color: var(--falcon-danger); font-weight: 400; }
 .widgetPreview { display: flex; gap: 12px; margin-top: 16px; padding: 16px; border: 1px solid var(--line); background: var(--falcon-surface); }
 .widgetPreview p { margin: 3px 0 0; color: var(--muted); }
 
@@ -2254,7 +2250,6 @@
 .integrationFlowFields,
 .inlineUpload,
 .snapshotNote,
-.formError,
 .widgetPreview { border-radius: 8px; }
 
 .contextFiles,
@@ -2831,7 +2826,6 @@
 }
 
 .modal:not(.modalDrawer):not(.modalSheet) { animation: tms-reveal-panel 180ms cubic-bezier(.2, .72, .3, 1); }
-.formError,
 .drawerSummaryLine,
 .blockerNotice,
 .inlineFiles,
@@ -2843,7 +2837,6 @@
   .modalDrawer,
   .inlineDefect,
   .toolbarPopover,
-  .formError,
   .drawerSummaryLine,
   .blockerNotice,
   .inlineFiles,

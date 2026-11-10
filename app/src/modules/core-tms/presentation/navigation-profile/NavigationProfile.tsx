@@ -1,3 +1,4 @@
+import { ErrorToast } from "../common/error/ErrorToast";
 import { AvatarProfile, BuildingWorkspace, ChatTripleDots, Lifesaver, Logout, Settings } from "@openai/apps-sdk-ui/components/Icon";
 import { useId, useState } from "react";
 import { createPortal } from "react-dom";
@@ -75,7 +76,7 @@ export function NavigationProfile({ collapsed, workspaceId, onOpenSettings, onOp
             void session.signOut().catch(() => setFailed(true)).finally(() => setPending(false));
           }}><Logout width={20} height={20} aria-hidden="true"/><span>{t("auth.signOut")}</span></button>
       </>}
-      {failed && <p className={css.error} role="alert">{t("auth.logoutError")}</p>}
+      <ErrorToast message={failed ? t("auth.logoutError") : null} />
     </div>, document.body)}
     {downloadsAvailable && <DesktopDownloadsPanel open={downloadsOpen} anchor={popup.trigger} onClose={() => setDownloadsOpen(false)} />}
   </div>;

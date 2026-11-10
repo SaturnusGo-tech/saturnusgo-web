@@ -2,4 +2,3 @@
 .actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
 .actions button { min-height: 32px; }
 .actions span { color: var(--falcon-text-muted); font-size: 11px; }
-.editor p { margin: 0; color: var(--falcon-danger); font-size: 12px; }

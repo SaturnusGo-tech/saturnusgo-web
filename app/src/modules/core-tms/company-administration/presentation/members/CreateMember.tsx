@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { MemberDraft, MemberMutation } from "../../domain/administration";
@@ -46,7 +47,7 @@ export function CreateMember({ client, owner, onBack, onCreated, onBusy }: {
           onChange={(event) => setDraft({ ...draft, email: event.target.value })} /></label>
       <div className={styles.field}><span>{copy.role}</span><RoleField role={draft.role} disabled={command.pending}
         allowAdmin={owner} onChange={(role) => setDraft({ ...draft, role })} /></div>
-      {command.error && <p className={styles.error} role="alert">{administrationError(command.error, locale)}</p>}
+      <ErrorToast message={command.error ? administrationError(command.error, locale) : null} />
     </div>
   </form>;
 }

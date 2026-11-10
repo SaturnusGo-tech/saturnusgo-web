@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { Button, Popover, PopoverContent, Textarea } from "@heroui/react";
 import { useId, useRef, useState } from "react";
 import { Star, X } from "lucide-react";
@@ -50,9 +51,7 @@ export function MaintenanceControl({ state, workspaceId, ru, canManage, source }
           {state.projection.updatedAt && <time dateTime={state.projection.updatedAt}>{new Date(state.projection.updatedAt).toLocaleString(ru ? "ru" : "en", { dateStyle: "medium", timeStyle: "short" })}</time>}</div>}
         {state.projection?.note && <p className={css.note}>{state.projection.note}</p>}
         {state.loading && <p role="status" className={css.hint}>{ru ? "Загружаем отметку…" : "Loading maintenance…"}</p>}
-        {failure && <div className={css.error} role="alert"><span>{failure}</span>
-          <Button type="button" variant="light" isDisabled={state.pending} onPress={state.refresh}>{ru ? "Обновить" : "Reload"}</Button>
-        </div>}
+        <ErrorToast message={failure} retryLabel={ru ? "Обновить" : "Reload"} onRetry={state.pending ? undefined : state.refresh} />
         {canManage && (flagged || source) && <form className={css.form} onSubmit={async event => {
           event.preventDefault();
           if (state.pending || state.loading || !state.etag) return;

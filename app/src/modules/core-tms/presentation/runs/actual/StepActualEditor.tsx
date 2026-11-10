@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../common/error/ErrorToast";
 import { useEffect, useRef, useState } from "react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import styles from "../../../tms.module.css";
@@ -40,7 +41,7 @@ export function StepActualEditor({ value, order, onChange, onSave, onDirtyChange
           : (locale === "ru" ? "Сохранить результат" : "Save result")}</button>
       <span role="status">{!dirty && !pending ? (locale === "ru" ? "Сохранено" : "Saved") : ""}</span>
     </div>
-    {failed && <p role="alert">{locale === "ru" ? "Результат не сохранён. Повторите сохранение перед завершением кейса."
-      : "Result was not saved. Retry saving before finishing the case."}</p>}
+    <ErrorToast message={failed ? (locale === "ru" ? "Результат не сохранён. Повторите сохранение перед завершением кейса."
+      : "Result was not saved. Retry saving before finishing the case.") : null} retryLabel={t("common.retry")} onRetry={() => void save()} />
   </div>;
 }

@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { useEffect, type ReactNode } from "react";
 import type { useStartupSetup } from "../application/useStartupSetup";
 import type { BillingPlan, BillingAccount, BillingCheckout, BillingOutcome } from "../../domain/billing";
@@ -57,7 +58,7 @@ export function StartupSetupScreen({ model, plan, quote, canCheckout, paymentsAv
       {setup?.status === "failed" && <button type="button" onClick={() => void retryPreparation()}>{ru ? "Повторить подготовку" : "Retry preparation"}</button>}
       <button type="button" onClick={() => wizard.go("address")}>{ru ? "Изменить адрес" : "Edit address"}</button>
     </div>}
-    {stage !== "identity" && error && !fieldError && <div className={css.recovery} role="alert"><p>{ru ? "Не удалось продолжить. Ваши данные сохранены." : "Could not continue. Your details are saved."}</p></div>}
+    <ErrorToast message={stage !== "identity" && error && !fieldError ? (ru ? "Не удалось продолжить. Ваши данные сохранены." : "Could not continue. Your details are saved.") : null} />
     {model.canRetryCommand ? <div className={css.recovery}><button type="button" disabled={busy || model.busy} onClick={() => void retryCommand()}>{ru ? "Повторить то же действие" : "Retry the same action"}</button></div> : error && <div className={css.recovery}><button type="button" disabled={locked} onClick={model.reload}>{ru ? "Обновить данные" : "Refresh details"}</button></div>}
     {stage !== "identity" && checkoutNotice && <div className={css.checkoutNotice}>{checkoutNotice}</div>}
   </CompanyWizardFrame>;

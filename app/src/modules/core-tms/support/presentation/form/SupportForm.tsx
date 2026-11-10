@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { Bug, CircleHelp, Lightbulb, Camera, Send, Check } from "lucide-react";
 import { AnimatedSelect } from "../../../presentation/common/select/AnimatedSelect";
 import { MarkdownField } from "../../../presentation/cases/inspector/markdown/MarkdownField";
@@ -33,7 +34,7 @@ export function SupportForm({model:m,ru,pageUrl,onPageUrlChange,capture,capturin
       <SupportFiles files={m.files} remove={m.remove} busy={m.busy} ru={ru}/>
     </fieldset>
     {m.description.length>30000&&<p className={css.error} role="alert">{ru?'Описание должно быть не длиннее 30 000 символов.':'Description must be at most 30,000 characters.'}</p>}
-    {m.error&&<p className={css.error} role="alert">{m.error}</p>}
+    <ErrorToast message={m.error} />
     {m.busy&&<div className={css.progress} role="status"><span>{m.progress<1?(ru?'Загружаем вложения':'Uploading attachments'):(ru?'Отправляем обращение':'Submitting request')}</span><progress max={1} value={m.progress}/></div>}
     <footer className={css.actions}><button type="button" disabled={m.busy} onClick={onClose}>{ru?'Закрыть':'Close'}</button>
       <button type="submit" className={css.primary} disabled={m.busy||capturing||m.subject.trim().length<3||m.description.trim().length<3||m.description.length>30000}><Send size={16}/>{ru?'Создать обращение':'Send request'}</button></footer>

@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { useEffect, useState } from "react";
 import { customFieldError } from "../../application/field-errors";
 import type { CustomFieldDefinition, CustomFieldScope, CustomFieldSelection, CustomFieldValue } from "../../model/custom-field";
@@ -41,7 +42,8 @@ export function CustomFieldValueForm({ scope, field, current, ru, onSaved, onClo
       {write.conflict.kind === "similar" && <button type="button" className={css.secondary} disabled={write.pending}
         onClick={() => void save(write.conflict!.values.map(value => value.id))}>{ru ? "Создать отдельное значение" : "Create a separate value"}</button>}
     </div>}
-    {(validation || write.error) && <p role="alert" className={css.error}>{validation || write.error}</p>}
+    {validation && <p className={css.error} role="alert">{validation}</p>}
+      <ErrorToast message={write.error} />
     <div className={css.valueActions}><button type="submit" className={css.primary} disabled={write.pending || parent.loading || parentValue.loading || !!(parent.failure || parentValue.failure)}>
       {write.pending ? (ru ? "Сохранение…" : "Saving…") : current ? (ru ? "Сохранить значение" : "Save value") : (ru ? "Добавить" : "Add")}</button>
       <button type="button" className={css.secondary} disabled={write.pending} onClick={onClose}>{ru ? "Отмена" : "Cancel"}</button></div>

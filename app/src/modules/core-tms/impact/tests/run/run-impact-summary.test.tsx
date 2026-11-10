@@ -10,12 +10,14 @@ import { analysis, scope, storageFixture } from "../fixtures/impact-fixture";
 const require = createRequire(import.meta.url), previousCss = require.extensions[".css"];
 const previousReact = Object.getOwnPropertyDescriptor(globalThis, "React");
 let Summary: typeof import("../../presentation/run/RunImpactSummary")["RunImpactSummary"];
+let ErrorToast: typeof import("../../../presentation/common/error/ErrorToast")["ErrorToast"];
 type SummaryProps = Parameters<typeof Summary>[0];
 type SummaryUpdate = Omit<Partial<SummaryProps>, "state"> & { state?: Partial<SummaryProps["state"]> };
 before(async () => {
   require.extensions[".css"] = module => { module.exports = {}; };
   Object.assign(globalThis, { React });
   ({ RunImpactSummary: Summary } = await import("../../presentation/run/RunImpactSummary"));
+  ({ ErrorToast } = await import("../../../presentation/common/error/ErrorToast"));
 });
 after(() => {
   if (previousCss) require.extensions[".css"] = previousCss; else delete require.extensions[".css"];
@@ -104,8 +106,10 @@ test("loading and empty results stay quiet; failures retain Retry and Russian ap
   f.update({ state: { items: [], ready: true, error: null } });
   assert.equal(f.root.toJSON(), null);
   f.update({ state: { items: [], ready: false, error: "Failed" } });
-  const retry = f.root.root.findByProps({ role: "alert" }).findAllByType("button"); assert.equal(retry.length, 1);
-  await act(async () => retry[0].props.onClick()); assert.equal(f.refreshes(), 1);
+  assert.equal(f.root.toJSON(), null);
+  const toast = f.root.root.findByType(ErrorToast);
+  assert.equal(toast.props.retryLabel, "Retry");
+  await act(async () => toast.props.onRetry()); assert.equal(f.refreshes(), 1);
   f.proposals([analysis({ approved: true })]);
   f.update({ ru: true, state: { items: [analysis({ approved: true })], ready: true, error: null } });
   assert.ok(JSON.stringify(f.root.toJSON()).includes("Состав подтверждён QA"));

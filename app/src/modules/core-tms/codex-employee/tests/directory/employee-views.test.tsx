@@ -9,6 +9,7 @@ import type { useCodexEmployee } from "../../application/state/useCodexEmployee"
 const requireCss = require.extensions[".css"];
 require.extensions[".css"] = module => { module.exports = {}; };
 const { CodexEmployeeRow } = require("../../presentation/directory/CodexEmployeeRow") as typeof import("../../presentation/directory/CodexEmployeeRow");
+const { ErrorToast } = require("../../../presentation/common/error/ErrorToast") as typeof import("../../../presentation/common/error/ErrorToast");
 if (requireCss)
     require.extensions[".css"] = requireCss;
 else
@@ -42,11 +43,14 @@ test("directory preserves loading/error/retry before any employee exists without
   assert.match(loading,/Loading Codex/);assert.doesNotMatch(loading,/data-codex-employee-row|Disable for company|Activate Codex/);
   const failed={...pending,loading:false,error:"SERVICE_UNAVAILABLE"};
   const html=renderToStaticMarkup(<CodexEmployeeRow employee={failed.employee} locale="en" error={failed.error} retry={failed.refresh}/>);
-  assert.match(html,/Codex could not be loaded/);assert.match(html,/Retry/);assert.doesNotMatch(html,/data-codex-employee-row/);
+  assert.equal(html, "");
   const {act,create}=await import("react-test-renderer");
   const mounted:{view?:ReturnType<typeof create>}={};
   await act(async()=>{mounted.view=create(<CodexEmployeeRow employee={failed.employee} locale="en" error={failed.error} retry={failed.refresh}/>);});
   const view=mounted.view;assert.ok(view);
-  await act(async()=>view.root.findByType("button").props.onClick());assert.equal(retries,1);
+  const toast = view.root.findByType(ErrorToast);
+  assert.match(toast.props.message, /Codex could not be loaded/);
+  assert.equal(toast.props.retryLabel, "Retry");
+  await act(async()=>toast.props.onRetry());assert.equal(retries,1);
   await act(async()=>view.unmount());
 });

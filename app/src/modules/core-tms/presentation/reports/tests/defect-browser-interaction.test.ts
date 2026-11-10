@@ -122,7 +122,7 @@ test("scope retention clears immediately on access error or project changes", ()
   invoke(f.render().find(node => node.type === "Tabs")!, "onSelectionChange", "closed");
   f.state.groupsStatus = "error"; f.state.groupsError = "access_unavailable"; f.state.groups = []; f.state.branches = {};
   const error = f.render();
-  assert.ok(error.some(node => node.props.role === "alert"));
+  assert.equal(error.find(node => node.type === "ErrorToast")?.props.message, "Не удалось загрузить баг-репорты");
   assert.ok(!error.some(node => node.type === "DefectBranch"));
 
   f.state.groupsStatus = "ready"; f.state.groupsError = null;

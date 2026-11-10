@@ -53,8 +53,6 @@
 .empty { display: grid; justify-items: center; align-content: center; gap: 10px; min-height: 190px; padding: 32px 16px; color: var(--falcon-text-muted); text-align: center; }
 .empty h3 { margin: 0; color: var(--falcon-text); font-size: 16px; font-weight: 500; }
 .empty p { margin: 0; max-width: 400px; line-height: 21px; font-size: 13px; }
-.error { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; color: var(--falcon-danger); font-size: 13px; }
-.error p { margin: 0; flex: 1; }
 .catalog > aside { margin-bottom: 18px; padding: 12px 14px; gap: 16px; background: transparent; border-color: var(--falcon-border-subtle); }
 .catalog > aside h3 { margin: 3px 0; font-size: 13px; }
 .catalog > aside p { font-size: 12px; line-height: 18px; }

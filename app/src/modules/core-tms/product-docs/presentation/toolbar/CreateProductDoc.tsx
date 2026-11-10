@@ -1,7 +1,8 @@
 "use client";
 
+import { ErrorToast, showErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
-import { addToast, Button, Input, Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
+import { Button, Input, Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
 import { Check, ListPlus, Plus, X } from "lucide-react";
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import type { ProductDocNode, ProductDocsApi, ProductDocScope } from "../../domain/product-docs";
@@ -64,7 +65,7 @@ export function CreateProductDoc({ api, scope, parentId, kind, copy, onCreated, 
       onCreated(result.id, kind);
     } catch {
       if (controller.signal.aborted) return;
-      if (kind === "page") addToast({ title: copy.createError, severity: "danger" });
+      if (kind === "page") showErrorToast({ message: copy.createError });
       else setFailed(true);
     } finally {
       currentRequest.current = null;
@@ -120,7 +121,7 @@ export function CreateProductDoc({ api, scope, parentId, kind, copy, onCreated, 
           </Button>
           <Button size="sm" isIconOnly type="button" className={styles.iconButton} aria-label={copy.cancel} isDisabled={saving}
             onPress={dismiss}><X size={16} aria-hidden="true" /></Button>
-          {failed && <p className={styles.error} role="alert">{copy.createError}</p>}
+          <ErrorToast message={failed ? copy.createError : null} />
         </form>
       </PopoverContent>
     </Popover>

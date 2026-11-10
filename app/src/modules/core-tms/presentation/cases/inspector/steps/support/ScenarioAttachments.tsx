@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorToast } from "../../../../common/error/ErrorToast";
 import type { ReactNode } from "react";
 import { useTmsLocale } from "../../../../../localization/context/useTmsLocale";
 import { AttachmentLink } from "../../../../../attachments/presentation/link/AttachmentLink";
@@ -43,9 +44,7 @@ export function ScenarioAttachmentControls(props: DraftAttachmentsProps & {prefi
       onRemove={attachments.remove}
       presentation="media"
     />}
-    {attachments.problem && <span className={css.attachmentError} role="alert">
-      {attachments.problem}
-    </span>}
+    <ErrorToast message={attachments.problem} />
   </div>;
 }
 

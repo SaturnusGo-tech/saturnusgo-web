@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { Button, Textarea } from "@heroui/react";
 import { ArrowUp } from "lucide-react";
@@ -93,7 +94,7 @@ export function ProductDocActivity({ api, scope, document, locale, copy }: {
     {published && resource.status !== "ready" && <ReadState copy={copy} status={resource.status} retry={resource.retry} />}
     {cursor && <Button type="button" variant="light" size="sm" className={styles.older} isDisabled={loadingMore}
       onPress={() => void loadOlder(cursor)}>{loadingMore ? copy.loading : ru ? "Предыдущие комментарии" : "Earlier comments"}</Button>}
-    {moreError && <p role="alert" className={styles.error}>{copy.unavailable}</p>}
+    <ErrorToast message={moreError ? copy.unavailable : null} />
     {rows.length > 0 && <ol className={styles.feed} role="list">
       {rows.map((row) => <li className={styles.entry} data-comment={Boolean(row.body) || undefined} key={row.id}>
         <span className={styles.avatar} aria-hidden="true">
@@ -118,7 +119,7 @@ export function ProductDocActivity({ api, scope, document, locale, copy }: {
         classNames={{ inputWrapper: styles.field, input: styles.input }}
         maxLength={4000} minRows={1} maxRows={10} isDisabled={posting} onValueChange={setBody} />
       <div className={styles.composerActions}>
-        {postError && <p className={styles.error} role="alert">{copy.commentError}</p>}
+        <ErrorToast message={postError ? copy.commentError : null} />
         <Button type="submit" isIconOnly size="sm" radius="full" disableRipple className={styles.send}
           aria-label={posting ? copy.postingComment : copy.postComment} title={copy.postComment} isLoading={posting} spinner={<LoadingOrb />} isDisabled={posting || !body.trim()}>
           <ArrowUp size={15} aria-hidden="true" />

@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { useState } from "react";
 import { Button } from "@heroui/react";
 import { Archive, RotateCcw } from "lucide-react";
@@ -53,7 +54,8 @@ export function CustomFieldEditor({ field, scope, canManageFields, canManageValu
           <FieldToggle checked={draft.required} onChange={value => change("required", value)} disabled={readonly} label={ru ? "Обязательное поле" : "Required field"} />
           <span className={css.hint}>{ru ? "Проверяется при сохранении тест-кейса." : "Checked when saving a test case."}</span>
         </div></div>
-        {(validation || write.error) && <p className={css.error} role="alert">{validation || write.error}</p>}
+        {validation && <p className={css.error} role="alert">{validation}</p>}
+      <ErrorToast message={write.error} />
       </form>
       {field ? <CustomFieldValues field={field} scope={scope} canManage={canManageValues && !field.archivedAt} />
         : <p className={css.hint}>{ru ? "Сохраните поле, чтобы добавить значения." : "Save the field to add values."}</p>}

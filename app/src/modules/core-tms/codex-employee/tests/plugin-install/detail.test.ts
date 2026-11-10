@@ -34,7 +34,9 @@ test("Codex detail delegates installation states and Manage while company activa
   installed = true; phase = "ready";
   resource.employee = { ...resource.employee!, status: "active" }; phase = "idle"; installed = false;
   assert.equal(action().props.canManage, true); assert.equal(action().props.installed, false);
-  phase = "error"; assert.ok(nodes(render()).find(node => node.props.role === "alert"));
+  phase = "error";
+  const toast = nodes(render()).find(node => node.type === "ErrorToast");
+  assert.match(String(toast?.props.message), /Could not prepare the integration/);
   assert.equal(Boolean(action().props.disabled), false); h.dispose();
 });
 test("Codex detail opens the playbook panel and preserves the workspace URL", () => {

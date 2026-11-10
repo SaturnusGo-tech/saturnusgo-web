@@ -51,3 +51,9 @@ test("safe errors preserve a support request ID and never render upstream respon
   const message = connectorError(failure, true);
   assert.match(message, /request-safe/); assert.equal(message.includes("secret-token"), false);
 });
+
+test("Linear discovery gives safe guidance for a gateway failure", () => {
+  const failure = new TmsApiError("sensitive upstream response", 502, "request-safe");
+  assert.equal(connectorError(failure, true, true),
+    "Не удалось проверить доступ к Linear. Повторите проверку через минуту. · request-safe");
+});

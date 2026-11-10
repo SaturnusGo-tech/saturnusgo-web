@@ -5,4 +5,3 @@
 .section a:hover strong { text-decoration: underline; }
 .section a span { display: grid; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
 .section strong { font-size: 12px; }
-.section button { padding: 5px 8px; margin: 6px 0; display: block; background: var(--paper); border: 1px solid var(--line); border-radius: 4px; cursor: pointer; }

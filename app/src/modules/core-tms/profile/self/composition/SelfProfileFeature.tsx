@@ -1,4 +1,5 @@
 "use client";
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { RefreshCw } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
@@ -31,7 +32,7 @@ export function SelfProfileFeature({ workspaceId }: {
   const message = code === "VERSION_CONFLICT" ? copy.conflict : /IMAGE|AVATAR|BANNER|FILE/.test(code) ? copy.imageError : profile ? copy.error : copy.loadError;
   return <div className={styles.page}>
     <header className={styles.heading}><h1>{copy.title}</h1><span className={styles.saved} role="status">{resource.notice && !resource.error ? copy.saved : ""}</span></header>
-    {!!resource.error && <div className={styles.feedback} role="alert"><span>{message}</span><button type="button" disabled={resource.pending} onClick={resource.retry}><RefreshCw size={13} />{copy.retry}</button></div>}
+    <ErrorToast message={resource.error ? message : null} retryLabel={copy.retry} onRetry={resource.pending ? undefined : resource.retry} />
     {!profile ? resource.loading ? <div className={styles.skeleton} aria-busy="true" aria-label={ru ? "Загружаем профиль" : "Loading profile"}><div /><div /></div> : null : <>
       <div className={styles.overview}>
         <aside className={styles.person}>

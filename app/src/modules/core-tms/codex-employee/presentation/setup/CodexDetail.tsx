@@ -8,6 +8,7 @@ import { CodexPluginPreview } from "../plugin-preview/CodexPluginPreview";
 import { useCodexInstall } from "./installation/useCodexInstall";
 import { IntegrationGuideLink } from "../../../presentation/hooks/shared/theme/IntegrationGuideLink";
 import { PluginInstallAction } from "../../../presentation/hooks/shared/plugin-install/PluginInstallAction";
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import surface from "../plugin-surface/plugin.module.css";
 import css from "./setup.module.css";
 
@@ -37,7 +38,8 @@ export function CodexDetail({ state, locale, onBack, onManage = () => {}, accoun
       </header>
       <CodexResourceState loading={state.loading} error={state.error} locale={locale} retry={state.refresh} />
       {state.readOnly && <p className={surface.notice}>{ru ? "Доступны только чтение и экспорт. Изменения и выполнение отключены." : "Read and export access only. Changes and execution are disabled."}</p>}
-      {installation.phase === "error" && <p className={surface.notice} role="alert">{ru ? "Не удалось подготовить интеграцию. Повторите установку." : "Could not prepare the integration. Try installing again."}</p>}
+      <ErrorToast message={installation.phase === "error" ? (ru ? "Не удалось подготовить интеграцию." : "Could not prepare the integration.") : null}
+        retryLabel={ru ? "Повторить" : "Retry"} onRetry={state.loading || !(state.connection ?? employee?.setup) ? undefined : () => void installation.install()} />
       <CodexPluginPreview ru={ru} />
       <p className={css.description}>{ru ? "Поручайте Codex подготовку и обновление тест-кейсов, организацию репозитория, создание прогонов и разбор результатов в Falcon. Работайте с требованиями, URL, PDF и Figma — в рамках своих прав и выбранных проектов."
         : "Use Codex to prepare and update test cases, organize the repository, create test runs, and review results in Falcon. Work from requirements, URLs, PDFs, and Figma within your permissions and selected projects."}</p>

@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { useRef, useState } from "react";
 import { PiPaperclip, PiArrowClockwise, PiX } from "react-icons/pi";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -23,7 +24,7 @@ export function OrganizationAttachments({ target, canRead, canManage }: { target
     </div>
     {selectionError && <FormError message={copy.limit} />}
     {state.loading && <p role="status" className={css.note}>{copy.loading}</p>}
-    {state.error && <div><FormError message={formatTmsMutationFailure(state.error, copy.loadError)} /><button type="button" className={css.action} onClick={state.reload}>{copy.retry}</button></div>}
+    <ErrorToast message={state.error ? formatTmsMutationFailure(state.error, copy.loadError) : null} retryLabel={copy.retry} onRetry={state.reload} />
     <ul className={css.list}>{state.items.map((item) => <li key={item.id}>{item.status === "ready" ?
       <AttachmentLink attachmentId={item.id} canRemove={canManage} disposition="attachment" /> :
       <span>{item.originalFilename} · {item.status === "pending" ? copy.pending : copy.unavailable}</span>}</li>)}</ul>

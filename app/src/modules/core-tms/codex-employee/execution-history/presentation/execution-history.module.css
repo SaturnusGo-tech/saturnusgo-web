@@ -13,9 +13,8 @@
 .filters > div > button { min-height: 32px; border-color: var(--falcon-border-subtle); border-radius: 8px; background: transparent; font: inherit; font-size: 12px; }
 .body { min-width: 0; }
 .hint { margin: 0; padding: 4px 0; color: var(--falcon-text-muted); font-size: 12px; line-height: 20px; }
-.error { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 4px 0; color: var(--falcon-danger); line-height: 20px; }
-.error button, .more { min-height: 30px; padding: 4px 8px; border: 0; border-radius: 7px; color: var(--falcon-text-muted); background: transparent; font: inherit; font-size: 12px; cursor: pointer; }
-.error button:hover, .more:hover { color: var(--falcon-text); background: var(--falcon-hover); }
+.more { min-height: 30px; padding: 4px 8px; border: 0; border-radius: 7px; color: var(--falcon-text-muted); background: transparent; font: inherit; font-size: 12px; cursor: pointer; }
+.more:hover { color: var(--falcon-text); background: var(--falcon-hover); }
 .more { margin-top: 8px; }.more:disabled { opacity: .5; cursor: default; }
 .events { list-style: none; padding: 0; margin: 0; }
 .events > li { min-width: 0; padding: 11px 0; border-top: 1px solid var(--falcon-border-subtle); }

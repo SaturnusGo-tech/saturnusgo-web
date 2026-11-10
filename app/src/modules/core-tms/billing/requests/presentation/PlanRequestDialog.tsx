@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { useEffect, useId, useRef, useState } from "react";
 import { ArrowUpRight, Check, Copy, Mail, Settings2, X } from "lucide-react";
 import { FalconBrandMark } from "../../../../../shared/components/brand/FalconBrandMark";
@@ -114,7 +115,8 @@ export function PlanRequestDialog({ planId, ru, data, request, busy, loading, er
         </div>
         {unavailable && !contactOnly && <p className={css.message} role="status">{ru ? "Этот тариф недоступен для текущего пространства." : "This plan is unavailable for your current workspace."}</p>}
         {loading && <p className={css.message} role="status">{ru ? "Загружаем данные заявки…" : "Loading request details…"}</p>}
-        {((error && !request) || failed) && <p className={css.error} role="alert">{ru ? "Не удалось обновить заявку. Попробуйте ещё раз." : "Couldn’t update the request. Please try again."} <button type="button" onClick={onReload}>{ru ? "Обновить" : "Refresh"}</button></p>}
+        <ErrorToast message={(error && !request) || failed ? (ru ? "Не удалось обновить заявку." : "Couldn’t update the request.") : null}
+          retryLabel={ru ? "Обновить" : "Refresh"} onRetry={onReload} />
         {!request && !unavailable && <button type="submit" className={css.primary} disabled={busy || closing || !data?.applicant.email || error}>{busy ? (ru ? "Отправляем…" : "Sending…") : (ru ? "Отправить заявку" : "Send request")}</button>}
         {request && canActivate && <button type="button" className={css.primary} disabled={busy || closing} onClick={() => onActivate(request)}>
           {request.planId === "startup" && request.workspaceKind === "personal" ? (ru ? "Настроить компанию" : "Set up company") : (ru ? "Активировать доступ" : "Activate access")}

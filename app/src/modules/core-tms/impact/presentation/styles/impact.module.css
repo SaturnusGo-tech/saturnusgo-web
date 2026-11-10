@@ -24,9 +24,8 @@
 .rowHeading strong { overflow-wrap: anywhere; }
 .badge { display: inline-block; font-size: 11px; line-height: 1.5; padding: 3px 7px; background: var(--tms-bg-elevated, var(--falcon-surface)); border: 1px solid var(--tms-border, var(--falcon-border)); border-radius: 5px; color: var(--tms-text-secondary, var(--falcon-text)); }
 .badge[data-warning="true"] { color: var(--falcon-warning); background: var(--falcon-warning-bg); border-color: var(--falcon-warning-border); }
-.notice, .error { padding: 12px 14px; border-radius: 8px; line-height: 1.6; font-size: 13px; overflow-wrap: anywhere; }
+.notice { padding: 12px 14px; border-radius: 8px; line-height: 1.6; font-size: 13px; overflow-wrap: anywhere; }
 .notice { background: var(--tms-bg-elevated, var(--falcon-surface)); color: var(--tms-text-secondary, var(--falcon-text)); border: 1px solid var(--tms-border, var(--falcon-border)); }
-.error { color: var(--falcon-danger); background: var(--falcon-danger-bg); border: 1px solid var(--falcon-danger-border); }
 .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 .field { display: grid; gap: 7px; font-size: 13px; color: var(--tms-text-secondary, var(--falcon-text)); min-width: 0; }
 .field input, .field select, .field textarea { font: inherit; width: 100%; min-width: 0; border: 1px solid var(--tms-border-strong, var(--falcon-border)); border-radius: 6px; background: var(--tms-bg-canvas, var(--falcon-control)); color: var(--tms-text, var(--falcon-text)); padding: 9px 10px; }
@@ -60,8 +59,6 @@
 .pagination { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 12px; padding-top: 4px; }
 .reviewFooter { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; justify-content: space-between; padding-top: 16px; border-top: 1px solid var(--tms-border); }
 .reviewFooter > p { flex: 1 1 260px; }
-.availability { display: grid; gap: 8px; }
-.availability > p { margin: 0; }
 .evidence > summary { padding: 8px 0; }
 .evidence > .list { margin-top: 12px; }
 .aiBanner { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 20px 24px; border: 1px solid var(--tms-border); border-radius: 12px; background: var(--tms-bg-elevated); overflow: hidden; }
@@ -70,7 +67,6 @@
 .aiBanner p { margin: 0; color: var(--tms-text-secondary); font-size: 13px; line-height: 1.65; }
 .aiBanner img { width: clamp(96px, 18vw, 180px); height: auto; flex: 0 0 auto; object-fit: contain; }
 @media (max-width: 560px) { .aiBanner { gap: 12px; padding: 16px; align-items: flex-start; } .aiBanner img { width: 76px; margin-top: 18px; } .aiBanner h3 { font-size: 16px; } }
-:global(.dark) .error { color: var(--falcon-danger); background: var(--tms-bg-elevated); border-color: var(--falcon-danger-border); }
 :global(.dark) .badge[data-warning="true"] { color: var(--falcon-warning); background: var(--tms-bg-elevated); border-color: var(--falcon-warning-border); }
 @media (max-width: 640px) { .panel { padding: 14px; } .grid { grid-template-columns: 1fr; } .heading { gap: 10px; } }
 @media (max-width: 700px) { .workspace .panel { scroll-margin-top: 214px; } }

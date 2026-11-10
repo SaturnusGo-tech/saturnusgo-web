@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../common/error/ErrorToast";
 import { useEffect, useId, useRef, useState } from "react";
 import type { TestCaseRevision } from "../../../../../../core/tms/contracts/legacy-contract";
 import { useWorkspacePeople } from "../../../../workspace/members/context/WorkspacePeopleContext";
@@ -110,7 +111,8 @@ export function CaseCustomFields({ projectId = "", revision, editing, creating =
       })}
     </dl>
     {editing && catalog.loading && <p role="status" className={css.loading}>{ru ? "Загрузка полей…" : "Loading fields…"}</p>}
-    {useCatalog && Boolean(catalog.failure) && <p role="alert" className={css.error}>{ru ? "Не удалось загрузить поля." : "Could not load fields."} <button type="button" onClick={catalog.refresh}>{ru ? "Повторить" : "Retry"}</button></p>}
+    <ErrorToast message={useCatalog && catalog.failure ? (ru ? "Не удалось загрузить поля." : "Could not load fields.") : null}
+      retryLabel={ru ? "Повторить" : "Retry"} onRetry={catalog.refresh} />
     {showFallback && <p ref={fallbackError} tabIndex={-1} role="alert" className={css.error}>
       {ru ? "Выберите значения обязательных полей." : "Choose a value for each required field."}
       {!editing && canEdit && <button ref={editFields} type="button" onClick={onRequestEdit}>

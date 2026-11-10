@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../common/error/ErrorToast";
 import { ArrowLeft } from "@openai/apps-sdk-ui/components/Icon";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import type { Suite, TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
@@ -70,7 +71,8 @@ export function SuiteDialog(props: Props) {
         <section className={css.scopeSection} aria-label={ru ? "Состав сьюта" : "Suite membership"}>
           <header className={css.scopeHeader}><h2>{type === "dynamic" ? (ru ? "Подходящие кейсы" : "Matching cases") : (ru ? "Выберите кейсы" : "Choose cases")}</h2>
             <span aria-live="polite">{effectiveIds.length} {ru ? "в наборе" : "in suite"}</span></header>
-          {preview.loading ? <RunCasesSkeleton /> : preview.error ? <div role="alert"><p>{ru ? "Не удалось проверить состав. Выбранные кейсы сохранены в черновике." : "Could not resolve membership. Your selection is still in this draft."}</p><button type="button" className={css.cancel} onClick={preview.retry}>{ru ? "Повторить" : "Retry"}</button></div>
+          {preview.loading ? <RunCasesSkeleton /> : preview.error ? <ErrorToast message={ru ? "Не удалось проверить состав. Выбранные кейсы сохранены в черновике." : "Could not resolve membership. Your selection is still in this draft."}
+            retryLabel={ru ? "Повторить" : "Retry"} onRetry={preview.retry} />
             : <SuiteCasePicker cases={type === "dynamic" ? preview.cases : activeCases} folders={props.folders} selected={selected}
               projectName={props.projectName} ru={ru} readonly={type === "dynamic"} onToggle={id => scope([id])} onScope={scope} />}
           {!effectiveIds.length && <p className={css.hint}>{ru ? "Добавьте хотя бы один кейс, чтобы сохранить набор." : "Add at least one case to save this suite."}</p>}

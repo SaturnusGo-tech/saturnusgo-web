@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../common/error/ErrorToast";
 import { useWorkspaceMembers } from "../../../../workspace/members/state/useWorkspaceMembers";
 import { MemberAvatar } from "../../../../workspace/members/avatar/MemberAvatar";
 import { RunFilterOptions } from "../options/RunFilterOptions";
@@ -14,7 +15,8 @@ export function RunAssigneeFilter({ workspaceId, selected, onChange, ru, popover
     onChange={onChange}
     search={members.search} onSearch={members.setSearch} placeholder={ru ? "Имя или почта" : "Name or email"}>
     {members.loading && <div className={css.loading} role="status" aria-label={ru ? "Загрузка участников" : "Loading members"} />}
-    {members.error && <button type="button" onClick={members.retry}>{ru ? "Не удалось загрузить. Повторить" : "Could not load. Retry"}</button>}
+    <ErrorToast message={members.error ? (ru ? "Не удалось загрузить участников" : "Could not load members") : null}
+      retryLabel={ru ? "Повторить" : "Retry"} onRetry={members.retry} />
     {members.cursor && <button type="button" disabled={members.loading} onClick={members.more}>{ru ? "Загрузить ещё" : "Load more"}</button>}
   </RunFilterOptions>;
 }

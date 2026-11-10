@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../../presentation/common/error/ErrorToast";
 import { ArrowUpRight, Bug, ShieldCheck } from "lucide-react";
 import type { RunItem, TestRunSummary } from "../../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
@@ -19,10 +20,8 @@ export function VerificationRunContext({ run, item, connected, onOpenCaseActivit
     {context.pending && <div className={styles.loading} role="status" aria-label={ru ? "Загрузка связанных багов" : "Loading linked bugs"}>
       <i /><i />
     </div>}
-    {context.error && <p className={styles.message} role="alert">
-      {ru ? "Не удалось загрузить связанные баги." : "Could not load linked bugs."}
-      <button type="button" onClick={() => { void context.refresh(); }}>{ru ? "Повторить" : "Retry"}</button>
-    </p>}
+    <ErrorToast message={context.error ? (ru ? "Не удалось загрузить связанные баги." : "Could not load linked bugs.") : null}
+      retryLabel={ru ? "Повторить" : "Retry"} onRetry={() => void context.refresh()} />
     {!context.pending && !context.error && defects.length === 0 && <p className={styles.message}>
       {ru ? "Для этого кейса нет связанных исправлений в прогоне." : "This case has no linked fixes in this run."}
     </p>}

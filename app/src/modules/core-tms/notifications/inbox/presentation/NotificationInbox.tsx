@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import type { RefObject } from 'react';
 import { Archive, Bell, MailCheck, Settings2, X } from 'lucide-react';
 import type { NotificationInboxState } from '../application/useNotificationInbox';
@@ -22,8 +23,7 @@ export function NotificationInbox({ panel, id, model: m, locale, workspaceId, pa
       </div>
     </header>
     <div className={css.scroll} aria-busy={m.loading}>
-      {m.error && <div className={css.error} role="alert"><span>{ru ? 'Не удалось обновить уведомления.' : 'Notifications could not be updated.'}</span>
-        <button type="button" onClick={() => void m.retry()} disabled={m.busy}>{ru ? 'Повторить' : 'Retry'}</button></div>}
+      <ErrorToast message={m.error ? (ru ? "Не удалось обновить уведомления." : "Notifications could not be updated.") : null} retryLabel={ru ? "Повторить" : "Retry"} onRetry={!m.busy ? m.retry : undefined} />
       {m.loading ? <div className={css.skeleton} role="status" aria-label={ru ? 'Загрузка уведомлений' : 'Loading notifications'}><i/><i/><i/></div>
         : m.items.length ? <ol className={css.feed} aria-label={ru ? 'Входящие уведомления' : 'Notification inbox'}>
           {m.items.map(item => <NotificationRow key={item.id} item={item} locale={locale} workspaceId={workspaceId} pageUrl={pageUrl}

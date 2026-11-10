@@ -1,5 +1,6 @@
 import { ChevronRight, Plus, Search, X } from "@openai/apps-sdk-ui/components/Icon";
 import { useState } from "react";
+import { ErrorToast } from "../../common/error/ErrorToast";
 import type { useCodexEmployee } from "../../../codex-employee/application/state/useCodexEmployee";
 import { CodexResourceState } from "../../../codex-employee/presentation/shared/CodexResourceState";
 import type { CatalogEntry } from "../catalog/model/catalog-model";
@@ -18,7 +19,8 @@ export function PluginsList({ entries, codex, ru, canManage, canAdminCodex = fal
       <div className={surface.actions}><button type="button" className={surface.quiet} onClick={onBrowse}>{ru ? "Открыть каталог" : "Browse directory"}</button><button type="button" className={`${surface.primary} ${css.addButton}`} onClick={onBrowse}><Plus width={17} height={17} />{ru ? "Добавить" : "Add"}</button></div></header>
     <div className={css.toolbar}><span>{ru ? "Плагины" : "Plugins"} <small>{entries.length}</small></span><label className={css.search} data-input-shell><Search width={17} height={17} aria-hidden="true" /><input type="search" value={query} aria-label={ru ? "Поиск плагинов" : "Search plugins"} placeholder={ru ? "Поиск плагинов" : "Search plugins"} onChange={event => setQuery(event.target.value)} />{query && <button type="button" aria-label={ru ? "Очистить поиск" : "Clear search"} onClick={() => setQuery("")}><X width={14} height={14} /></button>}</label></div>
     {entries.some(entry => entry.integration.id === "codex") && <CodexResourceState loading={codex.loading} error={codex.error} locale={ru ? "ru" : "en"} retry={codex.refresh} />}
-    {error && <p className={css.error} role="alert">{ru ? "Не удалось изменить подключение. Откройте «Управлять», проверьте настройки и повторите." : "Could not update the connection. Open Manage, review the settings and try again."}</p>}
+    <ErrorToast message={error ? (ru ? "Не удалось изменить подключение. Откройте «Управлять», проверьте настройки и повторите."
+      : "Could not update the connection. Open Manage, review the settings and try again.") : null} />
     {visible.length ? <div className={surface.group}>{visible.map(({ integration, status }) => {
       const id = integration.id, active = status === "connected", planned = status === "planned";
       const disabled = pending || status === "checking" || planned || !canManage;

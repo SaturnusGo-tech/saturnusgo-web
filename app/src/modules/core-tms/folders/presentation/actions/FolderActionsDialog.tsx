@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { Popover, PopoverContent } from "@heroui/popover";
 import { FolderVisual } from "../appearance/visual/FolderVisual";
 import { FolderAppearanceControl } from "../appearance/control/FolderAppearanceControl";
@@ -58,7 +59,7 @@ export function FolderActionsDialog({ id, folder, trigger, resource, ru, onClose
           </div>
         </>}
       </div>}
-      {resource.error && <p role="alert" className={css.error}>{resource.error}</p>}
+      <ErrorToast message={resource.error} />
     </PopoverContent>
   </Popover>;
 }

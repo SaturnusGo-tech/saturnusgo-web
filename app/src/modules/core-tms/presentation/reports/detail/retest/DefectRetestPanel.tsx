@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
 import { ChevronUp, Link2 } from "lucide-react";
 import type { DefectRetest } from "../../../../runs/verification/state/defect/useDefectRetest";
@@ -45,7 +46,7 @@ export function DefectRetestPanel({ retest }: { retest: DefectRetest }) {
             {retest.pending ? (ru ? "Создаём…" : "Creating…") : retest.unresolved ? (ru ? "Повторить запуск" : "Retry start") : (ru ? "Создать прогон" : "Create run")}
           </button>
         </footer>
-        {retest.error && <p className={styles.error} role="alert">{retest.error}</p>}
+        <ErrorToast message={retest.error} />
       </form>
     </section>
   </div>;

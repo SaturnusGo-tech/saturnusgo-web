@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../common/error/ErrorToast";
 import { useState } from "react";
 import { MAX_CASE_BULK_MUTATION_ITEMS } from "../../../../../../core/tms/contracts/test-cases/bulk-case-contract";
 import { CaseBulkActionBar } from "../../bulk/action/CaseBulkActionBar";
@@ -29,7 +30,7 @@ export function CasesSelectionActions({ props, view, locale, action, onAction }:
         onChangeLifecycle={(value) => props.onBulkChangeLifecycle(view.bulkSelection.selectedIds, value)}
         onChangePriority={(value) => props.onBulkChangePriority(view.bulkSelection.selectedIds, value)}
       />}
-    {error && <p role="alert">{error}</p>}
+    <ErrorToast message={error} />
     {props.folders && action === "archive" && <ArchiveCasesDialog resource={props.folders} ids={view.bulkSelection.selectedIds} ru={locale === "ru"}
       onClose={() => onAction(null)} onArchived={view.bulkSelection.clear} />}
   </>;

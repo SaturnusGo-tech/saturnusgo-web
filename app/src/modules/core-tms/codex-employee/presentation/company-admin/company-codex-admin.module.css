@@ -23,12 +23,10 @@
 .primary:hover:not(:disabled) { background: var(--falcon-action-hover); }
 .destructive { color: var(--falcon-danger-on-solid); background: var(--falcon-danger-solid); border-color: transparent; }
 .destructive:hover:not(:disabled) { filter: brightness(.92); }
-.confirmation, .failure { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; padding: 12px; border-radius: 8px; background: var(--falcon-panel); font-size: 13px; }
+.confirmation { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; padding: 12px; border-radius: 8px; background: var(--falcon-panel); font-size: 13px; }
 .confirmation { margin-block: 8px; }
 .confirmation > :first-child { flex: 1 1 220px; }
-.confirmation p, .failure p { margin: 0; overflow-wrap: anywhere; }
-.confirmation .error { margin-top: 6px; color: var(--falcon-danger); }
-.failure { margin-bottom: 12px; color: var(--falcon-danger); }
+.confirmation p { margin: 0; overflow-wrap: anywhere; }
 .saved { margin: 12px 0 0; font-size: 13px; color: var(--falcon-success); }
 .connections { margin-top: 32px; }
 .sectionHeader { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 8px; }

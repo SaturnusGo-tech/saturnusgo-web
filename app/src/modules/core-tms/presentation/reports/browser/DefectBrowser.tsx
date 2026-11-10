@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../common/error/ErrorToast";
 import { Button, Input, Tab, Tabs } from "@heroui/react";
 import { ArrowDownWideNarrow, ArrowUpWideNarrow, Bug, Plus, Search } from "lucide-react";
 import { useEffect, useRef } from "react";
@@ -129,10 +130,8 @@ export function DefectBrowser({ workspaceId, projectId, projectName, connected, 
         {loading && !retained && shown.groups.length === 0 && <div className={styles.skeleton} role="status" aria-label={locale === "ru" ? "Загрузка разделов" : "Loading sections"}>
           <span /><span /><span /><span />
         </div>}
-        {shown.groupsStatus === "error" && <div className={styles.message} role="alert">
-          <strong>{locale === "ru" ? "Не удалось загрузить баг-репорты" : "Could not load bug reports"}</strong>
-          <button type="button" onClick={browser.retryGroups}>{retryLabel}</button>
-        </div>}
+        <ErrorToast message={shown.groupsStatus === "error" ? (locale === "ru" ? "Не удалось загрузить баг-репорты" : "Could not load bug reports") : null}
+          retryLabel={retryLabel} onRetry={browser.retryGroups} />
         {shown.groupsStatus === "ready" && shown.groups.length === 0 && <div className={styles.empty}>
           <Bug size={28} /><strong>{emptyTitle}</strong><span>{emptyHint}</span>
           {query.trim() && shownScope !== "all" && <button type="button" onClick={() => setScope("all")}>

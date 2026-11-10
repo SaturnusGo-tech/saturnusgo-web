@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import type { ProductDocsCopy } from "../../localization/copy";
 import styles from "../product-docs.module.css";
@@ -12,8 +13,5 @@ export function ReadState({ copy, status, retry }: {
     <span>{copy.loading}</span>
   </div>;
 
-  return <div className={styles.readState} role="alert">
-    <span>{copy.unavailable}</span>
-    <button type="button" className={styles.action} onClick={retry}>{copy.retry}</button>
-  </div>;
+  return <ErrorToast message={copy.unavailable} retryLabel={copy.retry} onRetry={retry} />;
 }

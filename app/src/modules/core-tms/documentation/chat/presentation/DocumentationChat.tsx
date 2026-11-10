@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { ArrowUpRight, Plus, ArrowRotateCcw, CloseBold } from "@openai/apps-sdk-ui/components/Icon";
 import { useEffect, type KeyboardEvent } from "react";
@@ -64,10 +65,8 @@ export function DocumentationChat({ chat, navigation, onSource, history }: {
     </div>
     {chat.notice && <div className={css.notice} role="status"><span>{historyCopy[chat.notice]}</span>
       {chat.notice === "pending" && <button type="button" onClick={chat.refresh}>{historyCopy.refresh}</button>}</div>}
-    {chat.error && <div className={css.error} role="alert"><p>{copy[chat.error]}</p>
-      <button type="button" onClick={chat.retry} disabled={!chat.enabled || !chat.draft.trim()}><ArrowRotateCcw width={16} height={16} />{copy.retry}</button>
-      <button type="button" className={css.iconButton} onClick={chat.dismissError} aria-label={copy.dismiss}><CloseBold width={15} height={15} /></button>
-    </div>}
+    <ErrorToast message={chat.error ? copy[chat.error] : null} retryLabel={copy.retry}
+      onRetry={chat.enabled && chat.draft.trim() ? chat.retry : undefined} />
     {chat.readonly ? <div className={css.sharedFooter}><p>{historyCopy.ownHint}</p><button type="button" onClick={chat.startOwn}>{historyCopy.startOwn}</button></div>
       : <GuideComposer chat={chat} />}
     </div>

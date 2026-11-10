@@ -11,6 +11,7 @@ const { HooksView } = require("../../../presentation/hooks/HooksView") as typeof
 const { TmsHttpClientProvider } = require("../../../auth/http/TmsHttpClientContext") as typeof import("../../../auth/http/TmsHttpClientContext");
 const { TmsSessionProvider } = require("../../../auth/presentation/session/TmsSessionContext") as typeof import("../../../auth/presentation/session/TmsSessionContext");
 const { TmsLocaleContext } = require("../../../localization/context/TmsLocaleProvider") as typeof import("../../../localization/context/TmsLocaleProvider");
+const { ErrorToast } = require("../../../presentation/common/error/ErrorToast") as typeof import("../../../presentation/common/error/ErrorToast");
 if (previous) require.extensions[".css"] = previous; else delete require.extensions[".css"];
 
 test("catalog, detail, browser back and refresh share one resource owner", async () => {
@@ -95,7 +96,11 @@ test("profile connect URL reaches setup and a core-only denial stays actionable"
     await act(async () => { view = create(<TmsHttpClientProvider client={client}><TmsSessionProvider value={session}><TmsLocaleContext.Provider value={locale}><HooksView workspaceId="w" projectId="" canManage={false} capabilities={["integration:read"]} connected /></TmsLocaleContext.Provider></TmsSessionProvider></TmsHttpClientProvider>); });
     const rendered = JSON.stringify(view.toJSON());
     if (entitled) assert.match(rendered, /Your QA workflow in Codex/);
-    else { assert.match(rendered, /Refresh|Retry/); assert.doesNotMatch(rendered, /Company active/); }
+    else {
+      const toast = view.root.findAllByType(ErrorToast).find(node => node.props.message);
+      assert.equal(typeof toast?.props.onRetry, "function");
+      assert.doesNotMatch(rendered, /Company active/);
+    }
     assert.ok(calls.every(path => path.endsWith("/codex/setup") || path.endsWith("/company/agents/codex") || path.endsWith("/profile/mcp-connections")));
     await act(async () => view.unmount());
   }

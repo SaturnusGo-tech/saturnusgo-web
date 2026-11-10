@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../../../../common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../../../../../shared/components/loading/LoadingOrb";
 import { Listbox, ListboxItem } from "@heroui/react";
 import { useIsPresent } from "framer-motion";
@@ -39,8 +40,7 @@ export function InsightsRecords({ item, query, revision, readDrill, openDrill, o
       </div>
     </header>
     {readDrill && <div aria-live="polite" aria-busy={loading || showLoading}>
-      {showLoading ? <p className={styles.loading}><LoadingOrb size="sm" /> {t("dashboard.drillLoading")}</p> : loading ? null : rows === null ? <p>{t("dashboard.drillError")}
-        <WidgetAction onClick={retry}>{t("dashboard.retry")}</WidgetAction></p>
+      {showLoading ? <p className={styles.loading}><LoadingOrb size="sm" /> {t("dashboard.drillLoading")}</p> : loading ? null : rows === null ? <ErrorToast message={t("dashboard.drillError")} retryLabel={t("dashboard.retry")} onRetry={retry} />
         : items.length === 0 ? <p>{t("dashboard.drillEmpty")}</p>
           : drill?.filter.entity === "defect" ? <DefectDrillList rows={rows} onOpenRow={onOpenRow} compact />
           : <Listbox aria-label={label} selectionMode="none" disabledKeys={disabledKeys}

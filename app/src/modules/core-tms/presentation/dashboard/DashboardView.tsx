@@ -1,4 +1,5 @@
 "use client";
+import { ErrorToast } from "../common/error/ErrorToast";
 import { LoadingOrb } from "../../../../shared/components/loading/LoadingOrb";
 import { transitionContent } from "../workspace/motion/transition/content-transition";
 import { useTmsSession } from "../../auth/presentation/session/TmsSessionContext";
@@ -124,13 +125,13 @@ function DashboardWorkspace(props: DashboardViewProps) {
         </div>
       </div>}
     </header>
-    {failure && <div className={styles.failure} role="alert">
-      <p>{!layoutFailure ? t("dashboardLayout.personalSyncError") : t(loadFailure ? "dashboardLayout.loadError" : `dashboardLayout.${layoutFailure}`)}</p>
-      {!layout.retryPending && <button type="button" onClick={() => {
+    <ErrorToast message={failure ? t(!layoutFailure ? "dashboardLayout.personalSyncError"
+      : loadFailure ? "dashboardLayout.loadError" : `dashboardLayout.${layoutFailure}`) : null}
+      retryLabel={t(layout.draft ? "dashboardLayout.reload" : "dashboardLayout.retry")}
+      onRetry={layout.retryPending ? undefined : () => {
         const failed = layoutFailure ? layout : personalBoard?.failure ? personalBoard : legacyLayout;
         void failed?.controller.load();
-      }}>{t(layout.draft ? "dashboardLayout.reload" : "dashboardLayout.retry")}</button>}
-    </div>}
+      }} />
     <DeferredPane pending={loading} variant="dashboard" label={t("dashboardLayout.loading")}>
       {!board ? !layoutFailure && !personalBoard?.failure && <DashboardEmpty editing={false} personal={canComposePersonal}
         canEdit={canEdit} onAdd={openCatalog} />

@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../common/error/ErrorToast";
 import { ChevronRight, Folder, FolderOpen } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useId } from "react";
@@ -37,10 +38,8 @@ export function DefectBranch({ group, branch, expanded, workspaceId, selectedDef
           {loading && !branch?.items.length && <li className={styles.skeleton} role="status" aria-label={locale === "ru" ? "Загрузка багов" : "Loading bugs"}>
             <span /><span /><span />
           </li>}
-          {branch?.status === "error" && <li className={styles.message} role="alert">
-            <span>{locale === "ru" ? "Не удалось загрузить баги" : "Could not load bugs"}</span>
-            <button type="button" onClick={onRetry}>{locale === "ru" ? "Повторить" : "Retry"}</button>
-          </li>}
+          <ErrorToast message={branch?.status === "error" ? (locale === "ru" ? "Не удалось загрузить баги" : "Could not load bugs") : null}
+            retryLabel={locale === "ru" ? "Повторить" : "Retry"} onRetry={onRetry} />
           {branch?.status === "ready" && branch.items.length === 0 && <li className={styles.message}>
             {locale === "ru" ? "В разделе нет подходящих багов" : "No matching bugs in this section"}
           </li>}

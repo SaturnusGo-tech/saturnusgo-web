@@ -42,7 +42,7 @@ test("only company administrators get a management link and company lifecycle ha
 });
 test("search, empty and failed update states retain a clear recovery path", () => {
   const t = setup(); t.props.error = "PRECONDITION_FAILED";
-  const all = nodes(t.render()); assert.match(text(all.find(node => node.props.role === "alert")), /Open Manage/);
+  const all = nodes(t.render()); assert.match(String(all.find(node => node.type === "ErrorToast")?.props.message), /Open Manage/);
   invoke(all.find(node => node.type === "input")!, "onChange", { target: { value: "not-a-service" } });
   assert.match(text(t.render()), /No matching plugins/); assert.equal(nodes(t.render()).some(node => node.props.role === "switch"), false); t.h.dispose();
 });

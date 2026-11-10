@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorToast } from "../../../../presentation/common/error/ErrorToast";
 import { Button, Popover, PopoverContent, PopoverTrigger, Skeleton } from "@heroui/react";
 import { ArrowUpRight, History, PanelRight, PlayCircle } from "lucide-react";
 import { useContext, useMemo, useRef, type CSSProperties } from "react";
@@ -99,12 +100,8 @@ export function ProductDocRunEvidence({ snapshotId, placement, onPlacementChange
             </dl>
           </PopoverContent>
         </Popover>}
-        {!value && (!request || result.status === "error" ? <div className={styles.message} role="status">
-          {ru ? "Снимок недоступен" : "Snapshot unavailable"}
-          {request && <Button type="button" size="sm" variant="light" disableRipple onPress={result.retry}>
-            {ru ? "Повторить" : "Retry"}
-          </Button>}
-        </div> : <div className={styles.message} role="status" aria-label={ru ? "Загружаем снимок прогона" : "Loading run snapshot"}>
+        {!value && (!request || result.status === "error" ? <ErrorToast message={ru ? "Снимок недоступен" : "Snapshot unavailable"}
+          retryLabel={ru ? "Повторить" : "Retry"} onRetry={request ? result.retry : undefined} /> : <div className={styles.message} role="status" aria-label={ru ? "Загружаем снимок прогона" : "Loading run snapshot"}>
           <Skeleton className={styles.skeleton} aria-hidden="true" />
         </div>)}
       </div>

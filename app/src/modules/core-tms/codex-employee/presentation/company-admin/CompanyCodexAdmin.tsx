@@ -3,6 +3,7 @@ import type { CodexEmployee } from "../../domain/model/codex-employee";
 import type { useCompanyCodexAdmin } from "../../application/admin/useCompanyCodexAdmin";
 import type { CodexConnectionFilter } from "../../domain/admin/company-codex-admin";
 import { administrationError } from "../../../company-administration/presentation/copy/administration-errors";
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { CodexMark } from "../branding/CodexMark";
 import { CompanyCodexConnectionRow } from "./connections/CompanyCodexConnectionRow";
 import css from "./company-codex-admin.module.css";
@@ -38,7 +39,6 @@ export function CompanyCodexAdmin({ employee, state, ru, refresh }: {
         : action.kind === "deactivate"
           ? (ru ? "Отключить Codex для всей компании? Текущие подключения потеряют доступ." : "Deactivate Codex for the company? Current connections will lose access.")
           : (ru ? "Активировать агента Codex для компании? Он займёт одно место." : "Activate the company Codex agent? It will use one seat.")}</p>
-      {error && <p className={css.error} role="alert">{failure(error)}</p>}
     </div>
     <div className={css.controls}>
       <button type="button" className={css.secondary} disabled={pending} onClick={() => state.choose(null)}>{ru ? "Отмена" : "Cancel"}</button>
@@ -49,6 +49,7 @@ export function CompanyCodexAdmin({ employee, state, ru, refresh }: {
   </div>;
 
   return <article className={css.page}>
+    <ErrorToast message={error ? failure(error) : null} />
     <header className={css.header}>
       <div>
         <h1>Codex</h1>
@@ -102,10 +103,8 @@ export function CompanyCodexAdmin({ employee, state, ru, refresh }: {
       {list.loading ? <div className={css.loading} role="status" aria-label={ru ? "Загружаем подключения" : "Loading connections"}>
         <span /><span />
       </div> : <>
-        {list.error && <div className={css.failure} role="alert">
-          <p>{failure(list.error)}</p>
-          <button type="button" className={css.secondary} disabled={list.pending} onClick={list.refresh}>{ru ? "Повторить" : "Try again"}</button>
-        </div>}
+        <ErrorToast message={list.error ? failure(list.error) : null} retryLabel={ru ? "Повторить" : "Retry"}
+          onRetry={list.pending ? undefined : list.refresh} />
         {!list.error && !list.items.length && <div className={css.empty}>
           <span className={css.emptyIcon}><Link2 size={18} aria-hidden="true" /></span>
           <div className={css.settingCopy}>

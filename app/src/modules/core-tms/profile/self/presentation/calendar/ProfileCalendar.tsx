@@ -1,4 +1,5 @@
 "use client";
+import { ErrorToast } from "../../../../presentation/common/error/ErrorToast";
 import { RefreshCw } from "lucide-react";
 import { useEffect, useId, useMemo, useRef, useState, type CSSProperties, type FocusEvent, type MouseEvent } from "react";
 import { createPortal } from "react-dom";
@@ -30,7 +31,7 @@ export function ProfileCalendar({ value, loading, error, year, ru, onYear, retry
     <header><div><h2>{ru ? "Активность QA" : "QA activity"}</h2><p>{loading ? (ru ? "Загружаем активность…" : "Loading activity…") : value ? actionCount(calendar.total) : (ru ? "В текущем пространстве" : "In this workspace")} · {year} · UTC</p></div>
       <div className={styles.years} role="group" aria-label={ru ? "Год активности" : "Activity year"}>{[currentYear, currentYear - 1].map(option => <button key={option} type="button" aria-pressed={year === option} onClick={() => onYear(option)}>{option}</button>)}</div>
     </header>
-    {error ? <div className={styles.feedback} role="alert"><p>{copy.activityError}</p><button type="button" onClick={retry}><RefreshCw size={13} />{copy.retry}</button></div>
+    {error ? <ErrorToast message={copy.activityError} retryLabel={copy.retry} onRetry={retry} />
       : !value ? <div className={styles.feedback}><p>{loading ? (ru ? "Собираем ваши результаты" : "Gathering your recorded work") : copy.noWorkspace}</p></div>
       : <><div className={styles.scroll}>
         <div className={styles.matrix} style={{ "--calendar-columns": calendar.columns } as CSSProperties}>

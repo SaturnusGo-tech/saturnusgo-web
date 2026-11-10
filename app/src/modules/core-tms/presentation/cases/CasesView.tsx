@@ -1,3 +1,4 @@
+import { ErrorToast } from "../common/error/ErrorToast";
 import { MoveToast } from "../../folders/presentation/move/MoveToast";
 import { useCaseBrowserFocus } from "./browser/layout/useCaseBrowserFocus";
 import { CasesSelectionActions } from "./browser/selection/CasesSelectionActions";
@@ -122,12 +123,10 @@ export function CasesView(props: CasesViewProps) {
     >
       {props.folders && !view.inspectorOpen ? <CaseBrowserEmpty ru={locale === "ru"} /> : !props.editor && props.testCase && !props.revision
         ? props.detailLoadError
-          ? <div className={styles.detailEmpty} role="alert" data-testid="case-detail-error">
-              <strong>{locale === "ru" ? "Не удалось загрузить тест-кейс" : "Could not load the test case"}</strong>
-              <span>{locale === "ru" ? "Проверьте подключение и повторите загрузку." : "Check the connection and try loading it again."}</span>
-              <button type="button" className={styles.secondaryButton} onClick={props.onRetryDetail}>
-                {locale === "ru" ? "Повторить" : "Retry"}
-              </button>
+          ? <div className={styles.detailEmpty} data-testid="case-detail-error">
+              <ErrorToast message={locale === "ru" ? "Не удалось загрузить тест-кейс" : "Could not load the test case"}
+                retryLabel={t("common.retry")} onRetry={props.onRetryDetail} />
+              <button type="button" className={styles.secondaryButton} onClick={props.onRetryDetail}>{t("common.retry")}</button>
             </div>
           : <div role="status" data-testid="case-detail-loading"><span className={shell.srOnly}>{t("common.loading")}</span></div>
         : <CaseDetailPanel

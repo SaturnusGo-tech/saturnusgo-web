@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../../../presentation/common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../../../shared/components/loading/LoadingOrb";
 import { CheckCircle2, ChevronRight } from "lucide-react";
 import type { useImportCases } from "../../../state/import/use-import-cases";
@@ -16,7 +17,7 @@ export function ImportProgress({ state, ru }: { state: ReturnType<typeof useImpo
     {status && <p className={css.message} role="status">{state.phase === "success" ? <CheckCircle2 className={css.success} size={18} /> : (state.busy || state.phase === "loading" || state.phase === "reading") && <LoadingOrb size="md" />}
       <span>{status}{["importing", "partial", "success", "stopped"].includes(state.phase) && ` · ${state.completed} / ${state.document?.testCases.length ?? 0}`}</span></p>}
     {state.phase === "importing" && <progress value={state.attempted} max={state.document?.testCases.length || 1} aria-label={copy.processed} />}
-    {state.error && <p className={css.error} role="alert">{state.error}</p>}
+    <ErrorToast message={state.error} />
     {!state.context && state.error && <button className={css.link} type="button" onClick={state.retryContext}>{copy.retryLoad}</button>}
     {state.failed.length > 0 && <details><summary><ChevronRight size={15} aria-hidden="true" />{copy.errors}: {state.failed.length}</summary><ul>{state.failed.map((item, index) => <li key={index}>{item.sourceKey}: {item.message}</li>)}</ul></details>}
     {(state.phase === "partial" || state.phase === "stopped") && <p className={css.hint}>{copy.partialRule}</p>}

@@ -1,11 +1,12 @@
 import { useImpactHistory } from "../../application/history/useImpactHistory";
 import type { ImpactAnalysis } from "../../model/impact-types";
 import { impactLabel } from "../../model/impact-copy";
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import css from "../styles/impact.module.css";
 export function AnalysisHistory({ analysis, ru }: { analysis: ImpactAnalysis; ru: boolean }) {
   const state = useImpactHistory(analysis, analysis.id, analysis.rowVersion, ru);
   return <section className={css.panel}><header className={css.heading}><h3>{ru ? "Журнал решений" : "Decision history"}</h3></header>
-    {state.error && <p className={css.error} role="alert">{state.error}<button type="button" onClick={() => void state.more()}>{ru ? "Повторить" : "Retry"}</button></p>}
+    <ErrorToast message={state.error} retryLabel={ru ? "Повторить" : "Retry"} onRetry={() => void state.more()} />
     {state.loading && <p role="status">{ru ? "Загружаем журнал…" : "Loading history…"}</p>}
     <ol className={css.list}>{state.items.map((item) => <li className={css.row} key={item.id}>
       <div className={css.rowHeading}><strong>{impactLabel(item.action, ru)}</strong><time dateTime={item.createdAt} className={css.muted}>{new Date(item.createdAt).toLocaleString(ru ? "ru-RU" : "en-GB")}</time></div>

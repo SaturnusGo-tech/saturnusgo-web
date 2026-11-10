@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../presentation/common/error/ErrorToast";
 import { LoadingOrb } from "../../../../shared/components/loading/LoadingOrb";
 import { Button, Input, Listbox, ListboxItem } from "@heroui/react";
 import { ArrowLeft, ChevronRight, Search } from "lucide-react";
@@ -111,11 +112,8 @@ export function RequirementPicker({ api, scope, ru, disabled, linkFailed, onLink
             startContent={<Search size={16} aria-hidden="true" />}
             classNames={{ inputWrapper: styles.pickerSearch, input: styles.pickerSearchInput, innerWrapper: styles.pickerSearchInner }}
             onValueChange={value => { setError(false); setQuery(value); }} />}
-          {error && <div className={styles.pickerMessage} role="alert">
-            <span>{ru ? "Не удалось загрузить документацию." : "Could not load Product Docs."}</span>
-            <Button size="sm" variant="light" className={styles.pickerAction} isDisabled={disabled}
-              onPress={() => { setError(false); setRetry(value => value + 1); }}>{ru ? "Повторить" : "Retry"}</Button>
-          </div>}
+          <ErrorToast message={error ? (ru ? "Не удалось загрузить документацию." : "Could not load Product Docs.") : null}
+            retryLabel={ru ? "Повторить" : "Retry"} onRetry={disabled ? undefined : () => { setError(false); setRetry(value => value + 1); }} />
           {showLoading && <div role="status" className={styles.pickerMessage}>
             <LoadingOrb />
             {ru ? "Загрузка…" : "Loading…"}
@@ -128,7 +126,7 @@ export function RequirementPicker({ api, scope, ru, disabled, linkFailed, onLink
           </Listbox> : <p className={styles.pickerMessage}>{ru ? "Статьи не найдены." : "No pages found."}</p>)}
           {page && <>
             <p className={styles.pickerPageTitle}>{page.title}</p>
-            {linkFailed && <p className={styles.pickerMessage} role="alert">{ru ? "Не удалось изменить связь." : "Could not update the link."}</p>}
+            <ErrorToast message={linkFailed ? (ru ? "Не удалось изменить связь." : "Could not update the link.") : null} />
             {activeDocument && <Listbox aria-label={listLabel} items={sectionOptions} classNames={{ base: styles.pickerList, list: styles.pickerListItems }}
               disabledKeys={disabled || activeDocument.version == null ? sectionOptions.map(section => section.key) : []}>
               {section => <ListboxItem key={section.key} textValue={section.label} className={styles.pickerOption}

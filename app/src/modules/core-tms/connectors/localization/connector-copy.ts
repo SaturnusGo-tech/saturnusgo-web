@@ -19,7 +19,7 @@ const copy: Record<Provider, { heading: [string, string]; purpose: [string, stri
     docs: "https://developer.atlassian.com/cloud/trello/guides/rest-api/webhooks/" },
   linear: { heading: ["Замкните цикл обратной связи", "Close the feedback loop"],
     purpose: ["Задачи для инженерной команды с контекстом дефекта и возвратом исправлений на ретест.", "Engineering issues with defect context and a clear path back to retesting."],
-    remote: ["ID команды Linear", "Linear team ID"], destination: ["Назначение", "Destination"],
+    remote: ["ID или ключ команды Linear", "Linear team ID or key"], destination: ["Назначение", "Destination"],
     hint: ["API key с доступом к выбранной команде и управлением задачами. Секрет подписи берётся из настроек вебхука.", "Use an API key with access to the selected team and issue management. Copy the signing secret from webhook settings."],
     docs: "https://linear.app/developers/webhooks" },
   github: { heading: ["Каждому изменению — свои тесты", "The right tests for every change"],

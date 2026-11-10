@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { useEffect, useId, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
@@ -103,7 +104,7 @@ export function WritingPanel({ target, workspaceId, ru, anchor, onClose }: {
       <span /><span /><span /><div className={css.loadingFooter}><small>{ru ? "Falcon AI готовит текст…" : "Falcon AI is writing…"}</small>
         <button type="button" onClick={request.cancel}>{ru ? "Остановить" : "Stop"}</button></div>
     </div>}
-    {request.error && <p className={css.error} role="alert">{request.error}</p>}
+    <ErrorToast message={request.error} />
     {result && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: reduced ? 0 : .2 }}>
       <div className={css.result} tabIndex={0} aria-label={ru ? "Предложенный текст" : "Suggested text"}>
         <MarkdownField value={result} label={ru ? "Предложенный текст" : "Suggested text"} allowAttachments={false} />

@@ -1,5 +1,6 @@
 import { ChevronRight } from "@openai/apps-sdk-ui/components/Icon";
 import { useEffect, useRef } from "react";
+import { ErrorToast } from "../../common/error/ErrorToast";
 import type { IntegrationId } from "../catalog/integration-definitions";
 import type { IntegrationUiStatus } from "../shared/IntegrationStatusBadge";
 import { IntegrationBrand } from "../shared/brand/IntegrationBrand";
@@ -20,7 +21,8 @@ export function IntegrationPluginDetail({ id, ru, status, accountKey, scopeKey, 
       <header className={surface.header}><div className={surface.identity}><div className={`${surface.logo} ${css.brand}`}><IntegrationBrand provider={id} /></div><div><h1 ref={heading} tabIndex={-1}>{content.name}</h1><p>Falcon · {content.description}</p></div></div>
         <PluginInstallAction installed={installation.prepared} installing={installation.phase === "loading"} disabled={disabled} ru={ru} canManage={status === "connected"} onInstall={() => void installation.install()} onManage={onManage} />
       </header>
-      {installation.phase === "error" && <p className={surface.notice} role="alert">{ru ? "Не удалось подготовить плагин. Попробуйте ещё раз." : "Could not prepare the plugin. Try again."}</p>}
+      <ErrorToast message={installation.phase === "error" ? (ru ? "Не удалось подготовить плагин." : "Could not prepare the plugin.") : null}
+        retryLabel={ru ? "Повторить" : "Retry"} onRetry={disabled ? undefined : () => void installation.install()} />
       <div className={css.preview} data-brand={id} aria-label={ru ? "Возможности интеграции" : "Integration workflows"}>
         <div className={css.workflows}>{content.workflows.map(text => <div key={text}><span className={css.workflowLogo}><IntegrationBrand provider={id} /></span><span>{text}</span><span className={css.falcon}>Falcon</span></div>)}</div>
       </div>

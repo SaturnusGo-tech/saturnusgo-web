@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { addToast } from "@heroui/react";
 import { FileText, RotateCcw } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
@@ -59,7 +60,7 @@ export function ProductDocsArchive({ api, scope, copy, refresh, onChanged }: {
         <h1 id={heading} ref={title} tabIndex={-1}>{copy.archive}</h1>
         <p>{copy.archiveDescription}</p>
       </header>
-      {failure && <p className={shared.error} role="alert">{failure}</p>}
+      <ErrorToast message={failure} />
       {nodes.length > 0 && <ul className={styles.list}>
         {nodes.map((node) => <li className={styles.row} key={node.id}>
           <span className={styles.label}>

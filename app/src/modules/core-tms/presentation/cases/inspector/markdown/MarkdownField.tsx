@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorToast } from "../../../common/error/ErrorToast";
 import MDEditor from "@uiw/react-md-editor/nohighlight";
 import dynamic from "next/dynamic";
 import { createContext, useCallback, useContext, type ReactNode } from "react";
@@ -157,8 +158,6 @@ function MarkdownFieldContent(props: Props) {
       />
       </MarkdownContextContent.Provider>
     </LoadingEditorContext.Provider>
-    {attachmentEnabled && attachmentProblem && <span className={css.attachmentError} role="alert">
-      {attachmentProblem}
-    </span>}
+    <ErrorToast message={attachmentEnabled ? attachmentProblem : null} />
   </div>;
 }

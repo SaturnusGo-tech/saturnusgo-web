@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../presentation/common/error/ErrorToast";
 import { TmsApiError } from "../../../../core/tms/transport/http";
 import { useEffect, useRef } from "react";
 import type { ApiSource, NamedOption } from "../model/api-source";
@@ -36,8 +37,8 @@ export function SourceEditor({ workspaceId, projectId, source, catalog, projects
           </span><input type="checkbox" role="switch" checked={draft.enabled} onChange={event => setDraft({ ...draft, enabled: event.target.checked })}/></label></section>}
       </div>
     </fieldset>
-    {Boolean(state.error) && <div className={css.error} role="alert"><p>{apiSourceError(state.error, ru)}</p>
-      {state.error instanceof TmsApiError && state.error.status === 412 && <button type="button" onClick={onReload}>{ru ? "Обновить данные" : "Reload data"}</button>}</div>}
+    <ErrorToast message={state.error ? apiSourceError(state.error, ru) : null}
+      retryLabel={ru ? "Обновить данные" : "Reload data"} onRetry={state.error && state.error instanceof TmsApiError && state.error.status === 412 ? onReload : undefined} />
     <footer><span role="status">{state.pending ? (ru ? "Проверяем спецификацию…" : "Checking specification…") : ""}</span>
       <button type="button" className={css.cancel} disabled={state.pending} onClick={onClose}>{ru ? "Отмена" : "Cancel"}</button>
       <button type="submit" className={css.save} disabled={state.pending}>{state.pending ? (ru ? "Сохранение…" : "Saving…") : source ? (ru ? "Сохранить изменения" : "Save changes") : (ru ? "Подключить API" : "Connect API")}</button></footer>

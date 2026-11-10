@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorToast } from "../../../../../common/error/ErrorToast";
 import { Button } from "@heroui/react";
 import { useEffect, useState, type ReactNode } from "react";
 import { useTmsHttpClient } from "../../../../../../auth/http/TmsHttpClientContext";
@@ -70,10 +71,15 @@ export function DefectPerformance({ snapshot, readBreakdown, openDrill, onOpenRo
   const currentCount = new Intl.NumberFormat(languageTag).format(snapshot.metrics.openDefects);
   const openActive = () => openDrill?.({ id: "defects:open-inventory", label: copy.open,
     filter: { entity: "defect", basis: "current", activeOnly: true } });
-  const retryButton = <Button type="button" variant="light" size="sm" onPress={() => setRetry(value => value + 1)}>{t("dashboard.retry")}</Button>;
   const reportData = activeReported?.data;
   const leadData = activeLead?.page;
   return <div className={styles.performance} data-defect-performance>
+    <ErrorToast message={activeLead?.failed || activeReported?.failed ? copy.failure : null}
+      retryLabel={t("dashboard.retry")} onRetry={() => {
+        setLead(previous => previous ? { ...previous, failed: false } : previous);
+        setReported(previous => previous ? { ...previous, failed: false } : previous);
+        setRetry(value => value + 1);
+      }} />
     <Panel title={copy.open} className={styles.open}>
       {openDrill && snapshot.metrics.openDefects > 0
         ? <Button type="button" disableRipple variant="light" className={styles.count} onPress={openActive}>{currentCount}</Button>
@@ -81,11 +87,10 @@ export function DefectPerformance({ snapshot, readBreakdown, openDrill, onOpenRo
     </Panel>
     <Panel title={copy.lead} className={styles.lead}>
       {!readBreakdown ? <p className={styles.notice}>{copy.preview}</p>
-        : activeLead?.failed && !leadData ? <p className={styles.notice} role="alert">{copy.failure}{retryButton}</p>
+        : activeLead?.failed && !leadData ? null
           : !leadData ? <p className={styles.notice} role="status">{copy.loading}</p>
             : !leadData.data.length ? <p className={styles.notice}>{copy.empty}</p>
               : <LeadTimePlot points={leadData.data} onOpenRow={onOpenRow} />}
-      {activeLead?.failed && leadData && <p className={styles.notice} role="alert">{copy.failure}{retryButton}</p>}
       {leadData?.meta.nextCursor && leadData.meta.hasMore && !activeLead?.failed &&
         <Button type="button" size="sm" variant="light" className={styles.more}
           isDisabled={cursor === leadData.meta.nextCursor}
@@ -93,7 +98,7 @@ export function DefectPerformance({ snapshot, readBreakdown, openDrill, onOpenRo
     </Panel>
     <Panel title={copy.reported} className={styles.reported}>
       {!readBreakdown || reportData === null ? <p className={styles.notice}>{copy.preview}</p>
-        : activeReported?.failed ? <p className={styles.notice} role="alert">{copy.failure}{retryButton}</p>
+        : activeReported?.failed ? null
           : !reportData ? <p className={styles.notice} role="status">{copy.loading}</p>
             : !reportData.total ? <p className={styles.notice}>{copy.empty}</p>
               : <ReportedPlot data={reportData} onPick={openDrill && ((status, label) => openDrill({

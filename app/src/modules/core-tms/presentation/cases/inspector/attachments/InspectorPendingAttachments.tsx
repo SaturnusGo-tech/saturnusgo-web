@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../common/error/ErrorToast";
 import { Upload } from "lucide-react";
 import type { TmsLocale } from "../../../../localization/model/locale";
 import { MarkdownPendingAttachments } from "../markdown/attachments/MarkdownAttachmentUi";
@@ -32,6 +33,6 @@ export function InspectorPendingAttachments({ locale, includeStepFiles = false, 
     </label>}
     {entries.length > 0 && <MarkdownPendingAttachments locale={locale} entries={entries}
       onRemove={draft.remove} presentation="media" />}
-    {draft.problem?.fieldKey === "case-files" && <span role="alert">{draft.problem.message}</span>}
+    <ErrorToast message={draft.problem?.fieldKey === "case-files" ? draft.problem.message : null} />
   </div>;
 }

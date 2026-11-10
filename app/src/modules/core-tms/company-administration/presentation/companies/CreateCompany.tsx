@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { ArrowLeft } from "lucide-react";
 import { useCallback, useState } from "react";
 import type { CompanyCreated, CompanyDraft } from "../../domain/administration";
@@ -58,7 +59,7 @@ export function CreateCompany({ client, onBack, onCreated }: {
       </div><CapabilityFields value={draft.capabilities} disabled={command.pending} onChange={(capabilities) => setDraft({ ...draft, capabilities })} /></section>
       <section className={styles.section}><h2>{copy.administrator}</h2><MemberFields copy={copy} draft={draft.administrator} disabled={command.pending}
         onChange={(administrator) => setDraft({ ...draft, administrator })} /><p className={styles.hint}>{copy.temporaryHelp}</p></section>
-      {command.error && <p className={styles.error} role="alert">{administrationError(command.error, locale)}</p>}
+      <ErrorToast message={command.error ? administrationError(command.error, locale) : null} />
       <div className={styles.formFooter}><button type="submit" className={styles.primary} disabled={command.pending || !options.value}>{copy.newCompany}</button>
         <button type="button" className={styles.button} onClick={onBack} disabled={command.pending}>{copy.cancel}</button></div>
     </form>

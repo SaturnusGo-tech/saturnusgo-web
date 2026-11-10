@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorToast } from "../../../../../presentation/common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../../../shared/components/loading/LoadingOrb";
 import { Button, DrawerBody, DrawerFooter, Input, Listbox, ListboxItem, ListboxSection, Skeleton } from "@heroui/react";
 import { Check, ChevronDown, ChevronRight, Search } from "lucide-react";
@@ -176,16 +177,12 @@ export function RunEvidencePicker({ scope, load, capture, onChoose }: Props) {
             {[0, 1].map((row) => <div key={row}><Skeleton className={styles.skeleton} disableAnimation /><Skeleton className={styles.skeleton} disableAnimation /></div>)}
           </div>
           : !replacingRuns && <div className={styles.empty} role="status"><LoadingOrb />{loadingLabel}</div>)}
-        {Boolean(page.failure) && <div className={styles.empty} role="alert">
-          {ru ? "Не удалось загрузить прогоны." : "Couldn’t load runs."}
-          <Button disableRipple variant="light" size="sm" isDisabled={capturePending} onPress={() => page.cursor ? void page.more() : page.refresh()}>{ru ? "Повторить" : "Retry"}</Button>
-        </div>}
+        <ErrorToast message={page.failure ? (ru ? "Не удалось загрузить прогоны." : "Couldn’t load runs.") : null}
+          retryLabel={ru ? "Повторить" : "Retry"} onRetry={capturePending ? undefined : () => { if (page.cursor) void page.more(); else page.refresh(); }} />
         {page.cursor && !loading && !page.failure && <Button disableRipple variant="light" size="sm" className={styles.more} isDisabled={capturePending}
           onPress={() => void page.more()} endContent={<ChevronDown size={15} aria-hidden="true" />}>{ru ? "Показать ещё" : "Show more"}</Button>}
       </div>
-      {captureFailed && <div className={styles.error} role="alert">
-        {ru ? "Не удалось сохранить снимок. Попробуйте ещё раз." : "Couldn’t save the snapshot. Try again."}
-      </div>}
+      <ErrorToast message={captureFailed ? (ru ? "Не удалось сохранить снимок. Попробуйте ещё раз." : "Couldn’t save the snapshot. Try again.") : null} />
     </div>
     <DrawerFooter as="footer" className={styles.footer}>
       <Button disableRipple className={styles.submit} size="sm" isDisabled={!selected || capturePending || loading || (qlOpen && invalidQl)} onPress={() => void submit()}

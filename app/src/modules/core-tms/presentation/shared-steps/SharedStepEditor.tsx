@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorToast } from "../common/error/ErrorToast";
 import { ArrowLeft, Plus, Save } from "lucide-react";
 import type { TestStep } from "../../../../core/tms/contracts/legacy-contract";
 import type { SharedStepDraft } from "../../shared-steps/model/shared-step";
@@ -66,7 +67,7 @@ export function SharedStepEditor({ draft, saving, locked = false, error, ru, onC
       </div>
     </header>
     <div className={styles.editorScroll}>
-      {error && <p role="alert" className={styles.saveError}>{error}</p>}
+      <ErrorToast message={error} />
       <fieldset className={styles.editorFields} disabled={saving || locked}>
       <div className={styles.paper}>
         <div className={styles.scenarioHeading}>

@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../common/error/ErrorToast";
 import type { TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import { canEditRunMetadata } from "../../../runs/edit/model/run-edit";
 import { RunEditDialog } from "../../../runs/edit/presentation/RunEditDialog";
@@ -31,10 +32,9 @@ export function WorkspaceRunsStage({ model, fixedRun = false, onCloseLockedChang
   const { enabled: impactEnabled, impact, startBlocked } = useRunImpact(impactScope, impactEligible, locale === "ru", model.selectedRun);
   const closeLocked = executionDirty || execution.pending || repository.browser.busy || repository.assignments.busy || Boolean(editingRun);
   useEffect(() => { onCloseLockedChange?.(closeLocked); }, [closeLocked, onCloseLockedChange]);
-  if (model.runResourceError) return <div className={runLayout.error} role="alert">
-    <p>{locale === "ru" ? "Не удалось открыть выбранный прогон. Проверьте доступ и повторите загрузку." : "The selected run could not be opened. Check access and retry."}</p>
-    <button type="button" onClick={model.retryRunResource}>{locale === "ru" ? "Повторить" : "Retry"}</button>
-  </div>;
+  if (model.runResourceError) return <ErrorToast
+    message={locale === "ru" ? "Не удалось открыть выбранный прогон." : "The selected run could not be opened."}
+    retryLabel={locale === "ru" ? "Повторить" : "Retry"} onRetry={model.retryRunResource} />;
   const scopeLoading = model.connection === "connected" && Boolean(model.selectedRun || model.selectedRunId)
     && !model.runResourceReady;
   const onEditRun = model.selectedRun && canEditRunMetadata(model.selectedRun) && model.connection === "connected"

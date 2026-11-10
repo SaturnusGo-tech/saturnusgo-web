@@ -28,7 +28,7 @@ test("a removed destination is revalidated and keeps the selection available", a
   f.props.resource.items = [];
   await nodes(f.render(), "form")[0].props.onSubmit(event);
   assert.equal(f.calls.length, 0);
-  assert.ok(nodes(f.render(), "p").some(node => node.props.role === "alert"));
+  assert.ok(nodes(f.render(), "ErrorToast").some(node => Boolean(node.props.message)));
 });
 
 test("busy operations prevent dismissal; failed moves leave the task open", async t => {
@@ -40,7 +40,7 @@ test("busy operations prevent dismissal; failed moves leave the task open", asyn
   f.props.resource.moveCases = async () => ({ ok: false, message: "Conflict. Refresh and retry." });
   await nodes(f.render(), "form")[0].props.onSubmit(event);
   assert.deepEqual(f.calls, []);
-  assert.ok(nodes(f.render(), "p").some(node => node.props.role === "alert"));
+  assert.ok(nodes(f.render(), "ErrorToast").some(node => Boolean(node.props.message)));
 });
 
 test("reusing a removed destination path never moves into a different folder without another selection", async t => {
@@ -49,7 +49,7 @@ test("reusing a removed destination path never moves into a different folder wit
   f.props.resource.items = [{ ...f.props.resource.items[0], id: "replacement" }];
   await nodes(f.render(), "form")[0].props.onSubmit(event);
   assert.deepEqual(f.calls, []);
-  assert.ok(nodes(f.render(), "p").some(node => node.props.role === "alert"));
+  assert.ok(nodes(f.render(), "ErrorToast").some(node => Boolean(node.props.message)));
   nodes(f.render(), "ParentFolderPicker")[0].props.onChange("/Web");
   await nodes(f.render(), "form")[0].props.onSubmit(event);
   assert.deepEqual(f.calls, [[["one", "two"], "replacement"], "moved", "close"]);

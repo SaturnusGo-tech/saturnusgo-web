@@ -1,4 +1,5 @@
-import { AlertCircle, MessageSquare, RotateCw } from "lucide-react";
+import { ErrorToast } from "../../../common/error/ErrorToast";
+import { MessageSquare, RotateCw } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { TmsLocale } from "../../../../localization/model/locale";
 import type { TestCaseComment } from "../../../../test-cases/collaboration/model/test-case-collaboration";
@@ -44,19 +45,18 @@ export function CaseCommentsSection({ caseId, locale, languageTag, model, showRe
       : <header className={css.commentsHeading}><MessageSquare size={15} aria-hidden="true" /><h3 id={headingId}>{heading}</h3>{refresh}</header>}
     {model.comments.status === "loading" && <div className={css.commentSkeleton} role="status" aria-busy="true" aria-label={ru ? "Загрузка комментариев" : "Loading comments"}><span /><span /><span /></div>}
     {model.comments.status === "unavailable" && <p className={css.commentsEmpty}>{ru ? "Комментарии доступны при подключении к серверу" : "Connect to the server to view comments"}</p>}
-    {model.comments.status === "error" && <div className={css.loadState} role="alert"><AlertCircle size={18} />
-      <span>{ru ? "Не удалось загрузить комментарии" : "Could not load comments"}</span>
-      <button type="button" onClick={model.retryComments}>{ru ? "Повторить" : "Retry"}</button></div>}
+    <ErrorToast message={model.comments.status === "error" ? (ru ? "Не удалось загрузить комментарии" : "Could not load comments") : null}
+      retryLabel={ru ? "Повторить" : "Retry"} onRetry={model.retryComments} />
     {model.comments.status === "ready" && <>
       {model.canComment && <div ref={composerRef}><ExpandingComment>{editor}</ExpandingComment></div>}
-      {failedId && <div className={css.pagination} role="alert"><span>{ru ? "Комментарий недоступен или не удалось его загрузить." : "The comment is unavailable or could not be loaded."}</span>
-        <button type="button" onClick={() => void reveal(failedId)}>{ru ? "Повторить" : "Retry"}</button></div>}
+      <ErrorToast message={failedId ? (ru ? "Комментарий недоступен или не удалось его загрузить." : "The comment is unavailable or could not be loaded.") : null}
+        retryLabel={ru ? "Повторить" : "Retry"} onRetry={failedId ? () => void reveal(failedId) : undefined} />
       {commentTree(model.comments.items).map(node => <CommentThread key={node.comment.id} node={node} ru={ru} languageTag={languageTag}
         model={model} collapsed={collapsed} toggle={id => setCollapsed(old => { const next = new Set(old); if (next.has(id)) next.delete(id); else next.add(id); return next; })}
         onReply={reply => { setComposer({ reply }); setCollapsed(old => { const next = new Set(old); next.delete(reply.id); return next; }); }}
         onParent={id => void reveal(id)} />)}
       {(model.comments.hasMore || model.comments.loadMoreFailed) && <div className={css.pagination}>
-        {model.comments.loadMoreFailed && <span role="alert">{ru ? "Не удалось загрузить предыдущие комментарии" : "Could not load older comments"}</span>}
+        <ErrorToast message={model.comments.loadMoreFailed ? (ru ? "Не удалось загрузить предыдущие комментарии" : "Could not load older comments") : null} />
         <button type="button" disabled={model.comments.loadingMore || model.comments.refreshing}
           onClick={model.comments.hasMore ? model.loadMoreComments : model.refreshComments}>
           {model.comments.loadingMore ? (ru ? "Загрузка…" : "Loading…") : (ru ? "Загрузить ещё" : "Load more")}</button></div>}

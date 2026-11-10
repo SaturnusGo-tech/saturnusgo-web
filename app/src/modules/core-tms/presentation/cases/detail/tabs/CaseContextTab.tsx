@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
 import { Button, Link } from "@heroui/react";
 import { ExternalLink } from "lucide-react";
@@ -65,9 +66,7 @@ export function CaseContextTab(props: Props) {
         if (!pending.enabled) requestEdit();
         pending.add("case-files", files);
       }} />}
-    {pending?.problem?.fieldKey === "case-files" && <p className={emptyStyles.attachmentError} role="alert">
-      {pending.problem.message}
-    </p>}
+    <ErrorToast message={pending?.problem?.fieldKey === "case-files" ? pending.problem.message : null} />
   </CaseTabEmpty>;
 
   return <div className={styles.content}>
@@ -89,14 +88,11 @@ export function CaseContextTab(props: Props) {
       <LoadingOrb />
       {ru ? "Загружаем вложения из комментариев…" : "Loading attachments from comments…"}
     </p>}
-    {(comments.status === "error" || comments.refreshFailed) && <div className={styles.status}>
-      <span role="alert">{ru ? "Не удалось загрузить вложения из комментариев." : "Could not load attachments from comments."}</span>
-      <Button size="sm" variant="light" disableRipple onPress={comments.status === "error" ? retryComments : refreshComments}>
-        {ru ? "Повторить" : "Retry"}
-      </Button>
-    </div>}
+    <ErrorToast message={comments.status === "error" || comments.refreshFailed
+      ? (ru ? "Не удалось загрузить вложения из комментариев." : "Could not load attachments from comments.") : null}
+      retryLabel={ru ? "Повторить" : "Retry"} onRetry={comments.status === "error" ? retryComments : refreshComments} />
     {comments.status === "ready" && (comments.hasMore || comments.loadMoreFailed) && <div className={styles.status}>
-      {comments.loadMoreFailed && <span role="alert">{ru ? "Не удалось загрузить более ранние вложения." : "Could not load earlier attachments."}</span>}
+      <ErrorToast message={comments.loadMoreFailed ? (ru ? "Не удалось загрузить более ранние вложения." : "Could not load earlier attachments.") : null} />
       <Button size="sm" variant="light" disableRipple isDisabled={comments.loadingMore || comments.refreshing}
         aria-busy={comments.loadingMore || undefined} onPress={comments.hasMore ? loadMoreComments : refreshComments}>
         {comments.loadingMore ? (ru ? "Загрузка…" : "Loading…")

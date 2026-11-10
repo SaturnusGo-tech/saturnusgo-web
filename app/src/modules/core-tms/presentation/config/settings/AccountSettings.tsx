@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../common/error/ErrorToast";
 import { useState } from "react";
 import { useTmsSession } from "../../../auth/presentation/session/TmsSessionContext";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -25,6 +26,6 @@ export function AccountSettings() {
           void session.signOut().catch(() => { setFailed(true); setPending(false); });
         }}>{t("auth.signOut")}</button>
     </div>
-    {failed && <p role="alert" className={css.exchangeError}>{t("auth.logoutError")}</p>}
+    <ErrorToast message={failed ? t("auth.logoutError") : null} />
   </div>;
 }

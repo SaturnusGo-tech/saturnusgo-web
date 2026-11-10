@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../../presentation/common/error/ErrorToast";
 import { Button, Input, Select, SelectItem } from "@heroui/react";
 import { Upload, X } from "lucide-react";
 import { useId, useRef } from "react";
@@ -50,7 +51,8 @@ export function RunPlatformBuildFields({ controller, projects, disabled, ru }: {
         {(draft.phase === "error" || draft.phase === "cancelled") && draft.file && <Button type="button" size="sm" variant="light" disableRipple className={css.retry}
           isDisabled={disabled} onPress={controller.retryUpload}>{ru ? "Повторить загрузку" : "Retry upload"}</Button>}
         <p className={css.hint}>{ru ? "APK, ZIP или другой файл до 500 МиБ. Для Android нужен файл сборки." : "APK, ZIP, or another file up to 500 MiB. Android builds require a file."}</p>
-        {draft.error && <p role="alert" className={css.error}>{draft.error}</p>}
+        <ErrorToast message={draft.error} retryLabel={ru ? "Повторить загрузку" : "Retry upload"}
+          onRetry={!disabled && draft.phase === "error" && draft.file ? controller.retryUpload : undefined} />
         {draft.androidVersion.trim() && !draft.file && !draft.artifact && <p className={css.error}>
           {ru ? "Добавьте файл для этой версии Android." : "Add the file for this Android version."}</p>}
       </div>

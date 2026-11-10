@@ -3,7 +3,9 @@ import { LoadingOrb } from "../../../../shared/components/loading/LoadingOrb";
 import { ContentSkeleton } from "../../presentation/common/skeleton/ContentSkeleton";
 import { transitionContent } from "../../presentation/workspace/motion/transition/content-transition";
 import { useState } from "react";
-import { Save, RefreshCw } from "lucide-react";
+import { Save } from "lucide-react";
+import { ErrorToast } from "../../presentation/common/error/ErrorToast";
+import { IntegrationBrand } from "../../presentation/hooks/shared/brand/IntegrationBrand";
 import type { Provider } from "../model/connector-types";
 import { useConnector } from "../application/useConnector";
 import { ConnectorChrome, type ConnectorTab } from "./chrome/ConnectorChrome";
@@ -32,9 +34,9 @@ export function ConnectorSettings({ workspaceId, projectId, provider, ru, canMan
   const snapshot = state.snapshot;
   return <ConnectorChrome provider={provider} ru={ru} project={project} tab={tab} onTab={selectTab} onBack={onBack}
     enabled={Boolean(snapshot?.connection?.enabled)} embedded={embedded}>
-    {state.error && <div className={styles.error} role="alert"><p>{state.error}</p>
-      <button type="button" className={styles.secondary} onClick={() => void (tab === "activity" && snapshot && !state.configurationReloadRequired ? state.refreshActivity() : state.load())}
-        disabled={Boolean(state.pending)}><RefreshCw size={14} />{ru ? "Загрузить заново" : "Reload"}</button></div>}
+    <ErrorToast message={state.failure?.message}
+      brand={provider === "linear" ? <IntegrationBrand provider="linear" /> : undefined}
+      title={provider === "linear" ? "Linear" : undefined} />
     {state.notice && <div className={styles.notice} role="status">{state.notice}</div>}
     {!snapshot && state.pending && <ContentSkeleton label={ru ? "Загрузка настроек" : "Loading settings"} />}
     {snapshot && <>

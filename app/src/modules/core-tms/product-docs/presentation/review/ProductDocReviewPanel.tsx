@@ -1,5 +1,6 @@
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
-import { addToast, Alert, Button } from "@heroui/react";
+import { addToast, Button } from "@heroui/react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowLeft, X } from "lucide-react";
 import { useLayoutEffect, useRef, useState, type RefObject } from "react";
@@ -73,12 +74,10 @@ export function ProductDocReviewPanel({ reviews, target, source, copy, locale, p
           <X size={16} aria-hidden="true" />
         </Button>
       </header>
-      {reviews.error && <Alert color="danger" isVisible description={productDocReviewError(copy, reviews.error)}
-        classNames={{ base: styles.error, iconWrapper: styles.alertIcon }} />}
+      <ErrorToast message={reviews.error ? productDocReviewError(copy, reviews.error) : null} />
       {loading && <div className={styles.loading} role="status"><LoadingOrb />{copy.loading}</div>}
-      {reviews.resource.status === "error" && <Alert color="danger" isVisible description={copy.loadError}
-        classNames={{ base: styles.error, iconWrapper: styles.alertIcon }}
-        endContent={<Button className={styles.textButton} onPress={reviews.resource.retry}>{copy.retry}</Button>} />}
+      <ErrorToast message={reviews.resource.status === "error" ? copy.loadError : null}
+        retryLabel={copy.retry} onRetry={reviews.resource.retry} />
       <motion.div key={showForm ? "request" : "history"} className={styles.body}
         initial={reducedMotion ? false : { opacity: 0, x: showForm ? 6 : -5 }} animate={{ opacity: 1, x: 0 }}
         transition={{ duration: reducedMotion ? 0 : .19, ease: [.22, .7, .2, 1] }}>

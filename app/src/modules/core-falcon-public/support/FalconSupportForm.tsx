@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorToast } from "../../core-tms/presentation/common/error/ErrorToast";
 import { Button, Input, Textarea } from "@heroui/react";
 import { Paperclip, X } from "lucide-react";
 import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
@@ -153,7 +154,8 @@ export default function FalconSupportForm({ locale }: { locale: SupportLocale })
           </Button>
         </div>
       </form>
-      {feedback && <p className={styles.feedback} data-error={feedback !== "sent"} role={feedback === "sent" ? "status" : "alert"}>{copy[feedback]}</p>}
+      {feedback === "sent" && <p className={styles.feedback} role="status">{copy.sent}</p>}
+      <ErrorToast message={feedback && feedback !== "sent" ? copy[feedback] : null} />
       <div className={styles.formFooter}>
         <p id="falcon-support-attachment-hint">{copy.attachmentHint}</p>
         <a href={`/privacy/?lang=${locale}`}>{copy.privacy}</a>

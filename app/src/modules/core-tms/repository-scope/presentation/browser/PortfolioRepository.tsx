@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { ArrowUpRight, ChevronDown, Folder, FolderKanban } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
@@ -58,8 +59,7 @@ export function PortfolioRepository({ model }: { model: WorkspaceModel }) {
       {!resource.loading && !resource.error && ![...branches.values()].some(branch => branch === null) && <span>{filters.visible.length}</span>}</div>
     {error && <p className={css.message} role="alert">{ru ? "Не удалось открыть кейс. Попробуйте ещё раз." : "Could not open the case. Please try again."}</p>}
     <div className={shared.treeScroll} aria-busy={resource.loading || Boolean(opening)}>
-      {resource.error && <div className={shared.loadError} role="alert"><span>{ru ? "Не удалось загрузить выбранные проекты или портфели." : "The selected projects or portfolios could not be loaded."}</span>
-        <button type="button" onClick={resource.retry}>{ru ? "Повторить" : "Retry"}</button></div>}
+      <ErrorToast message={resource.error ? (ru ? "Не удалось загрузить выбранные проекты или портфели." : "The selected projects or portfolios could not be loaded.") : null} retryLabel={ru ? "Повторить" : "Retry"} onRetry={resource.retry} />
       {resource.loading && <div className={shared.skeleton} role="status" aria-label={ru ? "Загрузка кейсов портфеля" : "Loading portfolio cases"}><i /><i /><i /></div>}
       {projects.map(project => {
         const branch = branches.get(project.id);
@@ -74,7 +74,7 @@ export function PortfolioRepository({ model }: { model: WorkspaceModel }) {
               title={ru ? "Только этот проект" : "Only this project"} onClick={async () => { if (await model.chooseProject(project.id)) model.repositoryScope.select(null, project.id); }}><ArrowUpRight size={16} /></button>
           </div>
           {expanded && <div className={css.contents}>
-            {branch === null ? <div className={shared.loadError} role="alert"><span>{ru ? "Кейсы проекта не загружены" : "Project cases could not be loaded"}</span><button type="button" onClick={resource.retry}>{ru ? "Повторить" : "Retry"}</button></div>
+            {branch === null ? <ErrorToast message={ru ? "Кейсы проекта не загружены" : "Project cases could not be loaded"} retryLabel={ru ? "Повторить" : "Retry"} onRetry={resource.retry} />
               : !branch ? null : cases.length ? <PortfolioCaseTree cases={cases} folders={branch.folders} workspaceId={model.data.workspace.id} ru={ru} disabled={locked}
                 activeId={model.selectedCaseId} loadingCaseId={loadingCaseId} includeArchived={filters.filters.includeArchived} onOpen={item => void openCase(item)} />
                 : <p className={css.message}>{ru ? "В проекте пока нет кейсов" : "This project has no cases yet"}</p>}

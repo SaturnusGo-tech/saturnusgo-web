@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../../../common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../../../../shared/components/loading/LoadingOrb";
 import { Button } from "@heroui/react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
@@ -134,10 +135,8 @@ export function DashboardcnSlices({ title, snapshot, kind, openDrill, onOpenRow,
         {result.loading && <span role="status" className={styles.loading}>
           <LoadingOrb /> {t("dashboard.summaryLoading")}
         </span>}
-        {result.error && <div role="alert" className={styles.notice}>
-          <span>{t("dashboard.summaryError")}</span>
-          <button type="button" className={styles.retry} onClick={result.retry}>{t("dashboard.retry")}</button>
-        </div>}
+        <ErrorToast message={result.error ? t("dashboard.summaryError") : null}
+          retryLabel={t("dashboard.retry")} onRetry={result.retry} />
         <AnimatePresence initial={false}>
           {selected && <motion.div key="records" className={styles.recordTransition} initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ duration: reduceMotion ? 0 : 0.17 }}>

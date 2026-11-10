@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../common/error/ErrorToast";
 import { PiFolderSimpleMinusDuotone, PiArrowBendDownRightDuotone } from "react-icons/pi";
 import { AlertTriangle, Archive, CheckCircle2, FilePenLine, Play, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -88,7 +89,7 @@ export function CaseBulkActionBar(props: {
       {props.onRemove && <button type="button" className={styles.bulkAction} disabled={busy} onClick={props.onRemove}><PiFolderSimpleMinusDuotone size={17} /><span>{ru ? "Убрать из папки" : "Unfile"}</span></button>}
       {props.onArchive && <button type="button" className={styles.bulkAction} disabled={busy} onClick={props.onArchive}><Archive size={15} /><span>{ru ? "В архив" : "Archive"}</span></button>}
       <button type="button" className={styles.bulkClose} disabled={busy} onClick={props.onClear} aria-label={ru ? "Снять выделение" : "Clear selection"}><X size={17} aria-hidden="true" /></button>
-      {error && <span className={styles.bulkError} role="alert">{error}</span>}
+      <ErrorToast message={error} />
     </div>
   );
 }

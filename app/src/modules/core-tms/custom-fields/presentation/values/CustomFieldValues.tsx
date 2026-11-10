@@ -1,3 +1,4 @@
+import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { useState } from "react";
 import { Plus, Search } from "lucide-react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -30,8 +31,8 @@ export function CustomFieldValues({ scope, field, canManage }: { scope: CustomFi
     {edit && canManage && <CustomFieldValueForm key={edit === "new" ? "new" : `${edit.id}:${edit.rowVersion}`} scope={scope} field={field}
       current={edit === "new" ? null : edit} ru={ru} onClose={() => setEdit(null)} onExisting={setEdit}
       onSaved={() => { setEdit(null); page.refresh(); }} />}
-    {write.error && <p className={css.error} role="alert">{write.error}</p>}
-    {!!page.failure && <p className={css.error} role="alert">{customFieldError(page.failure, ru)} <button type="button" className={css.secondary} onClick={page.refresh}>{ru ? "Повторить" : "Retry"}</button></p>}
+    <ErrorToast message={write.error} />
+    <ErrorToast message={page.failure ? customFieldError(page.failure, ru) : null} retryLabel={ru ? "Повторить" : "Retry"} onRetry={page.refresh} />
     {page.loading ? <p className={css.status} role="status">{ru ? "Загрузка значений…" : "Loading values…"}</p> : <>
       <table className={css.table}><thead><tr><th scope="col">{ru ? "Значение" : "Value"}</th><th scope="col">{ru ? "Обновлено" : "Updated at"}</th>
         <th scope="col">{ru ? "Автор изменения" : "Updated by"}</th><th scope="col"><span aria-label={ru ? "Действия" : "Actions"} /></th></tr></thead>
