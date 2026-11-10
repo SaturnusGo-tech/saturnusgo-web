@@ -22,75 +22,39 @@
 .trigger svg { flex: none; }
 .chevron { opacity: .72; }
 
-.scrim { background: #0009; }
-.dialog {
-  --language-ink: #f7f8f8;
-  --language-muted: #a0a1a8;
-  width: min(352px, calc(100% - 32px));
-  border: 1px solid #333438;
-  border-radius: 16px;
+.menuSurface {
+  width: 148px;
+  min-width: 0;
+  padding: 4px;
+  border: 1px solid #323336;
+  border-radius: 10px;
   background: #17181a;
-  color: var(--language-ink);
-  box-shadow: 0 20px 60px #0007;
+  color: #f7f8f8;
+  box-shadow: 0 8px 24px #0005;
   font-family: var(--font-geist-sans), Arial, sans-serif;
   color-scheme: dark;
 }
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 14px 6px 20px;
-  font-size: 16px;
-  font-weight: 600;
-}
-.close { color: var(--language-muted); }
-.close[data-hover="true"] { background: #26272c; color: var(--language-ink); }
-.content { padding: 4px 12px 12px; }
-.listbox { padding: 0; }
-.options {
-  display: grid;
-  gap: 2px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
+.menu { width: 100%; padding: 0; }
+.options { gap: 0; margin: 0; padding: 0; list-style: none; }
 .option {
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-height: 46px;
-  padding: 6px 9px;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--language-ink);
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 130ms ease;
-}
-.option[data-hover="true"] { background: #232429; }
-.option[data-focus-visible="true"] {
-  outline: 1px solid var(--language-muted);
-  outline-offset: -2px;
-}
-.label { flex: 1; font-size: inherit; }
-.code {
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: 29px;
-  height: 24px;
-  border: 1px solid #38393e;
+  gap: 8px;
+  min-height: 36px;
+  padding: 4px 8px;
   border-radius: 6px;
-  color: var(--language-muted);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .025em;
+  background: transparent;
+  color: inherit;
+  font-size: 13px;
+  cursor: pointer;
 }
-.check { flex: none; width: 16px; height: 16px; color: var(--language-ink); }
+.option[data-hover="true"], .option[data-focus-visible="true"] { background: #27282b; }
+.label { flex: 1; font-size: inherit; }
+.check { flex: none; width: 14px; height: 14px; }
 @media (max-width: 480px) {
   .trigger span, .chevron { display: none; }
   .trigger { width: 44px; padding: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .trigger, .option { transition: none; }
+  .trigger { transition: none; }
 }
