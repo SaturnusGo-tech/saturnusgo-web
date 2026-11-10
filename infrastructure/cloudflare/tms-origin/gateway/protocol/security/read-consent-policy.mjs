@@ -4,7 +4,7 @@ export function readConsentPolicy(request, response, audience) {
     !/^\/api\/v1\/falcon-oauth\/interaction\/[A-Za-z0-9_-]{1,128}$/.test(new URL(request.url).pathname) ||
     !/^text\/html(?:;|$)/i.test(response.headers.get("content-type") ?? "")) return null;
   const policy = response.headers.get("content-security-policy") ?? "";
-  const source = /^default-src 'none'; script-src 'none'; style-src 'unsafe-inline'; form-action 'self' (https?:\/\/[^\s;,<>"'\\*]+); base-uri 'none'; frame-ancestors 'none'$/.exec(policy)?.[1];
+  const source = /^default-src 'none'; (?:script-src 'none'; style-src 'unsafe-inline'; |script-src 'sha256-[A-Za-z0-9+/]{43}='; style-src 'unsafe-inline'; img-src data:; )form-action 'self' (https?:\/\/[^\s;,<>"'\\*]+); base-uri 'none'; frame-ancestors 'none'$/.exec(policy)?.[1];
   if (!source) return null;
   try {
     const target = new URL(source);
