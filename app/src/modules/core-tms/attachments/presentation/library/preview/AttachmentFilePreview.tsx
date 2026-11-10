@@ -2,12 +2,15 @@
 
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
 import { ChevronDown, Download, File, FileArchive, FileText, Grid2X2, Image, Music2, Video, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
 import { ProductDocPdfPreview } from "../../../../product-docs/presentation/attachments/preview/ProductDocPdfPreview";
 import { getFilePreviewKind, type FilePreviewKind, type FilePreviewRequest, type ParsedFilePreview } from "./model/file-preview-format";
+import { ArchivePreview } from "./archive/ArchivePreview";
 import { SpreadsheetPreview } from "./SpreadsheetPreview";
 import styles from "./attachment-file-preview.module.css";
+
+const SourceFilePreview = lazy(() => import("./source/SourceFilePreview"));
 
 export type PreviewFile = { id: string; filename: string; mimeType: string; sizeBytes?: number | null };
 
@@ -53,39 +56,40 @@ function parseInWorker(request: FilePreviewRequest, signal: AbortSignal): Promis
   });
 }
 
-function byteSize(bytes: number, ru: boolean) {
-  const format = new Intl.NumberFormat(ru ? "ru" : "en", { maximumFractionDigits: 1 });
-  if (bytes >= 1024 ** 2) return `${format.format(bytes / 1024 ** 2)} ${ru ? "МБ" : "MB"}`;
-  if (bytes >= 1024) return `${format.format(bytes / 1024)} ${ru ? "КБ" : "KB"}`;
-  return `${format.format(bytes)} ${ru ? "Б" : "B"}`;
+function ArchiveContent({ preview, blob, filename, ru }: {
+  preview: Extract<ParsedFilePreview, { kind: "archive" }>; blob: Blob; filename: string; ru: boolean;
+}) {
+  const openEntry = useCallback(async (entry: (typeof preview.entries)[number], signal: AbortSignal) => {
+    const result = await parseInWorker({ kind: "archive-entry", filename: entry.name, blob }, signal);
+    if (result.kind !== "text") throw new Error("Archive entry preview unavailable");
+    return result;
+  }, [blob]);
+  return <ArchivePreview {...preview} filename={filename} ru={ru} openEntry={openEntry} />;
 }
 
-function PreviewContent({ preview, file, zoom, ru, onFailure }: {
-  preview: Preview; file: PreviewFile; zoom: number; ru: boolean; onFailure: () => void;
+function PreviewContent({ preview, blob, file, zoom, ru, onFailure }: {
+  preview: Preview; blob?: Blob; file: PreviewFile; zoom: number; ru: boolean; onFailure: () => void;
 }) {
   if (preview.kind === "sheet") return <SpreadsheetPreview sheets={preview.sheets} limited={preview.limited} scale={zoom / 100} ru={ru} />;
-  if (preview.kind === "archive") return <div className={styles.archive}>
-    <table>
-      <thead><tr><th>{ru ? "Имя" : "Name"}</th><th>{ru ? "Размер" : "Size"}</th></tr></thead>
-      <tbody>{preview.entries.map((entry, index) => <tr key={index}>
-        <td>{entry.name}</td><td>{entry.directory ? "—" : byteSize(entry.size, ru)}</td>
-      </tr>)}</tbody>
-    </table>
-    {preview.limited && <p className={styles.limit}>{ru ? "Показаны первые 2 000 элементов" : "Showing the first 2,000 entries"}</p>}
-  </div>;
-  if (preview.kind === "text") return <div className={styles.text}>
-    <pre>{preview.text}</pre>
-    {preview.limited && <p className={styles.limit}>{ru ? "Показано начало файла" : "Showing the beginning of the file"}</p>}
-  </div>;
+  if (preview.kind === "archive") return blob ? <ArchiveContent preview={preview} blob={blob} filename={file.filename} ru={ru} /> : null;
+  if (preview.kind === "text") return <Suspense fallback={<div className={styles.unavailable}>
+    <LoadingOrb size="md" label={ru ? "Открываем файл" : "Opening file"} />
+  </div>}>
+    <SourceFilePreview {...preview} filename={file.filename} mimeType={file.mimeType} ru={ru} />
+  </Suspense>;
   if (preview.kind === "document") return <div className={styles.document} tabIndex={0} aria-label={file.filename}>
     {preview.paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
     {preview.truncated && <p className={styles.limit}>{ru ? "Показана часть документа" : "Partial document preview"}</p>}
   </div>;
-  if (preview.kind === "pdf") return <div className={styles.pdf} style={{ "--preview-zoom": zoom / 100 } as React.CSSProperties}>
-    <ProductDocPdfPreview blob={preview.blob} filename={file.filename} ru={ru} expanded />
+  if (preview.kind === "pdf") return <div className={styles.pdf}>
+    <ProductDocPdfPreview blob={preview.blob} filename={file.filename} ru={ru} viewportScale={zoom / 100} />
   </div>;
-  if (preview.kind === "image") return <div className={styles.media}>
-    <img className={styles.picture} src={preview.url} alt={file.filename} style={{ width: `${zoom}%`, maxWidth: "none" }} onError={onFailure} />
+  if (preview.kind === "image") return <div className={styles.pictureViewport} tabIndex={0}>
+    <img className={styles.picture} src={preview.url} alt={file.filename} style={{ "--preview-zoom": zoom / 100 } as React.CSSProperties}
+      onLoad={({ currentTarget }) => {
+        currentTarget.style.setProperty("--preview-aspect", String(currentTarget.naturalWidth / currentTarget.naturalHeight));
+      }}
+      onError={onFailure} />
   </div>;
   if (preview.kind === "video") return <div className={styles.media}>
     <video src={preview.url} controls playsInline preload="metadata" aria-label={file.filename} onError={onFailure} />
@@ -126,7 +130,7 @@ function PreviewBody({ file, loadFile, loadDocumentText, onClose, onDownload, ru
       if (blob.size > maxPreviewBytes) throw new Error("File exceeds preview limit");
       let preview: Preview;
       if (kind === "sheet" || kind === "text" || kind === "archive") {
-        preview = await parseInWorker({ kind, filename, blob }, controller.signal);
+        preview = await parseInWorker({ kind, filename, blob, mimeType: file.mimeType }, controller.signal);
       } else if (kind === "pdf") {
         preview = { kind, blob };
       } else {
@@ -140,7 +144,7 @@ function PreviewBody({ file, loadFile, loadDocumentText, onClose, onDownload, ru
       controller.abort();
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
-  }, [filename, kind, loadFile, loadDocumentText, supported]);
+  }, [file.mimeType, filename, kind, loadFile, loadDocumentText, supported]);
 
   function download() {
     if (onDownload) { onDownload(); return; }
@@ -182,7 +186,7 @@ function PreviewBody({ file, loadFile, loadDocumentText, onClose, onDownload, ru
     {!supported || result.state === "unavailable"
       ? <div className={styles.unavailable} role="status"><Icon size={28} aria-hidden="true" /><h2>{unavailable}</h2><p>{description}</p></div>
       : result.state === "loading" ? <div className={styles.unavailable}><LoadingOrb size="lg" label={ru ? "Открываем файл" : "Opening file"} /></div>
-      : <PreviewContent preview={result.preview} file={file} zoom={zoom} ru={ru} onFailure={() => setResult({ state: "unavailable" })} />}
+      : <PreviewContent preview={result.preview} blob={result.blob} file={file} zoom={zoom} ru={ru} onFailure={() => setResult({ state: "unavailable" })} />}
   </section>;
 }
 

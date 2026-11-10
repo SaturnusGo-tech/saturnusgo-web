@@ -74,22 +74,37 @@
 .header, .toolbar, .actions { display: flex; align-items: center; }
 .header, .toolbar { justify-content: space-between; gap: 16px; }
 .header h1 { margin: 0; font-size: 26px; line-height: 1.2; font-weight: 620; letter-spacing: -.035em; }
-.search { flex: 0 1 264px; min-inline-size: 116px; }
-.searchWrapper.searchWrapper {
-  min-block-size: 36px;
-  block-size: 36px;
-  gap: 8px;
-  padding-inline: 14px;
+.header .search[data-input-shell] {
+  --tms-focus-border: var(--falcon-text-secondary);
+  --tms-focus-ring: transparent;
+  flex: 0 1 264px;
+  min-inline-size: 116px;
   border: 1px solid color-mix(in srgb, var(--library-ink) 15%, transparent);
   border-radius: 999px;
+}
+.header .search[data-input-shell]:focus-within { border-color: var(--tms-focus-border); }
+.search .searchWrapper {
+  min-block-size: 34px;
+  block-size: 34px;
+  gap: 8px;
+  padding-inline: 14px;
+  border: 0;
   box-shadow: none;
   background: transparent;
   color: var(--library-muted);
 }
-.searchWrapper[data-focus="true"] { border-color: color-mix(in srgb, var(--library-ink) 34%, transparent); }
 .searchInner.searchInner { gap: 8px; }
 .searchInner > svg { flex: none; }
-.searchInput.searchInput { color: var(--library-ink); font-size: 14px; outline: none; }
+.search .searchWrapper input.searchInput {
+  min-inline-size: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  box-shadow: none;
+  background: transparent;
+  color: var(--library-ink);
+  font-size: 14px;
+}
 .searchInput::placeholder { color: var(--library-muted); }
 .toolbar { margin-block: 25px 17px; }
 .tabs.tabs { gap: 4px; padding: 0; border-radius: 999px; background: transparent; }
@@ -107,7 +122,21 @@
 }
 .iconButton[data-current], .iconButton[data-hover="true"] { color: var(--library-ink); background: var(--library-active); }
 .toolbarDivider { inline-size: 1px; block-size: 18px; margin-inline: 6px; background: var(--library-line); }
-.menu.menu { min-inline-size: 168px; }
+.menuPositioner { z-index: 130; }
+.menu.menu {
+  min-inline-size: 168px;
+  max-inline-size: calc(100vw - 24px);
+  max-block-size: min(360px, 65dvh);
+  overflow: auto;
+  padding: 6px;
+  border-radius: 12px;
+  background: var(--falcon-elevated);
+  color: var(--falcon-text);
+  box-shadow: var(--falcon-shadow-popover);
+}
+.menuList { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.menuList .menuItem { min-block-size: 30px; padding: 5px 8px; border-radius: 8px; cursor: pointer; }
+.menuItem:is([data-hover="true"], [data-focus-visible="true"]) { background: var(--falcon-hover); }
 
 .results { min-inline-size: 0; }
 .columns, .file {

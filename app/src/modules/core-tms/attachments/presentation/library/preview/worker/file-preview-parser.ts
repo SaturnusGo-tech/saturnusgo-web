@@ -1,7 +1,8 @@
 import { BlobReader, ZipReader } from "@zip.js/zip.js";
 import { fileExtension, type FilePreviewRequest, type ParsedFilePreview, type PreviewSheet } from "../model/file-preview-format";
+import { parseArchivePreview } from "./archive/archive-preview";
+import { decodeTextPreview, textByteLimit } from "./text/text-preview";
 
-const textByteLimit = 512 * 1024;
 const rowLimit = 10_000;
 const columnLimit = 256;
 const sheetLimit = 100;
@@ -35,23 +36,13 @@ async function checkWorkbookContainer(blob: Blob) {
 }
 
 export async function parseFilePreview(request: FilePreviewRequest): Promise<ParsedFilePreview> {
-  const { kind, blob, filename } = request;
+  const { kind, blob, filename, mimeType } = request;
   if (kind === "text") {
-    return { kind, text: await blob.slice(0, textByteLimit).text(), limited: blob.size > textByteLimit };
+    const limited = blob.size > textByteLimit;
+    const bytes = new Uint8Array(await blob.slice(0, textByteLimit).arrayBuffer());
+    return decodeTextPreview(bytes, limited, filename, mimeType);
   }
-  if (kind === "archive") {
-    const reader = new ZipReader(new BlobReader(blob));
-    try {
-      const entries = [];
-      for await (const entry of reader.getEntriesGenerator()) {
-        if (entries.length === 2_000) return { kind, entries, limited: true };
-        entries.push({ name: entry.filename, size: entry.uncompressedSize, directory: entry.directory });
-      }
-      return { kind, entries, limited: false };
-    } finally {
-      await reader.close();
-    }
-  }
+  if (kind === "archive" || kind === "archive-entry") return parseArchivePreview(blob, kind === "archive-entry" ? filename : undefined);
 
   await checkWorkbookContainer(blob);
   const { read, utils } = await import("xlsx");

@@ -115,9 +115,11 @@ export function AttachmentLibrary({ workspaceId, subject, connected }: {
       <div className={styles.main}>
         <header className={styles.header}>
           <h1>{copy.kinds[category]}</h1>
-          <Input aria-label={copy.search} placeholder={copy.search} value={query} onValueChange={setQuery}
-            startContent={<Search size={16} aria-hidden />} maxLength={200} size="sm" isClearable
-            classNames={{ base: styles.search, inputWrapper: styles.searchWrapper, innerWrapper: styles.searchInner, input: styles.searchInput }} />
+          <div className={styles.search} data-input-shell>
+            <Input aria-label={copy.search} placeholder={copy.search} value={query} onValueChange={setQuery}
+              startContent={<Search size={16} aria-hidden />} maxLength={200} size="sm" radius="full" isClearable
+              classNames={{ inputWrapper: styles.searchWrapper, innerWrapper: styles.searchInner, input: styles.searchInput }} />
+          </div>
         </header>
         <div className={styles.toolbar}>
           <Tabs aria-label={copy.title} selectedKey={tab} onSelectionChange={key => setTab(key as LibraryTab)}
@@ -125,11 +127,13 @@ export function AttachmentLibrary({ workspaceId, subject, connected }: {
             {tabs.map(value => <Tab key={value} title={copy[value]} aria-controls="attachment-library-results" />)}
           </Tabs>
           <div className={styles.actions}>
-            <Dropdown placement="bottom-end" classNames={{ content: styles.menu }}>
+            <Dropdown placement="bottom-end" shouldBlockScroll={false} shouldCloseOnScroll={false}
+              classNames={{ base: styles.menuPositioner, content: styles.menu }}>
               <DropdownTrigger><Button isIconOnly variant="light" radius="full" className={styles.iconButton} aria-label={copy.filters}>
                 <ListFilter size={18} aria-hidden />
               </Button></DropdownTrigger>
               <DropdownMenu aria-label={copy.filters} selectionMode="single" disallowEmptySelection selectedKeys={[category]}
+                classNames={{ list: styles.menuList }} itemClasses={{ base: styles.menuItem }}
                 onAction={key => setCategory(key as typeof category)}>
                 {categories.map(value => {
                   const Icon = categoryIcons[value];

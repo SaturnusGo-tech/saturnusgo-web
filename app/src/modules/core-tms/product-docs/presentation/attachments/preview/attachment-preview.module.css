@@ -10,6 +10,26 @@
   white-space: nowrap; gap: 4px; padding: 3px; border: 1px solid var(--attachment-stroke); border-radius: 7px;
   background: var(--attachment-surface); color: var(--attachment-title); opacity: 0; transition: opacity 140ms ease; }
 .pdf:is(:hover, :focus-within, [data-expanded]) .pager { opacity: 1; }
+.pdf[data-fit-viewport] { display: flex; flex: 1; flex-direction: column; min-block-size: 0; }
+.pdf[data-fit-viewport] .pdfViewport {
+  display: flex;
+  flex: 1;
+  align-items: safe center;
+  justify-content: safe center;
+  min-block-size: 0;
+  max-block-size: none;
+  outline-offset: -2px;
+}
+.pdf[data-fit-viewport] .paper { flex: none; max-width: none; margin: 0; }
+.pdf[data-fit-viewport] .pager {
+  position: static;
+  flex: none;
+  translate: none;
+  opacity: 1;
+  border: 0;
+  color: var(--falcon-text-secondary);
+  background: transparent;
+}
 .pager button, .sheets button { background: transparent; color: var(--falcon-text); min-width: 28px; padding: 3px 8px; border: 0; border-radius: 5px; }
 .pager button:hover, .sheets button:is(:hover, [aria-pressed="true"]) { background: var(--falcon-hover); }
 .sheets { justify-content: start; flex-wrap: wrap; }
