@@ -1,3 +1,8 @@
+.anchor { position: relative; flex: none; }
+
+/* The menu sits inside the sticky header's scroll padding. Keep focus from scrolling the page. */
+:global(html):has(.anchor .trigger[aria-expanded="true"]) { scroll-padding-top: 0; }
+
 .trigger {
   display: inline-flex;
   flex: none;
