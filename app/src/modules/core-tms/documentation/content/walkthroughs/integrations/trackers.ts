@@ -10,7 +10,7 @@ export const jiraWalkthrough = walkthrough("Connect Jira in Falcon", [
 
 export const linearWalkthrough = walkthrough("Connect a Linear team", [
   shot("linear-01-connection-20260914-en-20260928", "Connection fields",
-    "Enter the **API key** and **Linear team ID** under **Service access**. Use **Incoming events** to copy the Falcon webhook URL and save Linear's signing secret.",
+    "Enter the **API key** and either the team key or UUID in **Linear team ID or key** under **Service access**. Select **Verify access** and confirm the returned team before saving. Use **Incoming events** to copy the Falcon webhook URL and save Linear's signing secret.",
     "The webhook URL appears after you save the connection.",
     "Linear connection with key, team and callback fields and no secret values entered."),
 ]);

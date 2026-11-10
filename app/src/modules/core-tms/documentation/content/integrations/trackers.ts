@@ -25,26 +25,34 @@ export const trackerArticles: DocArticle[] = [
       section("verify", "Verify the full cycle", paragraph("Enable the integration and save. Create a test defect in Falcon; the log should show successful delivery and a Jira issue link. Move that issue to the selected readiness status and check that the defect returns for retesting. After a successful retest, confirm the fix and check the outgoing transition.")),
     ] },
   { id: "linear", title: "Linear", group: "integrations", description: "Connect this Falcon project to a Linear team. Send defects to Linear and bring fixes back to QA for retesting.",
-    keywords: ["Linear", "team ID", "API key", "webhook", "signing secret"], related: ["retest", "integration-troubleshooting", "integration-overview"],
+    keywords: ["Linear", "team ID", "team key", "team identifier", "UUID", "API key", "webhook", "signing secret"], related: ["retest", "integration-troubleshooting", "integration-overview"],
     sources: [{ title: "Linear API keys and webhooks", url: "https://linear.app/docs/api-and-webhooks" },
+      { title: "Linear team settings and identifiers", url: "https://linear.app/docs/teams#team-settings" },
       { title: "Linear team UUIDs", url: "https://linear.app/developers/graphql#queries-and-mutations" },
       { title: "Linear webhook signatures", url: "https://linear.app/developers/webhooks" }],
     sections: [
       section("open", "Start in Connection setup", paragraph("Expand **Connection setup** for Linear and open **Connection**. Check that Falcon has the project selected whose defects should reach Linear. The connection applies to this project.")),
-      section("access", "Get the API key and team ID from Linear", steps(
-        ["Create a personal API key", "In Linear, go to **Settings → Account → Security & Access**. Create a key with **Read** and **Write** access and restrict it to the team that should receive defects."],
-        ["Copy the team UUID", "Open that team's page in Linear. Press **⌘K** or **Ctrl+K**, search for **Copy model UUID**, and choose the team. Falcon expects the full team UUID."]),
-        note("If you cannot create a key", "Ask your Linear workspace admin to grant permission to create personal API keys.")),
+      section("access", "Get the API key and team identifier from Linear", steps(
+        ["Create a team-scoped personal API key", "Switch to the Linear workspace that contains the team. Under **Settings → Account → Security & Access**, create a personal API key with **Read** and limit the key to that team. Add **Write** if Falcon will create or update issues. **Verify access** only checks read access."],
+        ["Find the team key or copy its UUID", "In the Linear sidebar, open the team’s **··· → Team settings → General** and copy **Identifier**. For an issue such as **QA-42**, the team key is **QA**. Alternatively, open the team’s home page, press **⌘K** or **Ctrl+K**, and choose **Copy model UUID** for that team."]),
+        note("Use the team’s identifier", "The display name, workspace slug, Linear project name or UUID, and full issue ID such as QA-42 refer to different things. The Falcon project selects where defects come from. The Linear team selects where they go."),
+        note("If you cannot create a key", "Ask your Linear workspace admin whether members can create personal API keys. For a private team, check that your Linear account can open the team.")),
       section("connect", "Verify and save the connection", steps(
-        ["Check access", "Under **Service access**, fill in **API key** and **Linear team ID**. Click **Verify access** and confirm that Falcon shows the intended team. This also loads its workflow statuses for the Automation tab."],
-        ["Get the Falcon webhook URL", "Keep **Enable integration** off and click **Save connection**. The **Webhook URL** appears under **Incoming events**. Copy that URL for the next step."])),
+        ["Check access", "Under **Service access**, paste the personal key into **API key** and enter the team key or full UUID in **Linear team ID or key**. Click **Verify access** and check the returned team name and UUID. This loads the team’s workflow statuses for **Automation** without saving a connection or creating a Linear issue."],
+        ["Get the Falcon webhook URL", "Keep **Enable integration** off and click **Save connection**. The **Webhook URL** appears under **Incoming events**. Copy that URL for the next step."]),
+        note("Checking an existing connection", "Leave **API key** blank to verify the saved key, or enter a replacement key to test it before saving. The team field is locked to the saved destination.")),
+      section("verify-access-errors", "If Verify access fails", steps(
+        ["Required fields are missing · 422", "Enter the personal API key and the team key or UUID for a new connection."],
+        ["Linear denied access · 422", "Check that the key is a current personal API key from the correct workspace, that it has **Read**, and that the selected team is included in its scope. If a key was revoked or exposed, replace it."],
+        ["Team not found or wrong scope · 422", "Open the intended team in Linear, copy its current identifier or team UUID again, and check that the key’s owner and team scope allow access. If Falcon shows an unexpected team, stop before saving."],
+        ["Rate limit or temporary outage · 429 or 502", "Wait before trying **Verify access** again. If the problem persists, share the error and any available request ID with Falcon Support. Keep the API key and webhook signing secret private."])),
       section("webhook", "Send issue updates from Linear to Falcon", steps(
         ["Create the webhook in Linear", "A Linear workspace admin opens **Settings → Administration → API → New webhook**. Paste the Falcon **Webhook URL**, select the same team, and choose **Issues** as the resource type."],
         ["Save its signing secret in Falcon", "Open the webhook you just created and copy its signing secret. Paste it in Falcon under **Incoming events → Signing secret**, then save changes. Keep the integration off until you finish the status mapping."])),
       section("workflow", "Choose when a fix returns to QA", paragraph("Open **Automation**. Keep **Defect created** selected to create Linear issues from new Falcon defects. Under **Fix workflow**, choose the Linear status that means the fix is ready for QA. Optionally, map **Verified** to a Linear status under **Update the service status**. Then turn on **Enable integration** and click **Save changes**."),
         note("Verify access again if statuses are missing", "Return to **Connection** and click **Verify access** to reload the workflow statuses for the configured team.")),
       section("verify", "Check one defect end to end", steps(
-        ["Check delivery to Linear", "Create a test defect in this Falcon project. In **Activity & links**, look for a successful delivery and open the linked Linear issue. Check that the issue belongs to the intended team."],
+        ["Check delivery to Linear", "After enabling the integration, create an agreed test defect in the Falcon project with sample data. In **Activity & links**, look for a successful delivery and open the linked Linear issue. Check that the issue belongs to the intended team."],
         ["Check the return to QA", "Move the linked issue to the Linear status you mapped for retesting. Check that the Falcon defect becomes **Ready for QA**. The previous test result stays in place until a tester records a retest result."]),
         note("If the status does not return", "Check that the webhook is enabled for **Issues** in the same Linear team and that its current signing secret matches the one saved in Falcon.")),
       section("walkthrough", "Connection screen", linearWalkthrough),
