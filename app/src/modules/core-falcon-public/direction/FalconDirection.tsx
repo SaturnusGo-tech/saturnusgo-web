@@ -16,7 +16,6 @@ import styles from './direction.module.css';
 const { en, ru } = directionCopy;
 const navigation = [
   { href: '#repository', en: en.product, ru: ru.product },
-  { href: '#documentation', en: en.documentation.nav, ru: ru.documentation.nav },
   { href: '#falcon-ai', en: en.integrations, ru: ru.integrations },
   { href: '#plans', en: 'Plans', ru: 'Тарифы' },
   { href: '#resources', en: en.resources, ru: ru.resources },
