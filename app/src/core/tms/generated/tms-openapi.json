@@ -4298,6 +4298,120 @@
         }
       }
     },
+    "/workspaces/{workspaceId}/attachment-library": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Attachments"
+        ],
+        "operationId": "listAttachmentLibrary",
+        "summary": "List private attachment metadata visible in a workspace",
+        "description": "Returns ready attachments and visible documentation files. Project scope and document visibility are enforced on the server. Use the existing attachment access endpoints for expiring preview or download URLs. Start a new page when changing filters. Cursors are opaque and rows are ordered newest first.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ProjectIdQuery"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "description": "Case-insensitive substring of the filename."
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AttachmentLibraryKind"
+            }
+          },
+          {
+            "name": "uploader",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "me",
+                "others"
+              ]
+            }
+          },
+          {
+            "name": "ids",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 12899
+            },
+            "description": "Comma-separated attachment identifiers, up to 100."
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A bounded page of attachment metadata.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "X-Next-Cursor": {
+                "$ref": "#/components/headers/XNextCursor"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttachmentLibraryPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
     "/attachments/{attachmentId}/access": {
       "parameters": [
         {
@@ -44726,6 +44840,172 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/Attachment"
+          }
+        }
+      },
+      "AttachmentLibraryKind": {
+        "type": "string",
+        "enum": [
+          "image",
+          "spreadsheet",
+          "pdf",
+          "archive",
+          "video",
+          "audio",
+          "document",
+          "other"
+        ]
+      },
+      "AttachmentLibrarySource": {
+        "type": "object",
+        "required": [
+          "kind",
+          "id",
+          "label"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "test_case_revision",
+              "run",
+              "run_attempt",
+              "defect",
+              "shared_step_revision",
+              "project",
+              "portfolio",
+              "repository_folder",
+              "product_doc"
+            ]
+          },
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "draft": {
+            "type": "boolean",
+            "const": true,
+            "description": "Use the draft access route for a documentation file."
+          }
+        }
+      },
+      "AttachmentLibraryItem": {
+        "type": "object",
+        "required": [
+          "id",
+          "filename",
+          "mimeType",
+          "kind",
+          "byteSize",
+          "createdAt",
+          "workspaceId",
+          "projectId",
+          "uploadedByIdentityId",
+          "source"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/AttachmentLibraryKind"
+          },
+          "byteSize": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "workspaceId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "projectId": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "uploadedByIdentityId": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source": {
+            "$ref": "#/components/schemas/AttachmentLibrarySource"
+          }
+        }
+      },
+      "AttachmentLibraryPage": {
+        "type": "object",
+        "required": [
+          "data",
+          "meta"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/AttachmentLibraryItem"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "required": [
+              "limit",
+              "hasMore",
+              "nextCursor"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "limit": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100
+              },
+              "hasMore": {
+                "type": "boolean"
+              },
+              "nextCursor": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
           }
         }
       },

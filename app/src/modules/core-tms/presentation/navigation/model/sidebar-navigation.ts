@@ -4,14 +4,14 @@ import type { SidebarPreferences } from "./sidebar-preferences";
 export const SIDEBAR_GROUPS = [
   { id: "overview", ids: ["dashboard"] },
   { id: "testing", ids: ["cases", "product-docs", "shared-steps", "runs", "suites"] },
-  { id: "management", ids: ["portfolios", "custom-fields", "api", "hooks"] },
+  { id: "management", ids: ["portfolios", "custom-fields", "api", "hooks", "files"] },
   { id: "insights", ids: ["reports"] },
 ] as const;
 export type SidebarGroupId = typeof SIDEBAR_GROUPS[number]["id"];
 export type SidebarNavigationId = typeof SIDEBAR_GROUPS[number]["ids"][number];
 export const SIDEBAR_NAVIGATION_IDS: readonly SidebarNavigationId[] = SIDEBAR_GROUPS.flatMap(group => [...group.ids]);
 export const PRIMARY_SIDEBAR_IDS: readonly SidebarNavigationId[] = ["dashboard", "cases", "product-docs", "shared-steps", "runs", "suites", "reports"];
-export const RARE_SIDEBAR_IDS: readonly SidebarNavigationId[] = ["portfolios", "custom-fields", "api", "hooks"];
+export const RARE_SIDEBAR_IDS: readonly SidebarNavigationId[] = SIDEBAR_GROUPS[2].ids;
 
 export function canonicalSidebarView(view: unknown): SidebarNavigationId | null {
   const candidate = view === "imports" ? "cases" : view;

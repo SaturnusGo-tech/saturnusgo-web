@@ -1,5 +1,6 @@
 import { BarChart, Batches, BookOpen, CodeSquareSlash, ConnectApps, Folders, Home, Play, Stack, SuitcaseWorkBusiness, Text } from "@openai/apps-sdk-ui/components/Icon";
 import type { ComponentType, SVGProps } from "react";
+import { Paperclip } from "lucide-react";
 import type { TmsMessageKey } from "../../../localization/catalog/messages";
 import type { SidebarGroupId, SidebarNavigationId } from "../model/sidebar-navigation";
 
@@ -14,6 +15,7 @@ export const sidebarCatalog = {
   "custom-fields": { labelKey: "nav.customFields", icon: Text },
   api: { labelKey: "nav.apiTesting", icon: CodeSquareSlash },
   hooks: { labelKey: "nav.hooks", icon: ConnectApps },
+  files: { labelKey: "nav.files", icon: Paperclip },
   reports: { labelKey: "nav.reports", icon: BarChart },
 } satisfies Record<SidebarNavigationId, { labelKey: TmsMessageKey; icon: ComponentType<SVGProps<SVGSVGElement>> }>;
 

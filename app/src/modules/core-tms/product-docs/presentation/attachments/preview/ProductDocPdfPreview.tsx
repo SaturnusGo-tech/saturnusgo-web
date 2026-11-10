@@ -9,26 +9,29 @@ import { loadProductDocPdf, renderProductDocPdfPage } from "./rendering/productD
 import "./attachment-print.css";
 import styles from "./attachment-preview.module.css";
 
-export function ProductDocPdfPreview({ url, filename, ru, expanded, onDocument }: {
-  url: string; filename: string; ru: boolean; expanded?: boolean; onDocument?(pdf: PDFDocumentProxy | null): void;
+type PdfSource = { url: string; blob?: never } | { url?: never; blob: Blob };
+
+export function ProductDocPdfPreview({ url, blob, filename, ru, expanded, onDocument }: PdfSource & {
+  filename: string; ru: boolean; expanded?: boolean; onDocument?(pdf: PDFDocumentProxy | null): void;
 }) {
+  const input = blob ?? url;
   const viewport = useRef<HTMLDivElement>(null);
   const paper = useRef<HTMLDivElement>(null);
-  const [source, setSource] = useState<{ url: string; pdf: PDFDocumentProxy } | null>(null);
+  const [source, setSource] = useState<{ input: string | Blob; pdf: PDFDocumentProxy } | null>(null);
   const [number, setNumber] = useState(1);
-  const [failure, setFailure] = useState<string>();
+  const [failure, setFailure] = useState<string | Blob>();
   const [ready, setReady] = useState(0);
-  const pdf = source?.url === url ? source.pdf : null;
+  const pdf = source?.input === input ? source.pdf : null;
   useEffect(() => {
     const request = new AbortController();
     onDocument?.(null);
-    void loadProductDocPdf(url, request.signal).then((loaded) => {
+    void loadProductDocPdf(input, request.signal).then((loaded) => {
       if (request.signal.aborted) return;
-      setSource({ url, pdf: loaded });
+      setSource({ input, pdf: loaded });
       onDocument?.(loaded);
-    }, () => { if (!request.signal.aborted) setFailure(url); });
+    }, () => { if (!request.signal.aborted) setFailure(input); });
     return () => { request.abort(); onDocument?.(null); };
-  }, [url, onDocument]);
+  }, [input, onDocument]);
   useEffect(() => {
     const surface = paper.current;
     if (!pdf || !surface) return;
@@ -50,15 +53,15 @@ export function ProductDocPdfPreview({ url, filename, ru, expanded, onDocument }
           if (active.signal.aborted) return;
           surface.replaceChildren(canvas);
           setReady(number);
-        }, () => { if (!active.signal.aborted) setFailure(url); });
+        }, () => { if (!active.signal.aborted) setFailure(input); });
     }
     render();
     const observer = new ResizeObserver(render);
     observer.observe(surface);
     return () => { observer.disconnect(); request?.abort(); };
-  }, [number, pdf, url]);
+  }, [number, pdf, input]);
 
-  if (failure === url) return <p role="status" className={styles.unavailable}>
+  if (failure === input) return <p role="status" className={styles.unavailable}>
     {ru ? "Не удалось показать PDF. Скачайте файл, чтобы открыть его." : "PDF preview unavailable. Download the file to open it."}
   </p>;
   const pageLabel = ru ? `Страница ${number} из ${pdf?.numPages ?? "…"}` : `Page ${number} of ${pdf?.numPages ?? "…"}`;

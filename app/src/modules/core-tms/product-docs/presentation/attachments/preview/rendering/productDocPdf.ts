@@ -1,7 +1,8 @@
 import type { PDFDocumentProxy, RenderTask } from "pdfjs-dist";
 
-export async function loadProductDocPdf(url: string, signal: AbortSignal) {
+export async function loadProductDocPdf(source: string | Blob, signal: AbortSignal) {
   const pdf = await import("pdfjs-dist/legacy/build/pdf.mjs");
+  const input = typeof source === "string" ? { url: source } : { data: new Uint8Array(await source.arrayBuffer()) };
   signal.throwIfAborted();
   let worker: Worker | undefined;
   try {
@@ -12,7 +13,7 @@ export async function loadProductDocPdf(url: string, signal: AbortSignal) {
     await import("pdfjs-dist/legacy/build/pdf.worker.min.mjs");
   }
   const sharedWorker = worker && pdf.PDFWorker.create({ port: worker });
-  const task = pdf.getDocument({ url, worker: sharedWorker, enableXfa: false, useWasm: false,
+  const task = pdf.getDocument({ ...input, worker: sharedWorker, enableXfa: false, useWasm: false,
     maxImageSize: 16_000_000, canvasMaxAreaInBytes: 32 * 1024 * 1024 });
   const destroy = () => {
     void task.destroy().finally(() => { sharedWorker?.destroy(); worker?.terminate(); }).catch(() => undefined);

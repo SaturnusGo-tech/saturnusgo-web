@@ -1363,6 +1363,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/workspaces/{workspaceId}/attachment-library": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+            };
+            cookie?: never;
+        };
+        /**
+         * List private attachment metadata visible in a workspace
+         * @description Returns ready attachments and visible documentation files. Project scope and document visibility are enforced on the server. Use the existing attachment access endpoints for expiring preview or download URLs. Start a new page when changing filters. Cursors are opaque and rows are ordered newest first.
+         */
+        get: operations["listAttachmentLibrary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/attachments/{attachmentId}/access": {
         parameters: {
             query?: never;
@@ -9748,6 +9773,40 @@ export interface components {
         AttachmentEnvelope: {
             data: components["schemas"]["Attachment"];
         };
+        /** @enum {string} */
+        AttachmentLibraryKind: "image" | "spreadsheet" | "pdf" | "archive" | "video" | "audio" | "document" | "other";
+        AttachmentLibrarySource: {
+            /** @enum {string} */
+            kind: "test_case_revision" | "run" | "run_attempt" | "defect" | "shared_step_revision" | "project" | "portfolio" | "repository_folder" | "product_doc";
+            id: components["schemas"]["Identifier"];
+            label: string | null;
+            /**
+             * @description Use the draft access route for a documentation file.
+             * @constant
+             */
+            draft?: true;
+        };
+        AttachmentLibraryItem: {
+            id: components["schemas"]["Identifier"];
+            filename: string;
+            mimeType: string;
+            kind: components["schemas"]["AttachmentLibraryKind"];
+            byteSize: number;
+            /** Format: date-time */
+            createdAt: string;
+            workspaceId: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"] | null;
+            uploadedByIdentityId: components["schemas"]["Identifier"] | null;
+            source: components["schemas"]["AttachmentLibrarySource"];
+        };
+        AttachmentLibraryPage: {
+            data: components["schemas"]["AttachmentLibraryItem"][];
+            meta: {
+                limit: number;
+                hasMore: boolean;
+                nextCursor: string | null;
+            };
+        };
         AttachmentListEnvelope: {
             data: components["schemas"]["Attachment"][];
             meta: components["schemas"]["PageMeta"];
@@ -17067,6 +17126,48 @@ export interface operations {
             409: components["responses"]["Conflict"];
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listAttachmentLibrary: {
+        parameters: {
+            query?: {
+                projectId?: components["parameters"]["ProjectIdQuery"];
+                /** @description Case-insensitive substring of the filename. */
+                search?: string;
+                kind?: components["schemas"]["AttachmentLibraryKind"];
+                uploader?: "me" | "others";
+                /** @description Comma-separated attachment identifiers, up to 100. */
+                ids?: string;
+                cursor?: string;
+                limit?: number;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A bounded page of attachment metadata. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "X-Next-Cursor": components["headers"]["XNextCursor"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AttachmentLibraryPage"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
             500: components["responses"]["InternalError"];
         };
     };

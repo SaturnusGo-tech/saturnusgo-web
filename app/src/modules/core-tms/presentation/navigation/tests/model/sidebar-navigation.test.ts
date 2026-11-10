@@ -11,7 +11,7 @@ test("legacy modes keep the six primary sections visible and rare services in ov
   for (const mode of ["all", "contextual"] as const) {
     const result = navigation("cases", [], SIDEBAR_NAVIGATION_IDS.filter(id => id !== "product-docs").reverse(), mode);
     assert.deepEqual(result.visibleIds, core);
-    assert.deepEqual(result.hiddenIds, ["portfolios", "custom-fields", "api", "hooks"]);
+    assert.deepEqual(result.hiddenIds, ["portfolios", "custom-fields", "api", "hooks", "files"]);
     assert.deepEqual(result.groups.map(group => group.id), ["overview", "testing", "insights"]);
   }
 });

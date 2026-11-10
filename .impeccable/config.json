@@ -100,6 +100,15 @@
         ],
         "createdAt": "2026-11-07T23:20:35.018Z",
         "reason": "DESIGN.md governs public marketing only; the authenticated Product Docs interface follows the approved Confluence density and Falcon product theme."
+      },
+      {
+        "rule": "overused-font",
+        "value": "arial",
+        "files": [
+          "app/src/modules/core-tms/attachments/presentation/library/preview/attachment-file-preview.module.css"
+        ],
+        "createdAt": "2026-11-10T19:42:33.045Z",
+        "reason": "Agent: Arial is intentional in the spreadsheet viewport to preserve the typography and density of the supplied spreadsheet reference; Falcon chrome retains its design-system type."
       }
     ]
   }

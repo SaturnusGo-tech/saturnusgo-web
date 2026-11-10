@@ -32,6 +32,7 @@ import { WorkspaceSuitesStage } from "./suites/WorkspaceSuitesStage";
 import { SharedStepsView } from "../shared-steps/SharedStepsView";
 import { WorkspaceLoadState } from "../workspace-state/WorkspaceLoadState";
 import { WorkspaceCasesStage } from "./cases/WorkspaceCasesStage";
+import { AttachmentLibrary } from "../../attachments/presentation/library/AttachmentLibrary";
 
 export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
   const { t } = useTmsLocale();
@@ -116,6 +117,8 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
     );
   }
   if (!workspaceViewAllowed(model.view, model.data.meta.authorization.capabilities, codexAvailable)) return <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
+  if (model.view === "files") return <AttachmentLibrary key={JSON.stringify([model.data.workspace.id, session?.subject])}
+    workspaceId={model.data.workspace.id} subject={session?.subject ?? null} connected={model.connection === "connected"} />;
   if (model.view === "portfolios") return maintenance(<WorkspacePortfoliosStage model={model} />);
   if (model.view === "cases" && model.repositoryScope.aggregate) return maintenance(<WorkspaceCasesStage model={model} />);
   if (model.view === "api") return <ApiTestingView key={model.data.workspace.id}

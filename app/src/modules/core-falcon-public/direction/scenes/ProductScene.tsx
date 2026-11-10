@@ -16,9 +16,15 @@ type SceneImage = {
 
 const compactImageVersion = '20261107';
 const docsImageVersion = '20261110';
+const dashboardImageVersion = '20261111';
 
 function standardImage(name: FalconProductImageName, locale: LandingLocale): SceneImage {
   const capture = falconProductImage(name, locale);
+  if (name === 'dashboard') return {
+    ...capture,
+    src: `${capture.src}?v=${dashboardImageVersion}`,
+    compactSrc: `${capture.compactSrc}?v=${dashboardImageVersion}`,
+  };
   return { ...capture, compactSrc: `${capture.compactSrc}?v=${compactImageVersion}` };
 }
 

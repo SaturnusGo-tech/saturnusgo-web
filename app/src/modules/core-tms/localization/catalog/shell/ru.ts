@@ -43,6 +43,7 @@ export const ruShellMessages = {
   "nav.runs": "Тест-раны",
   "nav.suites": "Тест-сьюты",
   "nav.hooks": "Хуки",
+  "nav.files": "Вложения",
   "nav.reports": "Отчёты",
   "nav.config": "Настройки",
   "nav.create": "Создать",

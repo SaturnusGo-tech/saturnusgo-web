@@ -10,7 +10,7 @@ import css from "./sidebar-sections-menu.module.css";
 
 const labels: Record<SidebarNavigationId, TmsMessageKey> = {
   dashboard: "nav.dashboard", cases: "nav.cases", "product-docs": "nav.productDocs", "shared-steps": "nav.sharedSteps", runs: "nav.runs", suites: "nav.suites",
-  portfolios: "nav.portfolios", "custom-fields": "nav.customFields", api: "nav.apiTesting", hooks: "nav.hooks", reports: "nav.reports",
+  portfolios: "nav.portfolios", "custom-fields": "nav.customFields", api: "nav.apiTesting", hooks: "nav.hooks", files: "nav.files", reports: "nav.reports",
 };
 type Props = {
   sidebar: RefObject<HTMLElement | null>; availableIds: readonly SidebarNavigationId[]; activeId: SidebarNavigationId | null;
