@@ -1,7 +1,7 @@
 "use client";
 import { FalconBrandMark } from "../../../../../../shared/components/brand/FalconBrandMark";
 import { ArrowLeft } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useId, useState } from "react";
 import type { useSignIn } from "../../application/useSignIn";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import { signInError } from "../copy/sign-in-error";
@@ -20,6 +20,8 @@ export function SignInScreen({ signIn, signup = false, planIntent = null, organi
 }) {
   const { locale, setLocale } = useTmsLocale();
   const copy = signInCopy(locale);
+  const signupLegalId = useId();
+  const [signupAccepted, setSignupAccepted] = useState(false);
   const entryParams = new URLSearchParams({ lang: locale });
   if (planIntent) setPlanRequestIntent(entryParams, planIntent);
   const { state } = signIn;
@@ -39,14 +41,21 @@ export function SignInScreen({ signIn, signup = false, planIntent = null, organi
       {state.loading && <span className={styles.srOnly} role="status">{copy.loading}</span>}
       {!state.loading && !state.methods && <button className={styles.secondary} onClick={signIn.retryMethods}>{copy.retry}</button>}
       {signupRequired ? <a href={`/signup/?${entryParams}`} className={styles.primary}>{copy.signupLink}</a>
-        : state.step === "methods" ? <SignInMethods signIn={signIn} copy={copy} signup={signup} locale={locale} />
+        : state.step === "methods" ? <SignInMethods signIn={signIn} copy={copy} signup={signup} signupAccepted={signupAccepted} locale={locale} />
         : <ProofForm signIn={signIn} copy={copy} organization={state.step === "company" ? organization : undefined} />}
       <footer className={styles.footer}>
         {state.step !== "methods" ? <button className={styles.linkButton} onClick={signIn.back}><ArrowLeft size={16} aria-hidden="true" />{copy.back}</button>
           : <a href={`${signup ? "/cloud-login/" : "/signup/"}?${entryParams}`}>{signup ? copy.loginLink : copy.signupLink}</a>}
       </footer>
-      {signup && <p className={styles.disclosure}>{copy.termsStart}<a href={`/trial-terms/?lang=${locale}`} target="_blank" rel="noopener noreferrer">{copy.trialTerms}</a>
-        {copy.privacyBridge}<a href={`/privacy/?lang=${locale}`} target="_blank" rel="noopener noreferrer">{copy.privacy}</a>{copy.termsEnd}</p>}
+      {signup && state.step === "methods" && <div className={styles.disclosure}>
+        <input type="checkbox" aria-labelledby={signupLegalId} required checked={signupAccepted}
+          disabled={state.pending} onChange={event => setSignupAccepted(event.target.checked)} />
+        <p id={signupLegalId}>{copy.legalStart}
+          <a href={`/terms/?lang=${locale}`} target="_blank" rel="noopener noreferrer">{copy.terms}</a>{copy.legalJoin}
+          <a href={`/billing-terms/?lang=${locale}`} target="_blank" rel="noopener noreferrer">{copy.billingTerms}</a>{copy.privacyBridge}
+          <a href={`/privacy/?lang=${locale}`} target="_blank" rel="noopener noreferrer">{copy.privacy}</a>{copy.legalEnd}
+        </p>
+      </div>}
     </section>
   </main>;
 }

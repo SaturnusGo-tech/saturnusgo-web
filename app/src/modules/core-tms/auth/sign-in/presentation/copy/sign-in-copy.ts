@@ -15,7 +15,9 @@ export function signInCopy(locale: "ru" | "en") {
     signupRequired: "Аккаунт ещё не создан. Создайте личное пространство, чтобы начать 7 дней.",
     trial: "Ваши 7 дней с Falcon начались", ends: "Пробный период до", team: "Для команды", close: "Закрыть уведомление",
     payment: "Оплата пока недоступна", readonly: "Пробный период завершён. Просмотр и экспорт доступны.",
-    termsStart: "Продолжая, вы принимаете ", trialTerms: "условия пробного доступа", privacyBridge: ". Обработка данных описана в ", privacy: "политике конфиденциальности", termsEnd: ".",
+    legalStart: "Я принимаю ", terms: "условия использования", legalJoin: " и ",
+    billingTerms: "условия подписки и оплаты", privacyBridge: ". Подтверждаю ознакомление с ",
+    privacy: "политикой конфиденциальности", legalEnd: ".",
     retry: "Повторить", signupOff: "Создание личного пространства пока недоступно.",
   } : {
     browser: "Continue in browser", login: "Log in to Falcon", signup: "Create your personal workspace", google: "Continue with Google",
@@ -33,7 +35,9 @@ export function signInCopy(locale: "ru" | "en") {
     signupRequired: "Your account has not been created yet. Create a personal workspace to start your 7 days.",
     trial: "Your 7 days with Falcon have started", ends: "Trial ends", team: "For your team", close: "Dismiss notification",
     payment: "Payments are not available yet", readonly: "Your trial has ended. Viewing and export remain available.",
-    termsStart: "By continuing, you accept the ", trialTerms: "personal trial terms", privacyBridge: ". Read how Falcon handles data in the ", privacy: "privacy policy", termsEnd: ".",
+    legalStart: "I agree to the ", terms: "Terms of Service", legalJoin: " and ",
+    billingTerms: "Subscription and Billing Terms", privacyBridge: " and acknowledge the ",
+    privacy: "Privacy Policy", legalEnd: ".",
     retry: "Try again", signupOff: "Personal workspace signup is not available yet.",
   };
 }

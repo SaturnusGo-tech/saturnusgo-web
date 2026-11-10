@@ -32,7 +32,16 @@ void test("desktop login/signup survives Google and email, including explicit si
     await act(async () => renderer?.unmount()); browser.location = location(path);
     await act(async () => { renderer = create(wrap(<SignInFeature signup={signup} />)); });
   };
-  const click = async (label: string) => { await act(async () => renderer!.root.findAllByType("button").find(button => button.children.includes(label))!.props.onClick()); };
+  const click = async (label: string) => {
+    const button = renderer!.root.findAllByType("button").find(button => button.children.includes(label));
+    assert.ok(button);
+    assert.ok(!button.props.disabled);
+    await act(async () => button.props.onClick());
+  };
+  const acceptTerms = async () => {
+    const checkbox = renderer!.root.findByProps({ type: "checkbox" });
+    await act(async () => checkbox.props.onChange({ target: { checked: true } }));
+  };
   const submit = async (value: string) => {
     await act(async () => renderer!.root.findByType("input").props.onChange({ target: { value } }));
     await act(async () => { renderer!.root.findByType("form").props.onSubmit({ preventDefault() {} }); });
@@ -56,6 +65,7 @@ void test("desktop login/signup survives Google and email, including explicit si
     await mount(`${signup ? "/signup/" : "/cloud-login/"}?desktopAttempt=${attempt}`, signup);
     assert.equal(browser.location.search, ""); assert.ok(values.has(DESKTOP_ATTEMPT_KEY));
     assert.equal(renderer!.root.findAllByType("button").some(button => button.children.includes("Company workspace")), !signup, "general desktop login offers explicit company discovery; signup remains personal");
+    if (signup) await acceptTerms();
     if (provider === "google") {
       await click("Continue with Google"); assert.equal(destinations[0], "https://accounts.google.com/authorize");
       await mount(`/signup/?challengeId=google-proof&email=private%40example.test&expiresAt=2030-01-01T00%3A00%3A00Z&retryAfterSeconds=60&intent=${signup ? "signup" : "login"}`, true);
@@ -63,7 +73,7 @@ void test("desktop login/signup survives Google and email, including explicit si
       if (rejectLogin) {
         assert.ok(renderer!.root.findAllByType("a").some(link => link.props.href === "/signup/?lang=en"));
         assert.ok(values.has(DESKTOP_ATTEMPT_KEY));
-        await mount("/signup/", true); await click("Continue with email"); await submit("private@example.test"); await submit("654321");
+        await mount("/signup/", true); await acceptTerms(); await click("Continue with email"); await submit("private@example.test"); await submit("654321");
       }
     } else {
       await click("Continue with email"); await submit("private@example.test"); await submit("123456");

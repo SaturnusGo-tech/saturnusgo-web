@@ -79,7 +79,8 @@ test("company invitation fills the central workspace form and resolves it on Con
   ]) {
     await open(url);
     await loadMethods();
-    assert.deepEqual(view.root.findAllByType("input"), [], url);
+    const inputs = view.root.findAllByType("input");
+    assert.deepEqual(inputs.map(input => input.props.type), url.startsWith("/signup/") ? ["checkbox"] : [], url);
     assert.deepEqual(requests, [{ path: "/api/v1/auth/methods" }], url);
     assert.deepEqual(destinations, [], url);
   }
