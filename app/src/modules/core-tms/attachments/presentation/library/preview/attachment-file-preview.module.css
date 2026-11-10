@@ -458,6 +458,7 @@
 
 .sourcePreview {
   --file-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --line-number-end: 26px;
   display: flex;
   flex: 0 1 auto;
   flex-direction: column;
@@ -500,7 +501,7 @@
   user-select: none;
 }
 .sourceEditor :global(.cm-lineNumbers) { flex: 1; }
-.sourceEditor :global(.cm-gutterElement) { padding-inline: 8px 49px; }
+.sourceEditor.sourceEditor :global(.cm-lineNumbers .cm-gutterElement) { padding-inline: 4px var(--line-number-end); }
 .sourceEditor :global(.cm-content) { padding-block: 8px; }
 .sourceEditor :global(.cm-line) { padding-inline: 10px; }
 .sourceEditor :global(.cm-focused) { outline: 1px solid var(--file-link); outline-offset: -1px; }
@@ -520,5 +521,5 @@
   .archiveSidebar { border-inline-end: 0; border-block-end: 1px solid var(--file-border); }
   .archivePath { min-height: 48px; }
   .sourceEditor :global(.cm-gutters) { min-width: 36px; }
-  .sourceEditor :global(.cm-gutterElement) { padding-inline: 4px 8px; }
+  .sourcePreview { --line-number-end: 8px; }
 }
