@@ -31,10 +31,10 @@ export const trackerArticles: DocArticle[] = [
       { title: "Linear team UUIDs", url: "https://linear.app/developers/graphql#queries-and-mutations" },
       { title: "Linear webhook signatures", url: "https://linear.app/developers/webhooks" }],
     sections: [
-      section("open", "Start in Connection setup", paragraph("Expand **Connection setup** for Linear and open **Connection**. Check that Falcon has the project selected whose defects should reach Linear. The connection applies to this project.")),
+      section("open", "Start in Connection setup", paragraph("In Falcon, select the project whose defects should reach Linear. Go to **Settings → Plugins → Linear**, expand **Connection setup**, and open **Connection**. The connection applies to the selected Falcon project.")),
       section("access", "Get the API key and team identifier from Linear", steps(
         ["Create a team-scoped personal API key", "Switch to the Linear workspace that contains the team. Under **Settings → Account → Security & Access**, create a personal API key with **Read** and limit the key to that team. Add **Write** if Falcon will create or update issues. **Verify access** only checks read access."],
-        ["Find the team key or copy its UUID", "In the Linear sidebar, open the team’s **··· → Team settings → General** and copy **Identifier**. For an issue such as **QA-42**, the team key is **QA**. Alternatively, open the team’s home page, press **⌘K** or **Ctrl+K**, and choose **Copy model UUID** for that team."]),
+        ["Find the team key or copy its UUID", "In the Linear sidebar, open the team’s **··· → Team settings → General** and copy **Identifier**. For an issue such as **QA-42**, the team key is **QA**. To copy the UUID, open the team’s home page, press **⌘K** or **Ctrl+K**, and search for **Copy model UUID**. Linear may show Organization, UserAccount, User, and Team entries together. Select the row marked **(Team)** beside the intended team name."]),
         note("Use the team’s identifier", "The display name, workspace slug, Linear project name or UUID, and full issue ID such as QA-42 refer to different things. The Falcon project selects where defects come from. The Linear team selects where they go."),
         note("If you cannot create a key", "Ask your Linear workspace admin whether members can create personal API keys. For a private team, check that your Linear account can open the team.")),
       section("connect", "Verify and save the connection", steps(
@@ -44,7 +44,7 @@ export const trackerArticles: DocArticle[] = [
       section("verify-access-errors", "If Verify access fails", steps(
         ["Required fields are missing · 422", "Enter the personal API key and the team key or UUID for a new connection."],
         ["Linear denied access · 422", "Check that the key is a current personal API key from the correct workspace, that it has **Read**, and that the selected team is included in its scope. If a key was revoked or exposed, replace it."],
-        ["Team not found or wrong scope · 422", "Open the intended team in Linear, copy its current identifier or team UUID again, and check that the key’s owner and team scope allow access. If Falcon shows an unexpected team, stop before saving."],
+        ["Team not found or wrong scope · 422", "If the short team key returns this error, copy the full UUID from the **(Team)** row in Linear and verify again with the same API key. If you already entered a UUID, check which row you copied. If verification still fails, check that the key’s owner and team scope allow access. If Falcon shows an unexpected team, stop before saving."],
         ["Rate limit or temporary outage · 429 or 502", "Wait before trying **Verify access** again. If the problem persists, share the error and any available request ID with Falcon Support. Keep the API key and webhook signing secret private."])),
       section("webhook", "Send issue updates from Linear to Falcon", steps(
         ["Create the webhook in Linear", "A Linear workspace admin opens **Settings → Administration → API → New webhook**. Paste the Falcon **Webhook URL**, select the same team, and choose **Issues** as the resource type."],
