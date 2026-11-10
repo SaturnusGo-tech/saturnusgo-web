@@ -52,3 +52,34 @@ test("production capture registry verifies source, dimensions, integrity and com
     assert.throws(() => verifyProductionCaptures({ ...input, records: [{ ...mixed, contentLanguage: "ru" }] }), /language/i);
   } finally { rmSync(directory, { recursive: true, force: true }); }
 });
+
+test("Linear capture provenance is limited to the exact host and registered Linear asset keys", () => {
+  const directory = mkdtempSync(join(tmpdir(), "falcon-linear-media-"));
+  try {
+    const src = "/falcon/docs/2026-11-ru/linear-team-identifier-ru-20261105.jpg";
+    mkdirSync(join(directory, "falcon/docs/2026-11-ru"), { recursive: true });
+    writeFileSync(join(directory, src), bytes);
+    const image = { src, key: "linear-team-identifier", width: 3456, height: 2234, locale: "ru" as const };
+    const linear = { file: src, locale: "ru" as const, source: "authenticated-linear", surface: "linear" as const,
+      origin: "https://app.linear.app", sourceUrl: "https://app.linear.app/example/settings/teams/QA/general",
+      capturedAt: record.capturedAt, viewport: record.viewport, sha256: record.sha256, rawSha256: record.rawSha256,
+      uiLocale: "en" as const, contentLanguage: "en" as const, languageException: "Linear is shown in English." };
+    const input = { publicDirectory: directory, images: [image], records: [linear], media: [image], complete: true };
+    assert.doesNotThrow(() => verifyProductionCaptures(input));
+    assert.doesNotThrow(() => verifyProductionCaptures({ ...input, records: [{ ...linear,
+      origin: "https://linear.app", sourceUrl: "https://linear.app/example/settings" }] }));
+    assert.throws(() => verifyProductionCaptures({ ...input, images: [{ ...image, key: "jira-connection" }] }), /linear/i);
+    for (const update of [
+      { origin: "https://api.linear.app" },
+      { origin: "https://linear.app", sourceUrl: linear.sourceUrl },
+      { sourceUrl: "https://app.linear.app.example.com/example/settings" },
+      { sourceUrl: "https://app.linear.app@example.com/example/settings" },
+      { sourceUrl: "https://app.linear.app/example/settings#secret" },
+      { sourceUrl: "https://app.linear.app/example/settings?token=private" },
+      { releaseSha: record.releaseSha },
+      { workspace: "Umbrella Home" },
+    ]) assert.throws(() => verifyProductionCaptures({ ...input, records: [{ ...linear, ...update }] }), /linear|unsafe/i);
+    assert.throws(() => verifyProductionCaptures({ ...input, records: [{ ...linear, languageException: undefined }] }), /exception/i);
+    assert.throws(() => verifyProductionCaptures({ ...input, requireLanguage: true }), /language/i);
+  } finally { rmSync(directory, { recursive: true, force: true }); }
+});

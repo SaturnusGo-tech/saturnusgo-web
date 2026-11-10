@@ -3762,6 +3762,208 @@
       "sha256": "835fc1bae1b728dd02b169b528bb4c0ab1a1f655bc478391fefe0a3fa909c1b0",
       "rawFilename": "run-paused-actual.jpg",
       "method": "Actual authenticated production browser/app capture; JPEG transcoded without crop, resize or semantic edits."
+    },
+    {
+      "file": "/falcon/docs/2026-11-ru/linear-verify-access-mac16-ru-production20261110.jpg",
+      "locale": "ru",
+      "surface": "falcon",
+      "uiLocale": "ru",
+      "contentLanguage": "ru",
+      "source": "authenticated-production-umbrella",
+      "workspace": "Umbrella Home",
+      "releaseSha": "6d208e4f6b2c1b416bba8c6e5832412966a44af0",
+      "origin": "https://umbrella-falcon.saturnusgo.com",
+      "capturedAt": "2026-11-10T14:47:37.305Z",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sourceUrl": "https://umbrella-falcon.saturnusgo.com/work/?workspaceId=workspace_umbrella_home&projectId=project_59c48ce2121f461c8e604f35a9706aa3&view=config&settings=plugins&plugin=linear",
+      "redactedQueryKeys": [],
+      "rawSha256": "b749c8a30787d57216cc1cc7696045248e9479e7876e48d7a1e409fe11608da8",
+      "sha256": "480a4a1a56a0d49fcd2a97ac558ca9d521e3238f2e71c2212aa58cb652320bc5",
+      "rawFilename": "umbrella-falcon.saturnusgo.com_work__workspaceId=workspace_umbrella_home&projectId=project_59c48ce2121f461c8e604f35a9706aa3&view=config&settings=plugins&plugin=linear (4).png",
+      "method": "Actual authenticated production browser/app capture; JPEG transcoded without crop, resize or semantic edits."
+    },
+    {
+      "file": "/falcon/docs/2026-11-ru/linear-access-verified-mac16-ru-production20261110.jpg",
+      "locale": "ru",
+      "surface": "falcon",
+      "uiLocale": "ru",
+      "contentLanguage": "ru",
+      "source": "authenticated-production-umbrella",
+      "workspace": "Umbrella Home",
+      "releaseSha": "6d208e4f6b2c1b416bba8c6e5832412966a44af0",
+      "origin": "https://umbrella-falcon.saturnusgo.com",
+      "capturedAt": "2026-11-10T14:47:49.546Z",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sourceUrl": "https://umbrella-falcon.saturnusgo.com/work/?workspaceId=workspace_umbrella_home&projectId=project_59c48ce2121f461c8e604f35a9706aa3&view=config&settings=plugins&plugin=linear",
+      "redactedQueryKeys": [],
+      "rawSha256": "d3854d2843d7067e801a9d4f91503daa466946c9e908de0399a663157b7ccc4d",
+      "sha256": "c4da5d0cffba257066ca37cefde6f944b5d951a0356d595c5dfb7a7b6f6eee12",
+      "rawFilename": "umbrella-falcon.saturnusgo.com_work__workspaceId=workspace_umbrella_home&projectId=project_59c48ce2121f461c8e604f35a9706aa3&view=config&settings=plugins&plugin=linear (5).png",
+      "method": "Actual authenticated production browser/app capture; JPEG transcoded without crop, resize or semantic edits."
+    },
+    {
+      "file": "/falcon/docs/2026-11-ru/linear-automation-mac16-ru-production20261110.jpg",
+      "locale": "ru",
+      "surface": "falcon",
+      "uiLocale": "ru",
+      "contentLanguage": "ru",
+      "source": "authenticated-production-umbrella",
+      "workspace": "Umbrella Home",
+      "releaseSha": "6d208e4f6b2c1b416bba8c6e5832412966a44af0",
+      "origin": "https://umbrella-falcon.saturnusgo.com",
+      "capturedAt": "2026-11-10T14:47:53.990Z",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sourceUrl": "https://umbrella-falcon.saturnusgo.com/work/?workspaceId=workspace_umbrella_home&projectId=project_59c48ce2121f461c8e604f35a9706aa3&view=config&settings=plugins&plugin=linear",
+      "redactedQueryKeys": [],
+      "rawSha256": "1ae5325e008c83d6d694b2efdc88ba157707475c002c9062045ab11627070f06",
+      "sha256": "536906531cc6098f9d8904d45180d6e54b4f6c7e761f9d725804f348ec0ec65c",
+      "rawFilename": "umbrella-falcon.saturnusgo.com_work__workspaceId=workspace_umbrella_home&projectId=project_59c48ce2121f461c8e604f35a9706aa3&view=config&settings=plugins&plugin=linear (6).png",
+      "method": "Actual authenticated production browser/app capture; JPEG transcoded without crop, resize or semantic edits."
+    },
+    {
+      "file": "/falcon/docs/2026-11-ru/linear-activity-mac16-ru-production20261110.jpg",
+      "locale": "ru",
+      "surface": "falcon",
+      "uiLocale": "ru",
+      "contentLanguage": "ru",
+      "source": "authenticated-production-umbrella",
+      "workspace": "Umbrella Home",
+      "releaseSha": "6d208e4f6b2c1b416bba8c6e5832412966a44af0",
+      "origin": "https://umbrella-falcon.saturnusgo.com",
+      "capturedAt": "2026-11-10T14:47:59.246Z",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sourceUrl": "https://umbrella-falcon.saturnusgo.com/work/?workspaceId=workspace_umbrella_home&projectId=project_59c48ce2121f461c8e604f35a9706aa3&view=config&settings=plugins&plugin=linear",
+      "redactedQueryKeys": [],
+      "rawSha256": "5148dfe43258e7b14d014f57064fe61202d4d224698083083a753ed037832193",
+      "sha256": "d23505dd669a934397485e346d3a91b62b4f434ebd245af10be4cba76deaf147",
+      "rawFilename": "umbrella-falcon.saturnusgo.com_work__workspaceId=workspace_umbrella_home&projectId=project_59c48ce2121f461c8e604f35a9706aa3&view=config&settings=plugins&plugin=linear (7).png",
+      "method": "Actual authenticated production browser/app capture; JPEG transcoded without crop, resize or semantic edits."
+    },
+    {
+      "file": "/falcon/docs/2026-11-ru/linear-api-key-mac16-ru-20261110.jpg",
+      "locale": "ru",
+      "surface": "linear",
+      "uiLocale": "en",
+      "contentLanguage": "en",
+      "languageException": "Linear controls are shown in English as captured. The guide and captions are in Russian.",
+      "source": "authenticated-linear",
+      "origin": "https://linear.app",
+      "capturedAt": "2026-11-10T14:42:34.108630+00:00",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sourceUrl": "https://linear.app/mercury-rucks/settings/account/security/api-keys/new",
+      "redactedQueryKeys": [],
+      "rawSha256": "99093c4810ed70356c60c9b2f75e8f626412e70a7b913471b02f8f8a28f21402",
+      "sha256": "07e76da3847965b91593254b90bcd9373dca6b1651b68ca3201162f2747edc62",
+      "rawFilename": "linear.app_mercury-rucks_settings_account_security_api-keys_new.png",
+      "method": "Actual authenticated Linear browser capture; JPEG transcoded without crop, resize or semantic edits."
+    },
+    {
+      "file": "/falcon/docs/2026-11-ru/linear-identifier-mac16-ru-20261110.jpg",
+      "locale": "ru",
+      "surface": "linear",
+      "uiLocale": "en",
+      "contentLanguage": "en",
+      "languageException": "Linear controls are shown in English as captured. The guide and captions are in Russian.",
+      "source": "authenticated-linear",
+      "origin": "https://linear.app",
+      "capturedAt": "2026-11-10T14:43:11.274213+00:00",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sourceUrl": "https://linear.app/mercury-rucks/settings/teams/FQA/general",
+      "redactedQueryKeys": [],
+      "rawSha256": "4d1319cbc21f213085d5f1201f3e86980c634ed93861336426fab59772a4bb28",
+      "sha256": "f144d7e3352645d836b2409744ebcc033834155e9bdf15195ff05fad4daae9a9",
+      "rawFilename": "linear.app_mercury-rucks_settings_teams_FQA_general.png",
+      "method": "Actual authenticated Linear browser capture; JPEG transcoded without crop, resize or semantic edits."
+    },
+    {
+      "file": "/falcon/docs/2026-11-ru/linear-command-mac16-ru-20261110.jpg",
+      "locale": "ru",
+      "surface": "linear",
+      "uiLocale": "en",
+      "contentLanguage": "en",
+      "languageException": "Linear controls are shown in English as captured. The guide and captions are in Russian.",
+      "source": "authenticated-linear",
+      "origin": "https://linear.app",
+      "capturedAt": "2026-11-10T14:49:08.303300+00:00",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sourceUrl": "https://linear.app/mercury-rucks/team/FQA/active",
+      "redactedQueryKeys": [],
+      "rawSha256": "24aaba7d2871590386fe502f81e882c8f8720dd862835d63baef17918765eb6e",
+      "sha256": "0eb66da9fb8d707727488799be6bd4320c119fbbbd2555b529823c72ae1b4d22",
+      "rawFilename": "linear.app_mercury-rucks_team_FQA_active.png",
+      "method": "Actual authenticated Linear browser capture; JPEG transcoded without crop, resize or semantic edits."
+    },
+    {
+      "file": "/falcon/docs/2026-11-ru/linear-team-uuid-mac16-ru-20261110.jpg",
+      "locale": "ru",
+      "surface": "linear",
+      "uiLocale": "en",
+      "contentLanguage": "en",
+      "languageException": "Linear controls are shown in English as captured. The guide and captions are in Russian.",
+      "source": "authenticated-linear",
+      "origin": "https://linear.app",
+      "capturedAt": "2026-11-10T14:49:21.924787+00:00",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sourceUrl": "https://linear.app/mercury-rucks/team/FQA/active",
+      "redactedQueryKeys": [],
+      "rawSha256": "57505600351f5299a48ef54219a411456d94990cff08158813a7231d922f9899",
+      "sha256": "b5a60c81c65b2198460fece122b3e9b0e4459a895ce0757cc5da7eadf9698b83",
+      "rawFilename": "linear.app_mercury-rucks_team_FQA_active (1).png",
+      "method": "Actual authenticated Linear browser capture; JPEG transcoded without crop, resize or semantic edits."
+    },
+    {
+      "file": "/falcon/docs/2026-11-ru/linear-webhook-mac16-ru-20261110.jpg",
+      "locale": "ru",
+      "surface": "linear",
+      "uiLocale": "en",
+      "contentLanguage": "en",
+      "languageException": "Linear controls are shown in English as captured. The guide and captions are in Russian.",
+      "source": "authenticated-linear",
+      "origin": "https://linear.app",
+      "capturedAt": "2026-11-10T14:41:01.302061+00:00",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sourceUrl": "https://linear.app/mercury-rucks/settings/api/webhooks/new",
+      "redactedQueryKeys": [],
+      "rawSha256": "7a2b6235f6111bcaa20cdd519cefa1730342ac1e429756a1d50758924a6beffe",
+      "sha256": "76e63fb5f57dd691c6257786fb7a732ac3bbc200b9c4d62f1c9e8536cdd776b0",
+      "rawFilename": "linear.app_mercury-rucks_settings_api_webhooks_new.png",
+      "method": "Actual authenticated Linear browser capture; JPEG transcoded without crop, resize or semantic edits."
     }
   ]
 }

@@ -443,5 +443,50 @@
     "src": "/falcon/docs/2026-11-ru/codex-v2-admin-ru-production20261104.jpg",
     "width": 3456,
     "height": 2234
+  },
+  "linear-verify-access-mac16": {
+    "src": "/falcon/docs/2026-11-ru/linear-verify-access-mac16-ru-production20261110.jpg",
+    "width": 3456,
+    "height": 2234
+  },
+  "linear-access-verified-mac16": {
+    "src": "/falcon/docs/2026-11-ru/linear-access-verified-mac16-ru-production20261110.jpg",
+    "width": 3456,
+    "height": 2234
+  },
+  "linear-automation-mac16": {
+    "src": "/falcon/docs/2026-11-ru/linear-automation-mac16-ru-production20261110.jpg",
+    "width": 3456,
+    "height": 2234
+  },
+  "linear-activity-mac16": {
+    "src": "/falcon/docs/2026-11-ru/linear-activity-mac16-ru-production20261110.jpg",
+    "width": 3456,
+    "height": 2234
+  },
+  "linear-api-key-mac16": {
+    "src": "/falcon/docs/2026-11-ru/linear-api-key-mac16-ru-20261110.jpg",
+    "width": 3456,
+    "height": 2234
+  },
+  "linear-identifier-mac16": {
+    "src": "/falcon/docs/2026-11-ru/linear-identifier-mac16-ru-20261110.jpg",
+    "width": 3456,
+    "height": 2234
+  },
+  "linear-command-mac16": {
+    "src": "/falcon/docs/2026-11-ru/linear-command-mac16-ru-20261110.jpg",
+    "width": 3456,
+    "height": 2234
+  },
+  "linear-team-uuid-mac16": {
+    "src": "/falcon/docs/2026-11-ru/linear-team-uuid-mac16-ru-20261110.jpg",
+    "width": 3456,
+    "height": 2234
+  },
+  "linear-webhook-mac16": {
+    "src": "/falcon/docs/2026-11-ru/linear-webhook-mac16-ru-20261110.jpg",
+    "width": 3456,
+    "height": 2234
   }
 }

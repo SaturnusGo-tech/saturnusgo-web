@@ -3166,6 +3166,203 @@
       "sha256": "fac7e3bb6f7abc0244cf2a60083f891a8496db4123bb7b0326ec09c799066140",
       "rawFilename": "project-create-stable.jpg",
       "method": "Actual authenticated production browser/app capture; JPEG transcoded without crop, resize or semantic edits."
+    },
+    {
+      "file": "/falcon/docs/2026-11/linear-verify-access-mac16-en-production20261110.jpg",
+      "locale": "en",
+      "surface": "falcon",
+      "uiLocale": "en",
+      "contentLanguage": "en",
+      "source": "authenticated-production-umbrella",
+      "workspace": "Umbrella Home",
+      "releaseSha": "6d208e4f6b2c1b416bba8c6e5832412966a44af0",
+      "origin": "https://umbrella-falcon.saturnusgo.com",
+      "capturedAt": "2026-11-10T14:39:16.472Z",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sourceUrl": "https://umbrella-falcon.saturnusgo.com/work/?workspaceId=workspace_umbrella_home&projectId=project_59c48ce2121f461c8e604f35a9706aa3&view=config&settings=plugins&plugin=linear",
+      "redactedQueryKeys": [],
+      "rawSha256": "2de1d80c87f538c0669cc2fcaeee84888b91c71a06cfd4ba8b9be6614030f607",
+      "sha256": "f186197bb49d36c3cdb6f444ec622dc8dc364c975b707792cda87249fb1ac875",
+      "rawFilename": "umbrella-falcon.saturnusgo.com_work__workspaceId=workspace_umbrella_home&projectId=project_59c48ce2121f461c8e604f35a9706aa3&view=config&settings=plugins&plugin=linear.png",
+      "method": "Actual authenticated production browser/app capture; JPEG transcoded without crop, resize or semantic edits."
+    },
+    {
+      "file": "/falcon/docs/2026-11/linear-automation-mac16-en-production20261110.jpg",
+      "locale": "en",
+      "surface": "falcon",
+      "uiLocale": "en",
+      "contentLanguage": "en",
+      "source": "authenticated-production-umbrella",
+      "workspace": "Umbrella Home",
+      "releaseSha": "6d208e4f6b2c1b416bba8c6e5832412966a44af0",
+      "origin": "https://umbrella-falcon.saturnusgo.com",
+      "capturedAt": "2026-11-10T14:39:46.921Z",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sourceUrl": "https://umbrella-falcon.saturnusgo.com/work/?workspaceId=workspace_umbrella_home&projectId=project_59c48ce2121f461c8e604f35a9706aa3&view=config&settings=plugins&plugin=linear",
+      "redactedQueryKeys": [],
+      "rawSha256": "59aa1c855be56d68d63ff931e45263a2fe351053f4926e7eb80af4458a4ff25a",
+      "sha256": "3bc8a98d4a619942c03d5542f5688ae1ca1d1fe2d106d0a81a8ae71995626b66",
+      "rawFilename": "umbrella-falcon.saturnusgo.com_work__workspaceId=workspace_umbrella_home&projectId=project_59c48ce2121f461c8e604f35a9706aa3&view=config&settings=plugins&plugin=linear (1).png",
+      "method": "Actual authenticated production browser/app capture; JPEG transcoded without crop, resize or semantic edits."
+    },
+    {
+      "file": "/falcon/docs/2026-11/linear-activity-mac16-en-production20261110.jpg",
+      "locale": "en",
+      "surface": "falcon",
+      "uiLocale": "en",
+      "contentLanguage": "en",
+      "source": "authenticated-production-umbrella",
+      "workspace": "Umbrella Home",
+      "releaseSha": "6d208e4f6b2c1b416bba8c6e5832412966a44af0",
+      "origin": "https://umbrella-falcon.saturnusgo.com",
+      "capturedAt": "2026-11-10T14:39:57.592Z",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sourceUrl": "https://umbrella-falcon.saturnusgo.com/work/?workspaceId=workspace_umbrella_home&projectId=project_59c48ce2121f461c8e604f35a9706aa3&view=config&settings=plugins&plugin=linear",
+      "redactedQueryKeys": [],
+      "rawSha256": "cc7d9cf99dc45c374a48b50980b9936aa473edfcf7ed6f27385cb77b9d59035f",
+      "sha256": "13de91e452ad4205defc584d6966d385ee687731f64f06ad2311feec5ea54a93",
+      "rawFilename": "umbrella-falcon.saturnusgo.com_work__workspaceId=workspace_umbrella_home&projectId=project_59c48ce2121f461c8e604f35a9706aa3&view=config&settings=plugins&plugin=linear (2).png",
+      "method": "Actual authenticated production browser/app capture; JPEG transcoded without crop, resize or semantic edits."
+    },
+    {
+      "file": "/falcon/docs/2026-11/linear-access-verified-mac16-en-production20261110.jpg",
+      "locale": "en",
+      "surface": "falcon",
+      "uiLocale": "en",
+      "contentLanguage": "en",
+      "source": "authenticated-production-umbrella",
+      "workspace": "Umbrella Home",
+      "releaseSha": "6d208e4f6b2c1b416bba8c6e5832412966a44af0",
+      "origin": "https://umbrella-falcon.saturnusgo.com",
+      "capturedAt": "2026-11-10T14:46:31.109Z",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sourceUrl": "https://umbrella-falcon.saturnusgo.com/work/?workspaceId=workspace_umbrella_home&projectId=project_59c48ce2121f461c8e604f35a9706aa3&view=config&settings=plugins&plugin=linear",
+      "redactedQueryKeys": [],
+      "rawSha256": "5eb2b2ef0edd1880900d0976633184e076cb302351420662d53031ff9c2b9e0c",
+      "sha256": "1347f36841e82c288f0cac73596135301517b29d85043c5572fae122705fe86e",
+      "rawFilename": "umbrella-falcon.saturnusgo.com_work__workspaceId=workspace_umbrella_home&projectId=project_59c48ce2121f461c8e604f35a9706aa3&view=config&settings=plugins&plugin=linear (3).png",
+      "method": "Actual authenticated production browser/app capture; JPEG transcoded without crop, resize or semantic edits."
+    },
+    {
+      "file": "/falcon/docs/2026-11/linear-api-key-mac16-en-20261110.jpg",
+      "locale": "en",
+      "surface": "linear",
+      "uiLocale": "en",
+      "contentLanguage": "en",
+      "source": "authenticated-linear",
+      "origin": "https://linear.app",
+      "capturedAt": "2026-11-10T14:42:34.108630+00:00",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sourceUrl": "https://linear.app/mercury-rucks/settings/account/security/api-keys/new",
+      "redactedQueryKeys": [],
+      "rawSha256": "99093c4810ed70356c60c9b2f75e8f626412e70a7b913471b02f8f8a28f21402",
+      "sha256": "07e76da3847965b91593254b90bcd9373dca6b1651b68ca3201162f2747edc62",
+      "rawFilename": "linear.app_mercury-rucks_settings_account_security_api-keys_new.png",
+      "method": "Actual authenticated Linear browser capture; JPEG transcoded without crop, resize or semantic edits."
+    },
+    {
+      "file": "/falcon/docs/2026-11/linear-identifier-mac16-en-20261110.jpg",
+      "locale": "en",
+      "surface": "linear",
+      "uiLocale": "en",
+      "contentLanguage": "en",
+      "source": "authenticated-linear",
+      "origin": "https://linear.app",
+      "capturedAt": "2026-11-10T14:43:11.274213+00:00",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sourceUrl": "https://linear.app/mercury-rucks/settings/teams/FQA/general",
+      "redactedQueryKeys": [],
+      "rawSha256": "4d1319cbc21f213085d5f1201f3e86980c634ed93861336426fab59772a4bb28",
+      "sha256": "f144d7e3352645d836b2409744ebcc033834155e9bdf15195ff05fad4daae9a9",
+      "rawFilename": "linear.app_mercury-rucks_settings_teams_FQA_general.png",
+      "method": "Actual authenticated Linear browser capture; JPEG transcoded without crop, resize or semantic edits."
+    },
+    {
+      "file": "/falcon/docs/2026-11/linear-command-mac16-en-20261110.jpg",
+      "locale": "en",
+      "surface": "linear",
+      "uiLocale": "en",
+      "contentLanguage": "en",
+      "source": "authenticated-linear",
+      "origin": "https://linear.app",
+      "capturedAt": "2026-11-10T14:49:08.303300+00:00",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sourceUrl": "https://linear.app/mercury-rucks/team/FQA/active",
+      "redactedQueryKeys": [],
+      "rawSha256": "24aaba7d2871590386fe502f81e882c8f8720dd862835d63baef17918765eb6e",
+      "sha256": "0eb66da9fb8d707727488799be6bd4320c119fbbbd2555b529823c72ae1b4d22",
+      "rawFilename": "linear.app_mercury-rucks_team_FQA_active.png",
+      "method": "Actual authenticated Linear browser capture; JPEG transcoded without crop, resize or semantic edits."
+    },
+    {
+      "file": "/falcon/docs/2026-11/linear-team-uuid-mac16-en-20261110.jpg",
+      "locale": "en",
+      "surface": "linear",
+      "uiLocale": "en",
+      "contentLanguage": "en",
+      "source": "authenticated-linear",
+      "origin": "https://linear.app",
+      "capturedAt": "2026-11-10T14:49:21.924787+00:00",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sourceUrl": "https://linear.app/mercury-rucks/team/FQA/active",
+      "redactedQueryKeys": [],
+      "rawSha256": "57505600351f5299a48ef54219a411456d94990cff08158813a7231d922f9899",
+      "sha256": "b5a60c81c65b2198460fece122b3e9b0e4459a895ce0757cc5da7eadf9698b83",
+      "rawFilename": "linear.app_mercury-rucks_team_FQA_active (1).png",
+      "method": "Actual authenticated Linear browser capture; JPEG transcoded without crop, resize or semantic edits."
+    },
+    {
+      "file": "/falcon/docs/2026-11/linear-webhook-mac16-en-20261110.jpg",
+      "locale": "en",
+      "surface": "linear",
+      "uiLocale": "en",
+      "contentLanguage": "en",
+      "source": "authenticated-linear",
+      "origin": "https://linear.app",
+      "capturedAt": "2026-11-10T14:41:01.302061+00:00",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sourceUrl": "https://linear.app/mercury-rucks/settings/api/webhooks/new",
+      "redactedQueryKeys": [],
+      "rawSha256": "7a2b6235f6111bcaa20cdd519cefa1730342ac1e429756a1d50758924a6beffe",
+      "sha256": "76e63fb5f57dd691c6257786fb7a732ac3bbc200b9c4d62f1c9e8536cdd776b0",
+      "rawFilename": "linear.app_mercury-rucks_settings_api_webhooks_new.png",
+      "method": "Actual authenticated Linear browser capture; JPEG transcoded without crop, resize or semantic edits."
     }
   ]
 }

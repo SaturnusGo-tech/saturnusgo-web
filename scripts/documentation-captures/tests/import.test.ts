@@ -44,11 +44,14 @@ function fixture(run: (directory: string) => void) {
     run(directory);
   } finally { rmSync(directory, { recursive: true, force: true }); }
 }
-function invoke(directory: string, extra: string[] = []) {
+function invoke(directory: string, extra: string[] = [], target = [
+  "--key", key, "--origin", "https://umbrella-falcon.saturnusgo.com",
+  "--source-url", "https://umbrella-falcon.saturnusgo.com/testcases/umbrella-home/work/?view=cases",
+  "--release-sha", "a".repeat(40),
+]) {
   const result = spawnSync(join(frontend, "node_modules/.bin/tsx"), [join(frontend, "scripts/documentation-captures/import.ts"),
-    "--locale", "en", "--key", key, "--raw", join(directory, "raw.png"), "--origin", "https://umbrella-falcon.saturnusgo.com",
-    "--source-url", "https://umbrella-falcon.saturnusgo.com/testcases/umbrella-home/work/?view=cases", "--release-sha", "a".repeat(40),
-    "--captured-at", "2026-11-05T10:00:00Z", ...extra], { cwd: directory, encoding: "utf8" });
+    "--locale", "en", "--raw", join(directory, "raw.png"), "--captured-at", "2026-11-05T10:00:00Z", ...target, ...extra],
+    { cwd: directory, encoding: "utf8" });
   return { status: result.status, output: `${result.stdout}${result.stderr}` };
 }
 const language = ["--ui-locale", "en", "--content-language", "en"];
@@ -139,4 +142,30 @@ test("replacement retains the raw native geometry guard", () => fixture(director
   const result = invoke(directory, [...language, "--replace-existing"]);
   assert.notEqual(result.status, 0); assert.match(result.output, /3456/);
   assert.equal(json(directory, registryPath)[key].src, oldSrc);
+}));
+
+const linearTarget = [
+  "--surface", "linear", "--key", "linear-team-identifier", "--origin", "https://app.linear.app",
+  "--source-url", "https://app.linear.app/example/settings/teams/QA/general",
+];
+
+test("imports a Linear capture with provider provenance and no Falcon release metadata", () => fixture(directory => {
+  const result = invoke(directory, language, linearTarget);
+  assert.equal(result.status, 0, result.output);
+  const image = json(directory, registryPath)["linear-team-identifier"];
+  assert.match(image.src, /linear-team-identifier-en-20261105\.jpg$/);
+  const capture = json(directory, provenancePath).captures.find((record: { file: string }) => record.file === image.src);
+  assert.equal(capture.source, "authenticated-linear");
+  assert.equal(capture.surface, "linear");
+  assert.equal(capture.origin, "https://app.linear.app");
+  assert.equal(capture.workspace, undefined);
+  assert.equal(capture.releaseSha, undefined);
+}));
+
+test("a Linear import still rejects captures below the native geometry", () => fixture(directory => {
+  writeFileSync(join(directory, "raw.png"), png(1728, 1117));
+  const result = invoke(directory, language, linearTarget);
+  assert.notEqual(result.status, 0);
+  assert.match(result.output, /3456/);
+  assert.equal(json(directory, provenancePath).captures.length, 1);
 }));

@@ -3,7 +3,7 @@ import { closeSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, openSync, 
 import { tmpdir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
-import { verifyProductionCaptures, type CaptureRecord } from "./verify";
+import { verifyCaptureLanguage, verifyProductionCaptures, type CaptureRecord } from "./verify";
 import { documentationSectionMedia } from "../../app/src/modules/core-tms/documentation/model/visual/guide-media";
 import { historicalGuideMedia } from "../../app/src/modules/core-tms/documentation/model/visual/compatibility/historical-media";
 import type { DocArticle } from "../../app/src/modules/core-tms/documentation/model/article";
@@ -13,18 +13,16 @@ const args = process.argv.slice(2), get = (name: string) => {
 };
 const locale = get("--locale"), key = get("--key"), raw = get("--raw"), origin = get("--origin");
 const capturedAt = get("--captured-at"), surface = get("--surface") ?? "falcon";
+const isLinear = surface === "linear";
 const sourceUrl = get("--source-url"), releaseSha = get("--release-sha");
 const uiLocale = get("--ui-locale"), contentLanguage = get("--content-language"), replaceExisting = args.includes("--replace-existing");
 const languageException = get("--language-exception")?.trim();
-if (!locale || !["en", "ru"].includes(locale) || !key || !raw || !origin || !capturedAt || !["falcon", "codex"].includes(surface)
-  || !sourceUrl || !releaseSha || !/^[a-z0-9][a-z0-9-]{0,109}$/.test(key)) {
-  throw new Error("Usage: npx tsx scripts/documentation-captures/import.ts --locale en|ru --ui-locale en|ru --content-language en|ru|mixed --key <stable-key> --raw <actual-capture> --origin <production-origin> --source-url <actual-state-url> --release-sha <full-commit-sha> --captured-at <ISO-time> [--language-exception <explicit-reason-for-mixed-content>] [--surface falcon|codex] [--name <date-versioned-basename>] [--replace-existing]");
+if ((locale !== "en" && locale !== "ru") || !key || !raw || !origin || !capturedAt || !["falcon", "codex", "linear"].includes(surface)
+  || !sourceUrl || (isLinear ? args.includes("--release-sha") : !releaseSha) || !/^[a-z0-9][a-z0-9-]{0,109}$/.test(key)) {
+  throw new Error("Usage: npx tsx scripts/documentation-captures/import.ts --locale en|ru --ui-locale en|ru --content-language en|ru|mixed --key <stable-key> --raw <actual-capture> --origin <capture-origin> --source-url <actual-state-url> --captured-at <ISO-time> [--surface falcon|codex|linear] [--release-sha <full-commit-sha>, required for Falcon and Codex only] [--language-exception <explicit-reason>] [--name <date-versioned-basename>] [--replace-existing]");
 }
-if (uiLocale !== locale || (contentLanguage !== locale && contentLanguage !== "mixed")) {
-  throw new Error("Capture language mismatch: --ui-locale must match --locale; --content-language must match or explicitly declare mixed content");
-}
-if (contentLanguage === "mixed" && (!languageException || languageException.startsWith("--"))) {
-  throw new Error("Mixed content language requires a nonempty explicit --language-exception reason");
+if ((uiLocale !== "en" && uiLocale !== "ru") || (contentLanguage !== "en" && contentLanguage !== "ru" && contentLanguage !== "mixed")) {
+  throw new Error("Capture requires --ui-locale en|ru and --content-language en|ru|mixed");
 }
 if (!Number.isFinite(Date.parse(capturedAt))) throw new Error("Invalid capture timestamp");
 const captureDate = new Date(capturedAt).toISOString().slice(0, 10).replaceAll("-", "");
@@ -33,10 +31,13 @@ for (const key of [...stateUrl.searchParams.keys()]) if (/token|password|code|st
   stateUrl.searchParams.delete(key); redactedQueryKeys.push(key);
 }
 const edition = locale === "ru" ? "2026-11-ru" : "2026-11", content = locale === "ru" ? "content-ru" : "content";
-const name = get("--name") ?? `${key}-${locale}-production${captureDate}`;
+const name = get("--name") ?? `${key}-${locale}-${isLinear ? "" : "production"}${captureDate}`;
 if (!/^[a-z0-9][a-z0-9-]{0,139}$/.test(name)) throw new Error("Invalid production capture filename");
 if (!new RegExp(`(?:-|production)${captureDate}$`).test(name)) throw new Error("Capture filename must be versioned with its capture date (YYYYMMDD)");
 const src = `/falcon/docs/${edition}/${name}.jpg`, destination = resolve("public", src.slice(1));
+const captureLanguage = { file: src, locale, surface: surface as CaptureRecord["surface"], uiLocale, contentLanguage,
+  ...(languageException ? { languageException } : {}) } as const;
+verifyCaptureLanguage(captureLanguage);
 const registryPath = `app/src/modules/core-tms/documentation/${content}/walkthroughs/media/screenshots.production.json`;
 const provenancePath = `public/falcon/docs/${edition}/production-provenance.json`;
 const aliasesPath = `app/src/modules/core-tms/documentation/model/visual/compatibility/production-aliases-${locale}.json`;
@@ -59,13 +60,14 @@ try {
   execFileSync("sips", ["-s", "format", "jpeg", "-s", "formatOptions", "70", source, "--out", converted], { stdio: "pipe" });
   const image = { src, width: 3456, height: 2234 };
   const record: CaptureRecord & { rawFilename: string; method: string; redactedQueryKeys: string[] } = {
-    file: src, locale: locale as "en" | "ru", uiLocale: uiLocale as "en" | "ru", contentLanguage: contentLanguage as "en" | "ru" | "mixed",
-    ...(languageException ? { languageException } : {}),
-    source: "authenticated-production-umbrella", surface: surface as "falcon" | "codex",
-    origin, workspace: "Umbrella Home", capturedAt, viewport: { width: 1728, height: 1117, deviceScaleFactor: 2 },
-    sourceUrl: stateUrl.toString(), releaseSha, redactedQueryKeys,
+    ...captureLanguage, ...(isLinear ? { source: "authenticated-linear" }
+      : { source: "authenticated-production-umbrella", workspace: "Umbrella Home", releaseSha }),
+    origin, capturedAt, viewport: { width: 1728, height: 1117, deviceScaleFactor: 2 },
+    sourceUrl: stateUrl.toString(), redactedQueryKeys,
     rawSha256: createHash("sha256").update(bytes).digest("hex"), sha256: createHash("sha256").update(readFileSync(converted)).digest("hex"),
-    rawFilename: basename(source), method: "Actual authenticated production browser/app capture; JPEG transcoded without crop, resize or semantic edits.",
+    rawFilename: basename(source), method: isLinear
+      ? "Actual authenticated Linear browser capture; JPEG transcoded without crop, resize or semantic edits."
+      : "Actual authenticated production browser/app capture; JPEG transcoded without crop, resize or semantic edits.",
   };
   const previous = JSON.parse(readFileSync("public/falcon/docs/2026-11/codex-provenance.json", "utf8"));
   const legacyDigests: string[] = previous.files.flatMap((file: { sha256: string; sourcePngSha256: string }) => [file.sha256, file.sourcePngSha256]);
@@ -75,7 +77,7 @@ try {
       legacyDigests.push(createHash("sha256").update(readFileSync(join(folder, file))).digest("hex"));
     }
   }
-  verifyProductionCaptures({ publicDirectory: temporary, images: [{ ...image, locale: record.locale }], records: [record], media: [], legacyDigests });
+  verifyProductionCaptures({ publicDirectory: temporary, images: [{ ...image, key, locale }], records: [record], media: [], legacyDigests });
   const { docArticles } = require(resolve(`app/src/modules/core-tms/documentation/${content}/catalog.ts`)) as { docArticles: DocArticle[] };
   const oldSrc = previousImage?.src ?? get("--replaces") ?? `/falcon/docs/2026-09${locale === "ru" ? "-ru" : ""}/${key}.jpg`;
   const replacements = docArticles.flatMap(article => article.sections.flatMap(section => {
@@ -115,5 +117,5 @@ try {
       writeFileSync(`${file}.tmp`, JSON.stringify(data, null, 2) + "\n"); renameSync(`${file}.tmp`, file);
     }
   } finally { closeSync(lock); rmSync(lockPath); }
-  console.log(JSON.stringify({ key, ...image, sha256: record.sha256, registered: true, languageVerified: contentLanguage === locale }));
+  console.log(JSON.stringify({ key, ...image, sha256: record.sha256, registered: true, languageVerified: uiLocale === locale && contentLanguage === locale }));
 } finally { rmSync(temporary, { recursive: true, force: true }); }

@@ -1,4 +1,7 @@
-import { jiraWalkthrough, linearWalkthrough } from "../walkthroughs/integrations/trackers";
+import {
+  jiraWalkthrough, linearAccessWalkthrough, linearConnectWalkthrough, linearVerifyWalkthrough, linearWalkthrough,
+  linearWebhookWalkthrough, linearWorkflowWalkthrough,
+} from "../walkthroughs/integrations/trackers";
 import { code, note, paragraph, section, steps, table, warning, type DocArticle } from "../../model/article";
 export const trackerArticles: DocArticle[] = [
   { id: "jira", title: "Jira", group: "integrations", description: "Create issues from Falcon defects and return ready fixes for retesting.",
@@ -32,13 +35,10 @@ export const trackerArticles: DocArticle[] = [
       { title: "Linear webhook signatures", url: "https://linear.app/developers/webhooks" }],
     sections: [
       section("open", "Start in Connection setup", paragraph("In Falcon, select the project whose defects should reach Linear. Go to **Settings → Plugins → Linear**, expand **Connection setup**, and open **Connection**. The connection applies to the selected Falcon project.")),
-      section("access", "Get the API key and team identifier from Linear", steps(
-        ["Create a team-scoped personal API key", "Switch to the Linear workspace that contains the team. Under **Settings → Account → Security & Access**, create a personal API key with **Read** and limit the key to that team. Add **Write** if Falcon will create or update issues. **Verify access** only checks read access."],
-        ["Find the team key or copy its UUID", "In the Linear sidebar, open the team’s **··· → Team settings → General** and copy **Identifier**. For an issue such as **QA-42**, the team key is **QA**. To copy the UUID, open the team’s home page, press **⌘K** or **Ctrl+K**, and search for **Copy model UUID**. Linear may show Organization, UserAccount, User, and Team entries together. Select the row marked **(Team)** beside the intended team name."]),
+      section("access", "Get the API key and team identifier from Linear", linearAccessWalkthrough,
         note("Use the team’s identifier", "The display name, workspace slug, Linear project name or UUID, and full issue ID such as QA-42 refer to different things. The Falcon project selects where defects come from. The Linear team selects where they go."),
         note("If you cannot create a key", "Ask your Linear workspace admin whether members can create personal API keys. For a private team, check that your Linear account can open the team.")),
-      section("connect", "Verify and save the connection", steps(
-        ["Check access", "Under **Service access**, paste the personal key into **API key** and enter the team key or full UUID in **Linear team ID or key**. Click **Verify access** and check the returned team name and UUID. This loads the team’s workflow statuses for **Automation** without saving a connection or creating a Linear issue."],
+      section("connect", "Verify and save the connection", linearConnectWalkthrough, steps(
         ["Get the Falcon webhook URL", "Keep **Enable integration** off and click **Save connection**. The **Webhook URL** appears under **Incoming events**. Copy that URL for the next step."]),
         note("Checking an existing connection", "Leave **API key** blank to verify the saved key, or enter a replacement key to test it before saving. The team field is locked to the saved destination.")),
       section("verify-access-errors", "If Verify access fails", steps(
@@ -46,13 +46,12 @@ export const trackerArticles: DocArticle[] = [
         ["Linear denied access · 422", "Check that the key is a current personal API key from the correct workspace, that it has **Read**, and that the selected team is included in its scope. If a key was revoked or exposed, replace it."],
         ["Team not found or wrong scope · 422", "If the short team key returns this error, copy the full UUID from the **(Team)** row in Linear and verify again with the same API key. If you already entered a UUID, check which row you copied. If verification still fails, check that the key’s owner and team scope allow access. If Falcon shows an unexpected team, stop before saving."],
         ["Rate limit or temporary outage · 429 or 502", "Wait before trying **Verify access** again. If the problem persists, share the error and any available request ID with Falcon Support. Keep the API key and webhook signing secret private."])),
-      section("webhook", "Send issue updates from Linear to Falcon", steps(
-        ["Create the webhook in Linear", "A Linear workspace admin opens **Settings → Administration → API → New webhook**. Paste the Falcon **Webhook URL**, select the same team, and choose **Issues** as the resource type."],
+      section("webhook", "Send issue updates from Linear to Falcon", linearWebhookWalkthrough, steps(
         ["Save its signing secret in Falcon", "Open the webhook you just created and copy its signing secret. Paste it in Falcon under **Incoming events → Signing secret**, then save changes. Keep the integration off until you finish the status mapping."])),
-      section("workflow", "Choose when a fix returns to QA", paragraph("Open **Automation**. Keep **Defect created** selected to create Linear issues from new Falcon defects. Under **Fix workflow**, choose the Linear status that means the fix is ready for QA. Optionally, map **Verified** to a Linear status under **Update the service status**. Then turn on **Enable integration** and click **Save changes**."),
+      section("workflow", "Choose when a fix returns to QA", linearWorkflowWalkthrough,
+        paragraph("After setting up the webhook and workflow, turn on **Enable integration** and click **Save changes**."),
         note("Verify access again if statuses are missing", "Return to **Connection** and click **Verify access** to reload the workflow statuses for the configured team.")),
-      section("verify", "Check one defect end to end", steps(
-        ["Check delivery to Linear", "After enabling the integration, create an agreed test defect in the Falcon project with sample data. In **Activity & links**, look for a successful delivery and open the linked Linear issue. Check that the issue belongs to the intended team."],
+      section("verify", "Check one defect end to end", linearVerifyWalkthrough, steps(
         ["Check the return to QA", "Move the linked issue to the Linear status you mapped for retesting. Check that the Falcon defect becomes **Ready for QA**. The previous test result stays in place until a tester records a retest result."]),
         note("If the status does not return", "Check that the webhook is enabled for **Issues** in the same Linear team and that its current signing secret matches the one saved in Falcon.")),
       section("walkthrough", "Connection screen", linearWalkthrough),

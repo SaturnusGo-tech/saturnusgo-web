@@ -1,14 +1,32 @@
 export type CaptureRecord = {
-  file: string; locale: "en" | "ru"; source: string; surface: "falcon" | "codex"; origin: string; workspace: string;
-  sourceUrl: string; releaseSha: string;
+  file: string; locale: "en" | "ru"; source: string; surface: "falcon" | "codex" | "linear"; origin: string;
+  sourceUrl: string; workspace?: string; releaseSha?: string;
   uiLocale?: "en" | "ru"; contentLanguage?: "en" | "ru" | "mixed"; languageException?: string;
   capturedAt: string; viewport: { width: number; height: number; deviceScaleFactor: number }; rawSha256: string; sha256: string;
 };
 type CaptureInput = {
-  publicDirectory: string; images: readonly { src: string; width: number; height: number; locale: "en" | "ru" }[];
+  publicDirectory: string; images: readonly { src: string; key?: string; width: number; height: number; locale: "en" | "ru" }[];
   records: readonly CaptureRecord[]; media: readonly { src: string; locale: "en" | "ru" }[];
   legacyDigests?: readonly string[]; complete?: boolean; requireLanguage?: boolean;
 };
+
+type CaptureLanguage = Pick<CaptureRecord, "file" | "surface" | "locale" | "uiLocale" | "contentLanguage" | "languageException">;
+
+export function verifyCaptureLanguage(record: CaptureLanguage, requireLanguage = false) {
+  const { file, surface, locale, uiLocale, contentLanguage, languageException } = record;
+  const englishLinearUI = surface === "linear" && locale === "ru" && uiLocale === "en"
+    && (contentLanguage === "en" || contentLanguage === "mixed");
+  if ((requireLanguage || surface === "linear" || uiLocale !== undefined || contentLanguage !== undefined || languageException !== undefined)
+    && !englishLinearUI && (uiLocale !== locale || (contentLanguage !== locale && contentLanguage !== "mixed"))) {
+    throw new Error(`Capture UI and content language must match its locale: ${file}`);
+  }
+  if (englishLinearUI || contentLanguage === "mixed") {
+    if (requireLanguage) throw new Error(`Capture with a language exception cannot pass full language verification: ${file}`);
+    if (typeof languageException !== "string" || !languageException.trim() || languageException.trim().startsWith("--")) {
+      throw new Error(`Capture language requires an explicit exception reason: ${file}`);
+    }
+  }
+}
 
 export function verifyProductionCaptures(input: CaptureInput) {
   const root = realpathSync(input.publicDirectory), seen = new Set<string>(), totals = { en: 0, ru: 0 };
@@ -36,30 +54,32 @@ export function verifyProductionCaptures(input: CaptureInput) {
     if (data.length >= 1_400_000) throw new Error(`Production screenshot exceeds DPR2 budget: ${image.src}`);
     totals[image.locale] += data.length;
     const records = input.records.filter(record => record.file === image.src), record = records[0];
-    if (records.length !== 1 || record.locale !== image.locale || record.source !== "authenticated-production-umbrella"
-      || record.workspace !== "Umbrella Home" || !Number.isFinite(Date.parse(record.capturedAt))) {
+    if (records.length !== 1 || record.locale !== image.locale || !Number.isFinite(Date.parse(record.capturedAt))) {
+      throw new Error(`Missing production capture provenance: ${image.src}`);
+    }
+    const isLinear = record.surface === "linear";
+    if (isLinear) {
+      if (record.source !== "authenticated-linear" || record.workspace !== undefined || record.releaseSha !== undefined
+        || !/^linear-[a-z0-9][a-z0-9-]*$/.test(image.key ?? "") || !image.src.startsWith(`/falcon/docs/${edition}/linear-`)) {
+        throw new Error(`Invalid Linear capture provenance or registry key: ${image.src}`);
+      }
+    } else if (record.source !== "authenticated-production-umbrella" || record.workspace !== "Umbrella Home") {
       throw new Error(`Missing authenticated production Umbrella provenance: ${image.src}`);
     }
-    if ((input.requireLanguage || record.uiLocale !== undefined || record.contentLanguage !== undefined || record.languageException !== undefined)
-      && (record.uiLocale !== image.locale || (record.contentLanguage !== image.locale && record.contentLanguage !== "mixed"))) {
-      throw new Error(`Capture UI and content language must match its locale: ${image.src}`);
-    }
-    if (record.contentLanguage === "mixed") {
-      if (input.requireLanguage) throw new Error(`Mixed content cannot pass full language verification: ${image.src}`);
-      if (typeof record.languageException !== "string" || !record.languageException.trim() || record.languageException.trim().startsWith("--")) {
-        throw new Error(`Mixed content language requires an explicit exception reason: ${image.src}`);
-      }
-    }
+    verifyCaptureLanguage(record, input.requireLanguage);
     const origin = new URL(record.origin);
     const falconOrigin = origin.protocol === "https:" && origin.hostname.endsWith(".saturnusgo.com")
       && !/lab|preview|localhost|example|mail-check/i.test(origin.hostname) && origin.pathname === "/" && !origin.search && !origin.hash
       && !origin.username && !origin.password && !origin.port;
-    if (!(record.surface === "codex" ? record.origin === "codex://desktop" || record.origin === "https://chatgpt.com" : falconOrigin)) {
+    const validOrigin = isLinear ? record.origin === "https://linear.app" || record.origin === "https://app.linear.app"
+      : record.surface === "codex" ? record.origin === "codex://desktop" || record.origin === "https://chatgpt.com"
+      : record.surface === "falcon" && falconOrigin;
+    if (!validOrigin) {
       throw new Error(`Invalid production capture origin for: ${image.src}`);
     }
     const state = new URL(record.sourceUrl);
-    if (!/^[a-f0-9]{40}$/.test(record.releaseSha) || state.username || state.password
-      || (record.surface === "falcon" && state.origin !== origin.origin)
+    if ((!isLinear && !/^[a-f0-9]{40}$/.test(record.releaseSha ?? "")) || state.username || state.password
+      || (record.surface !== "codex" && state.origin !== origin.origin) || (isLinear && state.hash)
       || (record.surface === "codex" && !(state.protocol === "codex:" || state.origin === "https://chatgpt.com"))
       || [...state.searchParams.keys()].some(key => /token|password|code|state|secret|invite|signature|session|auth|challenge|redirect|nonce|api.?key|client_id/i.test(key))) {
       throw new Error(`Missing release SHA or unsafe source state URL for: ${image.src}`);
@@ -98,7 +118,7 @@ if (process.argv[1]?.endsWith("documentation-captures/verify.ts")) {
   for (const locale of ["en", "ru"] as const) {
     const edition = locale === "ru" ? "2026-11-ru" : "2026-11", content = locale === "ru" ? "content-ru" : "content";
     const registry = JSON.parse(readFileSync(`${module}/${content}/walkthroughs/media/screenshots.production.json`, "utf8"));
-    images.push(...Object.values(registry).map(image => ({ ...image as { src: string; width: number; height: number }, locale })));
+    images.push(...Object.entries(registry).map(([key, image]) => ({ ...image as { src: string; width: number; height: number }, key, locale })));
     records.push(...JSON.parse(readFileSync(`public/falcon/docs/${edition}/production-provenance.json`, "utf8")).captures);
     const catalog = require(resolve(module, content, "catalog.ts"));
     for (const article of catalog.docArticles) for (const section of article.sections) for (const block of section.blocks) {
@@ -132,6 +152,7 @@ if (process.argv[1]?.endsWith("documentation-captures/verify.ts")) {
     .flatMap((file: { sha256: string; sourcePngSha256: string }) => [file.sha256, file.sourcePngSha256]));
   verifyProductionCaptures({ publicDirectory, images, records, media: media.filter(image => !supplied.has(image.src) && !isProductDocsPreviewImage(image.src, image.locale)),
     legacyDigests, complete: process.argv.includes("--complete"), requireLanguage: process.argv.includes("--require-language") });
-  console.log(JSON.stringify({ productionCaptures: images.length, suppliedCodexCaptures: supplied.size,
+  const linearCaptures = images.filter(image => records.some(record => record.file === image.src && record.surface === "linear")).length;
+  console.log(JSON.stringify({ productionCaptures: images.length - linearCaptures, linearCaptures, suppliedCodexCaptures: supplied.size,
     syntheticProductDocsCaptures: previewMedia.length, activeReferences: media.length, complete: process.argv.includes("--complete"), requireLanguage: process.argv.includes("--require-language"), verified: true }));
 }
