@@ -109,6 +109,15 @@
         ],
         "createdAt": "2026-11-10T19:42:33.045Z",
         "reason": "Agent: Arial is intentional in the spreadsheet viewport to preserve the typography and density of the supplied spreadsheet reference; Falcon chrome retains its design-system type."
+      },
+      {
+        "rule": "gradient-text",
+        "value": "*",
+        "files": [
+          "app/src/modules/core-falcon-public/direction/pricing/pricing.module.css"
+        ],
+        "createdAt": "2026-11-11T05:38:14.835Z",
+        "reason": "Existing Falcon pricing headline treatment is present in production base 2f7a5c9 and intentionally preserved; this landing theme change only improves its light-mode contrast."
       }
     ]
   }

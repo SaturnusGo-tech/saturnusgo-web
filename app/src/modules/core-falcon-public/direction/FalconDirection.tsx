@@ -6,8 +6,11 @@ import { FalconBrandMark } from '../../../shared/components/brand/FalconBrandMar
 import { useLandingLocale } from '../landing/localization/context/LandingLocaleProvider';
 import { LandingHeaderLabel } from '../landing/localization/presentation/LandingHeaderLabel';
 import { LanguageSelector } from '../landing/localization/presentation/LanguageSelector';
+import { LandingThemeToggle } from '../landing/theme/LandingThemeToggle';
+import { useLandingTheme } from '../landing/theme/LandingTheme';
 import { DirectionMarquee } from './DirectionMarquee';
 import { ProductScene } from './scenes/ProductScene';
+import { WorkflowStory } from './workflow/WorkflowStory';
 import { directionCopy } from './content/copy';
 import { AchievementStory } from './achievements/AchievementStory';
 import { FalconPricing } from './pricing/FalconPricing';
@@ -27,6 +30,7 @@ function ResponsiveCopy({ desktop, phone }: { desktop: ReactNode; phone: string 
 
 export function FalconDirection() {
   const { locale } = useLandingLocale();
+  const { theme, ready } = useLandingTheme();
   const [menu, setMenu] = useState(false);
   const menuTrigger = useRef<HTMLButtonElement>(null);
   const c = directionCopy[locale];
@@ -34,7 +38,7 @@ export function FalconDirection() {
   const docs = locale === 'ru' ? '/ru/docs/' : '/docs/';
   const plansLabel = locale === 'ru' ? 'Тарифы' : 'Plans';
   const open = `/cloud-login/?lang=${locale}`;
-  return <div className={styles.page} lang={locale}>
+  return <div className={styles.page} lang={locale} data-theme={ready ? theme : undefined}>
     <a href="#main-content" className={styles.skipLink}>{c.skip}</a>
     <header className={styles.navigation} onKeyDown={event => {
       if (menu && event.key === 'Escape' && !event.defaultPrevented) {
@@ -52,13 +56,14 @@ export function FalconDirection() {
         </nav>
         <div className={styles.navActions}>
           <LanguageSelector />
+          <LandingThemeToggle locale={locale} />
           <a className={styles.docsLink} href={docs}><LandingHeaderLabel en={en.docs} ru={ru.docs} /></a>
           <a className={styles.primary} href={open}><LandingHeaderLabel en={en.open} ru={ru.open} /></a>
           <button type="button" ref={menuTrigger} className={styles.menuButton} onClick={() => setMenu(value => !value)} aria-label={menu ? c.closeMenu : c.menu} aria-expanded={menu} aria-controls="landing-menu">
             {menu ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
           </button>
         </div>
-        <nav id="landing-menu" className={styles.mobileNav} aria-label={c.menu} data-open={menu} inert={!menu}>
+        <nav id="landing-menu" className={styles.mobileNav} aria-label={c.menu} data-open={menu} {...(menu ? {} : { inert: '' }) as Record<string, string>}>
           {navigation.map(({ href, ...labels }) => <a key={href} href={href} onClick={() => setMenu(false)}><LandingHeaderLabel {...labels} /></a>)}
           <a href={docs} onClick={() => setMenu(false)}><LandingHeaderLabel en={en.docs} ru={ru.docs} /></a>
         </nav>
@@ -73,17 +78,7 @@ export function FalconDirection() {
         <ProductScene kind="hero" locale={locale} />
       </section>
       <DirectionMarquee title={c.tools} note={c.toolsNote} pause={c.pause} resume={c.resume} />
-      <section className={styles.principles} aria-labelledby="principles-title">
-        <h2 id="principles-title"><ResponsiveCopy desktop={<>{c.statement[0]} <span>{c.statement[1]}</span></>} phone={phone.statement} /></h2>
-        <p className={`${styles.phoneCopy} ${styles.principlesLead}`}>{phone.statementLead}</p>
-        <div className={styles.principleGrid}>
-          {c.principles.map((item, i) => <article key={item.image}>
-            <img src={`/falcon/landing/2026-11/concept-${item.image}.webp`} alt="" width={1448} height={1086} loading="lazy" />
-            <h3><ResponsiveCopy desktop={item.title} phone={phone.principles[i].title} /></h3>
-            <p><ResponsiveCopy desktop={item.body} phone={phone.principles[i].body} /></p>
-          </article>)}
-        </div>
-      </section>
+      <WorkflowStory locale={locale} />
       <section id="documentation" className={styles.chapter} aria-labelledby="documentation-title">
         <div className={styles.chapterHeading}>
           <h2 id="documentation-title">{c.documentation.title}</h2>

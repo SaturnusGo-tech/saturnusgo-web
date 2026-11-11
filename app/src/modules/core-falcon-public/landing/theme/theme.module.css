@@ -1,0 +1,4 @@
+.toggle{display:inline-flex;align-items:center;justify-content:center;flex:none;width:34px;min-width:34px;height:34px;padding:0;border:0;border-radius:50%;background:transparent;color:var(--landing-muted);cursor:pointer;transition:background .2s,color .2s}
+.toggle:hover,.toggle[data-hover=true]{background:var(--falcon-hover);color:var(--landing-text)}
+.toggle:focus-visible{outline:2px solid var(--landing-focus);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.toggle{transition:none}}

@@ -1,25 +1,54 @@
 "use client";
-import { useState } from 'react';
-import { Pause, Play } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { ArrowRight, Pause, Play } from 'lucide-react';
 import styles from './direction.module.css';
 import { INTEGRATIONS } from '../../core-tms/presentation/hooks/catalog/integration-definitions';
-const brandImages: Record<string, string> = { jira: 'jira.svg', youtrack: 'youtrack.svg', confluence: 'confluence.svg', slack: 'slack.png' };
-const rows = [INTEGRATIONS];
+
+const brandImages: Record<string, string> = {
+  codex: '/assets/integrations/codex/codex-light.png',
+  jira: '/falcon/integrations/jira.svg',
+  youtrack: '/falcon/integrations/youtrack.svg',
+  confluence: '/falcon/integrations/confluence.svg',
+  slack: '/falcon/integrations/slack.png',
+};
+
 export function DirectionMarquee({ title, note, pause, resume }: { title: string; note: string; pause: string; resume: string }) {
+  const sectionRef = useRef<HTMLElement>(null);
   const [paused, setPaused] = useState(false);
-  return <section className={styles.integrations} id="connected-tools" aria-labelledby="tools-title">
-    <h2 id="tools-title"><span className={styles.desktopCopy}>{title}</span><span className={styles.phoneCopy}>{note}</span></h2>
-    <div className={styles.marqueeWindow} data-paused={paused}>
-      {rows.map((row, i) => <div className={styles.marqueeTrack} data-reverse={i === 1} key={i}>
-        {[false, true].map(duplicate => <ul className={styles.logoRow} aria-hidden={duplicate || undefined} key={String(duplicate)}>
-          {row.map(({ id, name, icon: Icon }) => <li key={id}>
-            {brandImages[id] ? <img src={`/falcon/integrations/${brandImages[id]}`} width={24} height={24} alt="" /> : Icon ? <Icon size={24} aria-hidden="true" /> : null}{name}
-          </li>)}
-        </ul>)}
-      </div>)}
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    let inViewport = false;
+    const updateVisibility = () => setVisible(inViewport && !document.hidden);
+    const observer = new IntersectionObserver(([entry]) => {
+      inViewport = entry.isIntersecting;
+      updateVisibility();
+    }, { threshold: 0.05 });
+    observer.observe(section);
+    document.addEventListener('visibilitychange', updateVisibility);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', updateVisibility);
+    };
+  }, []);
+
+  return <section ref={sectionRef} className={styles.integrations} id="connected-tools" aria-labelledby="tools-title">
+    <div className={styles.constellation} data-paused={paused || !visible}>
+      <div className={styles.integrationCopy}>
+        <h2 id="tools-title">{title}</h2>
+        <a className={styles.integrationNote} href="#falcon-ai">{note}<ArrowRight size={15} aria-hidden="true" /></a>
+      </div>
+      <ul id="tools-logos" className={styles.logoConstellation} aria-label={title}>
+        {INTEGRATIONS.map(({ id, name, icon: Icon }) => <li key={id} data-brand={id}>
+          <span className={styles.logoFloat} role="img" aria-label={name}>
+            {brandImages[id] ? <img src={brandImages[id]} width={42} height={42} alt="" /> : Icon ? <Icon size={42} aria-hidden="true" /> : null}
+          </span>
+        </li>)}
+      </ul>
     </div>
-    <p className={styles.integrationNote}>{note}</p>
-    <button type="button" className={styles.motionControl} onClick={() => setPaused(value => !value)} aria-label={paused ? resume : pause} aria-pressed={paused}>
+    <button type="button" className={styles.motionControl} onClick={() => setPaused(value => !value)} aria-label={paused ? resume : pause} aria-pressed={paused} aria-controls="tools-logos">
       {paused ? <Play size={14} /> : <Pause size={14} />}
     </button>
   </section>;

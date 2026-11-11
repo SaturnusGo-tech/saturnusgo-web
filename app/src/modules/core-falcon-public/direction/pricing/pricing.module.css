@@ -58,7 +58,7 @@
   display: inline-flex;
   align-items: center;
   gap: .14em;
-  color: #99e5f6;
+  color: var(--landing-pricing-wordmark);
   font-size: clamp(27px, 4.5vw, 58px);
   font-weight: 550;
   letter-spacing: -.045em;
@@ -146,7 +146,7 @@
 .card .description {
   margin-block: 20px 18px;
   min-height: 2.8em;
-  color: #c0c4cb;
+  color: var(--landing-pricing-description);
   font-size: 14px;
   line-height: 1.4;
   max-width: 29ch;
@@ -161,7 +161,7 @@
   list-style: none;
   font-size: 14px;
   line-height: 1.35;
-  color: #d9dce1;
+  color: var(--landing-pricing-features);
 }
 
 .features li {
@@ -177,7 +177,7 @@
   flex: none;
   place-items: center;
   border-radius: 50%;
-  background: #323438;
+  background: var(--landing-pricing-check);
   color: var(--landing-text);
 }
 
@@ -200,7 +200,7 @@
   transition: background-color .18s ease;
 }
 
-.card .action:hover { background-color: #dcebf3; }
+.card .action:hover { background-color: var(--landing-pricing-action-hover); }
 
 .notes {
   display: flex;
@@ -218,6 +218,24 @@
 .notes a { color: var(--landing-text); text-decoration: underline; text-underline-offset: .25em; }
 
 .pager { display: none; }
+
+/* A light page uses translucent porcelain surfaces rather than dark cards. */
+:global(html[data-falcon-landing-theme="light"]) .light { opacity: .35; }
+:global(html[data-falcon-landing-theme="light"]) .title {
+  color: #397f9e;
+  background-image: radial-gradient(ellipse 58% 115% at 66% 47%, #568fa8 0%, #397f9e 40%, #28556e 76%, #1d3c54 100%);
+}
+:global(html[data-falcon-landing-theme="light"]) .card,
+:global(html[data-falcon-landing-theme="light"]) .card[data-plan="startup"] {
+  border-color: #c8d5de;
+  background: #ffffffeb;
+  box-shadow: 0 16px 48px #24435814;
+}
+:global(html[data-falcon-landing-theme="light"]) .card[data-plan="enterprise"] {
+  border-color: #b4cdd8;
+  background: linear-gradient(145deg, #f0f9fbeb, #ffffffeb 68%);
+  box-shadow: 0 16px 48px #2443581a;
+}
 
 @media (max-width: 960px) {
   .card { min-height: 460px; }
@@ -286,7 +304,7 @@
     border: 0;
     border-radius: 8px;
     background: transparent;
-    color: #838b95;
+    color: var(--landing-pricing-pager);
     cursor: pointer;
     transition: color .16s ease-out;
   }
@@ -310,7 +328,7 @@
 }
 
 @media (max-width: 800px) and (hover: hover) {
-  .pager button:not([aria-current]):hover { color: #c3cad3; }
+  .pager button:not([aria-current]):hover { color: var(--landing-pricing-pager-hover); }
 }
 
 @media (prefers-reduced-motion: reduce) {
