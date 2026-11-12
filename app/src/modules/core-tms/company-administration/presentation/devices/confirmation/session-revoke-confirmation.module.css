@@ -1,0 +1,11 @@
+.confirmation { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px 16px; padding-left:30px; }
+.confirmation .description { flex:1 1 210px; margin:0; color:var(--admin-muted,var(--falcon-text-muted)); font-size:12px; line-height:1.5; }
+.actions { display:flex; align-items:center; gap:6px; }
+.cancel,.confirm { min-width:0; height:30px; padding:0 11px; border:0; font:inherit; font-size:12px; }
+.cancel { background:transparent; color:var(--admin-text,var(--falcon-text)); }
+.cancel:hover { background:var(--admin-hover,var(--falcon-hover)); }
+.confirm { background:var(--falcon-danger-solid); color:var(--falcon-danger-on-solid); }
+.confirm:hover { filter:brightness(.92); }
+.cancel:focus-visible,.confirm:focus-visible { outline:2px solid var(--falcon-focus); outline-offset:2px; }
+.cancel[data-disabled="true"],.confirm[data-disabled="true"] { opacity:.55; }
+@media (max-width:480px) { .confirmation { padding-left:27px; } .actions { margin-left:auto; } }

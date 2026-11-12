@@ -1,5 +1,0 @@
-.page.page { display:grid; gap:36px; max-width:760px; min-height:0; background:transparent; font:inherit; }
-.section { display:grid; gap:14px; padding:0 0 28px; border-bottom:1px solid var(--falcon-border); scroll-margin-top:32px; }
-.section:last-child { border-bottom:0; }
-.section h3 { margin:0; color:var(--falcon-text); font-size:15px; font-weight:550; }
-.section p { margin:0; max-width:65ch; color:var(--falcon-text-muted); font-size:14px; line-height:1.6; }

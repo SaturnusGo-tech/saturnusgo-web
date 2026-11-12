@@ -6,18 +6,18 @@ import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { Monitor, Smartphone } from "lucide-react";
 import { TmsLocaleContext } from "../../../localization/context/TmsLocaleProvider";
 import type { AdministrationPort } from "../../application/ports/administration-port";
+import { installSecurityControls } from "../support/security-controls";
 
 const iphone = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1";
 const chrome = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
-const require = createRequire(import.meta.url), previousCss = require.extensions[".css"];
+const require = createRequire(import.meta.url);
 const previousReact = Object.getOwnPropertyDescriptor(globalThis, "React");
 let Sessions: typeof import("../../presentation/devices/ProfileSessions")["ProfileSessions"];
 before(async () => {
-  require.extensions[".css"] = module => { module.exports = {}; }; Object.assign(globalThis, { React });
-  ({ ProfileSessions: Sessions } = await import("../../presentation/devices/ProfileSessions"));
+  Object.assign(globalThis, { React }); const restore = installSecurityControls();
+  try { ({ ProfileSessions: Sessions } = require("../../presentation/devices/ProfileSessions")); } finally { restore(); }
 });
 after(() => {
-  if (previousCss) require.extensions[".css"] = previousCss; else delete require.extensions[".css"];
   if (previousReact) Object.defineProperty(globalThis, "React", previousReact); else Reflect.deleteProperty(globalThis, "React");
 });
 
@@ -31,13 +31,17 @@ test("session rows use compact device labels and appropriate icons while retaini
   try {
     await act(async () => { view = create(<TmsLocaleContext.Provider value={locale}><Sessions client={client} version={0} /></TmsLocaleContext.Provider>); });
     await act(async () => { await new Promise(resolve => setTimeout(resolve, 10)); });
-    assert.deepEqual(view.root.findAllByType("strong").map(node => node.children.join("")), ["Current session", "Safari · iPhone"]);
+    assert.deepEqual(view.root.findAllByType("strong").map(node => node.children.join("")), ["Chrome · macOS", "Safari · iPhone"]);
     assert.equal(view.root.findAll(node => node.type === (Smartphone as unknown)).length, 1);
     assert.equal(view.root.findAll(node => node.type === (Monitor as unknown)).length, 1);
     assert.equal(JSON.stringify(view.toJSON()).includes("Mozilla"), false);
     const buttons = view.root.findAllByType("button").filter(node => node.children.includes("End session"));
     assert.equal(buttons.length, 1);
     await act(async () => { buttons[0].props.onClick(); buttons[0].props.onClick(); });
+    assert.deepEqual(revoked, []);
+    const confirm = view.root.findByProps({ role: "group" }).findAllByType("button").find(node => node.children.includes("End session"));
+    assert.ok(confirm);
+    await act(async () => { confirm.props.onClick(); confirm.props.onClick(); });
     assert.deepEqual(revoked, ["phone"]);
   } finally { await act(async () => view?.unmount()); }
 });

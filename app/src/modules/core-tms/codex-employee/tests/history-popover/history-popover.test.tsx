@@ -5,14 +5,17 @@ import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { TmsHttpClientProvider } from "../../../auth/http/TmsHttpClientContext";
 import { TmsLocaleContext } from "../../../localization/context/TmsLocaleProvider";
 import type { TmsHttpClient } from "../../../../../core/tms/transport/http";
+import { HistoryToast, installHistoryToast } from "./history-toast-fixture";
 (globalThis as typeof globalThis & { React: typeof React }).React = React;
 require.extensions[".css"] = module => { module.exports = {}; };
+const restoreToast = installHistoryToast();
 const { ExecutionHistoryFeature } = require("../../execution-history/composition/ExecutionHistoryFeature") as typeof import("../../execution-history/composition/ExecutionHistoryFeature");
 const { AnimatedSelect } = require("../../../presentation/common/select/AnimatedSelect") as typeof import("../../../presentation/common/select/AnimatedSelect");
+restoreToast();
 const scope = { workspaceId: "w", projectId: "p", runId: "r", itemId: "i" };
 const event = { ...scope, id: "e", attemptNo: 1, kind: "result_recorded", status: "passed", actor: "Author", actorIdentityId: null, createdAt: "2026-11-01T00:00:00Z" };
 const listeners = new Map<string, (event: unknown) => void>();
-Object.assign(globalThis, { innerWidth: 900, innerHeight: 800,
+Object.assign(globalThis, { innerWidth: 900, innerHeight: 800, Element: class Element {},
   window: { addEventListener() {}, removeEventListener() {} },
   document: { addEventListener: (name: string, fn: (e: unknown) => void) => listeners.set(name, fn), removeEventListener: (name: string) => listeners.delete(name) } });
 type Options = Partial<Parameters<typeof ExecutionHistoryFeature>[0]>;
@@ -23,7 +26,7 @@ function tree(http: TmsHttpClient, options: Options = {}) {
 }
 function render(http: TmsHttpClient, focus: string[], panels: { style: Record<string, string> }[] = [], options: Options = {}) {
   return create(tree(http, options), { createNodeMock: element => { const node = {
-    focus: () => focus.push(element.props["aria-label"]), contains: () => false, style: {}, scrollHeight: 1000,
+    focus: () => focus.push(element.props["aria-label"]), contains: () => false, style: {}, dataset: {}, scrollHeight: 1000,
     matches: () => false, getBoundingClientRect: () => ({ width: 30, left: 300, top: 100, bottom: 130 }),
   }; if (element.props.role === "dialog") panels.push(node); return node; } });
 }
@@ -109,8 +112,11 @@ test("availability errors retain the history retry path and successful empty ret
   let view!: ReactTestRenderer; await act(async () => { view = render(http, []); }); t.after(() => act(() => view.unmount()));
   assert.equal(reads, 1);
   await act(async () => view.root.findByProps({ "aria-label": "Execution history" }).props.onClick());
-  assert.match(JSON.stringify(view.toJSON()), /Could not load history/);
+  const notification = view.root.findByType(HistoryToast);
+  assert.match(notification.props.message, /Could not load history/);
+  assert.equal(notification.props.retryLabel, "Retry");
+  assert.equal(typeof notification.props.onRetry, "function");
   failed = false;
-  await act(async () => view.root.findAllByType("button").find(button => button.children.includes("Retry"))!.props.onClick());
+  await act(async () => notification.props.onRetry());
   assert.equal(view.root.findAllByProps({ "aria-label": "Execution history" }).length, 0);
 });

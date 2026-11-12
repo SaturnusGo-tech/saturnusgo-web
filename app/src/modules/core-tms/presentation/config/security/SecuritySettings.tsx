@@ -1,16 +1,18 @@
 import { useTmsSession } from "../../../auth/presentation/session/TmsSessionContext";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { ManagedSecurity } from "../../../profile/security/composition/ManagedSecurity";
-import css from "./security.module.css";
+import { SecurityRow } from "../../../profile/security/presentation/SecurityRow";
+import css from "../../../profile/security/presentation/security-settings.module.css";
 
 export function SecuritySettings() {
   const session = useTmsSession();
   const { locale } = useTmsLocale();
-  if (session.kind === "managed") return <ManagedSecurity />;
+  if (session.kind === "managed") return <ManagedSecurity key={`${session.workspaceId}:${session.subject}`} />;
   return <div className={css.page}>
-    <section className={css.section}><h3>{locale === "ru" ? "Вход без пароля" : "Passwordless sign-in"}</h3>
-      <p>{locale === "ru" ? "Для входа используйте Google или одноразовый код из письма. Отдельный пароль Falcon для этого аккаунта не нужен." : "Sign in with Google or a one-time email code. This account does not use a separate Falcon password."}</p></section>
-    <section className={css.section}><h3>{locale === "ru" ? "Текущий аккаунт" : "Current account"}</h3><p>{session.label}</p>
-      <p>{locale === "ru" ? "Завершить текущий вход можно в разделе «Аккаунт и сессия»." : "End your current session in Account and session."}</p></section>
+    <SecurityRow title={locale === "ru" ? "Текущий аккаунт" : "Current account"} description={session.label}/>
+    <SecurityRow title={locale === "ru" ? "Вход и защита" : "Sign-in and security"}
+      description={locale === "ru" ? "Настройки входа доступны у провайдера, через которого вы вошли в Falcon." : "Manage sign-in security with the provider you used to access Falcon."}/>
+    <SecurityRow title={locale === "ru" ? "Текущая сессия" : "Current session"}
+      description={locale === "ru" ? "Чтобы выйти из Falcon на этом устройстве, откройте «Аккаунт и сессия»." : "To sign out of Falcon on this device, open Account and session."}/>
   </div>;
 }

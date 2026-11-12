@@ -1,13 +1,19 @@
-.list { display: grid; }
-.row { display: flex; align-items: center; gap: 16px; padding: 14px 0; }
-.row + .row { border-top: 1px solid var(--admin-line); }
-.device { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; }
-.device > svg { flex-shrink: 0; color: var(--admin-muted); }
-.device > span { display: grid; gap: 3px; min-width: 0; }
-.device strong { font-size: 13px; line-height: 1.5; font-weight: 500; overflow-wrap: anywhere; }
-.device small { color: var(--admin-muted); font-size: 12px; }
-.revoke { flex-shrink: 0; border: 0; border-radius: 8px; padding: 6px 8px; background: transparent; color: var(--admin-danger); font: inherit; font-size: 12px; cursor: pointer; }
-.revoke:hover { background: var(--admin-hover); }
-.revoke:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 2px; }
-.empty { padding-top: 18px; }
-@media (max-width: 480px) { .row { align-items: flex-start; flex-wrap: wrap; gap: 8px; } .device { flex-basis: 100%; } .revoke { margin-left: 24px; } }
+.section { --admin-text:var(--falcon-text); --admin-muted:var(--falcon-text-muted); --admin-line:var(--falcon-border); --admin-hover:var(--falcon-hover); --admin-danger:var(--falcon-danger); margin:0; color:var(--admin-text); }
+.list { display:grid; }
+.row { display:grid; gap:10px; padding:14px 0; }
+.row + .row { border-top:1px solid var(--admin-line); }
+.summary { display:flex; align-items:center; gap:16px; }
+.device { flex:1; min-width:0; display:flex; align-items:center; gap:12px; }
+.device > svg { flex-shrink:0; color:var(--admin-muted); }
+.device > span { display:grid; gap:3px; min-width:0; }
+.device strong { font-size:13px; line-height:1.5; font-weight:500; overflow-wrap:anywhere; }
+.device small { color:var(--admin-muted); font-size:12px; line-height:1.5; }
+.current { color:var(--admin-text); }
+.revoke,.more { min-width:0; height:30px; border:0; padding:0 10px; background:transparent; font:inherit; font-size:12px; }
+.revoke { flex-shrink:0; color:var(--admin-danger); }
+.more { margin-top:12px; color:var(--admin-text); }
+.revoke:hover,.more:hover { background:var(--admin-hover); }
+.revoke:focus-visible,.more:focus-visible { outline:2px solid var(--falcon-focus); outline-offset:2px; }
+.revoke[data-disabled="true"],.more[data-disabled="true"] { opacity:.5; }
+.empty { padding-top:18px; }
+@media (max-width:480px) { .summary { gap:8px; } .device { gap:9px; } .revoke { padding-inline:8px; } .row { padding-block:12px; } }

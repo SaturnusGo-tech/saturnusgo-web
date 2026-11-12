@@ -1,0 +1,8 @@
+.preview { height: 100dvh; display: flex; flex-direction: column; min-width: 0; color: var(--falcon-text); background: var(--falcon-surface); }
+.tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 10px 20px; border-bottom: 1px solid var(--falcon-border); font: 12px/1.5 var(--font-geist-sans), system-ui, sans-serif; }
+.tools strong { margin-right: auto; font-weight: 500; color: var(--falcon-text-muted); }
+.tools button { padding: 5px 10px; border: 1px solid var(--falcon-border); border-radius: 999px; color: inherit; background: transparent; }
+.tools button:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 3px; }
+.workspace { display: flex; flex: 1; min-height: 0; min-width: 0; }
+.workspace > div { flex: 1; min-width: 0; }
+@media (max-width: 600px) { .tools { padding: 10px 14px; gap: 8px; } .tools strong { flex-basis: 100%; } }

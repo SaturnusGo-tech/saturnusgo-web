@@ -5,14 +5,15 @@ import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { TmsLocaleContext } from "../../../localization/context/TmsLocaleProvider";
 import type { AdministrationPort } from "../../application/ports/administration-port";
 import { AdministrationError, type Profile, type PasswordChange } from "../../domain/administration";
+import { installSecurityControls } from "../support/security-controls";
 
 (globalThis as typeof globalThis & { React: typeof React }).React = React;
-const previousCss = require.extensions[".css"];
-require.extensions[".css"] = module => { module.exports = {}; };
+const restoreControls = installSecurityControls();
 const { ProfilePage } = require("../../presentation/profile-page/ProfilePage") as typeof import("../../presentation/profile-page/ProfilePage");
 const { ProfileDetailsForm } = require("../../presentation/profile/ProfileDetailsForm") as typeof import("../../presentation/profile/ProfileDetailsForm");
 const { ProfilePasswordForm } = require("../../presentation/profile/ProfilePasswordForm") as typeof import("../../presentation/profile/ProfilePasswordForm");
-if (previousCss) require.extensions[".css"] = previousCss; else delete require.extensions[".css"];
+const { ErrorToast } = require("../../../presentation/common/error/ErrorToast") as typeof import("../../../presentation/common/error/ErrorToast");
+restoreControls();
 const profile: Profile = { id: "me", name: "Ada", login: "ada", email: "ada@test.example", emailVerified: true, phone: "", role: "tester", owner: false, hasAvatar: false, version: 3, mfaEnabled: true, emailChangeAvailable: false };
 const locale = { locale: "en" as const, languageTag: "en-US" as const, setLocale() {}, t: () => "" };
 const wrap = (content: React.ReactNode) => <TmsLocaleContext.Provider value={locale}>{content}</TmsLocaleContext.Provider>;
@@ -32,7 +33,7 @@ test("profile save retains field constraints, sends edits and reports an unsucce
     await submit(view);
     assert.deepEqual(updates[0], [profile, { name: "Ada Lovelace", phone: "+77011234567" }]); assert.equal(saved, 1);
     denied = true; await submit(view);
-    assert.equal(saved, 1); assert.equal(view.root.findAllByProps({ role: "alert" }).length, 1);
+    assert.equal(saved, 1); assert.ok(view.root.findAllByType(ErrorToast).some(node => Boolean(node.props.message)));
   } finally { await act(async () => view.unmount()); }
 });
 
@@ -70,6 +71,10 @@ test("the sessions destination renders inline and revokes only a selected non-cu
     const revoke = view.root.findAllByType("button").filter(button => button.children.includes("End session"));
     assert.equal(revoke.length, 1);
     await act(async () => { revoke[0].props.onClick(); });
+    assert.deepEqual(revoked, []);
+    const confirm = view.root.findByProps({ role: "group" }).findAllByType("button").find(button => button.children.includes("End session"));
+    assert.ok(confirm);
+    await act(async () => { confirm.props.onClick(); });
     await act(async () => { await new Promise(resolve => setTimeout(resolve, 10)); });
     assert.deepEqual(revoked, ["old"]);
     assert.equal(view.root.findAllByType("button").filter(button => button.children.includes("End session")).length, 0);

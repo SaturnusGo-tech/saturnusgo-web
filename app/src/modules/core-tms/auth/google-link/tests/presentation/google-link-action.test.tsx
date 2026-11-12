@@ -5,6 +5,7 @@ import React from "react";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { TmsLocaleContext } from "../../../../localization/context/TmsLocaleProvider";
 import type { useGoogleLink } from "../../application/useGoogleLink";
+import { installSecurityControls } from "../../../../company-administration/tests/support/security-controls";
 void test("desktop linking opens the fixed profile command and never starts a provider in Electron", async t => {
   const require = createRequire(import.meta.url), previous = require.extensions[".css"];
   require.extensions[".css"] = module => { module.exports = {}; };
@@ -13,7 +14,9 @@ void test("desktop linking opens the fixed profile command and never starts a pr
     if (previous) require.extensions[".css"] = previous; else delete require.extensions[".css"];
     if (react) Object.defineProperty(globalThis, "React", react); else Reflect.deleteProperty(globalThis, "React");
   });
-  const { GoogleLinkAction } = await import("../../presentation/GoogleLinkAction");
+  const restoreControls = installSecurityControls();
+  const { GoogleLinkAction } = require("../../presentation/GoogleLinkAction") as typeof import("../../presentation/GoogleLinkAction");
+  restoreControls();
   const locale = { locale: "en" as const, languageTag: "en-US" as const, setLocale() {}, t: () => "" };
   let linked = 0;
   const model: ReturnType<typeof useGoogleLink> = { state: { available: true, pending: false, error: null, destination: null }, link: async () => { linked++; } };
