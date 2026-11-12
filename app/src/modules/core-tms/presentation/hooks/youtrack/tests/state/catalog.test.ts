@@ -58,3 +58,16 @@ test("explicit Refresh access keeps the actionable credential error without a du
     assert.equal(h.requests.some(request => request.method === "PATCH"), false);
   } finally { await h.dispose(); }
 });
+
+test("a partial nonempty catalog cannot replace a configured state field with a different visible field", async () => {
+  const { configuration } = await import("../../../../../youtrack/application/plugin-settings/tests/toggle-harness");
+  const saved = configuration(), projects = saved.routes.map(route => ({ ...route.project,
+    stateFields: [{ id: "different-field", name: "Another field", statuses: route.workflow.statuses }],
+  }));
+  const h = await catalogHarness("ready", true, { saved, projects });
+  try {
+    assert.deepEqual(h.model.draft?.routes.map(route => route.workflow), saved.routes.map(route => route.workflow));
+    assert.equal(h.model.catalogIssue, "missing_field");
+    assert.equal(h.requests.some(request => request.method === "PATCH"), false);
+  } finally { await h.dispose(); }
+});

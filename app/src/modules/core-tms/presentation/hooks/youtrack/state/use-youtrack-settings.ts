@@ -64,11 +64,11 @@ export function useYouTrackSettings(
         if (!canManage || !resource.data.baseUrl || !resource.data.tokenConfigured) return;
         try {
           const baseUrl = normalizeYouTrackBaseUrl(resource.data.baseUrl);
-          const { catalog, details } = await discoverWorkflowCatalog(http, workspaceId, baseUrl, nextDraft.routes, "", controller.signal);
+          const { catalog, details } = await discoverWorkflowCatalog(http, workspaceId, baseUrl, nextDraft.routes, "", controller.signal, resource.data.configurationVersion);
           if (controller.signal.aborted) return;
           setProjects(mergeProjects(details, mergeProjects(catalog.projects, seeded)));
           setProjectsBaseUrl(catalog.baseUrl);
-          setDraft((current) => current ? reconcileDraftProjects(current, catalog.projects, details) : current);
+          setDraft((current) => current ? reconcileDraftProjects(current, catalog.projects, details, resource.data.configurationVersion) : current);
         } catch (error: unknown) {
           if (!controller.signal.aborted) setCatalogIssue(catalogIssueFor(error));
         }
@@ -105,12 +105,13 @@ export function useYouTrackSettings(
     }
     setAction("connecting"); setNotice(null); setCatalogIssue(null);
     try {
-      const { catalog, details } = await discoverWorkflowCatalog(http, workspaceId, baseUrl, draft.routes, apiToken);
+      const { catalog, details } = await discoverWorkflowCatalog(http, workspaceId, baseUrl, draft.routes, apiToken, undefined, configuration.configurationVersion);
       setProjects(mergeProjects(details, catalog.projects)); setProjectsBaseUrl(catalog.baseUrl);
-      setDraft((current) => current ? reconcileDraftProjects(current, catalog.projects, details) : current);
+      setDraft((current) => current ? reconcileDraftProjects(current, catalog.projects, details, configuration.configurationVersion) : current);
       setNotice({ tone: "success", text: copy.connectionSuccess(catalog.projects.length) });
     } catch (error: unknown) {
-      if (catalogIssueFor(error) === "empty_fields") setCatalogIssue("empty_fields");
+      const issue = catalogIssueFor(error);
+      if (issue !== "request_failed") setCatalogIssue(issue);
       else setNotice({ tone: "error", text: discoveryError(copy, error) });
     }
     finally { setAction("idle"); }

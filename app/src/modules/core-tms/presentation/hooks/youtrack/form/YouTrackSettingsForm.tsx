@@ -38,6 +38,10 @@ export function YouTrackSettingsForm({ copy, state, webhook, canManage, onChange
       {state.catalogIssue && <p className={surface.projectLoading} role="status">
         {state.catalogIssue === "empty_fields"
           ? (russian ? "YouTrack не вернул поля статуса выбранных проектов. Текущие сопоставления не изменены." : "YouTrack returned no state fields for the selected projects. Current mappings are unchanged.")
+          : state.catalogIssue === "missing_field"
+          ? (russian ? "YouTrack не вернул настроенное поле статуса выбранного проекта. Текущие сопоставления не изменены." : "YouTrack did not return the configured state field for a selected project. Current mappings are unchanged.")
+          : state.catalogIssue === "legacy_mapping"
+          ? (russian ? "Не удалось однозначно сопоставить прежние настройки с полями и статусами YouTrack. Текущие сопоставления не изменены." : "Legacy mappings could not be matched unambiguously to YouTrack fields and statuses. Current mappings are unchanged.")
           : (russian ? "Не удалось загрузить поля и статусы YouTrack. Текущие сопоставления не изменены." : "Could not load YouTrack fields and statuses. Current mappings are unchanged.")}
         {" "}{russian ? "Проверьте доступ к проектам и полям, затем нажмите «Обновить доступ» в разделе «Подключение»." : "Check project and field access, then use Refresh access in Connection."}
       </p>}

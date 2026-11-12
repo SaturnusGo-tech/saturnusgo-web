@@ -1,3 +1,4 @@
+import { reconcileLegacyWorkflow } from "./legacy/reconcile-legacy-workflow";
 import { discoverYouTrack } from "../../../../application/integrations/getYouTrackIntegrationStatus";
 import type {
   YouTrackConfiguration,
@@ -76,6 +77,7 @@ export function reconcileDraftProjects(
   draft: YouTrackConfigurationDraft,
   catalog: readonly YouTrackProject[],
   details: readonly YouTrackProject[],
+  configurationVersion = 2,
 ): YouTrackConfigurationDraft {
   const known = new Map(catalog.map((project) => [project.id, project]));
   const detailed = new Map(details.map((project) => [project.id, project]));
@@ -84,7 +86,9 @@ export function reconcileDraftProjects(
     routes: draft.routes.map((route) => {
       if (!route.project.id) return route;
       const project = detailed.get(route.project.id) ?? known.get(route.project.id);
-      return project ? routeWithProject(route, project) : clearRouteProject(route);
+      if (!project) return clearRouteProject(route);
+      const compatible = reconcileLegacyWorkflow(route, project, configurationVersion);
+      return compatible ? routeWithProject(compatible, project) : route;
     }),
   };
 }

@@ -1,3 +1,4 @@
+import type { YouTrackConfiguration, YouTrackProject } from "../../../../../youtrack/model/youtrack-settings";
 import React from "react";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { createAuthenticatedTmsHttpClient } from "../../../../../auth/http/createAuthenticatedTmsHttpClient";
@@ -6,9 +7,9 @@ import { configuration } from "../../../../../youtrack/application/plugin-settin
 import { hooksCopy } from "../../../shared/hooks-copy";
 import { useYouTrackSettings } from "../../state/use-youtrack-settings";
 
-export async function catalogHarness(initial: "empty" | "failure" | "ready" | "credentials", canManage = true) {
+export async function catalogHarness(initial: "empty" | "failure" | "ready" | "credentials", canManage = true, fixture: { saved?: YouTrackConfiguration; projects?: readonly YouTrackProject[] } = {}) {
   const originalReact = Object.getOwnPropertyDescriptor(globalThis, "React"); Object.assign(globalThis, { React });
-  const saved = configuration(), requests: { method: string; path: string; body: Record<string, unknown> | null }[] = [];
+  const saved = fixture.saved ?? configuration(), requests: { method: string; path: string; body: Record<string, unknown> | null }[] = [];
   let disconnectFailure = false;
   let mode = initial, model!: ReturnType<typeof useYouTrackSettings>, view!: ReactTestRenderer;
   const http = createAuthenticatedTmsHttpClient({ apiBase: "https://fixture.invalid/api/v1", production: false, credentials: "include",
@@ -28,7 +29,7 @@ export async function catalogHarness(initial: "empty" | "failure" | "ready" | "c
       if (ids && mode === "credentials") return Response.json({ error: { code: "CREDENTIALS_REQUIRED", message: "private upstream details" } }, { status: 401 });
       if (ids && mode === "failure") return Response.json({ error: { code: "SERVICE_UNAVAILABLE", message: "private upstream details" } }, { status: 503 });
       return Response.json({ data: { baseUrl: saved.baseUrl, projects: saved.routes.filter(route => !ids || ids.includes(route.project.id)).map(route => ({
-        ...route.project, stateFields: ids && mode === "ready" ? [{ ...route.workflow.stateField, bundleId: "bundle-1", statuses: route.workflow.statuses }] : [],
+        ...route.project, stateFields: ids && mode === "ready" ? (fixture.projects?.find(project => project.id === route.project.id)?.stateFields ?? [{ ...route.workflow.stateField, bundleId: "bundle-1", statuses: route.workflow.statuses }]) : [],
       })) } });
     } });
   function Probe() { model = useYouTrackSettings("w", hooksCopy(false), () => {}, canManage); return null; }
