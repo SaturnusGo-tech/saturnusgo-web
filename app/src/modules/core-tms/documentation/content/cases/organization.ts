@@ -1,5 +1,4 @@
 import { folderWalkthrough } from "../walkthroughs/folders/create";
-import { importFoldersWalkthrough } from "../walkthroughs/folders/lifecycle";
 import { sharedStepsWalkthrough } from "../walkthroughs/shared/steps";
 import { bullets, note, paragraph, section, steps, table, warning, type DocArticle } from "../../model/article";
 export const caseOrganization: DocArticle[] = [
@@ -97,17 +96,18 @@ export const caseOrganization: DocArticle[] = [
   { id: "import-export", title: "Import and export cases", group: "cases", description: "Import JSON, CSV, TSV, XML or Excel files and preserve the original source with the prepared case structure.",
     keywords: ["import", "export", "JSON", "CSV", "TSV", "XML", "XLSX", "XLS", "v2", "folders", "file history", "download", "preview", "empty folder", "transfer", "continue import", "backup"], related: ["codex-capabilities-exchange", "codex-prompts-repository", "organize-cases", "create-test-case", "workspace"],
     sections: [
-      section("walkthrough", "Walkthrough: project and folder", importFoldersWalkthrough),
+      section("walkthrough", "Walkthrough: file to destination", paragraph("Choose a file, wait for preparation, review its case and folder tree, then click **Import** to choose the destination project and folder. Confirm **Import** on that destination step to save the original file, folders and cases.")),
       section("export", "Export a project", steps(
-        ["Select the project", "Open **Settings → Import and export**."],
-        ["Export the data", "Click **Export test cases** at the top right to download JSON containing current case revisions, their paths, and the active folder structure, including empty folders. See Transfer scope below for what is included."],
+        ["Open export", "Open **Settings → Import and export**, then click **Export test cases** at the top right."],
+        ["Choose the project", "In the export dialog, check **Project to export** and select the project whose repository you need. Click **Download JSON** to export current case revisions, their paths and the active folder structure, including empty folders. See Transfer scope below for what is included."],
         ["Check the file", "Verify the case count and project before using the file to transfer data."])),
       section("import", "Import cases", steps(
-        ["Open the import page", "In **Test cases**, click import in the repository header or go through **Settings → Import and export**. A dedicated **Import and export** page opens. Check the selected **Project**."],
-        ["Choose a file", "Click **Choose file** or drag in JSON, CSV, TSV, XML, XLSX or XLS. Use a Falcon export or a supported external test-case structure. The limits are 5 MB and 2,000 recognized cases; exceeding them rejects the file rather than importing a prefix."],
-        ["Choose the destination", "In **Folder**, expand the tree or search by folder name; choose **Project root** for the top level. Opening import from a selected folder prefills that destination; check it before starting."],
-        ["Start the import", "Click **Import**. Falcon parses the complete file, maps supported source content, prepares folders, and creates cases. Deterministic mapping runs first; the server can use OpenAI for unresolved structure when configured. Incomplete or lossy mappings stop preparation before case creation. After completion, check the case count, expand the structure tree, and open a few scenarios."])),
-      section("file-history", "Source file history", paragraph("Below the form is the selected project's **File history**. New imports retain the exact original file bytes; each row shows the filename, size, author, time, and destination. Search with **Find a file**; click **Load more** for earlier records."),
+        ["Open the import page", "In **Test cases**, click import in the repository header or go through **Settings → Import and export**. A dedicated **Import and export** page opens."],
+        ["Choose a file", "Click **Import test cases** to open the file picker, or drop a JSON, CSV, TSV, XML, XLSX or XLS file into the page. Use a Falcon export or a supported external test-case structure. The limits are 5 MB and 2,000 recognized cases; exceeding them rejects the file rather than importing a prefix."],
+        ["Wait and review", "Falcon prepares the complete file while the loader is visible, then shows the case and folder tree. Review the structure before choosing a destination. No source file, folder or case is saved during preparation. Deterministic mapping runs first; the server can use OpenAI for unresolved structure when configured. Incomplete or lossy mappings stop preparation before case creation."],
+        ["Choose the destination", "Click **Import** below the preview. On the next step, choose **Project** and **Folder**; search for a folder or choose **Project root**. Opening import from a folder prefills it for the initial project; changing the destination project resets the folder to its root."],
+        ["Confirm the import", "Check the destination and folder counts, then click **Import** on this step. Falcon saves the original file, prepares destination folders and creates cases. After completion, check the case count, expand the structure tree and open a few scenarios."])),
+      section("file-history", "Source file history", paragraph("Click the clock icon, **File history**, at the top right. In the history view, choose **Project** to see only that project's original import files; use the back arrow to return to import. New imports retain the exact original file bytes; each row shows the filename, size, author, time and destination. Search with **Find a file**; click **Load more** for earlier records."),
         bullets("The file menu offers **Open**, **Download**, and **Copy link**. Open previews supported source content; the original file can be downloaded; links lead into Falcon and still require access permission.",
           "**Delete file** requires case management permission. After confirmation, the source file becomes unavailable, but imported cases, folders, and the history record remain.",
           "Read permission allows viewing history and downloading available files. New imports require case management permission. File history does not prove every case in the file was imported successfully; check the operation's result.")),
@@ -116,13 +116,13 @@ export const caseOrganization: DocArticle[] = [
         ["/Transfers/Between accounts", "Products", "Products → Transfers → Between accounts"],
         ["/", "Products", "The case is placed directly in Products"],
         ["/", "Project root", "The case is placed in No folder"]),
-        note("Existing cases are preserved", "Import adds new records to the current project. It does not match cases by title or overwrite existing scenarios. A folder is reused only when its full path matches.")),
+        note("Existing cases are preserved", "Import adds new records to the destination project you choose. It does not match cases by title or overwrite existing scenarios. A folder is reused only when its full path matches.")),
       section("format", "JSON v2 and empty folders", paragraph("The current export uses `saturnusgo.tms.test-cases.v2`. The document may contain a `folders` array with full paths, such as `/Transfers` and `/Transfers/Limit checks`. This preserves folders without cases. A file with an empty `testCases` array and populated `folders` can transfer just the structure."),
         bullets("Earlier v1 and v2 exports without `folders` are supported: the tree is built from case paths.",
           "Paths start with `/`. Empty segments, `.` and `..`, backslashes, and leading or trailing spaces in folder names are not allowed.",
           "A folder name can contain up to 120 characters; the full resulting path, including the import destination, can contain up to 500. Preview checks up to 2,000 folders, including intermediate ones.")),
       section("partial", "If import stops or completes partially", steps(
-        ["Review the result", "**Cases completed** counts confirmed saves. Expand **Failed to import** to see original keys and error reasons."],
+        ["Review the result", "**Cases ready** counts confirmed saves. Expand **Could not import** to see original keys and error reasons."],
         ["Continue on this page", "Resolve the cause and click **Continue import**. The file and destination remain fixed; confirmed cases are skipped and unfinished steps are retried."],
         ["Check the repository", "After continuing, verify the result and project tree. If you leave or reload the page, first inspect saved folders and cases. Source file history does not restore the import's continuation point."]),
         note("Stopping does not undo saved work", "Import runs sequentially. **Stop** ends further processing, but created folders and cases remain in the project. Leaving the page stops an unfinished import; a request already sent may still finish saving. To start another import, click **Choose another file** once current processing ends.")),

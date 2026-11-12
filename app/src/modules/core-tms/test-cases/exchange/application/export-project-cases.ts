@@ -56,6 +56,9 @@ export async function exportProjectCases(
   for (let offset = 0; offset < ids.length; offset += 6) {
     const page = await Promise.all(ids.slice(offset, offset + 6).map(async (id) => {
       const resource = await http.getResource<Api["TestCase"]>(`/test-cases/${id}`, signal);
+      if (resource.data.id !== id || resource.data.projectId !== project.id) {
+        throw new Error("The export response does not match the selected project. Refresh and retry.");
+      }
       return portable(resource.data);
     }));
     testCases.push(...page);

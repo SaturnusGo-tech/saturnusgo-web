@@ -1,51 +1,33 @@
-import { LoadingOrb } from "../../../../../../../shared/components/loading/LoadingOrb";
-import { FileUp, Folder } from "lucide-react";
+import { Button } from "@heroui/react";
+import { FileUp, FolderInput } from "lucide-react";
 import { useRef, useState } from "react";
-import type { Project } from "../../../../../../../core/tms/contracts/legacy-contract";
-import { AnimatedSelect } from "../../../../../presentation/common/select/AnimatedSelect";
-import { ParentFolderPicker } from "../../../../../presentation/dialogs/folder/parent/ParentFolderPicker";
+import { ErrorToast } from "../../../../../presentation/common/error/ErrorToast";
 import type { useImportCases } from "../../../state/import/use-import-cases";
 import { importCopy } from "../../../localization/import-copy";
 import css from "../page/import-page.module.css";
 
-export function ImportComposer({ state, projects, projectId, onProjectChange, ru }: {
-  state: ReturnType<typeof useImportCases>; projects: readonly Project[]; projectId: string;
-  onProjectChange: (id: string) => void; ru: boolean;
-}) {
+export function ImportComposer({ state, ru }: { state: ReturnType<typeof useImportCases>; ru: boolean }) {
   const input = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const copy = importCopy[ru ? "ru" : "en"];
-  const disabled = state.locked || state.busy || state.phase === "reading" || !state.context;
-  const hasContent = Boolean(state.document?.testCases.length || state.plan?.folders.length);
-  const canStart = Boolean(state.context) && !state.busy && state.phase !== "reading" && state.phase !== "success"
-    && (state.external.active || Boolean(state.plan && hasContent));
-  const showImportAction = state.phase !== "success" && (state.external.active || Boolean(state.plan && hasContent) || state.busy || state.locked);
-  return <div className={css.composer}>
-    <div className={css.upload} data-dragging={dragging || undefined} onDragOver={event => {
-      event.preventDefault(); if (!disabled) setDragging(true);
-    }} onDragLeave={event => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDragging(false); }}
-      onDrop={event => { event.preventDefault(); setDragging(false); if (!disabled) void state.selectFile(event.dataTransfer.files[0]); }}>
-      <FileUp className={css.uploadIcon} size={64} strokeWidth={1.25} aria-hidden="true" />
-      <div className={css.uploadText}><strong title={state.fileName}>{state.fileName || (ru ? "Перетащите файл сюда" : "Drop an import file here")}</strong>
-        <span>{state.fileName ? copy.format : (ru ? "или выберите файл на компьютере" : "or choose a file from your computer")}</span>
-        <input ref={input} className={css.hidden} type="file" accept=".json,.csv,.tsv,.xml,.xlsx,.xls,application/json,text/csv,text/tab-separated-values,application/xml,text/xml,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" aria-label={copy.choose} disabled={disabled}
-          onChange={event => { void state.selectFile(event.target.files?.[0]); event.target.value = ""; }} />
-      </div>
-      <button type="button" className={css.primary} disabled={disabled} onClick={() => input.current?.click()}>{state.fileName ? copy.replace : (ru ? "Выбрать файл" : "Choose file")}</button>
-    </div>
-    <div className={css.destination}>
-      <h2>{ru ? "Место назначения" : "Destination"}</h2>
-      <div className={css.destinationFields}>
-      <div className={css.field}><span>{ru ? "Проект" : "Project"}</span><AnimatedSelect label={ru ? "Проект для импорта" : "Import project"} value={projectId}
-        options={projects.map(project => ({ value: project.id, label: project.name, icon: <Folder size={18} aria-hidden="true" /> }))} disabled={disabled} onChange={onProjectChange} /></div>
-      <fieldset className={css.field} disabled={disabled}><legend className={css.hidden}>{copy.destination}</legend><span aria-hidden="true">{ru ? "Папка" : "Folder"}</span>
-        <ParentFolderPicker value={state.destination} options={[{ value: "/", label: copy.root }, ...(state.context?.folders ?? [])
-          .filter(folder => !folder.archivedAt).map(folder => ({ value: folder.path, label: folder.path }))]}
-          label={copy.destination} searchLabel={copy.search} emptyLabel={copy.noFolder} onChange={state.setDestination} /></fieldset>
-      </div>
-      {showImportAction && <div className={css.importAction}>{state.busy && <button type="button" className={css.link} onClick={state.stop}>{copy.stop}</button>}
-        <button type="button" className={css.primary} disabled={!canStart} onClick={() => void state.start()}>
-          {state.busy && <LoadingOrb />}{state.locked && !state.busy ? copy.retry : copy.start}</button></div>}
-    </div>
-  </div>;
+  const disabled = state.locked || state.busy;
+  return <section className={css.upload} data-dragging={dragging || undefined}
+    onDragOver={event => { event.preventDefault(); if (!disabled) setDragging(true); }}
+    onDragLeave={event => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDragging(false); }}
+    onDrop={event => { event.preventDefault(); setDragging(false); if (!disabled) void state.selectFile(event.dataTransfer.files[0]); }}>
+    <FolderInput className={css.uploadIcon} size={72} strokeWidth={1} aria-hidden="true" />
+    <h2>{ru ? "Начните с файла экспорта" : "Start with an export file"}</h2>
+    <p>{ru ? "Перенесите тест-кейсы и чек-листы вместе со структурой папок."
+      : "Bring your test cases, checklists and folder structure into Falcon."}</p>
+    <input ref={input} className={css.hidden} type="file" hidden tabIndex={-1}
+      accept=".json,.csv,.tsv,.xml,.xlsx,.xls,application/json,text/csv,text/tab-separated-values,application/xml,text/xml,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      aria-label={copy.choose} disabled={disabled} onChange={event => { void state.selectFile(event.target.files?.[0]); event.target.value = ""; }} />
+    <Button className={css.primary} radius="full" isDisabled={disabled} onPress={() => input.current?.click()}
+      startContent={<FileUp size={17} aria-hidden="true" />}>{copy.title}</Button>
+    <span className={css.formats}>{copy.format}</span>
+    <span className={css.dropHint}>{ru ? "Можно просто перетащить файл сюда" : "Or drop a file anywhere here"}</span>
+    {state.external.active && !state.document && state.error && <Button className={css.quiet} variant="light" radius="full" onPress={() => void state.prepareAgain()}>
+      {ru ? "Продолжить подготовку" : "Continue preparation"}</Button>}
+    <ErrorToast message={state.error} />
+  </section>;
 }

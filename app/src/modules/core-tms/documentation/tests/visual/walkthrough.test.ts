@@ -28,13 +28,16 @@ function jpegDimensions(bytes: Buffer) {
   assert.fail("JPEG dimensions missing");
 }
 
-test("practical guide articles retain meaningful, captioned screenshot states", () => {
+test("practical guides retain captioned screenshots and the import wizard has an accurate text walkthrough", () => {
   // The English edition retains full company-access and company-administration text instructions;
   // administrator screenshots are pending authenticated English capture.
   for (const id of ["falcon-ai-writing", "colored-marker", "test-suites", "create-test-case", "edit-test-case", "archive-test-case", "shared-steps", "create-run", "execute-run", "product-docs-authoring",
-    "workspace", "portfolios", "organize-cases", "import-export", "dashboard", "create-defect", "jira", "linear", "trello", "github", "slack", "confluence", "swagger"]) {
+    "workspace", "portfolios", "organize-cases", "dashboard", "create-defect", "jira", "linear", "trello", "github", "slack", "confluence", "swagger"]) {
     assert.ok(flows.some(({ article }) => article.id === id), id);
   }
+  const importFlow = articleById.get("import-export")!.sections.find(section => section.id === "walkthrough")!.blocks;
+  assert.deepEqual(importFlow.map(block => block.kind), ["paragraph"]);
+  if (importFlow[0].kind === "paragraph") assert.match(importFlow[0].text, /Choose a file, wait for preparation.*review.*click \*\*Import\*\*.*destination project and folder.*Confirm \*\*Import\*\*/);
   for (const { article, block } of flows) {
     assert.ok(block.title && block.steps.length >= 1, article.id);
     assert.equal(new Set(block.steps.map((step) => step.image.src)).size, block.steps.length, article.id);

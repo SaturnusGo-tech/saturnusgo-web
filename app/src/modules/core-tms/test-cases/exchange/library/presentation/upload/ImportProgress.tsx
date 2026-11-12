@@ -1,26 +1,24 @@
-import { ErrorToast } from "../../../../../presentation/common/error/ErrorToast";
-import { LoadingOrb } from "../../../../../../../shared/components/loading/LoadingOrb";
-import { CheckCircle2, ChevronRight } from "lucide-react";
+import { Button, Progress } from "@heroui/react";
+import { FalconBrandMark } from "../../../../../../../shared/components/brand/FalconBrandMark";
 import type { useImportCases } from "../../../state/import/use-import-cases";
 import { importCopy } from "../../../localization/import-copy";
-import { ImportPreviewTree } from "../../../presentation/ImportPreviewTree";
 import css from "../page/import-page.module.css";
 
-export function ImportProgress({ state, ru }: { state: ReturnType<typeof useImportCases>; ru: boolean }) {
+export function ImportProgress({ state, ru, visible }: { state: ReturnType<typeof useImportCases>; ru: boolean; visible: boolean }) {
   const copy = importCopy[ru ? "ru" : "en"];
-  const status = state.phase === "saving" ? (ru ? "Сохраняем исходный файл…" : "Saving the original file…")
-    : state.phase === "converting" ? (ru ? "Подготавливаем тест-кейсы…" : "Preparing test cases…")
+  const status = state.phase === "saving" ? (ru ? "Сохраняем исходный файл" : "Saving the original file")
     : state.phase === "folders" ? copy.folderProgress : state.phase === "importing" ? copy.caseProgress
-    : state.phase === "success" ? copy.complete : state.phase === "partial" ? copy.partial : state.phase === "stopped" ? copy.stopped
-    : state.phase === "loading" ? copy.loading : state.phase === "reading" ? copy.reading : "";
-  return <div className={css.progressArea}>
-    {status && <p className={css.message} role="status">{state.phase === "success" ? <CheckCircle2 className={css.success} size={18} /> : (state.busy || state.phase === "loading" || state.phase === "reading") && <LoadingOrb size="md" />}
-      <span>{status}{["importing", "partial", "success", "stopped"].includes(state.phase) && ` · ${state.completed} / ${state.document?.testCases.length ?? 0}`}</span></p>}
-    {state.phase === "importing" && <progress value={state.attempted} max={state.document?.testCases.length || 1} aria-label={copy.processed} />}
-    <ErrorToast message={state.error} />
-    {!state.context && state.error && <button className={css.link} type="button" onClick={state.retryContext}>{copy.retryLoad}</button>}
-    {state.failed.length > 0 && <details><summary><ChevronRight size={15} aria-hidden="true" />{copy.errors}: {state.failed.length}</summary><ul>{state.failed.map((item, index) => <li key={index}>{item.sourceKey}: {item.message}</li>)}</ul></details>}
-    {(state.phase === "partial" || state.phase === "stopped") && <p className={css.hint}>{copy.partialRule}</p>}
-    {state.plan && !state.busy && <details className={css.previewTree}><summary><ChevronRight size={15} aria-hidden="true" />{copy.preview}</summary><ImportPreviewTree plan={state.plan} copy={copy} /></details>}
-  </div>;
+    : ru ? "Подготавливаем ваши кейсы" : "Preparing your test cases";
+  return <section className={css.loading} aria-busy="true" aria-label={status}>
+    <div className={css.loadingContent} data-visible={visible}>
+      <FalconBrandMark className={css.brand} intro />
+      <h2 role="status">{status}</h2>
+      <p>{state.fileName}</p>
+      {state.phase === "importing" && <Progress aria-label={copy.processed} className={css.importProgress}
+        value={state.attempted} maxValue={state.document?.testCases.length || 1} showValueLabel
+        valueLabel={`${state.completed} / ${state.document?.testCases.length ?? 0}`}
+        classNames={{ indicator: css.progressIndicator }} />}
+      {state.busy && <Button size="sm" variant="light" radius="full" className={css.quiet} onPress={state.stop}>{copy.stop}</Button>}
+    </div>
+  </section>;
 }

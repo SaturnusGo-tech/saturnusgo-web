@@ -80,7 +80,7 @@ test("exports all cursor pages and current revision content", async () => {
     },
     getResource: async (path: string) => ({ data: {
       id: path.endsWith("case-1") ? "case-1" : "case-2",
-      key: path.endsWith("case-1") ? "HOST-TC-1" : "HOST-TC-2",
+      key: path.endsWith("case-1") ? "HOST-TC-1" : "HOST-TC-2", projectId: "project-host",
       folderPath: "/Host",
       current: {
         title: "Case", description: "", preconditions: "", type: "automated", lifecycle: "ready",

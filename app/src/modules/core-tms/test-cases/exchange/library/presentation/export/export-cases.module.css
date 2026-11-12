@@ -1,0 +1,41 @@
+.action { display:flex; flex-direction:column; align-items:flex-end; gap:8px; min-width:0; max-width:100%; }
+.triggerButton { display:inline-flex; align-items:center; justify-content:center; gap:8px; border-radius:999px; cursor:pointer; min-height:34px; height:auto; padding:8px 14px; border:1px solid var(--falcon-border); color:var(--falcon-text); background:var(--falcon-control); font:inherit; font-size:13px; white-space:normal; }
+.triggerButton[data-hover="true"] { background:var(--falcon-hover); }
+.status { margin:0; color:var(--falcon-text-muted); font-size:12px; line-height:1.5; overflow-wrap:anywhere; }
+.wrapper { position:fixed; inset:0; z-index:180; display:flex; align-items:center; justify-content:center; padding:16px; overflow:auto; }
+.backdrop { position:fixed; inset:0; z-index:179; background:var(--falcon-scrim); }
+.dialog { position:relative; display:flex; flex-direction:column; max-height:calc(100dvh - 32px); overflow:visible; width:min(460px,calc(100vw - 32px)); margin:0; border:1px solid var(--falcon-border); border-radius:16px; color:var(--falcon-text); background:var(--falcon-elevated); box-shadow:none; font:inherit; }
+.header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding:18px 20px 20px; }
+.header h2 { margin:0; font-size:17px; font-weight:600; line-height:1.4; overflow-wrap:anywhere; }
+.closeButton { display:grid; place-items:center; border:0; border-radius:999px; cursor:pointer; flex:none; width:28px; min-width:28px; height:28px; padding:0; color:var(--falcon-text-muted); background:transparent; }
+.closeButton[data-hover="true"] { color:var(--falcon-text); background:var(--falcon-hover); }
+.body { display:flex; flex-direction:column; min-height:0; overflow:auto; gap:14px; padding:0 20px 18px; }
+.selectBase { display:flex; flex-direction:column; gap:8px; width:100%; min-width:0; }
+.selectTrigger { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; min-width:0; min-height:46px; height:auto; padding:12px; font:inherit; text-align:start; cursor:pointer; border:1px solid var(--falcon-border); border-radius:14px; color:var(--falcon-text); background:var(--falcon-control); box-shadow:none; }
+.selectTrigger[data-hover="true"],.selectTrigger[data-open="true"] { background:var(--falcon-hover); }
+.selectInner { display:flex; flex:1; align-items:center; min-width:0; }
+.selectValue { display:block; flex:1; min-width:0; text-align:start; color:var(--falcon-text); font-size:14px; white-space:normal; overflow-wrap:anywhere; }
+.selectLabel { display:block; position:static!important; transform:none!important; margin:0!important; line-height:1.4; color:var(--falcon-text-secondary); font-size:13px; }
+.selectChevron { position:static!important; flex:none; width:16px; height:16px; margin-inline-start:auto; color:var(--falcon-icon); transition:transform 140ms ease; }
+.selectTrigger[aria-expanded="true"] .selectChevron { transform:rotate(180deg); }
+.popover { position:relative; z-index:182; width:100%; max-height:260px; overflow:auto; padding:5px; color:var(--falcon-text); background:var(--falcon-elevated); border:1px solid var(--falcon-border); border-radius:12px; }
+.options,.optionList { display:grid; gap:2px; margin:0; padding:0; list-style:none; }
+.option { display:flex; align-items:center; gap:8px; min-height:36px; padding:8px; border-radius:8px; color:var(--falcon-text); cursor:pointer; }
+.option:is([data-hover="true"],[data-focus-visible="true"],[aria-selected="true"]) { background:var(--falcon-hover); }
+.selectedIcon { flex:none; width:16px; height:16px; }
+.optionTitle { display:flex; flex:1; min-width:0; align-items:baseline; justify-content:space-between; gap:12px; }
+.optionName { min-width:0; white-space:normal; overflow-wrap:anywhere; }
+.projectKey { flex:none; color:var(--falcon-text-muted); font-size:12px; }
+.scope { margin:0; color:var(--falcon-text-secondary); font-size:14px; line-height:1.6; overflow-wrap:anywhere; }
+.scope strong { color:var(--falcon-text); font-weight:500; }
+.footer { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:8px; padding:0 20px 18px; }
+.cancelButton,.downloadButton { display:inline-flex; align-items:center; justify-content:center; gap:8px; border:0; border-radius:999px; cursor:pointer; min-height:34px; height:auto; padding:8px 14px; font:inherit; font-size:13px; }
+.cancelButton { color:var(--falcon-text-secondary); background:transparent; }
+.cancelButton[data-hover="true"] { background:var(--falcon-hover); }
+.downloadButton { color:var(--falcon-on-action); background:var(--falcon-action); }
+.downloadButton[data-hover="true"] { background:var(--falcon-action-hover); }
+.dialog :is(button):focus-visible,.triggerButton:focus-visible { outline:2px solid var(--falcon-focus); outline-offset:3px; }
+@media(max-width:600px) { .action { align-items:flex-start; } }
+
+.triggerButton:disabled,.cancelButton:disabled,.downloadButton:disabled { opacity:.45; cursor:not-allowed; }
+@media(prefers-reduced-motion:reduce) { .selectChevron { transition:none; } }

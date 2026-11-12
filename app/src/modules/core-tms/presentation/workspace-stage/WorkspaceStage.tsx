@@ -78,9 +78,9 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
   const exchange = model.project && (companyViewAvailable("imports", session?.companyCapabilities) ? <ImportCasesPage key={model.data.workspace.id} project={model.project}
     workspaceId={model.data.workspace.id} canManage={model.data.meta.authorization.capabilities.includes("test_case:manage") && model.data.meta.authorization.capabilities.includes("attachment:manage")}
     exportEnabled={model.connection === "connected"}
-    initialFolderId={model.selectedFolderId} onProjectChange={id => void model.chooseProject(id)}
+    initialFolderId={model.selectedFolderId}
     onBack={() => transitionContent(() => { navigateWorkspace(settingsSectionLink(window.location.href, "general")); model.setView("config"); })}
-    onImported={async () => { model.folders.reload(); await model.loadProject(model.project!.id); }} />
+    onImported={async (projectId) => { model.folders.reload(); await model.loadProject(projectId ?? model.project!.id); }} />
     : <CompanyFeatureUnavailable onReturn={() => navigateWorkspace(settingsSectionLink(window.location.href, "general"))} />);
   if (!companyViewAvailable(model.view === "notifications" ? "config" : model.view, session?.companyCapabilities, codexAvailable)) return <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
   if (model.view === "profile") return session ? <WorkspaceProfile workspaceId={model.data.workspace.id} />

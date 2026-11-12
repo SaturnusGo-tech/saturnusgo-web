@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { docArticles, articleById, docGroups } from "../content/catalog";
+import { articleById as russianArticles } from "../content-ru/catalog";
 import { readingMinutes, searchArticles } from "../model/search";
 import { INTEGRATIONS } from "../../presentation/hooks/catalog/integration-definitions";
 import { providers } from "../../connectors/model/connector-types";
@@ -49,4 +50,19 @@ test("search finds English tasks, service names and body terms without case sens
   assert.ok(searchArticles(docArticles, "signing secret").length > 0);
   assert.deepEqual(searchArticles(docArticles, " \n "), []);
   assert.deepEqual(searchArticles(docArticles, "zzznomatchingarticle"), []);
+});
+
+test("exchange guides describe preparation before destination and explicit project-scoped actions", () => {
+  for (const [catalog, expected] of [[articleById, ["Wait and review", "Choose the destination", "Confirm the import"]],
+    [russianArticles, ["Дождитесь подготовки и проверьте структуру", "Выберите место", "Подтвердите импорт"]]] as const) {
+    const article = catalog.get("import-export")!;
+    const imports = article.sections.find(section => section.id === "import")!.blocks[0];
+    assert.equal(imports.kind, "steps");
+    if (imports.kind === "steps") assert.deepEqual(imports.items.slice(2).map(item => item.title), expected);
+    const exportText = JSON.stringify(article.sections.find(section => section.id === "export"));
+    assert.match(exportText, /Project to export/);
+    assert.match(exportText, /Download JSON/);
+    assert.match(JSON.stringify(article.sections.find(section => section.id === "file-history")), /File history/);
+    assert.ok(article.sections.find(section => section.id === "walkthrough")!.blocks.every(block => block.kind !== "walkthrough"));
+  }
 });
