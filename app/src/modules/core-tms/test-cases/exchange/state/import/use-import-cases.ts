@@ -8,8 +8,10 @@ import { importProjectCases } from "../../application/import-project-cases";
 import { buildImportPlan } from "../../application/preview/build-import-plan";
 import { loadImportContext } from "../../data/context/import-context";
 import { prepareImportFolders } from "../../data/folders/prepare-import-folders";
-import { TEST_CASE_IMPORT_BYTES, type TestCaseExchangeDocument } from "../../model/test-case-exchange";
+import type { TestCaseExchangeDocument } from "../../model/test-case-exchange";
 import { parseTestCaseExchange } from "../../validation/parse-test-case-exchange";
+import { decodeImportFile } from "../../application/source/decode-import-file";
+import { importFailureMessage } from "../../localization/import-error";
 
 type Phase = "loading" | "idle" | "reading" | "ready" | "saving" | "converting" | "folders" | "importing" | "partial" | "success" | "stopped";
 type Context = Awaited<ReturnType<typeof loadImportContext>>;
@@ -73,20 +75,23 @@ export function useImportCases(props: Readonly<{ project: Project; folders?: rea
     setDocument(null); setFileName(file.name); setError(""); setFailed([]); setPhase("reading");
     setCompleted(0); setAttempted(0); successful.current = [];
     try {
-      if (file.size > TEST_CASE_IMPORT_BYTES) throw new Error("JSON ≤ 5 MB");
-      const text = await file.text();
-      const raw: unknown = JSON.parse(text.replace(/^\uFEFF/, ""));
+      const decoded = await decodeImportFile(file);
+      const raw = decoded.source;
       if (!alive.current || generation !== fileGeneration.current) return;
       const schema = typeof raw === "object" && raw !== null && "schemaVersion" in raw ? raw.schemaVersion : null;
+      if (typeof schema === "string" && schema.startsWith("saturnusgo.tms.test-cases.")
+        && schema !== "saturnusgo.tms.test-cases.v1" && schema !== "saturnusgo.tms.test-cases.v2") {
+        throw new Error(props.locale === "ru" ? "Эта версия экспорта Falcon пока не поддерживается." : "This Falcon export version is not supported.");
+      }
       if (schema !== "saturnusgo.tms.test-cases.v1" && schema !== "saturnusgo.tms.test-cases.v2") {
         sourceFile.current = file; external.reset(raw); setPhase("idle"); return;
       }
-      const parsed = parseTestCaseExchange(text);
+      const parsed = parseTestCaseExchange(decoded.nativeText ?? JSON.stringify(raw));
       if (!alive.current || generation !== fileGeneration.current) return;
       sourceFile.current = file; setDocument(parsed); setPhase("ready");
     } catch (failure) {
       if (alive.current && generation === fileGeneration.current) {
-        setError(failure instanceof Error ? failure.message : "Invalid JSON."); setPhase("idle");
+        setError(importFailureMessage(failure, props.locale ?? "ru")); setPhase("idle");
       }
     }
   }
@@ -132,13 +137,7 @@ export function useImportCases(props: Readonly<{ project: Project; folders?: rea
     } catch (failure) {
       if (current()) {
         setPhase(changed || successful.current.length ? (abort.signal.aborted ? "stopped" : "partial") : "ready");
-        const code = typeof failure === "object" && failure && "code" in failure ? String(failure.code) : "";
-        const message = code.startsWith("IMPORT_") ? (props.locale === "ru"
-          ? code === "IMPORT_SOURCE_INVALID" ? "В файле не найдены тест-кейсы. Проверьте содержимое JSON."
-            : code === "IMPORT_LIMIT_EXCEEDED" ? "Файл превышает лимит обработки. Разделите его на несколько файлов."
-            : "Не удалось обработать файл. Повторите импорт; выбранный файл сохранён."
-          : "Could not process this file. Retry the import; your file is retained.")
-          : failure instanceof Error ? failure.message : "Import failed.";
+        const message = importFailureMessage(failure, props.locale ?? "ru");
         setError(abort.signal.aborted ? "" : message);
       }
     } finally {

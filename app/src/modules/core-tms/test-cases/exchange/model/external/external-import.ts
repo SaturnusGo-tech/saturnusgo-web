@@ -9,3 +9,9 @@ export interface ExternalImportPort {
 export interface ExternalImportCheckpoint {
   records: ExternalImportRecord[] | null; processed: number; cases: ExternalImportCase[]; issues: ExternalImportIssue[];
 }
+export class ImportNormalizationError extends Error {
+  constructor(readonly code: "IMPORT_LIMIT_EXCEEDED" | "IMPORT_MAPPING_INVALID") {
+    super(code);
+    this.name = "ImportNormalizationError";
+  }
+}

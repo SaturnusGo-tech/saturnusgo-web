@@ -25,6 +25,27 @@ test("cancellation rejects a late discovery result without updating the checkpoi
 });
 test("a missing source record fails closed before progress is committed", async () => {
   const checkpoint = fresh(); const port: ExternalImportPort = { inspect: async () => records, normalize: async () => ({ cases: [], issues: [] }) };
-  await assert.rejects(normalizeExternalImport(port, {}, checkpoint, [], new AbortController().signal, () => {}), /IMPORT_MAPPING_INVALID/);
+  await assert.rejects(normalizeExternalImport(port, {}, checkpoint, [], new AbortController().signal, () => {}),
+    (error: unknown) => error instanceof Error && "code" in error && error.code === "IMPORT_MAPPING_INVALID");
   assert.equal(checkpoint.processed, 0);
+});
+
+test("honors the exact record byte boundary and exposes a local limit error code", async () => {
+  const empty = { path: "/0", value: "", context: [] };
+  const overhead = new TextEncoder().encode(JSON.stringify(empty)).length;
+  for (const [byteSize, accepted] of [[350_000, true], [350_001, false]] as const) {
+    const checkpoint = fresh(); let submitted = 0;
+    const record = { ...empty, value: "x".repeat(byteSize - overhead) };
+    const port: ExternalImportPort = { inspect: async () => [record], normalize: async batch => {
+      submitted += batch.length;
+      return { cases: [], issues: [{ sourcePath: "/0", code: "IMPORT_MAPPING_INVALID" }] };
+    } };
+    const run = normalizeExternalImport(port, {}, checkpoint, [], new AbortController().signal, () => {});
+    if (accepted) { await run; assert.equal(checkpoint.processed, 1); assert.equal(submitted, 1); }
+    else {
+      await assert.rejects(run, (error: unknown) => error instanceof Error && "code" in error
+        && error.code === "IMPORT_LIMIT_EXCEEDED");
+      assert.equal(checkpoint.processed, 0); assert.equal(submitted, 0);
+    }
+  }
 });

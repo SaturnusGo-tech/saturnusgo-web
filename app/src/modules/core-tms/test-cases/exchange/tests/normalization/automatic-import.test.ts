@@ -9,19 +9,21 @@ import type { Project } from "../../../../../../core/tms/contracts/legacy-contra
 (globalThis as unknown as { React: typeof React }).React = React;
 const project = { id: "p", key: "P", name: "Project" } as Project;
 const content = { title: "Case", description: "", preconditions: "", testData: "", component: "", type: "manual", lifecycle: "draft", priority: "medium", tags: [], estimatedMinutes: null, steps: [{ order: 1, action: "Act", expectedResult: "Result", testData: "", required: true }], checklist: [] };
-async function harness(options: { issue?: boolean; failOnce?: boolean; delayed?: boolean; sourceFails?: boolean; sourceDelayed?: boolean } = {}) {
+async function harness(options: { issue?: boolean; failOnce?: boolean; delayed?: boolean; sourceFails?: boolean; sourceDelayed?: boolean;
+  largeRecord?: boolean; missingMapping?: boolean; locale?: "ru" | "en" } = {}) {
   let state!: ReturnType<typeof useImportCases>; let view!: ReactTestRenderer; let writes = 0; let normalizations = 0; let inspected = 0;
   let release: (() => void) | undefined;
   const http = { get: async () => ({ data: [], meta: { nextCursor: null } }),
     mutate: async (path: string) => {
-      if (path.endsWith("inspect")) { inspected++; return { records: [{ path: "/0", value: {}, context: [] }] }; }
+      if (path.endsWith("inspect")) { inspected++; return { records: [{ path: "/0", value: options.largeRecord ? "x".repeat(350_001) : {}, context: [] }] }; }
       normalizations++;
       if (options.delayed) await new Promise<void>(resolve => { release = resolve; });
       if (options.failOnce && normalizations === 1) throw new Error("Temporary processing failure");
+      if (options.missingMapping) return { cases: [], issues: [] };
       return options.issue ? { cases: [], issues: [{ sourcePath: "/0", code: "IMPORT_MAPPING_INVALID" }] }
         : { cases: [{ sourcePath: "/0", folderPath: "/", content, warnings: [] }], issues: [] };
     }, mutateResource: async () => { writes++; return { data: {}, etag: "1" }; } } as unknown as TmsHttpClient;
-  function Probe() { state = useImportCases({ project, workspaceId: "w", folders: [], locale: "ru", onImported: async () => {}, saveSource: async () => { if (options.sourceDelayed) await new Promise<void>(resolve => { release = resolve; }); if (options.sourceFails) throw new Error("Source upload failed"); } }); return null; }
+  function Probe() { state = useImportCases({ project, workspaceId: "w", folders: [], locale: options.locale ?? "ru", onImported: async () => {}, saveSource: async () => { if (options.sourceDelayed) await new Promise<void>(resolve => { release = resolve; }); if (options.sourceFails) throw new Error("Source upload failed"); } }); return null; }
   await act(async () => { view = create(createElement(TmsHttpClientProvider, { client: http, children: createElement(Probe) }) as unknown as Parameters<typeof create>[0]); });
   await act(async () => { await state.selectFile(new File(['[{"heading":"Case"}]'], "external.json")); });
   return { state: () => state, close: () => act(() => view.unmount()), counts: () => ({ writes, normalizations, inspected }), release: () => release?.() };
@@ -62,4 +64,22 @@ test("cancelling source upload blocks late normalization and case writes", async
   await act(async () => { run = h.state().start(); await Promise.resolve(); });
   await act(async () => { h.state().stop(); h.release(); await run; });
   assert.deepEqual(h.counts(), { writes: 0, normalizations: 0, inspected: 0 }); h.close();
+});
+
+test("local normalization failures display actionable localized errors before persistence", async () => {
+  for (const locale of ["ru", "en"] as const) {
+    for (const largeRecord of [true, false]) {
+      const h = await harness({ locale, largeRecord, missingMapping: !largeRecord });
+      try {
+        await act(async () => { await h.state().start(); });
+        assert.equal(h.counts().writes, 0);
+        assert.equal(h.state().locked, true);
+        assert.notEqual(h.state().phase, "success");
+        assert.doesNotMatch(h.state().error, /IMPORT_/);
+        assert.match(h.state().error, largeRecord
+          ? locale === "ru" ? /Разделите/ : /Split/
+          : locale === "ru" ? /Повторите.*сохранён/ : /Retry.*retained/);
+      } finally { h.close(); }
+    }
+  }
 });

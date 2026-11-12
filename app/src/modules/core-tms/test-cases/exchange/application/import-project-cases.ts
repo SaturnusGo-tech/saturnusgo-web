@@ -34,7 +34,7 @@ function body(projectId: string, item: PortableTestCase): Api["TestCaseCreateReq
     priority: item.priority,
     component: item.component,
     ownerIdentityId: null,
-    tags: marker && !item.tags.includes(marker) ? [...item.tags, marker] : [...item.tags],
+    tags: marker && item.tags.length < 100 && !item.tags.includes(marker) ? [...item.tags, marker] : [...item.tags],
     estimatedMinutes: item.estimatedMinutes,
     testData: item.testData,
     steps: item.steps.map((step) => ({ ...step })),

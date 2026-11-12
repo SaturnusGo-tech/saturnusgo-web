@@ -26,9 +26,9 @@ export function ImportComposer({ state, projects, projectId, onProjectChange, ru
     }} onDragLeave={event => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDragging(false); }}
       onDrop={event => { event.preventDefault(); setDragging(false); if (!disabled) void state.selectFile(event.dataTransfer.files[0]); }}>
       <FileUp className={css.uploadIcon} size={64} strokeWidth={1.25} aria-hidden="true" />
-      <div className={css.uploadText}><strong title={state.fileName}>{state.fileName || (ru ? "Перетащите JSON-файл сюда" : "Drop a JSON file here")}</strong>
+      <div className={css.uploadText}><strong title={state.fileName}>{state.fileName || (ru ? "Перетащите файл сюда" : "Drop an import file here")}</strong>
         <span>{state.fileName ? copy.format : (ru ? "или выберите файл на компьютере" : "or choose a file from your computer")}</span>
-        <input ref={input} className={css.hidden} type="file" accept="application/json,.json" aria-label={copy.choose} disabled={disabled}
+        <input ref={input} className={css.hidden} type="file" accept=".json,.csv,.tsv,.xml,.xlsx,.xls,application/json,text/csv,text/tab-separated-values,application/xml,text/xml,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" aria-label={copy.choose} disabled={disabled}
           onChange={event => { void state.selectFile(event.target.files?.[0]); event.target.value = ""; }} />
       </div>
       <button type="button" className={css.primary} disabled={disabled} onClick={() => input.current?.click()}>{state.fileName ? copy.replace : (ru ? "Выбрать файл" : "Choose file")}</button>

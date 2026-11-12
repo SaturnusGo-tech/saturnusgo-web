@@ -21,14 +21,20 @@ function object(value: unknown, path: string): JsonObject {
   return value as JsonObject;
 }
 
-function text(value: unknown, path: string, maximum: number, required = false): string {
+function text(value: unknown, path: string, maximum: number, required = false, preserveWhitespace = false): string {
   if (value === undefined && !required) return "";
   if (typeof value !== "string") throw new Error(`${path} must be a string.`);
-  const normalized = value.trim();
-  if ((required && !normalized) || normalized.length > maximum) {
+  const normalized = preserveWhitespace ? value : value.trim();
+  if ((required && !value.trim()) || normalized.length > maximum) {
     throw new Error(`${path} has an invalid length.`);
   }
   return normalized;
+}
+
+function array(value: unknown, path: string): unknown[] {
+  if (value === undefined) return [];
+  if (!Array.isArray(value)) throw new Error(`${path} must be an array.`);
+  return value;
 }
 
 function choice<T extends string>(value: unknown, path: string, values: readonly T[]): T {
@@ -54,10 +60,10 @@ function boolean(value: unknown, path: string): boolean {
 function step(value: unknown, index: number): PortableTestStep {
   const item = object(value, `testCases[].steps[${index}]`);
   return {
-    order: integer(item.order ?? index + 1, `steps[${index}].order`, 1, 10_000),
-    action: text(item.action, `steps[${index}].action`, 20_000, true),
-    expectedResult: text(item.expectedResult, `steps[${index}].expectedResult`, 20_000, true),
-    testData: text(item.testData, `steps[${index}].testData`, 20_000),
+    order: integer(item.order === undefined ? index + 1 : item.order, `steps[${index}].order`, 1, 10_000),
+    action: text(item.action, `steps[${index}].action`, 20_000, true, true),
+    expectedResult: text(item.expectedResult, `steps[${index}].expectedResult`, 20_000, true, true),
+    testData: text(item.testData, `steps[${index}].testData`, 20_000, false, true),
     required: boolean(item.required, `steps[${index}].required`),
   };
 }
@@ -65,8 +71,8 @@ function step(value: unknown, index: number): PortableTestStep {
 function checklistItem(value: unknown, index: number): PortableChecklistItem {
   const item = object(value, `testCases[].checklist[${index}]`);
   return {
-    order: integer(item.order ?? index + 1, `checklist[${index}].order`, 1, 10_000),
-    text: text(item.text, `checklist[${index}].text`, 20_000, true),
+    order: integer(item.order === undefined ? index + 1 : item.order, `checklist[${index}].order`, 1, 10_000),
+    text: text(item.text, `checklist[${index}].text`, 20_000, true, true),
     required: boolean(item.required, `checklist[${index}].required`),
   };
 }
@@ -80,18 +86,21 @@ function testCase(
   const types = schemaVersion === LEGACY_TEST_CASE_EXCHANGE_SCHEMA
     ? ["manual", "checklist"] as const
     : ["manual", "checklist", "automated"] as const;
-  const type = choice(item.type ?? "manual", `testCases[${index}].type`, types);
-  const folderPath = item.folderPath ?? "/";
+  const type = choice(item.type === undefined ? "manual" : item.type, `testCases[${index}].type`, types);
+  const folderPath = item.folderPath === undefined ? "/" : item.folderPath;
   if (typeof folderPath !== "string") throw new Error(`testCases[${index}].folderPath must be a string.`);
   validateImportFolderPath(folderPath);
-  const tags = Array.isArray(item.tags)
-    ? item.tags.map((tag, tagIndex) => text(tag, `testCases[${index}].tags[${tagIndex}]`, 64, true))
-    : [];
+  const tags = array(item.tags, `testCases[${index}].tags`)
+    .map((tag, tagIndex) => text(tag, `testCases[${index}].tags[${tagIndex}]`, 64, true));
   if (tags.length > 100 || new Set(tags).size !== tags.length || tags.some((tag) => !TAG.test(tag))) {
     throw new Error(`testCases[${index}].tags are invalid.`);
   }
-  const steps = Array.isArray(item.steps) ? item.steps.map(step) : [];
-  const checklist = Array.isArray(item.checklist) ? item.checklist.map(checklistItem) : [];
+  const steps = array(item.steps, `testCases[${index}].steps`).map(step);
+  const checklist = array(item.checklist, `testCases[${index}].checklist`).map(checklistItem);
+  for (const entries of [steps, checklist]) {
+    const orders = entries.map(entry => entry.order).sort((a, b) => a - b);
+    if (orders.some((order, at) => order !== at + 1)) throw new Error(`testCases[${index}] has invalid procedure order.`);
+  }
   const incompatibleProcedure = type === "checklist" ? steps.length : checklist.length;
   if (steps.length > 500 || checklist.length > 500 || incompatibleProcedure
     || (type === "automated" && steps.length === 0)) {
@@ -102,16 +111,16 @@ function testCase(
     sourceKey: item.sourceKey === undefined ? undefined : text(item.sourceKey, `testCases[${index}].sourceKey`, 128, true),
     folderPath,
     title: text(item.title, `testCases[${index}].title`, 300, true),
-    description: text(item.description, `testCases[${index}].description`, 20_000),
-    preconditions: text(item.preconditions, `testCases[${index}].preconditions`, 20_000),
+    description: text(item.description, `testCases[${index}].description`, 20_000, false, true),
+    preconditions: text(item.preconditions, `testCases[${index}].preconditions`, 20_000, false, true),
     type,
-    lifecycle: choice(item.lifecycle ?? "draft", `testCases[${index}].lifecycle`, ["draft", "ready", "deprecated"]),
+    lifecycle: choice(item.lifecycle === undefined ? "draft" : item.lifecycle, `testCases[${index}].lifecycle`, ["draft", "ready", "deprecated"]),
     priority: item.priority === null ? null
       : choice(item.priority ?? "medium", `testCases[${index}].priority`, ["low", "medium", "high", "critical"] as const),
     component: text(item.component, `testCases[${index}].component`, 500),
     tags,
     estimatedMinutes: estimate === null || estimate === undefined ? null : integer(estimate, `testCases[${index}].estimatedMinutes`, 0, 100_000),
-    testData: text(item.testData, `testCases[${index}].testData`, 20_000),
+    testData: text(item.testData, `testCases[${index}].testData`, 20_000, false, true),
     steps,
     checklist,
   };

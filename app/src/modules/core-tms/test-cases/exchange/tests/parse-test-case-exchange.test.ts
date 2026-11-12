@@ -116,3 +116,37 @@ test("rejects checklist content for automated cases", () => {
   };
   assert.throws(() => parseTestCaseExchange(JSON.stringify(base)), /invalid procedure/);
 });
+
+test("rejects explicitly malformed collection fields in native v1 and v2 exports", () => {
+  for (const schemaVersion of [LEGACY_TEST_CASE_EXCHANGE_SCHEMA, TEST_CASE_EXCHANGE_SCHEMA]) {
+    for (const field of ["tags", "steps", "checklist"]) {
+      for (const value of [null, {}, "Lost procedure", 1, true]) {
+        assert.throws(() => parseTestCaseExchange(source({ schemaVersion,
+          testCases: [{ title: "Case", [field]: value }] })), /must be an array/,
+        `${schemaVersion} ${field}: ${JSON.stringify(value)}`);
+      }
+    }
+    const parsed = parseTestCaseExchange(source({ schemaVersion,
+      testCases: [{ title: "Omitted" }, { title: "Empty", tags: [], steps: [], checklist: [] }] }));
+    for (const item of parsed.testCases) {
+      assert.deepEqual([item.tags, item.steps, item.checklist], [[], [], []]);
+    }
+  }
+});
+
+test("preserves meaningful Markdown whitespace throughout native case content", () => {
+  const markdown = "    indented code\n\nline with break  \n";
+  const parsed = parseTestCaseExchange(source({ testCases: [{ title: "  Case  ",
+    description: markdown, preconditions: markdown, testData: markdown,
+    steps: [{ action: markdown, expectedResult: markdown, testData: markdown }] },
+  { title: "Checklist", type: "checklist", checklist: [{ text: markdown }] }] }));
+  assert.equal(parsed.testCases[0]?.title, "Case");
+  assert.equal(parsed.testCases[0]?.description, markdown);
+  assert.equal(parsed.testCases[0]?.preconditions, markdown);
+  assert.equal(parsed.testCases[0]?.testData, markdown);
+  assert.deepEqual(parsed.testCases[0]?.steps[0], { order: 1, action: markdown,
+    expectedResult: markdown, testData: markdown, required: true });
+  assert.equal(parsed.testCases[1]?.checklist[0]?.text, markdown);
+  assert.throws(() => parseTestCaseExchange(source({ testCases: [{ title: "Case",
+    steps: [{ action: " \n ", expectedResult: "Result" }] }] })), /invalid length/);
+});

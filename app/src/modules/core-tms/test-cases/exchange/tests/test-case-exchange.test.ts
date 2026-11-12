@@ -50,6 +50,27 @@ test("imports with a stable key and preserves the external source marker", async
   assert.equal(body.changeNote, "Imported from HOST-ENTRY-001");
 });
 
+test("source markers respect the tag limit without removing any original tags", async () => {
+  const requests: { tags: string[]; changeNote: string }[] = [];
+  const http = { mutateResource: async (_path: string, _method: string,
+    body: { tags: string[]; changeNote: string }) => {
+    requests.push(body); return { data: {}, etag: null };
+  } } as unknown as TmsHttpClient;
+  const original = Array.from({ length: 100 }, (_, index) => `tag-${index}`);
+  for (const tags of [original.slice(0, 99), original,
+    [...original.slice(0, 99), "source-host-entry-001"]]) {
+    const source = document();
+    const result = await importProjectCases(http, "project-host", { ...source,
+      testCases: [{ ...source.testCases[0]!, tags }] });
+    assert.equal(result.completed, 1);
+  }
+  assert.deepEqual(requests[0]?.tags, [...original.slice(0, 99), "source-host-entry-001"]);
+  assert.deepEqual(requests[1]?.tags, original);
+  assert.deepEqual(requests[2]?.tags, [...original.slice(0, 99), "source-host-entry-001"]);
+  assert.ok(requests.every(request => request.tags.length === 100));
+  assert.ok(requests.every(request => request.changeNote === "Imported from HOST-ENTRY-001"));
+});
+
 test("exports all cursor pages and current revision content", async () => {
   let page = 0;
   const http = {

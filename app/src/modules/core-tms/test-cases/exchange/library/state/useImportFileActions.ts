@@ -37,7 +37,7 @@ export function useImportFileActions(scope: ImportScope, ru: boolean, canManage:
   }
   const open = (file: ImportFile) => perform(async signal => {
     setPreview({ file, text: "" });
-    const text = await readImportFile(client, file.id, signal);
+    const text = await readImportFile(client, file.id, signal, file.fileName);
     if (!signal.aborted) setPreview({ file, text });
   });
   useEffect(() => {
@@ -46,7 +46,7 @@ export function useImportFileActions(scope: ImportScope, ru: boolean, canManage:
       const file = await importFileApi.get(http, scope, id, signal);
       if (!file.available) { setNotice(ru ? "Исходный файл удалён или недоступен." : "The original file is deleted or unavailable."); return; }
       setPreview({ file, text: "" });
-      const text = await readImportFile(client, file.id, signal);
+      const text = await readImportFile(client, file.id, signal, file.fileName);
       if (!signal.aborted) setPreview({ file, text });
     });
     return () => controller.current?.abort();

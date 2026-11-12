@@ -12,6 +12,6 @@ export function ImportFileDialogs({ actions, ru }: { actions: ReturnType<typeof 
   if (!actions.preview) return null;
   return <Modal title={actions.preview.file.fileName} onClose={actions.closePreview} panelClassName={css.previewDialog}>
     <div className={css.dialogBody}>{actions.pending ? <p role="status">{ru ? "Открываем файл…" : "Opening file…"}</p> : actions.error ? <ErrorToast message={actions.error} />
-      : <pre className={css.jsonPreview} tabIndex={0} aria-label={ru ? "Содержимое JSON" : "JSON contents"}>{actions.preview.text}</pre>}</div>
+      : <pre className={css.jsonPreview} tabIndex={0} aria-label={ru ? "Содержимое файла" : "File contents"}>{actions.preview.text}</pre>}</div>
   </Modal>;
 }

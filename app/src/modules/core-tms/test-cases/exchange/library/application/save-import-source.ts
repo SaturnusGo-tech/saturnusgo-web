@@ -17,9 +17,14 @@ export function createImportSourceSaver(http: TmsHttpClient, client: PrivateAtta
     }
     if (attempt.saved) return;
     if (!attempt.id) {
+      const extension = file.name.toLowerCase().split(".").pop();
+      const mimeType = extension === "json" ? "application/json" as const
+        : ["csv", "tsv", "xml"].includes(extension ?? "") ? "text/plain" as const
+        : extension === "xls" || extension === "xlsx" ? "application/octet-stream" as const : null;
+      if (!mimeType) throw new Error("Unsupported import file format.");
       const metadata = await client.upload({ projectId: scope.projectId,
-        owner: { kind: "project", projectId: scope.projectId }, kind: "file", mimeType: "application/json",
-        file: new File([file], file.name, { type: "application/json", lastModified: file.lastModified }),
+        owner: { kind: "project", projectId: scope.projectId }, kind: "file", mimeType,
+        file: new File([file], file.name, { type: mimeType, lastModified: file.lastModified }),
         operationKey: attempt.key, signal });
       attempt.id = metadata.id;
     }

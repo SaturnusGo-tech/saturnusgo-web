@@ -4523,7 +4523,7 @@ export interface paths {
         get: operations["getImportFile"];
         put?: never;
         /**
-         * Retain an immutable import source receipt. PUT is idempotent by attachment ID; changing its folder/author returns CONFLICT. Requires a finalized JSON project attachment uploaded by this principal (max 5 MiB) and test_case:manage. Existing attachment download/deletion APIs apply.
+         * Retain an immutable JSON, CSV, TSV, XML, XLS or XLSX import source receipt (maximum 5,000,000 bytes). PUT is idempotent by attachment ID; changing its folder/author returns CONFLICT. Requires a finalized project attachment with a supported filename/media pair, uploaded by this principal, and test_case:manage. Existing attachment download/deletion APIs apply.
          * @description Registers one immutable source-file receipt. The finalized attachment ID is the durable idempotency identity. Repeating the same author and destination returns the original receipt; a different author or destination conflicts. Does not create or modify test cases.
          */
         post: operations["saveImportFile"];
@@ -11204,7 +11204,8 @@ export interface components {
              */
             type: "manual" | "checklist" | "automated";
             lifecycle?: components["schemas"]["TestCaseLifecycle"];
-            priority?: components["schemas"]["Priority"];
+            /** @description Preserves an explicitly unassigned source priority. */
+            priority?: components["schemas"]["Priority"] | null;
             component?: components["schemas"]["ShortText"];
             ownerIdentityId?: components["schemas"]["Identifier"] | null;
             tags?: string[];

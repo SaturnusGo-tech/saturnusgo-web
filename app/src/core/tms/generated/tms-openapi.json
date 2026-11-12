@@ -18340,7 +18340,7 @@
       },
       "post": {
         "operationId": "saveImportFile",
-        "summary": "Retain an immutable import source receipt. PUT is idempotent by attachment ID; changing its folder/author returns CONFLICT. Requires a finalized JSON project attachment uploaded by this principal (max 5 MiB) and test_case:manage. Existing attachment download/deletion APIs apply.",
+        "summary": "Retain an immutable JSON, CSV, TSV, XML, XLS or XLSX import source receipt (maximum 5,000,000 bytes). PUT is idempotent by attachment ID; changing its folder/author returns CONFLICT. Requires a finalized project attachment with a supported filename/media pair, uploaded by this principal, and test_case:manage. Existing attachment download/deletion APIs apply.",
         "tags": [
           "Attachments"
         ],
@@ -51502,7 +51502,11 @@
             "$ref": "#/components/schemas/TestCaseLifecycle"
           },
           "priority": {
-            "$ref": "#/components/schemas/Priority"
+            "oneOf": [
+              { "$ref": "#/components/schemas/Priority" },
+              { "type": "null" }
+            ],
+            "description": "Preserves an explicitly unassigned source priority."
           },
           "component": {
             "$ref": "#/components/schemas/ShortText"

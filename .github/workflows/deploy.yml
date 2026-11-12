@@ -60,6 +60,9 @@ jobs:
       - name: Test TMS Auth0 boundary
         run: npm run test:tms-auth
 
+      - name: Test test-case import integrity
+        run: npm run test:tms-import
+
       - name: Test TMS contract adapters
         run: npm run test:tms-adapters
 
