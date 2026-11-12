@@ -50,3 +50,19 @@ test("smart links classify authorized-looking Falcon routes and leave unrelated 
   }
   assert.equal(readProductDocSmartTarget("#overview", work + "&docId=doc_1", scope), null);
 });
+
+test("repository references keep a real folder selector and project without leaving the company", () => {
+  assert.deepEqual(readProductDocSmartTarget("/work/?workspaceId=w&projectId=other&view=cases&folderId=folder_42", work, scope),
+    {kind: "repository", projectId: "other", folderId: "folder_42"});
+  assert.deepEqual(readProductDocSmartTarget("/work/?workspaceId=w&projectId=p&view=cases&folderPath=Orders%2FMatching%20lifecycle", work, scope),
+    {kind: "repository", projectId: "p", folderPath: "Orders/Matching lifecycle"});
+  assert.deepEqual(readProductDocSmartTarget("/work/?workspaceId=w&projectId=other&caseId=case_1", work, scope),
+    {kind: "case", id: "case_1", projectId: "other"});
+  for (const href of ["/work/?workspaceId=other&projectId=p&view=cases&folderId=folder_42",
+    "/api/v1/?workspaceId=w&projectId=p&view=cases&folderId=folder_42",
+    "/work/?workspaceId=w&projectId=p&view=cases&folderId=bad%2Fid",
+    "/work/?workspaceId=w&projectId=p&view=cases&folderId=one&folderId=two",
+    "/work/?workspaceId=w&projectId=p&view=cases&folderPath=Orders%2F..%2Fprivate"]) {
+    assert.equal(readProductDocSmartTarget(href, work, scope), null);
+  }
+});

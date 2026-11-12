@@ -13,6 +13,9 @@ import { ProductDocCasePanel } from "../presentation/panel/case/ProductDocCasePa
 import { ProductDocsContext } from "./context/ProductDocsContext";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { ProductDocDraftBuffer } from "../state/draft/draft-buffer";
+import type { ProductDocRepositoryTarget } from "../navigation/product-doc-smart-link";
+import { ProductDocRepositoryPanel } from "../presentation/panel/repository/ProductDocRepositoryPanel";
+import { CaseReferenceProvider } from "../../case-references/presentation/CaseReferenceProvider";
 
 function subscribe(listener: () => void) {
   window.addEventListener(HISTORY_CHANGE, listener);
@@ -51,7 +54,8 @@ export function ProductDocsWorkspace({api, scope, children, visible, enabled, pr
   }, [enabled]);
   const href = useSyncExternalStore(subscribe, () => window.location.href, () => "");
   const [panel, setPanel] = useState<{scope: ProductDocScope; href: string; selection: ProductDocSelection; trigger: HTMLElement}>();
-  const [casePanel, setCasePanel] = useState<{href: string; id: string; trigger?: HTMLElement}>();
+  const [casePanel, setCasePanel] = useState<{href: string; id: string; scope: ProductDocScope; trigger?: HTMLElement}>();
+  const [repositoryPanel, setRepositoryPanel] = useState<{href: string; target: ProductDocRepositoryTarget; trigger: HTMLElement}>();
   const [runPanel, setRunPanel] = useState<{href: string; selection: ProductDocRunSelection}>();
   const selectedRun = runPanel?.href === href ? runPanel.selection : undefined;
   const selectedCase = casePanel?.href === href ? casePanel : undefined;
@@ -65,28 +69,46 @@ export function ProductDocsWorkspace({api, scope, children, visible, enabled, pr
     if (visible) navigateWorkspace(next);
     else visitWorkspace(next);
   }
-  function openCase(caseId: string, trigger?: HTMLElement, selection?: ProductDocSelection) {
+  function openCase(caseId: string, trigger?: HTMLElement, selection?: ProductDocSelection, projectId = scope.projectId) {
     setRunPanel(undefined);
-    setCasePanel({href: selection ? documentHref(selection) : href, id: caseId, trigger});
+    setRepositoryPanel(undefined);
+    setCasePanel({href: selection ? documentHref(selection) : href, id: caseId, scope: projectId === scope.projectId ? scope : {...scope, projectId}, trigger});
     if (selection) select(selection);
   }
   function openDocument(selection: ProductDocSelection, trigger: HTMLElement) {
     setCasePanel(undefined);
     setRunPanel(undefined);
+    setRepositoryPanel(undefined);
     setPanel({scope, href, selection, trigger});
   }
+  function openRepository(target: ProductDocRepositoryTarget, trigger: HTMLElement) {
+    setCasePanel(undefined);
+    setRunPanel(undefined);
+    setRepositoryPanel({href, target, trigger});
+  }
   function openRun(selection: ProductDocRunSelection) { setRunPanel({href, selection}); }
-  const context = api && enabled ? {api, scope, openCase, openDocument, openRun, open: openDocument} : null;
+  const context = api && enabled ? {api, scope, openCase: (id: string, trigger: HTMLElement, projectId?: string) => openCase(id, trigger, undefined, projectId),
+    openRepository, openDocument, openRun, open: openDocument} : null;
+  const referenceProjects = workspace.data.projects.map(project => project.id);
   return <ProductDocsContext.Provider value={context}>
+    <CaseReferenceProvider scope={scope} records={workspace.data.testCases} projectIds={referenceProjects}>
     {visible ? (context ? <ProductDocsView api={context.api} scope={scope} locale={locale} projectName={projectName} drafts={drafts.current}
       selection={href ? readProductDocSelection(href) : undefined} onSelect={select} onCreateCase={onCreateCase}
       onOpenCase={({caseId}, selection) => openCase(caseId, document.activeElement instanceof HTMLElement ? document.activeElement : undefined, selection)} /> : fallback) : children}
     {context && <ProductDocsPanel api={context.api} scope={scope} locale={locale} projectName={projectName} selection={currentPanel?.selection} trigger={currentPanel?.trigger}
       contentRef={contentRef} onClose={() => setPanel(undefined)}
       onOpenFull={(selection: ProductDocSelection) => { setPanel(undefined); select(selection); }} />}
-    {context && <ProductDocCasePanel caseId={selectedCase?.id} trigger={selectedCase?.trigger} scope={scope}
-      contentRef={contentRef} projectName={projectName} activity={activity} onClose={() => setCasePanel(undefined)} onOpenDefect={onOpenDefect} />}
+    {context && <ProductDocRepositoryPanel target={repositoryPanel?.href === href ? repositoryPanel.target : undefined} scope={scope}
+      trigger={repositoryPanel?.trigger} onClose={() => setRepositoryPanel(undefined)}
+      onCase={(id, trigger, projectId) => openCase(id, trigger, undefined, projectId)} />}
+    {context && <CaseReferenceProvider scope={selectedCase?.scope ?? scope} records={workspace.data.testCases} projectIds={referenceProjects}>
+      <ProductDocCasePanel caseId={selectedCase?.id} trigger={selectedCase?.trigger} scope={selectedCase?.scope ?? scope}
+        contentRef={contentRef} projectName={selectedCase?.scope.projectId === scope.projectId ? projectName
+          : workspace.data.projects.find(project => project.id === selectedCase?.scope.projectId)?.name}
+        activity={activity} onClose={() => setCasePanel(undefined)} onOpenDefect={selectedCase?.scope.projectId === scope.projectId ? onOpenDefect : undefined} />
+    </CaseReferenceProvider>}
     {context && <ProductDocRunInspector selection={selectedRun} workspace={workspace} contentRef={contentRef}
       onClose={() => setRunPanel(undefined)} />}
+    </CaseReferenceProvider>
   </ProductDocsContext.Provider>;
 }

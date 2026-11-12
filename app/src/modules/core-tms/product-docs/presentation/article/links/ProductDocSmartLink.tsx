@@ -7,6 +7,7 @@ import { useProductDocLinkPreview } from "../../../state/links/useProductDocLink
 import { ProductDocLinkHoverCard } from "./preview/ProductDocLinkHoverCard";
 import { productDocLinkIcon, productDocLinkSummary } from "./preview/ProductDocLinkPreviewContent";
 import styles from "./smart-link.module.css";
+import { ProductDocRepositoryBreadcrumbs } from "./repository/ProductDocRepositoryBreadcrumbs";
 
 export function ProductDocSmartLink({ href, title, children }: { href?: string; title?: string; children?: ReactNode }) {
   const { locale } = useTmsLocale();
@@ -17,12 +18,13 @@ export function ProductDocSmartLink({ href, title, children }: { href?: string; 
   const authoredText = typeof children === "string" ? children : undefined;
   const summary = productDocLinkSummary(href, locale, target, preview, authoredText);
   const external = target?.kind === "external";
-  const label = target?.kind === "case" || target?.kind === "document" ? preview?.title || summary.label || summary.title
+  const label = target?.kind === "repository" && preview?.path?.length ? <ProductDocRepositoryBreadcrumbs path={preview.path} />
+    : target?.kind === "case" || target?.kind === "document" ? preview?.title || summary.label || summary.title
     : authoredText ? summary.label || summary.title : children || summary.title;
   const Icon = productDocLinkIcon(target?.kind, preview?.status);
   return <>
-    <a className={styles.link} href={href} target={external ? "_blank" : undefined}
-      rel={external ? "noopener noreferrer" : undefined} aria-describedby={hover.anchor ? previewId : undefined}
+    <a className={styles.link} data-link-kind={target?.kind} href={href} target={external ? "_blank" : undefined}
+      rel={external ? "noopener noreferrer" : undefined} aria-controls={hover.anchor ? previewId : undefined} aria-haspopup="dialog"
       onPointerEnter={event => { if (event.pointerType !== "touch") hover.show(event.currentTarget); }}
       onPointerLeave={event => hover.hide(event.currentTarget)}
       onFocus={event => { if (event.currentTarget.matches(":focus-visible")) hover.show(event.currentTarget, 0); }}
@@ -35,6 +37,6 @@ export function ProductDocSmartLink({ href, title, children }: { href?: string; 
     </a>
     {hover.anchor && <ProductDocLinkHoverCard anchor={hover.anchor} trigger={hover.trigger} id={previewId} href={href} authoredText={authoredText} hint={title}
       target={target} preview={preview} previewPending={previewPending} workspaceId={workspace?.scope.workspaceId}
-      onPointerEnter={hover.retain} onPointerLeave={() => hover.hide()} onClose={hover.close} />}
+      onPointerEnter={hover.retain} onPointerLeave={() => hover.hide()} onClose={hover.close} onFollow={follow} />}
   </>;
 }

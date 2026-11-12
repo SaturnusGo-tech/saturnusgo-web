@@ -4,6 +4,7 @@ import { FolderOpen, SidebarMenuMobile } from "@openai/apps-sdk-ui/components/Ic
 import { Button } from "@heroui/button";
 import { PiUploadSimple } from "react-icons/pi";
 import type { Ref } from "react";
+import { DesktopResourceAction } from "../../desktop-links/presentation/DesktopResourceAction";
 import { companyViewAvailable } from "../../auth/managed/domain/features/company-features";
 import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
@@ -70,17 +71,18 @@ export function WorkspaceHeader({
         </div>
       </div>}
 
-      {showImport && <div className={shellStyles.headerActions}>
-        <Button type="button" size="sm" radius="full" variant="solid" className={shellStyles.importShortcut}
+      <div className={shellStyles.headerActions}>
+        <DesktopResourceAction />
+        {showImport && <Button type="button" size="sm" radius="full" variant="solid" className={shellStyles.importShortcut}
           data-testid="open-case-import" onPress={() => model.setView("imports")}
           isDisabled={!workspaceReady || !model.folders.canManage || model.folders.busy || model.dialog === "case"
             || !model.data.meta.authorization.capabilities.includes("attachment:manage")}
           aria-label={ru ? "Импорт тест-кейсов" : "Import test cases"}>
           <PiUploadSimple size={15} aria-hidden="true" />{ru ? "Импорт" : "Import"}
-        </Button>
-      </div>}
+        </Button>}
       {model.view === "dashboard" && dashboardActionsRef && <div ref={dashboardActionsRef}
         className={shellStyles.headerActions} data-workspace-dashboard-actions />}
+      </div>
     </header>
   );
 }

@@ -43,7 +43,7 @@ test("retains Mermaid for syntax with semantics the interactive view cannot expr
   assert.equal(createFlowchartModel({ ...input, groups: [{ ...input.groups[0], dir: "TB" }] }, "flowchart LR"), undefined);
 });
 
-test("keeps connected cards evenly sized and reserves extra height for unusually long text", async () => {
+test("sizes cards to their own content without stretching short decisions to the longest card", async () => {
   const graph = createFlowchartModel({
     ...input,
     groups: [],
@@ -59,19 +59,40 @@ test("keeps connected cards evenly sized and reserves extra height for unusually
   const { nodes, edges } = await layoutFlowchart(graph);
   const [first, second, third, long] = nodes;
   assert.equal(first.width, long.width);
-  assert.equal(first.height, second.height);
   assert.equal(first.height, third.height);
+  assert.ok(first.height < second.height);
   assert.ok(long.height > first.height);
   assert.equal(edges[0].tone, "teal");
   assert.ok(edges.every(edge => edge.route?.path.startsWith("M ")));
 });
 
-test("smooths routed connections without changing their attachment points", () => {
+test("rounds the ELK corridor without replacing its obstacle-avoiding route with a crossing curve", () => {
   const edge = { id: "edge", sources: ["a"], targets: ["b"], sections: [{
     id: "section", startPoint: { x: 24, y: 10 }, endPoint: { x: 102, y: 52 },
     bendPoints: [{ x: 48, y: 10 }, { x: 48, y: 52 }],
   }] };
-  assert.equal(flowchartEdgeRoute(edge, { x: 6, y: 2 })?.path, "M 30,12 C 54,12 54,54 108,54");
+  const route = flowchartEdgeRoute(edge, { x: 6, y: 2 });
+  assert.equal(route?.path, "M 30,12 L 42,12 Q 54,12 54,24 L 54,36 Q 54,54 72,54 L 108,54");
+  assert.deepEqual(route?.start, { x: 30, y: 12 });
+  assert.deepEqual(route?.end, { x: 108, y: 54 });
+});
+
+test("removes repeated and collinear route points so straight connectors do not develop tiny kinks", () => {
+  const edge = { id: "edge", sources: ["a"], targets: ["b"], sections: [{
+    id: "section", startPoint: { x: 20, y: 10 }, endPoint: { x: 20, y: 100 },
+    bendPoints: [{ x: 20, y: 10 }, { x: 20, y: 50 }, { x: 20, y: 50 }],
+  }] };
+  assert.equal(flowchartEdgeRoute(edge, { x: 0, y: 0 })?.path, "M 20,10 L 20,100");
+});
+
+test("reserves the rendered height for wrapping edge labels", async () => {
+  const graph = createFlowchartModel({ ...input, groups: [], edges: [{
+    start: "check", end: "open", text: "Ответ не получен до финального дедлайна поиска исполнителя", type: "arrow_point",
+  }] }, "flowchart TB\n%% falcon-preset procedure");
+  assert.ok(graph);
+  const { edges } = await layoutFlowchart(graph);
+  assert.ok(edges[0].route?.labelWidth);
+  assert.ok((edges[0].route?.labelHeight ?? 0) > 22);
 });
 
 test("uses an explicit presentation preset while keeping existing Mermaid direction otherwise", () => {

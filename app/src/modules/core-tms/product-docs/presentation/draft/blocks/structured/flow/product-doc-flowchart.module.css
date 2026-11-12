@@ -89,6 +89,7 @@
 }
 .canvas .edge { stroke: var(--flow-accent); stroke-width: 2; stroke-dasharray: 2 5; stroke-linecap: round; }
 .edgeLabel {
+  box-sizing: border-box;
   position: absolute;
   max-inline-size: 160px;
   padding: 2px 7px;

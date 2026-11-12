@@ -35,6 +35,8 @@ import { highlightPlugin } from "./highlight/editor/highlightPlugin";
 import typography from "./typography/markdownTypography.module.css";
 import markerCss from "./highlight/highlight.module.css";
 import { productDocDescriptionPaste } from "../../../../product-docs/requirements/description/editor/productDocDescriptionPaste";
+import { caseReferencesPlugin } from "../../../../case-references/editor/CaseReferenceEditor";
+import { useCaseReferenceNavigation } from "../../../../case-references/state/useCaseReferenceNavigation";
 
 import { MarkdownEmojiFooter, MarkdownEmojiFooterContext } from "./emoji/MarkdownEmojiFooter";
 
@@ -62,6 +64,7 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
   const onReady = useContext(MarkdownReadyContext);
   const editorRef = useRef<MDXEditorMethods>(null);
   const overlayAnchor = useRef<HTMLDivElement>(null);
+  const followLink = useCaseReferenceNavigation(props.validateUrl, overlayAnchor);
   const [overlayContainer, setOverlayContainer] = useState<HTMLElement | null>(null);
   const [editorPainted, setEditorPainted] = useState(false);
   const initialMarkdown = stripRawHtml(props.markdown);
@@ -76,12 +79,10 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
     thematicBreakPlugin(),
     highlightPlugin(),
     linkPlugin({ validateUrl: props.validateUrl }),
+    caseReferencesPlugin({ preview: true }),
     ...(props.productDocLinks ? [productDocDescriptionPaste()] : []),
     linkDialogPlugin({
-      onClickLinkCallback: (url) => {
-        if (!props.validateUrl(url)) return;
-        window.open(url, "_blank", "noopener,noreferrer");
-      },
+      onClickLinkCallback: followLink,
     }),
     ...(props.suppressEmailLinkPreview ? [suppressEmailLinkPreviewPlugin()] : []),
     markdownShortcutPlugin(),
@@ -89,7 +90,7 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
       toolbarContents: () => <MarkdownToolbar locale={props.locale} />,
     }),
     contextContentPlugin(),
-  ], [props.locale, props.onAttachmentFiles, props.productDocLinks, props.suppressEmailLinkPreview, props.validateUrl]);
+  ], [followLink, props.locale, props.onAttachmentFiles, props.productDocLinks, props.suppressEmailLinkPreview, props.validateUrl]);
 
   useEffect(() => {
     const safe = stripRawHtml(props.markdown);

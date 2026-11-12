@@ -49,16 +49,18 @@ test("current product scenes have valid localized captures", () => {
   }
 });
 
-test("landing shows the complete canonical integration catalog with accessible motion controls", () => {
+test("landing shows the complete integration catalog with reduced-motion support", () => {
   const marquee = readFileSync(resolve(root, "app/src/modules/core-falcon-public/direction/DirectionMarquee.tsx"), "utf8");
   assert.deepEqual(INTEGRATIONS.map(({ name }) => name).sort(), [
     "Codex", "Confluence", "GitHub", "GitLab", "Jenkins", "Jira", "Linear", "Slack", "Swagger", "TeamCity", "Trello", "YouTrack",
   ]);
   assert.match(marquee, /import\s*\{\s*INTEGRATIONS\s*\}\s*from[^;]*integration-definitions/);
-  assert.match(marquee, /const rows = \[INTEGRATIONS\]/);
-  assert.match(marquee, /aria-hidden=\{duplicate \|\| undefined\}/);
-  assert.match(marquee, /aria-pressed=\{paused\}/);
-  assert.match(marquee, /aria-label=\{paused \? resume : pause\}/);
+  assert.match(marquee, /role="img" aria-label=\{name\}/);
+  assert.doesNotMatch(marquee, /aria-pressed|aria-label=\{paused|<button\b/);
+  const motion = readFileSync(resolve(root, "app/src/modules/core-falcon-public/direction/integrations-constellation.module.css"), "utf8");
+  assert.match(motion, /prefers-reduced-motion:reduce/);
+  assert.match(motion, /animation:none/);
+  assert.match(motion, /data-visible="false"[^}]*animation-play-state:paused/);
   assert.doesNotMatch(marquee, /Скоро/);
   const youTrackMark = resolve(root, "public/falcon/integrations/youtrack.svg");
   assert.equal(existsSync(youTrackMark), true);
@@ -73,28 +75,22 @@ test("company entry uses one rounded input surface with neutral outer focus", ()
   assert.match(styles, /prefers-reduced-motion/);
 });
 
-test("landing marquee retains canonical names, YouTrack artwork and working pause controls", async () => {
-  const { componentHarness, invoke, nodes } = await import("../../../../portfolios/tests/support/component-harness");
+test("landing constellation exposes each canonical brand once without playback buttons", async () => {
+  const { componentHarness, nodes } = await import("../../../../portfolios/tests/support/component-harness");
   const document = { hidden: false, addEventListener() {}, removeEventListener() {} };
   const h = componentHarness(undefined, { document });
-  const { DirectionMarquee } = h.load<{ DirectionMarquee: (props: { title: string; note: string; pause: string; resume: string }) => unknown }>(new URL("../../../../../core-falcon-public/direction/DirectionMarquee.tsx", import.meta.url), name => {
+  const { DirectionMarquee } = h.load<{ DirectionMarquee: (props: { title: string; note: string }) => unknown }>(new URL("../../../../../core-falcon-public/direction/DirectionMarquee.tsx", import.meta.url), name => {
     if (name.endsWith("integration-definitions")) return { INTEGRATIONS };
   });
-  const render = () => h.render(() => DirectionMarquee({ title: "Connected tools", note: "Integration catalog", pause: "Pause", resume: "Resume" }));
+  const render = () => h.render(() => DirectionMarquee({ title: "Connected tools", note: "Integration catalog" }));
   const tree = render();
   const items = nodes(tree).filter(node => node.type === "li");
-  assert.equal(items.length, INTEGRATIONS.length * 2);
-  for (const { name } of INTEGRATIONS) assert.ok(items.some(node => (node.props.children as unknown[]).includes(name)), name);
-  const codex = items.find(node => (node.props.children as unknown[]).includes("Codex"))!;
-  const youtrack = items.find(node => (node.props.children as unknown[]).includes("YouTrack"))!;
-  assert.equal(nodes(codex).some(node => node.props.src === "/falcon/integrations/youtrack.svg"), false);
+  assert.equal(items.length, INTEGRATIONS.length);
+  const marks = nodes(tree).filter(node => node.props.role === "img");
+  assert.deepEqual(marks.map(node => node.props["aria-label"]).sort(), INTEGRATIONS.map(item => item.name).sort());
+  const codex = items.find(node => node.props["data-brand"] === "codex")!;
+  const youtrack = items.find(node => node.props["data-brand"] === "youtrack")!;
+  assert.ok(nodes(codex).some(node => node.props.src === "/assets/integrations/codex/codex-light.png"));
   assert.ok(nodes(youtrack).some(node => node.props.src === "/falcon/integrations/youtrack.svg"));
-  const pause = nodes(tree).find(node => node.type === "button" && node.props["aria-label"] === "Pause")!;
-  assert.equal(pause.props["aria-pressed"], false);
-  invoke(pause, "onClick");
-  const paused = nodes(render()).find(node => node.type === "button")!;
-  assert.equal(paused.props["aria-label"], "Resume");
-  assert.equal(paused.props["aria-pressed"], true);
-  invoke(paused, "onClick");
-  assert.equal(nodes(render()).find(node => node.type === "button")!.props["aria-pressed"], false);
+  assert.equal(nodes(tree).some(node => node.type === "button"), false);
 });

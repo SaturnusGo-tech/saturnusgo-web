@@ -7,6 +7,7 @@ import { writeClipboardText } from "../../../../../../../shared/lib/clipboard";
 import { useProductDocLinkPreview } from "../../../../state/links/useProductDocLinkPreview";
 import { ProductDocLinkPreviewContent } from "../../../article/links/preview/ProductDocLinkPreviewContent";
 import styles from "../link-dialog.module.css";
+import { productDocLinkAction } from "../../../../navigation/links/product-doc-link-action";
 
 export function ProductDocSelectedLinkPreview({ href, url, ru, onEdit, onRemove }: {
   href?: string; url: string; ru: boolean; onEdit(): void; onRemove(): void;
@@ -22,7 +23,7 @@ export function ProductDocSelectedLinkPreview({ href, url, ru, onEdit, onRemove 
       workspaceId={workspace?.scope.workspaceId} />
     <div className={styles.preview}>
       <a href={href} target={external ? "_blank" : undefined} rel={external ? "noopener noreferrer" : undefined} onClick={follow}>
-        <ExternalLink size={13} aria-hidden="true" /><span>{ru ? "Открыть" : "Open link"}</span>
+        <ExternalLink size={13} aria-hidden="true" /><span>{productDocLinkAction(target?.kind, ru)}</span>
       </a>
       <Button type="button" isIconOnly disableRipple onPointerDown={(event) => event.preventDefault()} onPress={onEdit}
         aria-label={ru ? "Редактировать ссылку" : "Edit link"} title={ru ? "Редактировать ссылку" : "Edit link"}>

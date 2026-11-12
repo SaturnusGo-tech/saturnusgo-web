@@ -41,6 +41,7 @@ import { productDocCallout } from "./blocks/callout/productDocCallout";
 import calloutStyles from "./blocks/callout/product-doc-callout.module.css";
 import markerStyles from "../../../presentation/cases/inspector/markdown/highlight/highlight.module.css";
 import styles from "./editor.module.css";
+import { caseReferencesPlugin } from "../../../case-references/editor/CaseReferenceEditor";
 
 const Title = createContext<ReactNode>(null);
 function PageTitle() { return useContext(Title); }
@@ -85,6 +86,7 @@ export default function RichProductSection({
   }), []);
   const plugins = useMemo(() => [
     observeImport(),
+    caseReferencesPlugin(),
     headingsPlugin({ allowedHeadingLevels: [1, 2, 3, 4] }),
     listsPlugin(),
     productDocChecklistPlugin(),

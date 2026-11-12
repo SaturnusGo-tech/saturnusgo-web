@@ -1,0 +1,13 @@
+.wrapper, .backdrop { position: fixed; inset: max(var(--falcon-native-toolbar, 0px), var(--falcon-desktop-caption, 0px)) 0 0; }
+.wrapper { z-index: 172; display: flex; justify-content: flex-end; }
+.backdrop { z-index: 171; background: var(--falcon-scrim); }
+.drawer { display: flex; flex-direction: column; min-inline-size: 0; margin: 0; overflow: hidden; background: var(--falcon-surface); color: var(--falcon-text); }
+.wrapper .drawer { inline-size: min(100vw, 560px); width: min(100vw, 560px); max-inline-size: 100vw; max-width: 100vw; block-size: 100%; border-radius: 0; }
+.header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 20px; border-block-end: 1px solid var(--falcon-border-subtle); }
+.header > div { min-inline-size: 0; }
+.project { display: block; color: var(--falcon-text-secondary); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.header h2 { margin: 5px 0 0; font-size: 16px; font-weight: 600; line-height: 1.4; overflow-wrap: anywhere; }
+.drawer .repository { inline-size: 100%; flex: 1; min-block-size: 0; max-block-size: none; border: 0; padding: 14px 12px; background: var(--falcon-surface); }
+.state { display: flex; align-items: center; justify-content: center; gap: 12px; flex: 1; min-block-size: 180px; padding: 32px; color: var(--falcon-text-secondary); font-size: 13px; line-height: 1.7; }
+.state svg { flex: none; }
+.state p { max-inline-size: 360px; margin: 0; text-wrap: pretty; }

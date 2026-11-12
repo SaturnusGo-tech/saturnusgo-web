@@ -1,19 +1,21 @@
 "use client";
 
-import { BookOpen, CircleCheck, CircleDashed, CircleMinus, ExternalLink, Link2, ListChecks } from "lucide-react";
+import { BookOpen, CircleCheck, CircleDashed, CircleMinus, ExternalLink, FolderOpen, Link2, ListChecks } from "lucide-react";
 import type { TmsLocale } from "../../../../../localization/model/locale";
 import { localizedLabel } from "../../../../../localization/format/labels";
 import { ResponsibleName } from "../../../../../workspace/members/presentation/ResponsibleName";
-import type { ProductDocLinkPreview } from "../../../../domain/product-docs";
+import type { ProductDocSmartPreview } from "../../../../domain/links/product-doc-smart-preview";
 import type { ProductDocSmartTarget } from "../../../../navigation/product-doc-smart-link";
 import styles from "../smart-link.module.css";
+import { ProductDocRepositoryBreadcrumbs } from "../repository/ProductDocRepositoryBreadcrumbs";
 
 export function productDocLinkSummary(href: string, locale: TmsLocale, target: ProductDocSmartTarget | null,
-  preview: ProductDocLinkPreview | null | undefined, authoredText: string | undefined) {
+  preview: ProductDocSmartPreview | null | undefined, authoredText: string | undefined) {
   const ru = locale === "ru";
   const domain = target?.kind === "external" ? new URL(target.url).hostname : undefined;
   const kindLabel = target?.kind === "case" ? (ru ? "Тест-кейс" : "Test case")
-    : target?.kind === "document" ? (ru ? "Документация" : "Documentation") : (ru ? "Ссылка" : "Link");
+    : target?.kind === "document" ? (ru ? "Документация" : "Documentation")
+      : target?.kind === "repository" ? (ru ? "Репозиторий" : "Repository") : (ru ? "Ссылка" : "Link");
   const label = authoredText?.trim() === href ? undefined : authoredText?.trim();
   const title = preview?.title || label || domain || kindLabel;
   const status = preview?.status === "published" ? (ru ? "Опубликовано" : "Published")
@@ -26,7 +28,7 @@ export function productDocLinkIcon(kind: ProductDocSmartTarget["kind"] | undefin
   if (status === "ready" || status === "published") return CircleCheck;
   if (status === "draft") return CircleDashed;
   if (status === "archived" || status === "deprecated") return CircleMinus;
-  return kind === "case" ? ListChecks : kind === "document" ? BookOpen : kind === "external" ? ExternalLink : Link2;
+  return kind === "case" ? ListChecks : kind === "document" ? BookOpen : kind === "repository" ? FolderOpen : kind === "external" ? ExternalLink : Link2;
 }
 
 function LinkPriorityIcon({ priority }: { priority: string | undefined }) {
@@ -41,7 +43,7 @@ export function ProductDocLinkPreviewContent({ href, locale, target, preview, au
   href: string;
   locale: TmsLocale;
   target: ProductDocSmartTarget | null;
-  preview: ProductDocLinkPreview | null | undefined;
+  preview: ProductDocSmartPreview | null | undefined;
   authoredText?: string;
   hint?: string;
   workspaceId?: string;
@@ -51,7 +53,8 @@ export function ProductDocLinkPreviewContent({ href, locale, target, preview, au
   const description = preview?.description || (hint !== title ? hint : undefined);
   return <div className={styles.previewContent}>
     <div className={styles.previewMeta}>
-      <span className={styles.source} title={source}>{preview?.key || source}</span>
+      <span className={styles.source} title={source}>{preview?.key || (preview?.path?.length
+        ? <ProductDocRepositoryBreadcrumbs path={preview.path} /> : source)}</span>
       {preview?.ownerIdentityId && workspaceId && <span className={styles.owner}>
         <ResponsibleName workspaceId={workspaceId} identityId={preview.ownerIdentityId} />
       </span>}

@@ -22,7 +22,7 @@ export function ProductDocEditorLinkHover({ blocked }: { blocked: boolean }) {
   const [editor, popup] = useCellValues(rootEditor$, editorRootElementRef$);
   const { anchor, trigger, close, hide, show, retain } = useProductDocLinkHover();
   const href = blocked ? undefined : anchor?.getAttribute("href") ?? undefined;
-  const { target, preview, previewPending, workspace } = useProductDocLinkPreview(href);
+  const { target, preview, previewPending, workspace, follow } = useProductDocLinkPreview(href);
   const id = useId();
 
   useEffect(() => {
@@ -101,5 +101,5 @@ export function ProductDocEditorLinkHover({ blocked }: { blocked: boolean }) {
   return anchor && href ? <ProductDocLinkHoverCard key={href} anchor={anchor} trigger={trigger} id={id} href={href} authoredText={anchor.textContent ?? undefined}
     hint={anchor.getAttribute("title") ?? undefined}
     target={target} preview={preview} previewPending={previewPending} workspaceId={workspace?.scope.workspaceId} portalContainer={popup?.current ?? undefined}
-    onPointerEnter={retain} onPointerLeave={() => hide()} onClose={close} /> : null;
+    onPointerEnter={retain} onPointerLeave={() => hide()} onClose={close} onFollow={follow} /> : null;
 }

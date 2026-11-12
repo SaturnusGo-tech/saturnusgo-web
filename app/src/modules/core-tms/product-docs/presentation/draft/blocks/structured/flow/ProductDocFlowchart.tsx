@@ -9,6 +9,7 @@ import { Maximize, Minus, Plus } from "lucide-react";
 import { useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { FlowchartEdgeRoute } from "./layout/flowchart-edge-route";
 import type { FlowchartLayout } from "./layout/flowchart-layout";
+import { flowchartInitialViewport } from "./viewport/flowchart-viewport";
 import { flowNodeTypes, type FlowNode } from "./nodes/FlowchartNodes";
 import type { FlowPreset, FlowTone } from "./model/flowchart-style";
 import "@xyflow/react/dist/style.css";
@@ -59,7 +60,7 @@ function FlowConnection(props: EdgeProps<FlowEdge>) {
     </g>}
     {label && <EdgeLabelRenderer>
       <span className={styles.edgeLabel} data-tone={tone}
-        style={{ transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)` }}>{label}</span>
+        style={{ width: data?.route?.labelWidth, transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)` }}>{label}</span>
     </EdgeLabelRenderer>}
   </>;
 }
@@ -87,19 +88,6 @@ function FlowchartControls({ zoom, ru }: { zoom: number; ru: boolean }) {
   </Panel>;
 }
 
-function initialViewport(layout: FlowchartLayout, width: number, height: number, expanded?: boolean): Viewport {
-  const margin = 20;
-  const fit = Math.min(1, (width - margin * 2) / layout.bounds.width, (height - margin * 2) / layout.bounds.height);
-  const zoom = Math.max(expanded ? minZoom : 0.8, fit);
-  const x = (width - layout.bounds.width * zoom) / 2;
-  const y = (height - layout.bounds.height * zoom) / 2;
-  return {
-    x: x > margin ? x : layout.direction === "LEFT" ? 2 * x - margin : margin,
-    y: y > margin ? y : layout.direction === "UP" ? 2 * y - margin : margin,
-    zoom,
-  };
-}
-
 export default function ProductDocFlowchart({ layout, expanded, ru }: {
   layout: FlowchartLayout; expanded?: boolean; ru: boolean;
 }) {
@@ -124,7 +112,7 @@ export default function ProductDocFlowchart({ layout, expanded, ru }: {
     if (!element) return;
     const initialize = () => {
       if (!element.clientWidth || !element.clientHeight) return;
-      const initial = initialViewport(layout, element.clientWidth, element.clientHeight, expanded);
+      const initial = flowchartInitialViewport(layout.bounds, element.clientWidth, element.clientHeight);
       setViewport(current => current ?? initial);
       observer.disconnect();
     };

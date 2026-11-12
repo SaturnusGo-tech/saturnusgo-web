@@ -20,7 +20,9 @@ import { ProductDocRunEvidence } from "../../run/card/ProductDocRunEvidence";
 import { markProductDocRun, readRunEmbedPlacement, runDirectiveName } from "../../run/markdown/runDirective";
 import { ProductDocAttachment } from "../../attachments/ProductDocAttachment";
 import { markProductDocAttachment, productDocAttachmentName, readProductDocAttachment } from "../../../domain/attachments/productDocAttachment";
-import { ProductDocSmartLink } from "../links/ProductDocSmartLink";
+import { CaseReferenceLink } from "../../../../case-references/presentation/CaseReferenceLink";
+import { remarkCaseReferences } from "../../../../case-references/markdown/remarkCaseReferences";
+import { ProductDocRepositoryPath } from "../links/repository/ProductDocRepositoryPath";
 import tableStyles from "./article-table.module.css";
 import { ProductDocRadioReader } from "../../draft/blocks/radio/ProductDocRadio";
 import { productDocRadioName, readRadioOptions } from "../../draft/blocks/radio/radioOptions";
@@ -122,7 +124,9 @@ const markdownComponents: Components = {
       ? <ProductDocCallout tone={tone}>{children}</ProductDocCallout>
       : <blockquote>{children}</blockquote>;
   },
-  a: ProductDocSmartLink,
+  a: CaseReferenceLink,
+  code: ({className, children}) => className ? <code className={className}>{children}</code>
+    : <ProductDocRepositoryPath>{children}</ProductDocRepositoryPath>,
   input: MarkdownTask,
   table: ({ children }) => <div className={tableStyles.scroll}><table>{children}</table></div>,
   hr: () => <hr className={blockStyles.divider} />,
@@ -155,7 +159,7 @@ function MarkdownTask({ type, checked }: { type?: string; checked?: boolean }) {
 export const ProductDocMarkdown = memo(function ProductDocMarkdown({ markdown, copy }: { markdown: string; copy: ProductDocsCopy }) {
   return <MarkdownCopy.Provider value={copy}>
     <div className={`${layoutStyles.articleLayouts} ${markerStyles.surface} ${calloutStyles.prose}`}><ReactMarkdown skipHtml
-      remarkPlugins={[remarkGfm, remarkDirective, [remarkHighlights, { preserveOtherDirectives: true }], renderDocumentBlocks]}
+      remarkPlugins={[remarkGfm, remarkDirective, [remarkHighlights, { preserveOtherDirectives: true }], remarkCaseReferences, renderDocumentBlocks]}
       components={markdownComponents}>{markdown}</ReactMarkdown></div>
   </MarkdownCopy.Provider>;
 });

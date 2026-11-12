@@ -59,17 +59,22 @@ function nodeSizes({ nodes, preset }: FlowchartModel) {
   });
   const detailSpace = preset === "procedure" ? 11 : 4;
   const textHeight = (title: number, detail: number) => 18 * title + (detail ? detailSpace + 16 * detail : 0);
-  const standardHeight = Math.max(54, ...labels.map(({ title, detail }) => textHeight(Math.min(3, title), Math.min(2, detail))));
   const insets = preset === "pipeline" ? 22 : 26;
   return new Map(labels.map(({ id, title, detail, metricHeight }) => [id, {
     width,
-    height: insets + Math.max(preset === "pipeline" ? 35 : standardHeight, textHeight(title, detail))
-      + (metricHeight ? 16 + metricHeight : 0),
+    height: Math.max(54, insets + textHeight(title, detail) + (metricHeight ? 16 + metricHeight : 0)),
   }]));
 }
 
 export async function layoutFlowchart(model: FlowchartModel): Promise<FlowchartLayout> {
   const sizes = nodeSizes(model);
+  const canvas = typeof document === "undefined" ? null : document.createElement("canvas").getContext("2d");
+  function edgeLabel(text: string) {
+    if (canvas) canvas.font = "650 11px system-ui";
+    const width = Math.min(160, Math.max(32, Math.ceil(canvas?.measureText(text).width ?? Array.from(text).length * 7.04) + 16));
+    const height = lineCount(text, "650 11px system-ui", 11, width - 16, canvas) * 16 + 6;
+    return { text, width, height };
+  }
   const ids = new Map([...model.groups, ...model.nodes].map((node, index) => [node.id, `node-${index}`]));
   const byParent = new Map<string | undefined, Array<Node | Group>>();
   for (const node of [...model.groups, ...model.nodes]) {
@@ -94,7 +99,7 @@ export async function layoutFlowchart(model: FlowchartModel): Promise<FlowchartL
     id: edge.id,
     sources: [ids.get(edge.from)!],
     targets: [ids.get(edge.to)!],
-    labels: edge.label ? [{ text: edge.label, width: Math.min(160, 17 + edge.label.length * 7), height: 22 }] : [],
+    labels: edge.label ? [edgeLabel(edge.label)] : [],
   }));
   const graph = await elk.layout<ElkNode>({
     id: "root",

@@ -17,6 +17,8 @@ import { highlightRemarkPlugins } from "./highlight/render/remarkHighlights";
 import typography from "./typography/markdownTypography.module.css";
 import markerCss from "./highlight/highlight.module.css";
 import { ProductDocDescriptionLink } from "../../../../product-docs/requirements/description/ProductDocDescriptionLink";
+import { CaseReferenceLink } from "../../../../case-references/presentation/CaseReferenceLink";
+import { remarkCaseReferences } from "../../../../case-references/markdown/remarkCaseReferences";
 
 type Props = {
   value: string;
@@ -51,7 +53,10 @@ type LoadingEditorState = {
 };
 
 const LoadingEditorContext = createContext<LoadingEditorState | null>(null);
-const caseDocumentationComponents = {a: ProductDocDescriptionLink};
+const caseRemarkPlugins = [...highlightRemarkPlugins, remarkCaseReferences];
+const caseDocumentationComponents = {a: (props: Parameters<typeof CaseReferenceLink>[0]) => <CaseReferenceLink {...props}
+  fallback={<ProductDocDescriptionLink {...props} />} />};
+const caseReferenceComponents = {a: CaseReferenceLink};
 
 function loadMarkdownEditor() {
   return import("./InitializedMarkdownEditor");
@@ -116,8 +121,8 @@ function MarkdownFieldContent(props: Props) {
       props.onRequestEdit?.();
     } : undefined}>
     {!props.value.trim() ? <p className={css.empty}>{props.emptyLabel}</p> : <MDEditor.Markdown
-      className={`${css.rendered} ${markerCss.surface} ${typography.prose}`} source={props.value} skipHtml remarkPlugins={highlightRemarkPlugins}
-      components={productDocLinks ? caseDocumentationComponents : undefined}
+      className={`${css.rendered} ${markerCss.surface} ${typography.prose}`} source={props.value} skipHtml remarkPlugins={caseRemarkPlugins}
+      components={productDocLinks ? caseDocumentationComponents : caseReferenceComponents}
       urlTransform={(url) => isSafeUrl(url) ? url : ""}
       wrapperElement={{ "data-color-mode": colorMode }} />}
     {attachments && <MarkdownPendingAttachments locale={locale} entries={pending} onRemove={attachments.remove} />}
