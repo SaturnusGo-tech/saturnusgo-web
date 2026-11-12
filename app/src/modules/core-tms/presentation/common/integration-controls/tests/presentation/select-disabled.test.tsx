@@ -50,6 +50,29 @@ test("single selection cannot toggle off its current item but an explicit empty 
   } finally { await act(async () => view?.unmount()); }
 });
 
+test("multi-selection delegates Escape to overlay dismissal and retains selections while explicit clearing stays available", async () => {
+  const values = ["test", "acceptance", "staging"], changes: string[][] = [];
+  const options = ["backlog", "develop", "review", ...values, "done"].map(value => ({ value, label: value }));
+  let view!: ReactTestRenderer;
+  try {
+    await act(async () => { view = create(<IntegrationMultiSelect aria-label="Ready for testing" values={values}
+      options={options} onValuesChange={next => changes.push(next)}/>); });
+    const control = () => view.root.findByProps({ "data-test-select": true });
+    await act(async () => control().props.onOpenChange(true));
+    assert.equal(control().props.listboxProps.escapeKeyBehavior, "none",
+      "React Aria otherwise clears selection and stops Escape before the overlay can dismiss");
+    const selected = values.map(value => `value:${value}`);
+    await act(async () => control().props.onOpenChange(false));
+    assert.equal(control().props.isOpen, false);
+    assert.deepEqual(control().props.selectedKeys, selected);
+    assert.deepEqual(changes, []);
+    await act(async () => control().props.onOpenChange(true));
+    assert.deepEqual(control().props.selectedKeys, selected);
+    await act(async () => control().props.onSelectionChange(new Set()));
+    assert.deepEqual(changes, [[]], "intentional deselection must remain supported");
+  } finally { await act(async () => view?.unmount()); }
+});
+
 test("visible labels are not duplicated by aria-label; unlabelled controls retain their accessible name", async () => {
   let view!: ReactTestRenderer;
   try {

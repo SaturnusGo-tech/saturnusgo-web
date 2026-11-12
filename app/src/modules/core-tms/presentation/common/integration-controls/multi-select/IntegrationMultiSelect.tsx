@@ -21,7 +21,7 @@ export function IntegrationMultiSelect({ values, options, onValuesChange, isDisa
     selectedKeys={model.selectedKeys} onSelectionChange={keys => onValuesChange(model.valuesFor(keys))}
     className={className} classNames={{ base: css.field, label: css.label, mainWrapper: css.main, trigger: css.selectTrigger,
       innerWrapper: css.inner, value: css.selectValue, description: css.description, errorMessage: css.error, selectorIcon: css.selectorIcon }}
-    popoverProps={{ classNames: { content: css.menu } }} listboxProps={{ "aria-label": accessibleLabel, classNames: { base: css.listbox }, itemClasses: {
+    popoverProps={{ classNames: { content: css.menu } }} listboxProps={{ "aria-label": accessibleLabel, escapeKeyBehavior: "none", classNames: { base: css.listbox }, itemClasses: {
       base: css.option, title: css.optionTitle, description: css.description, selectedIcon: css.selectedIcon,
     } }}>
     {model.options.map(option => <SelectItem key={option.key} textValue={option.label} description={option.description}>{option.label}</SelectItem>)}
