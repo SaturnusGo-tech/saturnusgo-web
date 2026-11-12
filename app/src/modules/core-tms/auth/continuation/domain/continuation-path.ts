@@ -1,7 +1,7 @@
 import { canonicalWorkspacePathname, LEGACY_WORKSPACE_PATH, WORKSPACE_PATH } from "../../../navigation/workspace-route";
 import { readPlanRequestIntent } from "../../../billing/requests/domain/plan-request";
 const workspace = WORKSPACE_PATH;
-const pages = new Set([workspace, LEGACY_WORKSPACE_PATH, "/admin/", "/profile/"]);
+const pages = new Set([workspace, LEGACY_WORKSPACE_PATH, "/admin/", "/profile/", "/work/notification-preferences/"]);
 const identifiers = new Set(["workspaceId", "projectId", "catalogProjectId", "portfolioId", "folderId", "caseId", "runId", "runItemId", "suiteId", "stepId", "attachmentId", "falconMcpInteraction"]);
 const routes = new Set(["view", "settings", "page", "tab", "article"]);
 type PlanIntent = NonNullable<ReturnType<typeof readPlanRequestIntent>>;

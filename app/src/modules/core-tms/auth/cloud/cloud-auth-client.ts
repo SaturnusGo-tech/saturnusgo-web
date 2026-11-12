@@ -98,6 +98,12 @@ export function cloudWorkspacePathFromLocation(
   session: CloudSession,
 ): string {
   const search = new URLSearchParams(location.search);
+  if (location.pathname === "/work/notification-preferences/") {
+    const ids = search.getAll("workspaceId");
+    return ids.length === 1 && ids[0] === session.workspace.id
+      ? `/work/notification-preferences/?${new URLSearchParams({ workspaceId: session.workspace.id })}`
+      : cloudWorkspacePath(session);
+  }
   if (!search.has("workspaceId")) search.set("workspaceId", session.workspace.id);
   if (!search.has("projectId")) search.set("projectId", session.defaultProject.id);
   return `${canonicalWorkspacePathname(location.pathname)}?${search.toString()}${location.hash}`;

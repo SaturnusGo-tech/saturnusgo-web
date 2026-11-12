@@ -13,7 +13,7 @@ test("notification settings load and preference updates never read or mutate the
   const settings = { version: 4, locale: "en", categories: ["runs"], browsers: [], telegram: null } as unknown as NotificationSettings;
   const client = { settings: async () => { calls.push("settings"); return settings; },
     inbox: async () => { throw new Error("Settings must not own the inbox query"); }, read: async () => { throw new Error("Settings must not mark inbox items"); },
-    preferences: async (_categories: unknown, locale: string, version: number) => { calls.push(locale); versions.push(version); } } as unknown as NotificationClient;
+    preferences: async (value: { locale: string }, version: number) => { calls.push(value.locale); versions.push(version); } } as unknown as NotificationClient;
   const browser = { permission: () => "unsupported", fingerprint: async () => null } as BrowserNotificationPort;
   let state!: ReturnType<typeof useNotifications>, tree!: ReactTestRenderer;
   function Hook() { state = useNotifications(client, "en", browser); return null; }

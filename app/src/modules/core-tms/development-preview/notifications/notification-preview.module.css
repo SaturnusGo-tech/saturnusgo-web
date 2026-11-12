@@ -1,0 +1,4 @@
+.preview { height: 100dvh; display: flex; flex-direction: column; background: var(--falcon-surface); color: var(--falcon-text); }
+.tools { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 10px 20px; border-bottom: 1px solid var(--falcon-border); font: 12px/1.5 system-ui, sans-serif; }
+.tools span { margin-right: auto; color: var(--falcon-text-muted); }
+.tools button { padding: 5px 10px; border: 1px solid var(--falcon-border); border-radius: 999px; background: transparent; color: inherit; }

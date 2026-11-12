@@ -59,8 +59,8 @@ test("an outdated Windows build offers a direct, versioned installer after hydra
 test("clicking an existing update rechecks latest and skips an intermediate installer", async () => {
   let checks = 0;
   const userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) FalconDesktop/0.2.9";
-  const next = { ...release, version: "0.2.12", baseUrl: "https://saturnusgo.com/falcon/desktop/beta/0.2.12/",
-    artifacts: release.artifacts.map(artifact => ({ ...artifact, file: artifact.file.replace(release.version, "0.2.12") })) } as DesktopRelease;
+  const next = { ...release, version: "0.2.13", baseUrl: "https://saturnusgo.com/falcon/desktop/beta/0.2.13/",
+    artifacts: release.artifacts.map(artifact => ({ ...artifact, file: artifact.file.replace(release.version, "0.2.13") })) } as DesktopRelease;
   const h = setup(userAgent, "en", async () => {
     const current = checks++ ? next : release as DesktopRelease;
     const update = await getDesktopUpdate({ userAgent }, current);
@@ -71,7 +71,7 @@ test("clicking an existing update rechecks latest and skips an intermediate inst
   (action.props.onClick as (event: unknown) => void)({ preventDefault() {} });
   await new Promise(setImmediate);
   assert.equal(checks, 2);
-  assert.deepEqual(h.opened, [`${next.baseUrl}Falcon-0.2.12-win-x64-beta-setup.exe`]); h.dispose();
+  assert.deepEqual(h.opened, [`${next.baseUrl}Falcon-0.2.13-win-x64-beta-setup.exe`]); h.dispose();
 });
 
 test("the control stays absent in web and on current desktop builds", async () => {

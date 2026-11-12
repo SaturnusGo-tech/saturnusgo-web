@@ -40,6 +40,6 @@ test("embedded notifications contain channel controls and preferences, without a
   const { NotificationPage: render } = h.load<{ NotificationPage: typeof NotificationPage }>(new URL("../../presentation/NotificationPage.tsx", import.meta.url));
   const all = nodes(h.render(() => render({ embedded: true, ru: false, model: { loading: false, settings: { categories: ["runs"] } } as never })));
   assert.ok(all.some(node => node.type === "NotificationChannels"));
-  assert.ok(all.some(node => node.props.children === "Event preferences"));
+  assert.ok(all.some(node => node.type === "EventPreferences"));
   assert.equal(all.some(node => node.type === "h1" || node.props.children === "Recent activity"), false);
 });

@@ -29,8 +29,8 @@ test("a failed click-time latest check never opens a stale installer and can ret
 });
 
 test("an unknown-CPU Mac chooser uses the fetched release and files together rather than the bundled version", async t => {
-  const current = parseDesktopRelease({ ...release, version: "0.2.12", baseUrl: "https://saturnusgo.com/falcon/desktop/beta/0.2.12/",
-    artifacts: release.artifacts.map(build => ({ ...build, file: build.file.replace(release.version, "0.2.12") })) });
+  const current = parseDesktopRelease({ ...release, version: "0.2.13", baseUrl: "https://saturnusgo.com/falcon/desktop/beta/0.2.13/",
+    artifacts: release.artifacts.map(build => ({ ...build, file: build.file.replace(release.version, "0.2.13") })) });
   const macFiles = current.artifacts.filter(build => build.platform === "mac").map(build => build.file);
   const h = componentHarness(undefined, { navigator: { userAgent: "Macintosh FalconDesktop/0.2.9" } }); t.after(h.dispose);
   const { DesktopUpdateControl: View } = h.load<{ DesktopUpdateControl: () => unknown }>(
@@ -39,5 +39,5 @@ test("an unknown-CPU Mac chooser uses the fetched release and files together rat
         : name.endsWith("/update") ? { loadDesktopUpdate: async () => ({ version: current.version, installer: null, macFiles, release: current }) } : undefined);
   const render = () => nodes(h.render(View)); render(); await new Promise(setImmediate);
   const chooser = render().find(node => node.type === "DesktopDownloadsPanel")!;
-  assert.equal((chooser.props.release as typeof current).version, "0.2.12"); assert.deepEqual(chooser.props.installerFiles, macFiles);
+  assert.equal((chooser.props.release as typeof current).version, "0.2.13"); assert.deepEqual(chooser.props.installerFiles, macFiles);
 });

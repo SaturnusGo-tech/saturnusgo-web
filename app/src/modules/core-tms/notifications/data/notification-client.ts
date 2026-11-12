@@ -7,11 +7,11 @@ export function notificationClient(http: TmsHttpClient, workspaceId: string): No
   return {
     settings: async (signal) =>
       (await http.get<Schemas["NotificationSettingsResponse"]>(path("/settings"), signal)).data,
-    preferences: async (categories, locale, version, signal) => {
+    preferences: async (preferences, version, signal) => {
       await http.mutateResource(
         path("/settings"),
         "PATCH",
-        { categories, locale },
+        preferences,
         { ifMatch: `"notification-v${version}"`, signal },
       );
     },

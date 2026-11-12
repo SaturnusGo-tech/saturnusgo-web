@@ -3495,7 +3495,7 @@ export interface paths {
         options?: never;
         head?: never;
         /**
-         * Choose notification categories and language
+         * Choose notification categories, excluded events and language
          * @description Per-member state replacement or single current challenge. Unique database keys make repeated destination registration and read marking converge.
          */
         patch: operations["updateNotificationSettings"];
@@ -11098,6 +11098,8 @@ export interface components {
             categories: components["schemas"]["NotificationCategory"][];
             /** @enum {string} */
             locale: "ru" | "en";
+            /** @description Optional personal opt-out list for Telegram and Browser delivery. Omission preserves saved exclusions; an empty list clears them. Does not filter the inbox. */
+            excludedEventTypes?: components["schemas"]["NotificationEventType"][];
         };
         NotificationSettings: {
             identityId: components["schemas"]["Identifier"];
@@ -11115,6 +11117,10 @@ export interface components {
                 name: string;
             } | null;
             version: number;
+            /** @description Personal outbound event opt-outs; empty by default. Applies jointly to Telegram and Browser, not the inbox. */
+            excludedEventTypes: components["schemas"]["NotificationEventType"][];
+            /** @description Live supported personal delivery events with server-owned labels. Unwired integration templates are excluded. */
+            availableEvents: components["schemas"]["NotificationAvailableEvent"][];
         };
         Notification: {
             id: components["schemas"]["Identifier"];
@@ -13731,6 +13737,17 @@ export interface components {
             id: components["schemas"]["GifIdentifier"];
             /** @description Original optional search query, preserved without trimming. */
             query?: string;
+        };
+        /**
+         * @description A live personal notification event type. Newly supported event types are allowed unless explicitly excluded.
+         * @enum {string}
+         */
+        NotificationEventType: "profile.achievement.earned" | "member.role" | "member.status" | "member.ownership" | "test_case.assigned" | "run_item.assigned" | "run.assigned" | "defect.assigned" | "project.assigned" | "portfolio.assigned" | "run.created" | "run.verification_created" | "run.start" | "run.complete" | "run.abort" | "run_item.status_changed" | "run_item.retested" | "defect.created" | "defect.updated" | "defect.status_changed" | "defect.fix_confirmed" | "integration.youtrack.received" | "defect.comment_mentioned" | "test_case.comment_mentioned" | "test_case.created" | "test_case.cloned" | "test_case.revised" | "test_case.archived" | "test_case.restored" | "suite.created" | "suite.updated" | "suite.archived";
+        NotificationAvailableEvent: {
+            type: components["schemas"]["NotificationEventType"];
+            category: components["schemas"]["NotificationCategory"];
+            labelRu: string;
+            labelEn: string;
         };
     };
     responses: {

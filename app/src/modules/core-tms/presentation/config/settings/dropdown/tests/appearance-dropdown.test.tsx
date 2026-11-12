@@ -18,9 +18,9 @@ function setup() {
     removeEventListener(name: string, fn: (event: { target: unknown }) => void) { listeners.get(name)?.delete(fn); },
   };
   let popover = false;
-  const trigger = { focus: () => { document.activeElement = trigger; },
+  const trigger = { contains: (target: unknown) => target === trigger, focus: () => { document.activeElement = trigger; },
     getBoundingClientRect: () => ({ left: 20, top: 10, width: 150, height: 34, bottom: 44 }) };
-  const menu = { style: {}, scrollHeight: 80, showPopover: () => { popover = true; },
+  const menu = { dataset: {}, style: {}, scrollHeight: 80, showPopover: () => { popover = true; },
     hidePopover: () => { popover = false; }, matches: () => popover };
   const root = { contains: (target: unknown) => target === trigger || target === menu };
   const modules = new Map<string, unknown>();
@@ -29,7 +29,7 @@ function setup() {
     const module = { exports: {} };
     runInNewContext(ts.transpileModule(readFileSync(url, "utf8"), {
       compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2021, jsx: ts.JsxEmit.ReactJSX },
-    }).outputText, { module, exports: module.exports, document, innerWidth: 1000, innerHeight: 800,
+    }).outputText, { module, exports: module.exports, document, Element: class Element {}, innerWidth: 1000, innerHeight: 800,
       window: { addEventListener() {}, removeEventListener() {} },
       require: (name: string) => {
         if (name === "react") return React;

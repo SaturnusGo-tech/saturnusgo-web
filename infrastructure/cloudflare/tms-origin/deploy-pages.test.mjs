@@ -120,6 +120,10 @@ write("out/cloud-login/index.html", "FALCON CLOUD LOGIN\\n");
 if (process.env.INCLUDE_LOGIN === "1") write("out/login/index.html", "FALCON LOGIN\\n");
 write("out/work/index.html", "CURRENT TMS\\n");
 write("out/work/index.txt", "CURRENT TMS DATA\\n");
+if (process.env.OMIT_NOTIFICATION_PREFERENCES !== "1") {
+  write("out/work/notification-preferences/index.html", "FALCON NOTIFICATION PREFERENCES\\n");
+  write("out/work/notification-preferences/index.txt", "NOTIFICATION PREFERENCES DATA\\n");
+}
 write("out/_next/static/chunks/app.js", "static chunk\\n");
 write("out/_next/static/css/app.css", process.env.UNCOMPILED_TAILWIND === "1" ? "@tailwind utilities;" : ".w-full { width: 100%; }");
 for (const weight of ["Regular", "RegularItalic", "Medium", "Semibold", "Bold"]) if (process.env.OMIT_DOCS_FONT !== weight) write("out/falcon/docs/fonts/OpenAISans-" + weight + ".woff2", "font asset");
@@ -242,6 +246,10 @@ test("publishes Falcon routes into an isolated namespace without replacing Pages
     readFileSync(join(fixture.pages, "tms-origin/cloud-login/index.html"), "utf8"),
     "FALCON CLOUD LOGIN\n",
   );
+  assert.equal(readFileSync(join(fixture.pages, "tms-origin/work/notification-preferences/index.html"), "utf8"),
+    "FALCON NOTIFICATION PREFERENCES\n");
+  assert.equal(readFileSync(join(fixture.pages, "tms-origin/work/notification-preferences/index.txt"), "utf8"),
+    "NOTIFICATION PREFERENCES DATA\n");
   assert.deepEqual(
     JSON.parse(readFileSync(join(fixture.pages, "tms-origin/release.json"), "utf8")),
     { sourceSha: fixture.sourceSha, routeManifest: "tms-origin-v1" },
@@ -302,6 +310,18 @@ test("fails closed when a required public route is absent", (context) => {
   assert.match(result.stderr, /Required Falcon route is missing.*\/signup\//);
   assert.equal(readFileSync(join(fixture.pages, "index.html"), "utf8"), rootBefore);
   assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), pagesHeadBefore);
+});
+
+test("a missing notification preferences page blocks publication before Pages changes", (context) => {
+  const fixture = createFixture(context);
+  const before = git(fixture.pages, "rev-parse", "HEAD").stdout;
+  const remoteBefore = git(fixture.pages, "ls-remote", "origin", "refs/heads/main").stdout;
+  const result = deploy(fixture, "--publish", { OMIT_NOTIFICATION_PREFERENCES: "1" });
+  assert.equal(result.status, 14);
+  assert.match(result.stderr, /Required Falcon route is missing.*\/work\/notification-preferences\//);
+  assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout, before);
+  assert.equal(git(fixture.pages, "ls-remote", "origin", "refs/heads/main").stdout, remoteBefore);
+  assert.equal(readFileSync(join(fixture.pages, "index.html"), "utf8"), "SATURNUSGO ROOT\n");
 });
 
 test("fails closed when a manifest-required public asset is absent", (context) => {

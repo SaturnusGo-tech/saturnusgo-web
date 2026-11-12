@@ -1,0 +1,194 @@
+[
+  {
+    "type": "profile.achievement.earned",
+    "category": "access",
+    "labelRu": "Получено достижение",
+    "labelEn": "Achievement earned"
+  },
+  {
+    "type": "member.role",
+    "category": "access",
+    "labelRu": "Ваша роль изменена",
+    "labelEn": "Your role changed"
+  },
+  {
+    "type": "member.status",
+    "category": "access",
+    "labelRu": "Доступ к рабочему пространству восстановлен",
+    "labelEn": "Workspace access restored"
+  },
+  {
+    "type": "member.ownership",
+    "category": "access",
+    "labelRu": "Вы стали владельцем компании",
+    "labelEn": "You are now the company owner"
+  },
+  {
+    "type": "test_case.assigned",
+    "category": "assignments",
+    "labelRu": "Вы назначены ответственным за тест-кейс",
+    "labelEn": "You are responsible for a test case"
+  },
+  {
+    "type": "run_item.assigned",
+    "category": "assignments",
+    "labelRu": "Вам назначен кейс в прогоне",
+    "labelEn": "A run case was assigned to you"
+  },
+  {
+    "type": "run.assigned",
+    "category": "assignments",
+    "labelRu": "Вам назначен прогон",
+    "labelEn": "A test run was assigned to you"
+  },
+  {
+    "type": "defect.assigned",
+    "category": "assignments",
+    "labelRu": "Вам назначен дефект",
+    "labelEn": "A defect was assigned to you"
+  },
+  {
+    "type": "project.assigned",
+    "category": "assignments",
+    "labelRu": "Вы назначены ответственным за проект",
+    "labelEn": "You are responsible for a project"
+  },
+  {
+    "type": "portfolio.assigned",
+    "category": "assignments",
+    "labelRu": "Вы назначены ответственным за портфель",
+    "labelEn": "You are responsible for a portfolio"
+  },
+  {
+    "type": "run.created",
+    "category": "runs",
+    "labelRu": "Создан прогон",
+    "labelEn": "Run created"
+  },
+  {
+    "type": "run.verification_created",
+    "category": "runs",
+    "labelRu": "Назначена проверка исправлений",
+    "labelEn": "Fix verification scheduled"
+  },
+  {
+    "type": "run.start",
+    "category": "runs",
+    "labelRu": "Начался прогон",
+    "labelEn": "Run started"
+  },
+  {
+    "type": "run.complete",
+    "category": "runs",
+    "labelRu": "Прогон завершён",
+    "labelEn": "Run completed"
+  },
+  {
+    "type": "run.abort",
+    "category": "runs",
+    "labelRu": "Прогон остановлен",
+    "labelEn": "Run stopped"
+  },
+  {
+    "type": "run_item.status_changed",
+    "category": "runs",
+    "labelRu": "Обновлён результат проверки",
+    "labelEn": "Check result updated"
+  },
+  {
+    "type": "run_item.retested",
+    "category": "runs",
+    "labelRu": "Начата повторная проверка",
+    "labelEn": "Retest started"
+  },
+  {
+    "type": "defect.created",
+    "category": "defects",
+    "labelRu": "Зарегистрирован дефект",
+    "labelEn": "Defect reported"
+  },
+  {
+    "type": "defect.updated",
+    "category": "defects",
+    "labelRu": "Обновлён дефект",
+    "labelEn": "Defect updated"
+  },
+  {
+    "type": "defect.status_changed",
+    "category": "defects",
+    "labelRu": "Изменился статус дефекта",
+    "labelEn": "Defect status changed"
+  },
+  {
+    "type": "defect.fix_confirmed",
+    "category": "defects",
+    "labelRu": "Исправление подтверждено",
+    "labelEn": "Fix verified"
+  },
+  {
+    "type": "integration.youtrack.received",
+    "category": "defects",
+    "labelRu": "Дефект обновлён в YouTrack",
+    "labelEn": "Defect updated in YouTrack"
+  },
+  {
+    "type": "defect.comment_mentioned",
+    "category": "defects",
+    "labelRu": "Вас упомянули в баг-репорте",
+    "labelEn": "You were mentioned in a bug report"
+  },
+  {
+    "type": "test_case.comment_mentioned",
+    "category": "cases",
+    "labelRu": "Вас упомянули в комментарии",
+    "labelEn": "You were mentioned in a comment"
+  },
+  {
+    "type": "test_case.created",
+    "category": "cases",
+    "labelRu": "Создан тест-кейс",
+    "labelEn": "Test case created"
+  },
+  {
+    "type": "test_case.cloned",
+    "category": "cases",
+    "labelRu": "Скопирован тест-кейс",
+    "labelEn": "Test case copied"
+  },
+  {
+    "type": "test_case.revised",
+    "category": "cases",
+    "labelRu": "Обновлён тест-кейс",
+    "labelEn": "Test case updated"
+  },
+  {
+    "type": "test_case.archived",
+    "category": "cases",
+    "labelRu": "Тест-кейс в архиве",
+    "labelEn": "Test case archived"
+  },
+  {
+    "type": "test_case.restored",
+    "category": "cases",
+    "labelRu": "Тест-кейс восстановлен",
+    "labelEn": "Test case restored"
+  },
+  {
+    "type": "suite.created",
+    "category": "suites",
+    "labelRu": "Создан тест-сьют",
+    "labelEn": "Test suite created"
+  },
+  {
+    "type": "suite.updated",
+    "category": "suites",
+    "labelRu": "Обновлён тест-сьют",
+    "labelEn": "Test suite updated"
+  },
+  {
+    "type": "suite.archived",
+    "category": "suites",
+    "labelRu": "Тест-сьют в архиве",
+    "labelEn": "Test suite archived"
+  }
+]

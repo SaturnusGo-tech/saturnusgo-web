@@ -6,6 +6,7 @@ export const APP_PATH = "/work/";
 export const LEGACY_APP_PATH = "/testcases/umbrella-home/work/";
 
 export const publicRoutes = Object.freeze([
+  Object.freeze({ publicPath: "/work/notification-preferences/", artifactPath: "work/notification-preferences/index.html", required: true }),
   Object.freeze({ publicPath: "/privacy/", artifactPath: "privacy/index.html", required: true }),
   Object.freeze({ publicPath: "/terms/", artifactPath: "terms/index.html", required: true }),
   Object.freeze({ publicPath: "/billing-terms/", artifactPath: "billing-terms/index.html", required: true }),

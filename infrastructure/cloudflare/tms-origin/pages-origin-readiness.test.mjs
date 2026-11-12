@@ -36,7 +36,8 @@ test("verifies reviewed Pages evidence, required routes and their runtime assets
     sourceSha,
   });
 
-  assert.deepEqual(result.checkedRoutes, ["/privacy/", "/terms/", "/billing-terms/", "/trial-terms/", "/sandbox/", "/admin/", "/profile/", "/", "/ru/", "/docs/", "/ru/docs/", "/contact-support/", "/ru/contact-support/", "/signup/", "/cloud-login/"]);
+  assert.deepEqual(result.checkedRoutes, ["/work/notification-preferences/", "/privacy/", "/terms/", "/billing-terms/", "/trial-terms/", "/sandbox/", "/admin/", "/profile/", "/", "/ru/", "/docs/", "/ru/docs/", "/contact-support/", "/ru/contact-support/", "/signup/", "/cloud-login/"]);
+  assert.ok(requests.some(({ url }) => url.pathname === "/tms-origin/work/notification-preferences/index.html"));
   assert.ok(result.checkedAssets.includes("/_next/static/chunks/app.js"));
   assert.ok(result.checkedAssets.includes("/falcon/falcon-mark-dark.png"));
   assert.ok(result.checkedAssets.includes("/falcon/falcon-brand-mark.svg"));
@@ -54,6 +55,14 @@ test("verifies reviewed Pages evidence, required routes and their runtime assets
   assert.ok(requests.every(({ url }) => url.protocol === "https:"));
   assert.ok(requests.every(({ url }) => url.searchParams.get("falcon_release") === sourceSha));
   assert.ok(requests.every(({ options }) => options.redirect === "error"));
+});
+
+test("readiness refuses a missing notification preferences page", async () => {
+  await assert.rejects(verifyPagesOriginReadiness({
+    fetchImpl: async (input, options) => new URL(input).pathname === "/tms-origin/work/notification-preferences/index.html"
+      ? new Response("missing", { status: 404 }) : successfulFetch([])(input, options),
+    sourceOrigin: "https://origin.example", sourceSha,
+  }), /Required route \/work\/notification-preferences\/ returned 404/);
 });
 
 test("rejects release evidence for a different source commit", async () => {

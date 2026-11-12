@@ -3,11 +3,12 @@ type Schemas = components["schemas"];
 export type NotificationItem = Schemas["Notification"];
 export type NotificationSettings = Schemas["NotificationSettings"];
 export type NotificationCategory = Schemas["NotificationCategory"];
+export type NotificationEventType = Schemas["NotificationEventType"];
+export type NotificationPreferences = Schemas["NotificationPreferences"];
 export interface NotificationClient {
   settings(signal: AbortSignal): Promise<NotificationSettings>;
   preferences(
-    categories: NotificationCategory[],
-    locale: "ru" | "en",
+    preferences: NotificationPreferences,
     version: number,
     signal: AbortSignal,
   ): Promise<void>;
