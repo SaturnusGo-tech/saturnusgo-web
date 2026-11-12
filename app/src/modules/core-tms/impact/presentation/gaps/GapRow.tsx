@@ -1,3 +1,5 @@
+import { IntegrationButton } from "../../../presentation/common/integration-controls/button/IntegrationButton";
+import { IntegrationTextarea } from "../../../presentation/common/integration-controls/textarea/IntegrationTextarea";
 import { useId } from "react";
 import { ChevronDown, ExternalLink } from "lucide-react";
 import type { ImpactAnalysis } from "../../model/impact-types";
@@ -24,14 +26,14 @@ export function GapRow({ gap, analysis, ru, writable, pending, command, expanded
         : action?.status === "failed" ? (ru ? "Ошибка черновика" : "Draft failed")
           : (ru ? "Нужна проверка" : "Needs review");
   return <li className={css.row} data-open={expanded || undefined}>
-    <button type="button" className={css.toggle} id={triggerId} aria-expanded={expanded} aria-controls={panelId}
-      aria-label={`${expanded ? (ru ? "Свернуть пробел покрытия" : "Collapse coverage gap") : (ru ? "Раскрыть пробел покрытия" : "Expand coverage gap")}: ${gap.area}`} onClick={onToggle}>
+    <IntegrationButton type="button" className={css.toggle} id={triggerId} aria-expanded={expanded} aria-controls={panelId}
+      aria-label={`${expanded ? (ru ? "Свернуть пробел покрытия" : "Collapse coverage gap") : (ru ? "Раскрыть пробел покрытия" : "Expand coverage gap")}: ${gap.area}`} onPress={onToggle}>
       <span className={css.identity}><strong>{gap.area}</strong><span className={css.counts}>
         {gap.changedFiles.length} {ru ? "файлов" : "files"}<span aria-hidden="true">·</span>{gap.suggestedTestCases.length} {ru ? "проверок" : "checks"}
       </span></span>
       <span className={css.meta}><span>{platformNames[gap.platform]}</span><span className={css.status} data-status={action?.status}>{status}</span></span>
       <ChevronDown size={15} strokeWidth={1.6} className={css.chevron} aria-hidden="true" />
-    </button>
+    </IntegrationButton>
     <div className={css.reveal} id={panelId} role="region" aria-labelledby={triggerId} aria-hidden={!expanded}
       ref={element => { if (element) element.inert = !expanded; }}>
       <div className={css.clip}><div className={css.content}>
@@ -50,16 +52,16 @@ export function GapRow({ gap, analysis, ru, writable, pending, command, expanded
         {action?.status === "acknowledged" && <p className={css.feedback}><strong>{ru ? "Пробел принят QA:" : "Acknowledged by QA:"}</strong> {action.reason}</p>}
         {href && <a className={css.draftLink} href={href}>{ru ? "Открыть черновик теста" : "Open test draft"}<ExternalLink size={13} aria-hidden="true" /></a>}
         {actionable && <div className={css.actions}>
-          {analysis.aiEnabled !== false && <button type="button" disabled={pending} onClick={() => void command({ action: `gaps/${gap.id}/generate`, body: { mode: "ai" } })}>
-            {action?.status === "failed" ? (ru ? "Повторить AI-черновик" : "Retry AI draft") : (ru ? "Подготовить AI-черновик" : "Generate AI draft")}</button>}
-          <button type="button" disabled={pending} onClick={() => void command({ action: `gaps/${gap.id}/generate`, body: { mode: "manual" } })}>{ru ? "Заполнить вручную" : "Create manual draft"}</button>
-          <button type="button" disabled={pending} aria-expanded={acknowledging} aria-controls={reasonId} onClick={onAcknowledge}>{ru ? "Принять пробел" : "Acknowledge gap"}</button>
+          {analysis.aiEnabled !== false && <IntegrationButton type="button" isDisabled={pending} onPress={() => void command({ action: `gaps/${gap.id}/generate`, body: { mode: "ai" } })}>
+            {action?.status === "failed" ? (ru ? "Повторить AI-черновик" : "Retry AI draft") : (ru ? "Подготовить AI-черновик" : "Generate AI draft")}</IntegrationButton>}
+          <IntegrationButton type="button" isDisabled={pending} onPress={() => void command({ action: `gaps/${gap.id}/generate`, body: { mode: "manual" } })}>{ru ? "Заполнить вручную" : "Create manual draft"}</IntegrationButton>
+          <IntegrationButton type="button" isDisabled={pending} aria-expanded={acknowledging} aria-controls={reasonId} onPress={onAcknowledge}>{ru ? "Принять пробел" : "Acknowledge gap"}</IntegrationButton>
         </div>}
         {acknowledging && actionable && <form className={css.form} id={reasonId} onSubmit={event => {
           event.preventDefault(); if (!pending && reason.trim()) void command({ action: `gaps/${gap.id}/acknowledge`, body: { reason: reason.trim() } });
-        }}><label>{ru ? "Почему отдельная проверка не требуется сейчас" : "Why a separate test is not required now"}
-            <textarea required maxLength={2000} disabled={pending} value={reason} onChange={event => onReason(event.target.value)} /></label>
-          <button type="submit" disabled={pending || !reason.trim()}>{ru ? "Сохранить решение" : "Save decision"}</button></form>}
+        }}><IntegrationTextarea label={ru ? "Почему отдельная проверка не требуется сейчас" : "Why a separate test is not required now"}
+            isRequired maxLength={2000} isDisabled={pending} value={reason} onValueChange={onReason} />
+          <IntegrationButton type="submit" isDisabled={pending || !reason.trim()}>{ru ? "Сохранить решение" : "Save decision"}</IntegrationButton></form>}
       </div></div>
     </div>
   </li>;

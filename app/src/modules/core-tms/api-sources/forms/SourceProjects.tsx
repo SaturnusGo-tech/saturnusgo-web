@@ -1,4 +1,5 @@
-import { Checkbox, Input } from "@heroui/react";
+import { IntegrationCheckbox } from "../../presentation/common/integration-controls/checkbox/IntegrationCheckbox";
+import { IntegrationInput } from "../../presentation/common/integration-controls/input/IntegrationInput";
 import { Search } from "lucide-react";
 import { useState } from "react";
 import type { ApiSourceDraft, NamedOption } from "../model/api-source";
@@ -8,21 +9,20 @@ export function SourceProjects({ draft, projects, ru, disabled = false, onChange
   const [search, setSearch] = useState(""); const visible = projects.filter(p => p.name.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()));
   const selected = projects.filter(project => draft.projectIds.includes(project.id));
   const summary = draft.allProjects ? (ru ? "Все проекты" : "All projects") : draft.projectIds.length === 1 && selected[0] ? selected[0].name : draft.projectIds.length ? (ru ? `Проектов: ${draft.projectIds.length}` : `${draft.projectIds.length} projects`) : (ru ? "Без проектов" : "No projects");
-  const checkboxSlots = { base: css.check, wrapper: css.checkBox, label: css.checkLabel };
   return <SourceDisclosure title={ru ? "Доступно в проектах" : "Available in projects"} summary={summary} disabled={disabled}>
-    <Checkbox size="sm" isDisabled={disabled} isSelected={draft.allProjects} classNames={checkboxSlots}
+    <IntegrationCheckbox isDisabled={disabled} isSelected={draft.allProjects} className={css.check}
       onValueChange={allProjects => onChange({ ...draft, allProjects, projectIds: [] })}>
       {ru ? "Все проекты рабочего пространства" : "All workspace projects"}
-    </Checkbox>
+    </IntegrationCheckbox>
     {draft.allProjects ? <p>{ru ? "Включая проекты, которые будут созданы позже." : "Includes projects created in the future."}</p> : <>
-      {projects.length > 6 && <Input size="sm" variant="flat" aria-label={ru ? "Найти проект" : "Find a project"}
+      {projects.length > 6 && <IntegrationInput aria-label={ru ? "Найти проект" : "Find a project"}
         value={search} onValueChange={setSearch} placeholder={ru ? "Найти проект" : "Find a project"} isDisabled={disabled} startContent={<Search size={15} aria-hidden="true"/>}
-        classNames={{ base: css.search, inputWrapper: css.inputWrapper, innerWrapper: css.inputInner, input: css.input }}/ >}
-      <div className={css.projectList}>{visible.map(project => <Checkbox size="sm" key={project.id} isDisabled={disabled}
-        isSelected={draft.projectIds.includes(project.id)} classNames={checkboxSlots}
+        className={css.search}/ >}
+      <div className={css.projectList}>{visible.map(project => <IntegrationCheckbox key={project.id} isDisabled={disabled}
+        isSelected={draft.projectIds.includes(project.id)} className={css.check}
         onValueChange={selected => onChange({ ...draft, projectIds: selected ? [...draft.projectIds, project.id] : draft.projectIds.filter(id => id !== project.id) })}>
         {project.name}
-      </Checkbox>)}</div>
+      </IntegrationCheckbox>)}</div>
       {!visible.length && <p>{search ? (ru ? "Проекты не найдены." : "No matching projects.") : (ru ? "В рабочем пространстве пока нет проектов." : "No projects in this workspace yet.")}</p>}
       {!draft.projectIds.length && <small>{ru ? "API сохранится без привязки к проектам." : "This API will be saved without project links."}</small>}
     </>}

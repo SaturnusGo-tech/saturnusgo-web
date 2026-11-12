@@ -1,3 +1,4 @@
+import { IntegrationButton } from "../../../presentation/common/integration-controls/button/IntegrationButton";
 import { CheckCircle2, ExternalLink, ShieldCheck } from "lucide-react";
 import { Check, Copy } from "@openai/apps-sdk-ui/components/Icon";
 import { useState } from "react";
@@ -5,6 +6,8 @@ import type { Provider, ConnectionInput, Discovery, Snapshot } from "../../model
 import { providerCopy } from "../../localization/connector-copy";
 import { CredentialFields } from "./CredentialFields";
 import styles from "../styles/connector.module.css";
+import { IntegrationInput } from "../../../presentation/common/integration-controls/input/IntegrationInput";
+import { IntegrationSelect } from "../../../presentation/common/integration-controls/select/IntegrationSelect";
 export function ConnectionPanel({ provider, ru, draft, snapshot, discovery, pending, onChange, onDiscover }: {
   provider: Provider; ru: boolean; draft: ConnectionInput; snapshot: Snapshot;
   discovery: Discovery | null; pending: string | null; onChange: (value: ConnectionInput) => void; onDiscover: () => void;
@@ -21,16 +24,15 @@ export function ConnectionPanel({ provider, ru, draft, snapshot, discovery, pend
       <p>{provider === "slack" ? (ru ? "Выбранный канал получает только отмеченные события." : "The chosen channel receives selected events.") :
         provider === "github" ? (ru ? "Наборы тестов и окружения задаются в разделе автоматизации." : "Choose test suites and environments in Automation.") :
           (ru ? "Проверьте доступ, затем выберите ресурс сервиса." : "Verify access, then select a service resource.")}</p>
-      {provider === "confluence" && <label>{copy.destination}<input value={settings.destinationId}
-        onChange={(e) => onChange({ ...draft, settings: { ...settings, destinationId: e.target.value } })} /></label>}
-      {["jira", "trello"].includes(provider) && <label>{copy.destination}
-        {discovery ? <select value={settings.destinationId} onChange={(e) => onChange({ ...draft, settings: { ...settings, destinationId: e.target.value } })}>
-          <option value="">{ru ? "Выберите значение" : "Select a value"}</option>
-          {discovery.destinations.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-        </select> : <input value={settings.destinationId} placeholder={ru ? "ID или выбор после проверки" : "ID or select after verification"}
-          onChange={(e) => onChange({ ...draft, settings: { ...settings, destinationId: e.target.value } })} />}</label>}
-      <button type="button" className={styles.secondary} disabled={Boolean(pending)} onClick={onDiscover}>
-        <ShieldCheck size={16} />{pending === "discover" ? (ru ? "Проверяем…" : "Verifying…") : (ru ? "Проверить доступ" : "Verify access")}</button>
+      {provider === "confluence" && <IntegrationInput label={copy.destination} value={settings.destinationId}
+        onValueChange={(destinationId) => onChange({ ...draft, settings: { ...settings, destinationId } })} />}
+      {["jira", "trello"].includes(provider) && (discovery ? <IntegrationSelect label={copy.destination} value={settings.destinationId}
+        placeholder={ru ? "Выберите значение" : "Select a value"} options={discovery.destinations.map(item => ({ value: item.id, label: item.name }))}
+        onValueChange={(destinationId) => onChange({ ...draft, settings: { ...settings, destinationId } })} />
+        : <IntegrationInput label={copy.destination} value={settings.destinationId} placeholder={ru ? "ID или выбор после проверки" : "ID or select after verification"}
+          onValueChange={(destinationId) => onChange({ ...draft, settings: { ...settings, destinationId } })} />)}
+      <IntegrationButton type="button" className={styles.secondary} isDisabled={Boolean(pending)} onPress={onDiscover}>
+        <ShieldCheck size={16} />{pending === "discover" ? (ru ? "Проверяем…" : "Verifying…") : (ru ? "Проверить доступ" : "Verify access")}</IntegrationButton>
       {discovery && <div className={styles.verified}><CheckCircle2 size={18} /><div><strong>{discovery.account}</strong>
         {discovery.resources.map((item) => <p key={item.id}>{item.name} <code>{item.id}</code></p>)}</div></div>}
       {snapshot.connection?.checkedAt && <small>{ru ? "Последняя проверка: " : "Last verified: "}
@@ -51,14 +53,14 @@ export function ConnectionPanel({ provider, ru, draft, snapshot, discovery, pend
               "Create a service webhook with this URL. Use the same signing secret in the service and in the field below.")}</p>
         {!snapshot.connection?.enabled && <small>{ru ? "После настройки вебхука включите интеграцию и сохраните изменения, чтобы запустить автоматизацию." :
           "After setting up the webhook, enable the integration and save changes to start automation."}</small>}
-        <label>{provider === "trello" ? (ru ? "Секрет приложения Trello" : "Trello application secret") : (ru ? "Секрет подписи" : "Signing secret")}
-          <input type="password" autoComplete="new-password" value={draft.secrets.signingSecret ?? ""}
+        <IntegrationInput label={provider === "trello" ? (ru ? "Секрет приложения Trello" : "Trello application secret") : (ru ? "Секрет подписи" : "Signing secret")}
+          type="password" autoComplete="new-password" value={draft.secrets.signingSecret ?? ""}
             placeholder={snapshot.connection?.webhookConfigured ? "••••••••" : (ru ? "Не менее 32 символов" : "At least 32 characters")}
-            onChange={(e) => { const secrets = { ...draft.secrets }; if (e.target.value) secrets.signingSecret = e.target.value;
-              else delete secrets.signingSecret; onChange({ ...draft, secrets }); }} /></label>
+            onValueChange={(value) => { const secrets = { ...draft.secrets }; if (value) secrets.signingSecret = value;
+              else delete secrets.signingSecret; onChange({ ...draft, secrets }); }} />
         {snapshot.webhook.url ? <div className={styles.callback}><span>Webhook URL</span><code>{snapshot.webhook.url}</code>
-          <button type="button" className={styles.copyCode} aria-label={ru ? "Копировать Webhook URL" : "Copy Webhook URL"} title={done ? (ru ? "Скопировано" : "Copied") : (ru ? "Копировать Webhook URL" : "Copy Webhook URL")} onClick={() => { const url = snapshot.webhook.url!; void navigator.clipboard.writeText(url).then(() => setCopied({ url, success: true }), () => setCopied({ url, success: false })); }}>
-            {done ? <Check width={16} height={16} /> : <Copy width={16} height={16} />}</button><span className={styles.srOnly} role="status">{copied?.url === snapshot.webhook.url ? done ? (ru ? "Скопировано" : "Copied") : (ru ? "Не удалось скопировать. Выделите текст вручную." : "Copy failed. Select the text manually.") : ""}</span></div> :
+          <IntegrationButton type="button" className={styles.copyCode} aria-label={ru ? "Копировать Webhook URL" : "Copy Webhook URL"} title={done ? (ru ? "Скопировано" : "Copied") : (ru ? "Копировать Webhook URL" : "Copy Webhook URL")} onPress={() => { const url = snapshot.webhook.url!; void navigator.clipboard.writeText(url).then(() => setCopied({ url, success: true }), () => setCopied({ url, success: false })); }}>
+            {done ? <Check width={16} height={16} /> : <Copy width={16} height={16} />}</IntegrationButton><span className={styles.srOnly} role="status">{copied?.url === snapshot.webhook.url ? done ? (ru ? "Скопировано" : "Copied") : (ru ? "Не удалось скопировать. Выделите текст вручную." : "Copy failed. Select the text manually.") : ""}</span></div> :
           <small>{ru ? "Для получения адреса сохраните подключение; секрет подписи можно добавить следующим шагом." :
             "Save the connection to get its URL; the signing secret can be added in the next step."}</small>}
         <a href={copy.docs} target="_blank" rel="noreferrer">{ru ? "Настроить вебхук в сервисе" : "Set up the service webhook"}<ExternalLink size={13} /></a>

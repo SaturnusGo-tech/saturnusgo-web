@@ -1,3 +1,4 @@
+import { installIntegrationTestControls } from "../support/control-test-boundary";
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import { after, before, test, type TestContext } from "node:test";
@@ -13,13 +14,16 @@ let Summary: typeof import("../../presentation/run/RunImpactSummary")["RunImpact
 let ErrorToast: typeof import("../../../presentation/common/error/ErrorToast")["ErrorToast"];
 type SummaryProps = Parameters<typeof Summary>[0];
 type SummaryUpdate = Omit<Partial<SummaryProps>, "state"> & { state?: Partial<SummaryProps["state"]> };
+let restoreControls: () => void;
 before(async () => {
+  restoreControls = installIntegrationTestControls();
   require.extensions[".css"] = module => { module.exports = {}; };
   Object.assign(globalThis, { React });
   ({ RunImpactSummary: Summary } = await import("../../presentation/run/RunImpactSummary"));
   ({ ErrorToast } = await import("../../../presentation/common/error/ErrorToast"));
 });
 after(() => {
+  restoreControls();
   if (previousCss) require.extensions[".css"] = previousCss; else delete require.extensions[".css"];
   if (previousReact) Object.defineProperty(globalThis, "React", previousReact); else Reflect.deleteProperty(globalThis, "React");
 });
@@ -49,7 +53,7 @@ function fixture(t: TestContext, items: ImpactAnalysis[] = [analysis()], blocked
     remount: () => { act(() => root.unmount()); render(); },
     dismiss: (index = 0) => {
       const button = root.root.findAllByType("button").filter(node => String(node.props["aria-label"]).startsWith("Dismiss analysis proposal"))[index];
-      assert.ok(button, "each proposal has an accessible dismissal action"); act(() => button.props.onClick());
+      assert.ok(button, "each proposal has an accessible dismissal action"); act(() => button.props.onPress());
     },
   };
 }
@@ -112,6 +116,7 @@ test("loading and empty results stay quiet; failures retain Retry and Russian ap
   await act(async () => toast.props.onRetry()); assert.equal(f.refreshes(), 1);
   f.proposals([analysis({ approved: true })]);
   f.update({ ru: true, state: { items: [analysis({ approved: true })], ready: true, error: null } });
-  assert.ok(JSON.stringify(f.root.toJSON()).includes("Состав подтверждён QA"));
+  assert.ok(f.root.root.findAllByType("span").some(node => node.children.includes("Состав подтверждён QA")),
+    "the rendered proposal status retains Russian QA approval copy");
   assert.ok(f.root.root.findAllByType("button").some(node => String(node.props["aria-label"]).startsWith("Скрыть предложение анализа")));
 });

@@ -10,9 +10,6 @@
 .heading h2, .heading h3 { font-size: 18px; margin: 0 0 6px; font-weight: 650; }
 .heading p, .muted { color: var(--tms-text-muted, var(--falcon-text-muted)); font-size: 13px; line-height: 1.6; margin: 0; }
 .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-.root button, .button { cursor: pointer; min-height: 36px; padding: 7px 12px; border: 1px solid var(--tms-border-strong, var(--falcon-border)); border-radius: 7px; background: var(--tms-bg-elevated, var(--falcon-surface)); color: var(--tms-text, var(--falcon-text)); font: inherit; font-size: 13px; display: inline-flex; align-items: center; gap: 7px; text-decoration: none; }
-.root button:hover, .button:hover { background: var(--tms-bg-hover, var(--falcon-hover)); }
-.root button:disabled { opacity: .55; cursor: default; }
 .root .primary { background: var(--falcon-action); border-color: var(--falcon-border); color: var(--falcon-on-action); }
 .root .primary:hover { background: var(--falcon-action-hover); }
 .root button:focus-visible, .root a:focus-visible, .root input:focus-visible, .root select:focus-visible, .root textarea:focus-visible { outline: 2px solid var(--tms-focus-border); outline-offset: 3px; }
@@ -26,12 +23,9 @@
 .badge[data-warning="true"] { color: var(--falcon-warning); background: var(--falcon-warning-bg); border-color: var(--falcon-warning-border); }
 .notice { padding: 12px 14px; border-radius: 8px; line-height: 1.6; font-size: 13px; overflow-wrap: anywhere; }
 .notice { background: var(--tms-bg-elevated, var(--falcon-surface)); color: var(--tms-text-secondary, var(--falcon-text)); border: 1px solid var(--tms-border, var(--falcon-border)); }
-.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.grid { display: grid; align-items: start; min-width: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 .field { display: grid; gap: 7px; font-size: 13px; color: var(--tms-text-secondary, var(--falcon-text)); min-width: 0; }
-.field input, .field select, .field textarea { font: inherit; width: 100%; min-width: 0; border: 1px solid var(--tms-border-strong, var(--falcon-border)); border-radius: 6px; background: var(--tms-bg-canvas, var(--falcon-control)); color: var(--tms-text, var(--falcon-text)); padding: 9px 10px; }
-.field textarea { min-height: 74px; resize: vertical; }
 .check { display: flex; align-items: center; gap: 9px; font-size: 13px; }
-.check input { width: 16px; height: 16px; flex: 0 0 auto; }
 .root fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 14px; min-width: 0; }
 .root legend { padding: 0 0 10px; font-weight: 600; }
 .meta { display: flex; gap: 12px; flex-wrap: wrap; color: var(--tms-text-muted, var(--falcon-text-muted)); font-size: 12px; align-items: center; }
@@ -43,7 +37,7 @@
 .empty { padding: 28px 10px; text-align: center; color: var(--tms-text-muted, var(--falcon-text)); line-height: 1.7; }
 .root .panel > .heading { margin: 0; }
 .heading > div { min-width: 0; flex: 1 1 240px; }
-.root button, .root .button { width: auto; max-width: 100%; height: auto; line-height: 1.45; flex-shrink: 0; white-space: normal; justify-content: center; }
+.actions > button { max-width: 100%; white-space: normal; height: auto; min-height: 36px; }
 .root button > svg, .root a > svg { flex-shrink: 0; }
 .actions > a { display: inline-flex; align-items: center; gap: 6px; }
 .actions, .rowHeading { min-width: 0; }
@@ -54,8 +48,7 @@
 .root .field { margin: 0; }
 .collection { display: grid; gap: 12px; min-width: 0; scroll-margin-top: 76px; }
 .reviewToolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
-.root .search { display: flex; align-items: center; gap: 8px; margin: 0; padding: 0 10px; min-height: 38px; width: min(100%, 280px); border: 1px solid var(--tms-border-strong); border-radius: 8px; color: var(--tms-text-muted); background: var(--tms-bg-canvas); box-sizing: border-box; }
-.root .search input[type="search"] { width: 100%; min-width: 0; min-height: 36px; margin: 0; padding: 7px 0; border: 0; border-radius: 0; color: var(--tms-text); background: transparent; font: inherit; }
+.root .search { width: min(100%, 280px); min-width: 0; }
 .pagination { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 12px; padding-top: 4px; }
 .reviewFooter { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; justify-content: space-between; padding-top: 16px; border-top: 1px solid var(--tms-border); }
 .reviewFooter > p { flex: 1 1 260px; }

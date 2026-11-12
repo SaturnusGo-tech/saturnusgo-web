@@ -38,9 +38,7 @@
 .actions button:disabled, .form button:disabled { color: var(--falcon-text-disabled); opacity: .65; cursor: default; }
 .actions button:focus-visible, .form button:focus-visible, .form textarea:focus-visible, .draftLink:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 3px; }
 .section a.draftLink { display: inline-flex; gap: 7px; align-items: center; justify-self: start; font-size: 12px; line-height: 1.6; color: var(--falcon-link); text-decoration: underline; text-underline-offset: 3px; }
-.form { display: grid; justify-items: start; gap: 10px; max-width: 620px; }
-.form label { display: grid; gap: 8px; width: 100%; font-size: 12px; line-height: 1.6; color: var(--falcon-text-secondary); }
-.form textarea { width: 100%; min-height: 80px; padding: 10px 12px; border: 1px solid var(--falcon-border-strong); border-radius: 8px; background: var(--falcon-control); color: var(--falcon-text); caret-color: var(--falcon-text); font: inherit; line-height: 1.65; resize: vertical; box-sizing: border-box; }
+.form { display: grid; width: 100%; justify-items: start; gap: 10px; max-width: 620px; }
 @media (max-width: 600px) {
   .row button.toggle { gap: 12px; padding-inline: 4px; grid-template-columns: minmax(0, 1fr) 15px; }
   .identity { grid-column: 1; }

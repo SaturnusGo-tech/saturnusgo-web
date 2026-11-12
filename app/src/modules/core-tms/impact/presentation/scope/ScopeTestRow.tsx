@@ -1,8 +1,10 @@
+import { IntegrationButton } from "../../../presentation/common/integration-controls/button/IntegrationButton";
 import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { useId, useState } from "react";
 import { ChevronRight, FileCode2 } from "lucide-react";
 import type { ImpactAnalysis } from "../../model/impact-types";
 import css from "./scope.module.css";
+import { IntegrationCheckbox } from "../../../presentation/common/integration-controls/checkbox/IntegrationCheckbox";
 
 type Selection = NonNullable<ImpactAnalysis["result"]>["selectedTestCases"][number];
 export function ScopeTestRow({ caseId, caseKey, title, origin, revision, included, selection, editable, pending = false, saving = false, ru, onToggle }: {
@@ -16,9 +18,9 @@ export function ScopeTestRow({ caseId, caseKey, title, origin, revision, include
   return <li className={css.row} data-included={included}>
     <div className={css.rowMain} data-recommendation={included === undefined || undefined}>
       {included !== undefined && <span className={css.selection} data-saving={saving || undefined} aria-busy={saving || undefined}>
-        <input type="checkbox" checked={included} disabled={!editable} aria-disabled={pending || undefined}
+        <IntegrationCheckbox isSelected={included} isDisabled={!editable} aria-disabled={pending || undefined}
           aria-label={`${ru ? "Включить" : "Include"} ${caseKey || caseId} · ${label}`}
-          onChange={() => { if (editable && !pending) onToggle?.(); }} />
+          onValueChange={() => { if (editable && !pending) onToggle?.(); }} />
         {saving && <span className={css.saving} role="status" aria-label={ru ? "Сохраняем выбор" : "Saving selection"}>
           <LoadingOrb />
         </span>}
@@ -32,10 +34,10 @@ export function ScopeTestRow({ caseId, caseKey, title, origin, revision, include
           {included !== undefined && <span>{included ? (ru ? "В составе" : "Included") : (ru ? "Исключён QA" : "Excluded by QA")}</span>}
         </div>
       </div>
-      <button type="button" className={css.detailsToggle} aria-expanded={expanded} aria-controls={evidenceId}
-        aria-label={`${ru ? "Причина выбора" : "Selection details"}: ${caseKey || caseId}`} onClick={() => setExpanded(value => !value)}>
+      <IntegrationButton type="button" className={css.detailsToggle} aria-expanded={expanded} aria-controls={evidenceId}
+        aria-label={`${ru ? "Причина выбора" : "Selection details"}: ${caseKey || caseId}`} onPress={() => setExpanded(value => !value)}>
         <span>{ru ? "Обоснование" : "Details"}</span><ChevronRight size={14} aria-hidden="true" />
-      </button>
+      </IntegrationButton>
     </div>
     <div className={css.reveal} data-open={expanded} id={evidenceId} aria-hidden={!expanded}
       ref={element => { if (element) element.inert = !expanded; }}>

@@ -15,7 +15,7 @@ test("scope writes retain Add test and only mark the clicked row as saving", asy
     command: async command => { calls.push(command); await new Promise<void>(resolve => { complete = resolve; }); } };
   const render = () => nodes(harness.render(() => Review(props)));
   let all = render();
-  const addButton = () => all.find(node => node.type === "button" && node.props.children === "Add test");
+  const addButton = () => all.find(node => node.type === "IntegrationButton" && node.props.children === "Add test");
   const rows = () => {
     const collection = all.find(node => node.type === "ReviewCollection" && node.props.label === "Scope tests")!;
     return props.analysis.scope.map(collection.props.children as (item: unknown) => Node);
@@ -27,7 +27,7 @@ test("scope writes retain Add test and only mark the clicked row as saving", asy
   assert.equal(rows()[1].props.pending, true); invoke(rows()[1], "onToggle");
   assert.equal(calls.length, 1); assert.deepEqual(JSON.parse(JSON.stringify(calls[0])), { action: "scope", body: { caseIds: ["second"] } });
   props.pending = true; all = render(); assert.ok(addButton());
-  invoke(addButton()!, "onClick"); all = render();
+  invoke(addButton()!, "onPress"); all = render();
   assert.equal(all.find(node => node.type === "CasePicker")!.props.disabled, true);
   complete(); await new Promise<void>(resolve => setImmediate(resolve));
   props.pending = false; all = render();

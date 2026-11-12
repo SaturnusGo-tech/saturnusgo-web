@@ -1,3 +1,5 @@
+import { YouTrackSettingsFailure } from "./chrome/failure/YouTrackSettingsFailure";
+import { IntegrationButton } from "../../common/integration-controls/button/IntegrationButton";
 import { useState } from "react";
 
 import type { YouTrackIntegrationStatus } from "../../../application/integrations/getYouTrackIntegrationStatus";
@@ -6,7 +8,6 @@ import identity from "./youtrack.module.css";
 import type { IntegrationUiStatus } from "../shared/IntegrationStatusBadge";
 import { hooksCopy } from "../shared/hooks-copy";
 import {
-  YouTrackSettingsFailure,
   YouTrackSettingsSkeleton,
 } from "./chrome/YouTrackSettingsAside";
 import { YouTrackSettingsHeader } from "./chrome/YouTrackSettingsChrome";
@@ -71,7 +72,7 @@ export function YouTrackSettings({
       />}
       <YouTrackSettingsForm embedded={embedded} russian={russian} copy={copy} state={state} webhook={webhook} canManage={canManage}
         onChangeConnection={() => setDisconnectOpen(true)} />
-      {embedded && canManage && <footer className={identity.embeddedFooter}><button type="button" onClick={() => void state.save()} disabled={state.action !== "idle"}>{state.action === "saving" ? copy.saving : copy.save}</button></footer>}
+      {embedded && canManage && <footer className={identity.embeddedFooter}><IntegrationButton variant="solid" onPress={() => void state.save()} isDisabled={state.action !== "idle"} isLoading={state.action === "saving"}>{state.action === "saving" ? copy.saving : copy.save}</IntegrationButton></footer>}
       {canManage && disconnectOpen ? <DisconnectYouTrackDialog copy={copy} busy={state.action === "disconnecting"}
         onClose={() => setDisconnectOpen(false)} onConfirm={() => {
           void state.disconnect().then((done) => { if (done) setDisconnectOpen(false); });

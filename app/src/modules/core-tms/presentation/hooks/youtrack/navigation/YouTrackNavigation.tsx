@@ -1,3 +1,4 @@
+import { IntegrationButton } from "../../../common/integration-controls/button/IntegrationButton";
 import { BookOpen, Settings2, FolderKanban, GitBranch, Webhook } from "lucide-react";
 import type { HooksCopy } from "../../shared/hooks-copy";
 import { IntegrationGuideLink } from "../../shared/theme/IntegrationGuideLink";
@@ -12,13 +13,13 @@ export function YouTrackNavigation({ tab, onTab, copy, canManage, russian, embed
     { id: "workflow" as const, title: copy.workflow, Icon: GitBranch },
     ...(canManage ? [{ id: "webhook" as const, title: "Webhook", Icon: Webhook }] : [])];
   if (embedded) return <nav className={styles.embeddedTabs} aria-label={russian ? "Разделы YouTrack" : "YouTrack sections"}>
-    {items.map(({ id, title }) => <button key={id} type="button" aria-current={tab === id ? "page" : undefined} onClick={() => onTab(id)}>{title}</button>)}
+    {items.map(({ id, title }) => <IntegrationButton key={id} variant="light" aria-current={tab === id ? "page" : undefined} onPress={() => onTab(id)}>{title}</IntegrationButton>)}
   </nav>;
   return <aside className={styles.sidebar}>
     <div className={styles.sideTitle}>{russian ? "НАСТРОЙКИ ИНТЕГРАЦИИ" : "INTEGRATION SETTINGS"}</div>
     <nav aria-label={russian ? "Разделы YouTrack" : "YouTrack sections"}>
-      {items.map(({ id, title, Icon }) => <button key={id} type="button" aria-current={tab === id ? "page" : undefined}
-        onClick={() => onTab(id)}><Icon size={16} aria-hidden="true" />{title}</button>)}
+      {items.map(({ id, title, Icon }) => <IntegrationButton key={id} variant="light" aria-current={tab === id ? "page" : undefined}
+        onPress={() => onTab(id)}><Icon size={16} aria-hidden="true" />{title}</IntegrationButton>)}
     </nav>
     <IntegrationGuideLink article="youtrack" className={styles.helpLink}><BookOpen size={15} aria-hidden="true" />{russian ? "Руководство по YouTrack" : "YouTrack guide"}</IntegrationGuideLink>
     <div className={styles.sideFoot}>Falcon <span>↔</span> YouTrack</div>

@@ -1,4 +1,5 @@
 "use client";
+import { IntegrationButton } from "../../presentation/common/integration-controls/button/IntegrationButton";
 import { LoadingOrb } from "../../../../shared/components/loading/LoadingOrb";
 import { ContentSkeleton } from "../../presentation/common/skeleton/ContentSkeleton";
 import { transitionContent } from "../../presentation/workspace/motion/transition/content-transition";
@@ -16,6 +17,8 @@ import { ActivityPanel } from "./activity/ActivityPanel";
 import styles from "./styles/connector.module.css";
 import { ImpactWorkspace } from "../../impact/presentation/ImpactWorkspace";
 import { impactPermissions } from "../../impact/model/impact-types";
+import { IntegrationSwitch } from "../../presentation/common/integration-controls/switch/IntegrationSwitch";
+import { IntegrationControlScope } from "../../presentation/common/integration-controls/scope/IntegrationControlScope";
 export function ConnectorSettings({ workspaceId, projectId, provider, ru, canManage, capabilities, connected, onBack, onSaved, embedded = false }: {
   workspaceId: string; projectId: string; provider: Provider; ru: boolean; canManage: boolean;
   capabilities: readonly string[]; connected: boolean;
@@ -47,20 +50,20 @@ export function ConnectorSettings({ workspaceId, projectId, provider, ru, canMan
         refreshFailed={state.activityFailed} onRecover={(id, remote) => void state.recover(id, remote)}
         onMore={() => void state.more()} onRefresh={() => void state.refreshActivity()} onRepublish={(id) => void state.republish(id)} /> :
         <form onSubmit={(event) => { event.preventDefault(); void state.save(); }}>
-          <fieldset className={styles.form} disabled={!canManage || Boolean(state.pending)}>
+          <IntegrationControlScope disabled={!canManage || Boolean(state.pending)}><fieldset className={styles.form} disabled={!canManage || Boolean(state.pending)}>
             <legend className={styles.srOnly}>{ru ? "Настройки интеграции" : "Integration settings"}</legend>
             {tab === "connection" ? <ConnectionPanel provider={provider} ru={ru} draft={state.draft} snapshot={snapshot}
               discovery={state.discovery} pending={state.pending} onChange={state.setDraft} onDiscover={() => void state.discover()} /> :
               <AutomationPanel provider={provider} ru={ru} draft={state.draft} discovery={state.discovery} catalog={snapshot.catalog} onChange={state.setDraft} />}
-          </fieldset>
-          {canManage && <footer className={styles.footer}><label className={styles.check}><input type="checkbox" checked={state.draft.enabled}
-            disabled={Boolean(state.pending)} onChange={(e) => state.setDraft({ ...state.draft, enabled: e.target.checked })} />
-            <span>{ru ? "Включить интеграцию" : "Enable integration"}</span></label>
+          </fieldset></IntegrationControlScope>
+          {canManage && <footer className={styles.footer}><IntegrationSwitch isSelected={state.draft.enabled}
+            isDisabled={Boolean(state.pending)} onValueChange={(enabled) => state.setDraft({ ...state.draft, enabled })}>
+            {ru ? "Включить интеграцию" : "Enable integration"}</IntegrationSwitch>
             <small>{state.draft.enabled ? (ru ? "Изменения применятся после сохранения." : "Changes take effect after saving.") :
               (ru ? "Подключение сохранится без запуска автоматизации." : "The connection will be saved without starting automation.")}</small>
-            <button type="submit" className={styles.primary} disabled={Boolean(state.pending) || !snapshot.etag}>
+            <IntegrationButton type="submit" className={styles.primary} isDisabled={Boolean(state.pending) || !snapshot.etag}>
               {state.pending === "save" ? <LoadingOrb /> : <Save size={16} />}{state.pending === "save" ? (ru ? "Сохраняем…" : "Saving…") :
-                !snapshot.connection ? (ru ? "Сохранить подключение" : "Save connection") : (ru ? "Сохранить" : "Save changes")}</button></footer>}
+                !snapshot.connection ? (ru ? "Сохранить подключение" : "Save connection") : (ru ? "Сохранить" : "Save changes")}</IntegrationButton></footer>}
           {tab === "connection" && snapshot.connection && canManage && <DisconnectPanel ru={ru}
             pending={Boolean(state.pending)} onDisconnect={() => void state.disconnect()} />}
         </form>}

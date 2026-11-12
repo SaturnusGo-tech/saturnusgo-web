@@ -1,3 +1,4 @@
+import { IntegrationControlScope } from "../../../common/integration-controls/scope/IntegrationControlScope";
 import { useState } from "react";
 import { YouTrackNavigation, type YouTrackTab } from "../navigation/YouTrackNavigation";
 import identity from "../youtrack.module.css";
@@ -34,7 +35,7 @@ export function YouTrackSettingsForm({ copy, state, webhook, canManage, onChange
       {!canManage ? <div className={surface.settingsNotice} data-tone="neutral" role="note">
         <strong>{copy.readOnly}</strong> {copy.readOnlyHint}
       </div> : null}
-      <fieldset className={surface.settingsFields} disabled={!canManage}>
+      <IntegrationControlScope disabled={!canManage || state.action !== "idle"}><fieldset className={surface.settingsFields} disabled={!canManage || state.action !== "idle"}>
       {tab === "connection" && <ConnectionSection
         copy={copy}
         draft={state.draft}
@@ -48,7 +49,7 @@ export function YouTrackSettingsForm({ copy, state, webhook, canManage, onChange
         canDisconnect={state.configuration.source === "workspace" && state.configuration.tokenConfigured}
         onChangeConnection={onChangeConnection}
       />}
-      {tab === "projects" && <RoutingSection
+      {tab === "projects" && <RoutingSection russian={russian}
         copy={copy}
         draft={state.draft}
         projects={state.selectedProjects}
@@ -64,7 +65,7 @@ export function YouTrackSettingsForm({ copy, state, webhook, canManage, onChange
         onUpdate={state.updateDraft}
       />}
       {canManage && tab === "webhook" ? <WebhookSection copy={copy} setup={webhook.setup} status={webhook.status} /> : null}
-      </fieldset>
+      </fieldset></IntegrationControlScope>
     </Content>
     </div>
   );

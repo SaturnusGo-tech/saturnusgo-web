@@ -17,7 +17,7 @@ test("Swagger full-page form retains validation, pending gate and saved callback
   assert.equal(all[0].type, "form"); assert.equal(all.some(node => node.props.role === "dialog"), false);
   assert.equal(all.find(node => node.props.type === "url")?.props.isRequired, true);
   invoke(all[0], "onSubmit", { preventDefault() {} }); assert.equal(saves, 1);
-  invoke(all.find(node => node.type === "Button" && node.props.type === "button")!, "onPress"); assert.equal(cancels, 1);
+  invoke(all.find(node => node.type === "IntegrationButton" && node.props.type === "button")!, "onPress"); assert.equal(cancels, 1);
   state.pending = true; all = nodes(h.render(() => View(props)));
   assert.equal(all.find(node => node.type === "fieldset")?.props.disabled, true);
   assert.equal(all.find(node => node.props.type === "submit")?.props.isDisabled, true);
@@ -27,10 +27,10 @@ test("specification authentication preserves masked credentials and clears incom
   const { SourceCredentials: View } = h.load<{ SourceCredentials: typeof SourceCredentials }>(new URL("../../forms/SourceCredentials.tsx", import.meta.url), name => name.endsWith("api-source") ? { keepsSourceCredentials } : undefined);
   const render = () => nodes(h.render(() => View({ draft, source: null, ru: false, onChange: value => { draft = value; } })));
   let all = render(); assert.equal(all.find(node => node.type === "SourceDisclosure")?.props.defaultOpen, false);
-  const selector = all.find(node => node.type === "Select")!; assert.ok(selector);
+  const selector = all.find(node => node.type === "IntegrationSelect")!; assert.ok(selector);
   draft.secrets = { username: "saved", password: "secret" };
-  invoke(selector, "onSelectionChange", new Set(["bearer"])); assert.equal(draft.authMode, "bearer"); assert.deepEqual(Object.keys(draft.secrets), []);
-  all = render(); const token = all.find(node => node.type === "Input" && node.props.type === "password")!;
+  invoke(selector, "onValueChange", "bearer"); assert.equal(draft.authMode, "bearer"); assert.deepEqual(Object.keys(draft.secrets), []);
+  all = render(); const token = all.find(node => node.type === "IntegrationInput" && node.props.type === "password")!;
   invoke(token, "onValueChange", "new-token"); assert.equal(draft.secrets.apiToken, "new-token");
   assert.equal(render().find(node => node.type === "SourceDisclosure")?.props.defaultOpen, true);
 });
@@ -39,11 +39,11 @@ test("project controls retain scoped selection and all-projects replacement", ()
   const { SourceProjects: View } = h.load<{ SourceProjects: typeof SourceProjects }>(new URL("../../forms/SourceProjects.tsx", import.meta.url));
   const render = () => nodes(h.render(() => View({ draft, projects: [{ id: "p", name: "Release" }, { id: "q", name: "Web" }], ru: false, onChange: value => { draft = value; } })));
   let all = render(); assert.deepEqual(Array.from(draft.projectIds), ["p"]);
-  invoke(all.find(node => node.type === "Checkbox" && node.props.children === "Web")!, "onValueChange", true);
+  invoke(all.find(node => node.type === "IntegrationCheckbox" && node.props.children === "Web")!, "onValueChange", true);
   assert.deepEqual(Array.from(draft.projectIds), ["p", "q"]);
-  all = render(); invoke(all.find(node => node.type === "Checkbox" && node.props.children === "Release")!, "onValueChange", false);
+  all = render(); invoke(all.find(node => node.type === "IntegrationCheckbox" && node.props.children === "Release")!, "onValueChange", false);
   assert.deepEqual(Array.from(draft.projectIds), ["q"]);
-  invoke(render().find(node => node.type === "Checkbox" && node.props.children === "All workspace projects")!, "onValueChange", true);
+  invoke(render().find(node => node.type === "IntegrationCheckbox" && node.props.children === "All workspace projects")!, "onValueChange", true);
   assert.equal(draft.allProjects, true); assert.deepEqual(Array.from(draft.projectIds), []);
 });
 test("HeroUI disclosures preserve drafts while excluding collapsed fields from keyboard and accessibility navigation", () => {
@@ -56,12 +56,14 @@ test("HeroUI disclosures preserve drafts while excluding collapsed fields from k
     let all = render(), accordion = all[0];
     assert.equal(accordion.type, "Accordion"); assert.equal(accordion.props.keepContentMounted, true);
     assert.equal(accordion.props.disableAnimation, reducedMotion);
+    assert.equal(all.find(node => node.type === "IntegrationControlScope")?.props.disabled, true);
     assert.ok(content(all), "mounted credentials have a focus-isolation wrapper");
     assert.equal(content(all).props["aria-hidden"], true);
     invoke(content(all), "ref", element); assert.equal(element.inert, true);
     invoke(accordion, "onSelectionChange", new Set(["settings"])); all = render(); accordion = all[0];
     assert.deepEqual(Array.from(accordion.props.selectedKeys as string[]), ["settings"]);
     assert.equal(content(all).props["aria-hidden"], undefined);
+    assert.equal(all.find(node => node.type === "IntegrationControlScope")?.props.disabled, false);
     invoke(content(all), "ref", element); assert.equal(element.inert, false);
     invoke(accordion, "onSelectionChange", new Set()); all = render();
     assert.deepEqual(Array.from(all[0].props.selectedKeys as string[]), []);

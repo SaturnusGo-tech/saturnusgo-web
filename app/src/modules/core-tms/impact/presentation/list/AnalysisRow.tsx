@@ -1,3 +1,4 @@
+import { IntegrationButton } from "../../../presentation/common/integration-controls/button/IntegrationButton";
 import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { Check, ChevronRight, Circle, CircleCheck, CircleX, Clock3, GitPullRequest } from "lucide-react";
 import type { ImpactAnalysis } from "../../model/impact-types";
@@ -15,7 +16,7 @@ export function AnalysisRow({ item, ru, onSelect }: { item: ImpactAnalysis; ru: 
   const Build = item.buildStatus === "success" ? Check : CircleX;
   const count = item.scope.filter(test => test.included).length, gaps = openCoverageGapCount(item);
   return <li className={css.row} data-analysis-id={item.id}>
-    <button type="button" className={css.open} onClick={() => onSelect(item.id)} aria-label={`${ru ? "Открыть анализ" : "Review analysis"}: ${title}`}>
+    <IntegrationButton type="button" className={css.open} onPress={() => onSelect(item.id)} aria-label={`${ru ? "Открыть анализ" : "Review analysis"}: ${title}`}>
       <span className={css.change}><GitPullRequest size={17} strokeWidth={1.6} aria-hidden="true" /><span className={css.copy}>
         <strong title={title}>{title}</strong><span className={css.meta} title={`${item.change.repository} · ${item.change.branch} · ${item.change.sha}`}>
           {item.buildStatus === "pending"
@@ -28,6 +29,6 @@ export function AnalysisRow({ item, ru, onSelect }: { item: ImpactAnalysis; ru: 
       <span className={css.coverage}>{item.result ? <><span>{count} {ru ? "кейсов" : "cases"}</span><small data-gaps={gaps > 0 || undefined}>{gaps ? `${gaps} ${ru ? "пробелов" : "gaps"}` : (ru ? "Без пробелов" : "No gaps")}</small></> : <span>—</span>}</span>
       <time className={css.date} dateTime={item.createdAt} title={new Date(item.createdAt).toLocaleString(ru ? "ru-RU" : "en-GB")}>{new Date(item.createdAt).toLocaleDateString(ru ? "ru-RU" : "en-GB", { day: "numeric", month: "short" })}</time>
       <ChevronRight size={15} className={css.chevron} aria-hidden="true" />
-    </button>
+    </IntegrationButton>
   </li>;
 }

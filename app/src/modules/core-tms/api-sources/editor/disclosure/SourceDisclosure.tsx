@@ -2,6 +2,7 @@ import { Accordion, AccordionItem } from "@heroui/react";
 import { useReducedMotion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 import { useState, type ReactNode } from "react";
+import { IntegrationControlScope } from "../../../presentation/common/integration-controls/scope/IntegrationControlScope";
 import css from "../editor.module.css";
 
 /** HeroUI owns keyboard navigation, disclosure semantics and the height transition. */
@@ -17,7 +18,7 @@ export function SourceDisclosure({ title, summary, defaultOpen = false, disabled
       title: css.optionTitle, titleWrapper: css.optionTitleWrapper, indicator: css.optionIndicator, content: css.optionBody }}>
     <AccordionItem key="settings" aria-label={title} title={<><span>{title}</span><span className={css.optionValue}>{summary}</span></>}
       indicator={<ChevronRight size={16} aria-hidden="true"/>}>
-      <div aria-hidden={!open || undefined} ref={element => { if (element) element.inert = !open; }}>{children}</div>
+      <IntegrationControlScope disabled={!open || disabled}><div aria-hidden={!open || undefined} ref={element => { if (element) element.inert = !open; }}>{children}</div></IntegrationControlScope>
     </AccordionItem>
   </Accordion>;
 }

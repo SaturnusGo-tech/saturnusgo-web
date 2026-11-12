@@ -1,3 +1,4 @@
+import { IntegrationButton } from "../../presentation/common/integration-controls/button/IntegrationButton";
 import { useEffect, useState } from "react";
 import type { Catalog } from "../../connectors/model/connector-types";
 import type { ImpactPermissions, ImpactScope } from "../model/impact-types";
@@ -19,8 +20,8 @@ export function ImpactWorkspace({ scope, ru, permissions, catalog, connectionId 
   if (!permissions.read) return <p className={css.notice}>{ru ? "Анализ доступен после подключения и проверки прав проекта." : "Analysis is available after connecting and checking project access."}</p>;
   return <div className={`${css.root} ${css.workspace}`} data-impact-workspace>
     {!selected && <div className={css.tabs} aria-label={ru ? "Разделы Impact Analysis" : "Impact Analysis sections"}>
-      <button type="button" aria-pressed={tab === "analyses"} onClick={() => setTab("analyses")}>{ru ? "Анализы" : "Analyses"}</button>
-      <button type="button" aria-pressed={tab === "repositories"} onClick={() => setTab("repositories")}>{ru ? "Репозитории" : "Repositories"}</button></div>}
+      <IntegrationButton type="button" aria-pressed={tab === "analyses"} onPress={() => setTab("analyses")}>{ru ? "Анализы" : "Analyses"}</IntegrationButton>
+      <IntegrationButton type="button" aria-pressed={tab === "repositories"} onPress={() => setTab("repositories")}>{ru ? "Репозитории" : "Repositories"}</IntegrationButton></div>}
     {selected ? <AnalysisDetail key={selected} scope={scope} id={selected} ru={ru} permissions={permissions} onBack={() => open(null)} />
       : tab === "analyses" ? <AnalysisList scope={scope} ru={ru} enabled={permissions.read} onSelect={open} />
         : <RepositorySettings scope={scope} ru={ru} permissions={permissions} catalog={catalog} connectionId={connectionId} />}

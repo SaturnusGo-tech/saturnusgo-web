@@ -1,3 +1,4 @@
+import { IntegrationButton } from "../../../presentation/common/integration-controls/button/IntegrationButton";
 import { useState } from "react";
 import { ArrowDownToLine, ArrowUpRight, RefreshCw, Link2 } from "lucide-react";
 import type { Snapshot } from "../../model/connector-types";
@@ -6,6 +7,7 @@ import { eventLabel, statusLabel } from "../../localization/connector-copy";
 import { connectorFailureLabel } from "../../localization/connector-failure-copy";
 import { reportRepublishAvailable } from "./report-republish-action";
 import styles from "../styles/connector.module.css";
+import { IntegrationInput } from "../../../presentation/common/integration-controls/input/IntegrationInput";
 export function ActivityPanel({ snapshot, ru, canManage, pending, refreshFailed, onRecover, onMore, onRefresh, onRepublish }: {
   snapshot: Snapshot; ru: boolean; canManage: boolean; pending: string | null;
   refreshFailed: boolean;
@@ -16,8 +18,8 @@ export function ActivityPanel({ snapshot, ru, canManage, pending, refreshFailed,
   const refreshing = pending === "activity" || pending === "load";
   return <div className={styles.activityGrid} aria-busy={refreshing}>
     <section className={styles.panel}>
-      <header><h2>{ru ? "Доставка событий" : "Event deliveries"}</h2><button type="button" className={styles.secondary}
-        onClick={onRefresh} disabled={Boolean(pending)}><RefreshCw size={15} />{ru ? "Обновить" : "Refresh"}</button></header>
+      <header><h2>{ru ? "Доставка событий" : "Event deliveries"}</h2><IntegrationButton type="button" className={styles.secondary}
+        onPress={onRefresh} isDisabled={Boolean(pending)}><RefreshCw size={15} />{ru ? "Обновить" : "Refresh"}</IntegrationButton></header>
       {refreshing && <p role="status">{ru ? "Обновляем журнал и связи…" : "Refreshing activity and links…"}</p>}
       {!refreshing && !refreshFailed && snapshot.deliveries.length === 0 && <div className={styles.empty}><ArrowDownToLine size={24} /><h3>{ru ? "Событий пока нет" : "No events yet"}</h3>
         <p>{ru ? "После подключения подходящие события проекта и подписанные вебхуки появятся здесь." : "Matching project events and signed webhooks will appear here after setup."}</p></div>}
@@ -25,23 +27,25 @@ export function ActivityPanel({ snapshot, ru, canManage, pending, refreshFailed,
         <div className={styles.deliveryMain}><strong>{eventLabel(d.event, ru)}</strong><span className={styles.deliveryBadge} data-status={d.status}>{statusLabel(d.status, ru)}</span></div>
         <p><time dateTime={d.createdAt}>{new Date(d.createdAt).toLocaleString(ru ? "ru-RU" : "en-US")}</time> · {d.direction === "inbound" ? "→ Falcon" : "Falcon →"} · {ru ? "попыток" : "attempts"}: {d.attempts}</p>
         <code>{d.targetId}</code>{d.errorCode && <small className={styles.deliveryError}>{connectorFailureLabel(d.errorCode, ru)}</small>}
-        {d.status === "failed" && canManage && <button type="button" className={styles.secondary} disabled={Boolean(pending)} onClick={() => onRecover(d.id)}>{ru ? "Повторить" : "Retry"}</button>}
+        {d.status === "failed" && canManage && <IntegrationButton type="button" className={styles.secondary} isDisabled={Boolean(pending)} onPress={() => onRecover(d.id)}>{ru ? "Повторить" : "Retry"}</IntegrationButton>}
         {canManage && reportRepublishAvailable(snapshot, d) && <div>
-          <button type="button" className={styles.secondary} disabled={Boolean(pending)} onClick={() => onRepublish(d.targetId)}>
-            <RefreshCw size={15} />{ru ? "Обновить отчёт" : "Republish report"}</button>
-          <small>{ru ? "Обновить существующую страницу Confluence отчётом этого прогона." : "Update the existing Confluence page with this run’s report."}</small>
+          <IntegrationButton type="button" className={styles.secondary} isDisabled={Boolean(pending)} onPress={() => onRepublish(d.targetId)}>
+            <RefreshCw size={15} />{ru ? "Обновить отчёт" : "Republish report"}</IntegrationButton>
+          <small className={styles.reconcileHint}>{ru ? "Обновить существующую страницу Confluence отчётом этого прогона." : "Update the existing Confluence page with this run’s report."}</small>
         </div>}
         {d.status === "uncertain" && <><p>{snapshot.connection?.provider === "confluence"
           ? (ru ? "Ответ Confluence потерян. Проверьте содержимое и версию страницы отчёта, затем укажите её ID для проверки связи. Повторная публикация автоматически не запускается." :
             "The Confluence response was lost. Check the report page content and version, then enter its page ID to verify the link. Publication is not retried automatically.")
           : (ru ? "Ответ сервиса потерян. Проверьте, создалась ли запись, и укажите её ID для восстановления связи." :
             "The service response was lost. Check whether the record exists and enter its ID to restore the link.")}</p>
-          {canManage && (reconcile === d.id ? <div className={styles.reconcile}><label>{ru ? "ID созданной записи" : "Created record ID"}
-            <input value={remoteId} onChange={(e) => setRemoteId(e.target.value)} /></label><button type="button" className={styles.secondary}
-              disabled={!remoteId.trim() || Boolean(pending)} onClick={() => onRecover(d.id, remoteId.trim())}>{ru ? "Проверить и связать" : "Verify and link"}</button></div> :
-            <button type="button" className={styles.secondary} onClick={() => { setReconcile(d.id); setRemoteId(""); }}>{ru ? "Восстановить связь" : "Restore link"}</button>)}</>}
+          {canManage && (reconcile === d.id ? <div className={styles.reconcile}><div className={styles.reconcileAction}>
+            <IntegrationInput className={styles.reconcileField} label={ru ? "ID созданной записи" : "Created record ID"}
+              value={remoteId} isDisabled={Boolean(pending)} onValueChange={setRemoteId} />
+            <IntegrationButton type="button" className={styles.secondary}
+              isDisabled={!remoteId.trim() || Boolean(pending)} onPress={() => onRecover(d.id, remoteId.trim())}>{ru ? "Проверить и связать" : "Verify and link"}</IntegrationButton></div></div> :
+            <IntegrationButton type="button" className={styles.secondary} isDisabled={Boolean(pending)} onPress={() => { setReconcile(d.id); setRemoteId(""); }}>{ru ? "Восстановить связь" : "Restore link"}</IntegrationButton>)}</>}
       </article>)}</div>
-      {snapshot.nextCursor && <button type="button" className={styles.secondary} disabled={Boolean(pending)} onClick={onMore}>{ru ? "Показать ещё" : "Load more"}</button>}
+      {snapshot.nextCursor && <IntegrationButton type="button" className={styles.secondary} isDisabled={Boolean(pending)} onPress={onMore}>{ru ? "Показать ещё" : "Load more"}</IntegrationButton>}
     </section>
     <section className={styles.panel}><header><Link2 size={18} /><h2>{ru ? "Связанные записи" : "Linked records"}</h2></header>
       <small>{ru ? "Последние 50 обновлённых связей" : "The 50 most recently updated links"}</small>

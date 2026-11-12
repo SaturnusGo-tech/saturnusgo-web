@@ -1,116 +1,45 @@
-import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
-import { ExternalLink, Eye, EyeOff, HelpCircle, RefreshCw, Unplug } from "lucide-react";
-import { useState } from "react";
-
+import { Eye, EyeOff, RefreshCw, Unplug } from "lucide-react";
+import { IntegrationInput } from "../../../common/integration-controls/input/IntegrationInput";
+import { IntegrationCheckbox } from "../../../common/integration-controls/checkbox/IntegrationCheckbox";
+import { IntegrationButton } from "../../../common/integration-controls/button/IntegrationButton";
 import type { YouTrackConfigurationDraft } from "../../../../youtrack/model/youtrack-settings";
 import surface from "../../hooks.module.css";
 import type { HooksCopy } from "../../shared/hooks-copy";
 import { SettingsSection } from "../form/SettingsSection";
+import { TokenHelp } from "./connection/TokenHelp";
 
-export function ConnectionSection({
-  copy,
-  draft,
-  tokenConfigured,
-  showToken,
-  connectedProjects,
-  action,
-  onToggleToken,
-  onUpdate,
-  onConnect,
-  canDisconnect,
-  onChangeConnection,
-}: {
-  copy: HooksCopy;
-  draft: YouTrackConfigurationDraft;
-  tokenConfigured: boolean;
-  showToken: boolean;
-  connectedProjects: number;
-  action: "idle" | "connecting" | "saving" | "disconnecting";
-  onToggleToken: () => void;
-  onUpdate: (updater: (current: YouTrackConfigurationDraft) => YouTrackConfigurationDraft) => void;
-  onConnect: () => void;
-  canDisconnect: boolean;
-  onChangeConnection: () => void;
+export function ConnectionSection({ copy, draft, tokenConfigured, showToken, connectedProjects, action,
+  onToggleToken, onUpdate, onConnect, canDisconnect, onChangeConnection }: {
+  copy: HooksCopy; draft: YouTrackConfigurationDraft; tokenConfigured: boolean; showToken: boolean;
+  connectedProjects: number; action: "idle" | "connecting" | "saving" | "disconnecting";
+  onToggleToken: () => void; onUpdate: (updater: (current: YouTrackConfigurationDraft) => YouTrackConfigurationDraft) => void;
+  onConnect: () => void; canDisconnect: boolean; onChangeConnection: () => void;
 }) {
-  const [tokenHelpOpen, setTokenHelpOpen] = useState(false);
-  return (
-    <SettingsSection title={copy.connection} description={copy.connectionHint}>
-      <div className={surface.connectionFields}>
-        <label className={surface.field}>
-          <span>{copy.baseUrl}</span>
-          <input
-            type="url"
-            value={draft.baseUrl}
-            placeholder="https://company.youtrack.cloud/"
-            onChange={(event) => onUpdate((current) => ({ ...current, baseUrl: event.target.value }))}
-            autoComplete="url"
-          />
-        </label>
-        <div className={surface.field}>
-          <span className={surface.fieldLabelWithHelp}>
-            <label htmlFor="youtrack-token">{copy.apiToken}</label>
-            <span className={surface.tokenHelp}
-              onMouseEnter={() => setTokenHelpOpen(true)} onMouseLeave={() => setTokenHelpOpen(false)}
-              onFocus={() => setTokenHelpOpen(true)}
-              onBlur={(event) => {
-                if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setTokenHelpOpen(false);
-              }}
-              onKeyDown={(event) => { if (event.key === "Escape") setTokenHelpOpen(false); }}>
-              <button type="button" aria-label={copy.tokenHelpLabel} aria-haspopup="dialog"
-                aria-expanded={tokenHelpOpen} aria-controls="youtrack-token-help"
-                onClick={() => setTokenHelpOpen(true)}>
-                <HelpCircle size={15} aria-hidden="true" />
-              </button>
-              {tokenHelpOpen ? <aside id="youtrack-token-help" role="dialog" aria-label={copy.tokenHelpTitle}
-                className={surface.tokenPopover} data-open="true">
-                <strong>{copy.tokenHelpTitle}</strong>
-                <ol>{copy.tokenHelpSteps.map((step) => <li key={step}>{step}</li>)}</ol>
-                <p>{copy.tokenHelpNote}</p>
-                <a href="https://www.jetbrains.com/help/youtrack/cloud/manage-permanent-token.html" target="_blank" rel="noreferrer">
-                  {copy.tokenHelpLink}<ExternalLink size={13} aria-hidden="true" />
-                </a>
-              </aside> : null}
-            </span>
-          </span>
-          <span className={surface.tokenField} data-input-shell>
-            <input
-              id="youtrack-token"
-              type={showToken ? "text" : "password"}
-              value={draft.apiToken}
-              placeholder={tokenConfigured ? copy.tokenStored : copy.tokenPlaceholder}
-              onChange={(event) => onUpdate((current) => ({ ...current, apiToken: event.target.value }))}
-              autoComplete="new-password"
-            />
-            <button type="button" aria-label={showToken ? copy.hideToken : copy.showToken} onClick={onToggleToken}>
-              {showToken
-                ? <EyeOff size={16} aria-hidden="true" />
-                : <Eye size={16} aria-hidden="true" />}
-            </button>
-          </span>
-          <small>{copy.tokenHint}</small>
-        </div>
+  return <SettingsSection title={copy.connection} description={copy.connectionHint}>
+    <div className={surface.connectionFields}>
+      <IntegrationInput label={copy.baseUrl} type="url" value={draft.baseUrl} placeholder="https://company.youtrack.cloud/"
+        autoComplete="url" onValueChange={value => onUpdate(current => ({ ...current, baseUrl: value }))}/>
+      <div className={surface.tokenGroup}>
+        <IntegrationInput label={copy.apiToken} type={showToken ? "text" : "password"} value={draft.apiToken}
+          placeholder={tokenConfigured ? copy.tokenStored : copy.tokenPlaceholder} autoComplete="new-password" spellCheck="false"
+          onValueChange={value => onUpdate(current => ({ ...current, apiToken: value }))}
+          endContent={<IntegrationButton isIconOnly variant="light" aria-label={showToken ? copy.hideToken : copy.showToken}
+            aria-pressed={showToken} onPress={onToggleToken}>{showToken ? <EyeOff size={16}/> : <Eye size={16}/>}</IntegrationButton>}/>
+        <div className={surface.tokenSupport}><small>{copy.tokenHint}</small><TokenHelp copy={copy}/></div>
       </div>
-      <div className={surface.connectionActions}>
-        <label className={surface.switchRow}>
-          <input
-            type="checkbox"
-            checked={draft.enabled}
-            onChange={(event) => onUpdate((current) => ({ ...current, enabled: event.target.checked }))}
-          />
-          <span><strong>{copy.enabled}</strong><small>{copy.enabledHint}</small></span>
-        </label>
-        <span className={surface.connectionResult}>
-          {connectedProjects > 0 ? copy.connectedProjects(connectedProjects) : null}
-          {canDisconnect ? <button type="button" className={surface.quietButton}
-            onClick={onChangeConnection} disabled={action !== "idle"}>
-            <Unplug size={14} aria-hidden="true" />{copy.changeConnection}
-          </button> : null}
-          <button type="button" className={surface.secondaryButton} onClick={onConnect} disabled={action !== "idle"}>
-            {action === "connecting" ? <LoadingOrb /> : <RefreshCw size={15} aria-hidden="true" />}
-            {action === "connecting" ? copy.connecting : tokenConfigured ? copy.reconnect : copy.connect}
-          </button>
-        </span>
+    </div>
+    <div className={surface.connectionActions}>
+      <IntegrationCheckbox isSelected={draft.enabled} onValueChange={enabled => onUpdate(current => ({ ...current, enabled }))}>
+        <span className={surface.checkCopy}><strong>{copy.enabled}</strong><small>{copy.enabledHint}</small></span>
+      </IntegrationCheckbox>
+      <div className={surface.connectionResult}>
+        {connectedProjects > 0 && <span>{copy.connectedProjects(connectedProjects)}</span>}
+        {canDisconnect && <IntegrationButton variant="light" onPress={onChangeConnection} isDisabled={action !== "idle"}>
+          <Unplug size={14}/>{copy.changeConnection}</IntegrationButton>}
+        <IntegrationButton variant="bordered" onPress={onConnect} isDisabled={action !== "idle"} isLoading={action === "connecting"}>
+          <RefreshCw size={15}/>{action === "connecting" ? copy.connecting : tokenConfigured ? copy.reconnect : copy.connect}
+        </IntegrationButton>
       </div>
-    </SettingsSection>
-  );
+    </div>
+  </SettingsSection>;
 }

@@ -1,3 +1,4 @@
+import { IntegrationButton } from "../../../common/integration-controls/button/IntegrationButton";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import type { YouTrackIntegrationStatus } from "../../../../application/integrations/getYouTrackIntegrationStatus";
 import { IntegrationStatusBadge, type IntegrationUiStatus } from "../../shared/IntegrationStatusBadge";
@@ -14,7 +15,7 @@ export function YouTrackSettingsHeader({ onBack, copy, status, integrationStatus
   const failed = integrationStatus?.failed ?? 0;
   return <header className={styles.header}>
     <div className={styles.breadcrumb}>
-      <button type="button" onClick={onBack} aria-label={copy.back}><ArrowLeft size={15} aria-hidden="true" />{copy.integrations}</button>
+      <IntegrationButton variant="light" onPress={onBack} aria-label={copy.back}><ArrowLeft size={15} aria-hidden="true" />{copy.integrations}</IntegrationButton>
       <span>/</span><span>YouTrack</span>
       <IntegrationThemeToggle russian={russian} className={styles.themeButton} />
     </div>
@@ -24,7 +25,7 @@ export function YouTrackSettingsHeader({ onBack, copy, status, integrationStatus
         <p>{russian ? "Дефекты и рабочие процессы" : "Defects and workflows"}</p></div>
       <div className={styles.actions}>
         {baseUrl && <a href={baseUrl} target="_blank" rel="noreferrer">{copy.openYouTrack}<ExternalLink size={14} /></a>}
-        {onSave && <button type="button" onClick={onSave} disabled={action !== "idle"}>{action === "saving" ? copy.saving : copy.save}</button>}
+        {onSave && <IntegrationButton variant="solid" onPress={onSave} isDisabled={action !== "idle"} isLoading={action === "saving"}>{action === "saving" ? copy.saving : copy.save}</IntegrationButton>}
       </div>
     </div>
     {integrationStatus && <div className={styles.syncLine}>

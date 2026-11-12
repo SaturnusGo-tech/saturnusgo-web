@@ -1,3 +1,4 @@
+import { IntegrationButton } from "../../../presentation/common/integration-controls/button/IntegrationButton";
 import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { useState } from "react";
 import { Check, CircleX, ExternalLink, GitBranch, GitCommitHorizontal, RefreshCw } from "lucide-react";
@@ -37,10 +38,10 @@ export function AnalysisSummary({ data, ru, pending, canRetry, onRetry }: {
       {build && <a href={build} target="_blank" rel="noreferrer">{ru ? "Сборка" : "Build"}<ExternalLink size={12} /></a>}
     </div>
     {data.result ? <div className={css.description}><p data-expanded={expanded || undefined}>{data.result.summary}</p>
-      {data.result.summary.length > 240 && <button className={css.textButton} type="button" aria-expanded={expanded} onClick={() => setExpanded(!expanded)}>{expanded ? (ru ? "Свернуть" : "Show less") : (ru ? "Читать полностью" : "Read full summary")}</button>}</div>
+      {data.result.summary.length > 240 && <IntegrationButton className={css.textButton} type="button" aria-expanded={expanded} onPress={() => setExpanded(!expanded)}>{expanded ? (ru ? "Свернуть" : "Show less") : (ru ? "Читать полностью" : "Read full summary")}</IntegrationButton>}</div>
       : <p className={css.muted}>{ru ? "Результат анализа ещё не получен." : "Analysis results are not available yet."}</p>}
     {data.aiEnabled !== false && (data.errorCode || data.result?.ai.errorCode) && <AnalysisAvailability code={data.errorCode || data.result!.ai.errorCode!} ru={ru} />}
     {data.change.truncated && <p className={shared.notice}>{ru ? "Список изменений неполный. Проверьте исходный diff перед подтверждением." : "The change list is incomplete. Review the source diff before approval."}</p>}
-    {failed && canRetry && <button type="button" className={css.quiet} disabled={pending} onClick={onRetry}><RefreshCw size={14} />{data.aiEnabled === false ? (ru ? "Пересчитать рекомендации" : "Recalculate recommendations") : (ru ? "Повторить анализ" : "Retry analysis")}</button>}
+    {failed && canRetry && <IntegrationButton type="button" className={css.quiet} isDisabled={pending} onPress={onRetry}><RefreshCw size={14} />{data.aiEnabled === false ? (ru ? "Пересчитать рекомендации" : "Recalculate recommendations") : (ru ? "Повторить анализ" : "Retry analysis")}</IntegrationButton>}
   </header>;
 }

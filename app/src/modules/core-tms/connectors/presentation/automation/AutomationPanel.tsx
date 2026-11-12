@@ -4,6 +4,8 @@ import { eventOptions } from "../../model/connector-draft";
 import { eventLabel, statusLabel } from "../../localization/connector-copy";
 import { RunRules } from "./RunRules";
 import styles from "../styles/connector.module.css";
+import { IntegrationCheckbox } from "../../../presentation/common/integration-controls/checkbox/IntegrationCheckbox";
+import { IntegrationSelect } from "../../../presentation/common/integration-controls/select/IntegrationSelect";
 export function AutomationPanel({ provider, ru, draft, discovery, catalog, onChange }: {
   provider: Provider; ru: boolean; draft: ConnectionInput; discovery: Discovery | null;
   catalog: Catalog; onChange: (value: ConnectionInput) => void;
@@ -16,10 +18,10 @@ export function AutomationPanel({ provider, ru, draft, discovery, catalog, onCha
     <section className={styles.panel}>
       <header><Bell size={20} /><h2>{ru ? "События" : "Events"}</h2></header>
       <p>{ru ? "Выберите события этого проекта, которые должна обрабатывать интеграция." : "Choose which events from this project the integration should process."}</p>
-      <div className={styles.checkList}>{eventOptions[provider].map((event) => <label className={styles.check} key={event}>
-        <input type="checkbox" checked={settings.events.includes(event)} onChange={(e) => update({
-          events: e.target.checked ? [...settings.events, event] : settings.events.filter((v) => v !== event),
-        })} /><span>{eventLabel(event, ru)}<small>{event}</small></span></label>)}</div>
+      <div className={styles.checkList}>{eventOptions[provider].map((event) => <IntegrationCheckbox className={styles.check} key={event}
+        isSelected={settings.events.includes(event)} onValueChange={(selected) => update({
+          events: selected ? [...settings.events, event] : settings.events.filter((v) => v !== event),
+        })}><span>{eventLabel(event, ru)}<small>{event}</small></span></IntegrationCheckbox>)}</div>
     </section>
     {tracker && <section className={styles.panel}>
       <header><Workflow size={20} /><h2>{ru ? "Движение исправления" : "Fix workflow"}</h2></header>
@@ -27,18 +29,17 @@ export function AutomationPanel({ provider, ru, draft, discovery, catalog, onCha
       <p>{ru ? "Статусы сервиса ниже возвращают дефект в Falcon в состояние «Готов к ретесту». Они не отмечают тест пройденным." :
         "These service statuses return a defect to Falcon as Ready for retest. They never mark a test as passed."}</p>
       {statusOptions.length === 0 && <div className={styles.empty}>{ru ? "Сначала проверьте доступ на вкладке подключения, чтобы загрузить статусы." : "Verify access on the Connection tab to load statuses."}</div>}
-      {statusOptions.map((option) => <label className={styles.check} key={option.id}><input type="checkbox"
-        checked={settings.inboundReadyStatuses.includes(option.id)} onChange={(e) => update({
-          inboundReadyStatuses: e.target.checked ? [...settings.inboundReadyStatuses, option.id] : settings.inboundReadyStatuses.filter((id) => id !== option.id),
-        })} /><span>{option.name}</span></label>)}
+      <div className={styles.statusChoices}>{statusOptions.map((option) => <IntegrationCheckbox className={styles.check} key={option.id}
+        isSelected={settings.inboundReadyStatuses.includes(option.id)} onValueChange={(selected) => update({
+          inboundReadyStatuses: selected ? [...settings.inboundReadyStatuses, option.id] : settings.inboundReadyStatuses.filter((id) => id !== option.id),
+        })}>{option.name}</IntegrationCheckbox>)}</div>
       <h3>{ru ? "Обновление статуса в сервисе" : "Update the service status"}</h3>
       <div className={styles.mapping}>{(["open", "triaged", "in_progress", "ready_for_retest", "verified", "closed", "reopened"] as const).map((status) =>
-        <label key={status}><span>{statusLabel(status, ru)}</span><ArrowRight size={13} />
-          <select aria-label={`${statusLabel(status, ru)} → ${provider}`} value={settings.outboundStatuses[status] ?? ""} onChange={(e) => {
-            const mapped = { ...settings.outboundStatuses }; if (e.target.value) mapped[status] = e.target.value; else delete mapped[status];
+        <div key={status}><span>{statusLabel(status, ru)}</span><ArrowRight size={13} />
+          <IntegrationSelect aria-label={`${statusLabel(status, ru)} → ${provider}`} value={settings.outboundStatuses[status] ?? ""} onValueChange={(value) => {
+            const mapped = { ...settings.outboundStatuses }; if (value) mapped[status] = value; else delete mapped[status];
             update({ outboundStatuses: mapped });
-          }}><option value="">{ru ? "Не менять" : "Keep unchanged"}</option>
-            {statusOptions.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}</select></label>)}</div>
+          }} options={[{ value: "", label: ru ? "Не менять" : "Keep unchanged" }, ...statusOptions.map(o => ({ value: o.id, label: o.name }))]} /></div>)}</div>
     </section>}
     {provider === "github" && <RunRules ru={ru} catalog={catalog} rules={settings.rules} onChange={(rules) => update({ rules })} />}
     {provider === "slack" && <section className={styles.panel}><header><h2>{ru ? "Что увидит команда" : "What the team receives"}</h2></header>

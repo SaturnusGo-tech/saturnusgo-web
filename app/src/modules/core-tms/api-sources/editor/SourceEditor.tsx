@@ -1,4 +1,7 @@
-import { Button, Input, Switch } from "@heroui/react";
+import { IntegrationButton } from "../../presentation/common/integration-controls/button/IntegrationButton";
+import { IntegrationInput } from "../../presentation/common/integration-controls/input/IntegrationInput";
+import { IntegrationSwitch } from "../../presentation/common/integration-controls/switch/IntegrationSwitch";
+import { IntegrationControlScope } from "../../presentation/common/integration-controls/scope/IntegrationControlScope";
 import { LoadingOrb } from "../../../../shared/components/loading/LoadingOrb";
 import { ErrorToast } from "../../presentation/common/error/ErrorToast";
 import { TmsApiError } from "../../../../core/tms/transport/http";
@@ -18,21 +21,20 @@ export function SourceEditor({ workspaceId, projectId, source, catalog, projects
   const { draft, setDraft } = state;
   useEffect(() => { nameInput.current?.focus({ preventScroll: true }); }, []);
   useEffect(() => { onPendingChange?.(state.pending); }, [state.pending, onPendingChange]);
-  const fieldSlots = { base: css.field, label: css.fieldLabel, mainWrapper: css.fieldMain, inputWrapper: css.inputWrapper, innerWrapper: css.inputInner, input: css.input };
   const duplicate = !source && catalog.find(api => api.sourceUrl.trim() === draft.sourceUrl.trim());
   return <form className={css.panel} aria-labelledby="api-source-title" onSubmit={event => { event.preventDefault(); void state.save(); }}>
     <header><ApiSourceIcon id={source?.id} size={30}/><div><h1 id="api-source-title">{source ? source.name : (ru ? "Подключить API" : "Connect API")}</h1>
       <p>{ru ? "Спецификация OpenAPI или Swagger в формате JSON или YAML." : "An OpenAPI or Swagger specification in JSON or YAML."}</p></div></header>
-    <fieldset disabled={state.pending}>
+    <IntegrationControlScope disabled={state.pending}><fieldset disabled={state.pending}>
       <legend className={css.srOnly}>{ru ? "Подключение API" : "API connection"}</legend>
       <div className={css.fields}>
-      <Input ref={nameInput} label={ru ? "Название" : "Name"} labelPlacement="outside-top" size="sm" variant="flat" maxLength={255} isDisabled={state.pending}
-        value={draft.name} onValueChange={name => setDraft({ ...draft, name })} placeholder={ru ? "API бронирований" : "Booking API"} classNames={fieldSlots}/>
-      <Input label={ru ? "URL спецификации" : "Specification URL"} labelPlacement="outside-top" size="sm" variant="flat" isRequired validationBehavior="native" type="url" maxLength={2048}
+      <IntegrationInput ref={nameInput} label={ru ? "Название" : "Name"} maxLength={255} isDisabled={state.pending}
+        value={draft.name} onValueChange={name => setDraft({ ...draft, name })} placeholder={ru ? "API бронирований" : "Booking API"}/>
+      <IntegrationInput label={ru ? "URL спецификации" : "Specification URL"} isRequired validationBehavior="native" type="url" maxLength={2048}
         spellCheck="false" autoComplete="off" isDisabled={state.pending} value={draft.sourceUrl} onValueChange={sourceUrl => setDraft({ ...draft, sourceUrl })}
-        placeholder="https://api.company.com/openapi.json" classNames={fieldSlots}/>
+        placeholder="https://api.company.com/openapi.json"/>
       </div>
-      {duplicate && <div className={css.duplicate}><span>{ru ? "Этот адрес уже подключён:" : "This URL is already connected:"} {duplicate.name}</span><Button type="button" variant="light" size="sm" disableRipple className={css.inlineAction} onPress={() => onExisting(duplicate)}>{ru ? "Использовать подключение" : "Use existing connection"}</Button></div>}
+      {duplicate && <div className={css.duplicate}><span>{ru ? "Этот адрес уже подключён:" : "This URL is already connected:"} {duplicate.name}</span><IntegrationButton type="button" variant="light" className={css.inlineAction} onPress={() => onExisting(duplicate)}>{ru ? "Использовать подключение" : "Use existing connection"}</IntegrationButton></div>}
       <div className={css.options}>
         <SourceCredentials disabled={state.pending} source={source} draft={draft} ru={ru} onChange={setDraft}/>
         <SourceProjects disabled={state.pending} projects={projects} draft={draft} ru={ru} onChange={setDraft}/>
@@ -40,14 +42,14 @@ export function SourceEditor({ workspaceId, projectId, source, catalog, projects
           {(draft.allProjects || draft.projectIds.length > 1) && <small>{draft.allProjects
             ? (ru ? "Отключение действует во всех проектах рабочего пространства." : "Disabling affects every project in this workspace.")
             : (ru ? "Отключение действует во всех выбранных проектах." : "Disabling affects all selected projects.")}</small>}
-          </span><Switch aria-label={ru ? "API включён" : "API enabled"} size="sm" isSelected={draft.enabled} isDisabled={state.pending}
-            classNames={{ base: css.switch, wrapper: css.switchTrack, thumb: css.switchThumb }} onValueChange={enabled => setDraft({ ...draft, enabled })}/></div></section>}
+          </span><IntegrationSwitch aria-label={ru ? "API включён" : "API enabled"} isSelected={draft.enabled} isDisabled={state.pending}
+            onValueChange={enabled => setDraft({ ...draft, enabled })}/></div></section>}
       </div>
-    </fieldset>
+    </fieldset></IntegrationControlScope>
     <ErrorToast message={state.error ? apiSourceError(state.error, ru) : null}
       retryLabel={ru ? "Обновить данные" : "Reload data"} onRetry={state.error && state.error instanceof TmsApiError && state.error.status === 412 ? onReload : undefined} />
     <footer><span role="status">{state.pending ? (ru ? "Проверяем спецификацию…" : "Checking specification…") : ""}</span>
-      <Button type="button" variant="light" size="sm" disableRipple className={css.cancel} isDisabled={state.pending} onPress={onClose}>{ru ? "Отмена" : "Cancel"}</Button>
-      <Button type="submit" size="sm" disableRipple className={css.save} isDisabled={state.pending} isLoading={state.pending} spinner={<LoadingOrb/>}>{state.pending ? (ru ? "Сохранение…" : "Saving…") : source ? (ru ? "Сохранить изменения" : "Save changes") : (ru ? "Подключить API" : "Connect API")}</Button></footer>
+      <IntegrationButton type="button" variant="light" className={css.cancel} isDisabled={state.pending} onPress={onClose}>{ru ? "Отмена" : "Cancel"}</IntegrationButton>
+      <IntegrationButton type="submit" variant="solid" className={css.save} isDisabled={state.pending} isLoading={state.pending} spinner={<LoadingOrb/>}>{state.pending ? (ru ? "Сохранение…" : "Saving…") : source ? (ru ? "Сохранить изменения" : "Save changes") : (ru ? "Подключить API" : "Connect API")}</IntegrationButton></footer>
   </form>;
 }

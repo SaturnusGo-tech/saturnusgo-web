@@ -1,3 +1,4 @@
+import { IntegrationButton } from "../../common/integration-controls/button/IntegrationButton";
 import { Unplug } from "lucide-react";
 
 import { Modal } from "../../common/modal/Modal";
@@ -11,17 +12,17 @@ export function DisconnectYouTrackDialog({ copy, busy, onClose, onConfirm }: {
   onConfirm: () => void;
 }) {
   return (
-    <Modal title={copy.disconnectTitle} onClose={onClose} panelClassName={surface.disconnectDialog}>
+    <Modal title={copy.disconnectTitle} onClose={() => { if (!busy) onClose(); }} panelClassName={surface.disconnectDialog}>
       <div className={surface.disconnectBody}>
         <p>{copy.disconnectText}</p>
         <div className={surface.disconnectActions}>
-          <button type="button" className={surface.secondaryButton} onClick={onClose} disabled={busy}>
+          <IntegrationButton variant="light" onPress={onClose} isDisabled={busy}>
             {copy.cancel}
-          </button>
-          <button type="button" className={surface.dangerButton} onClick={onConfirm} disabled={busy}>
+          </IntegrationButton>
+          <IntegrationButton color="danger" onPress={onConfirm} isDisabled={busy} isLoading={busy}>
             <Unplug size={15} aria-hidden="true" />
             {busy ? copy.saving : copy.disconnectConfirm}
-          </button>
+          </IntegrationButton>
         </div>
       </div>
     </Modal>

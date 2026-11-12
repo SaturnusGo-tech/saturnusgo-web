@@ -1,3 +1,4 @@
+import { installIntegrationTestControls } from "../../../impact/tests/support/control-test-boundary";
 import assert from "node:assert/strict";
 import test from "node:test";
 import React from "react";
@@ -7,10 +8,12 @@ import { TmsHttpClientProvider } from "../../../auth/http/TmsHttpClientContext";
 import type { ConnectionInput } from "../../model/connector-types";
 
 Object.assign(globalThis, { React });
+const restoreControls = installIntegrationTestControls();
 const previous = require.extensions[".css"];
 require.extensions[".css"] = module => { module.exports = {}; };
 const { ConnectorSettings } = require("../../presentation/ConnectorSettings") as typeof import("../../presentation/ConnectorSettings");
 const { ErrorToast } = require("../../../presentation/common/error/ErrorToast") as typeof import("../../../presentation/common/error/ErrorToast");
+restoreControls();
 if (previous) require.extensions[".css"] = previous;
 else delete require.extensions[".css"];
 
@@ -40,22 +43,22 @@ test("Linear gateway failure retries discovery without reloading or disclosing c
           onBack={() => {}} onSaved={() => {}} embedded />
       </TmsHttpClientProvider>);
     });
-    const field = (label: string) => view.root.findAllByType("label")
-      .find(node => node.children.includes(label))!.findByType("input");
-    act(() => field("API key").props.onChange({ target: { value: "test-only-token" } }));
-    act(() => field("Linear team ID or key").props.onChange({ target: { value: "QA" } }));
-    await act(async () => view.root.findAllByType("button").find(node => node.children.includes("Verify access"))!.props.onClick());
+    const field = (label: string) => view.root.findAllByType("input").find(node => node.props.label === label)!;
+    act(() => field("API key").props.onValueChange("test-only-token"));
+    act(() => field("Linear team ID or key").props.onValueChange("QA"));
+    await act(async () => view.root.findAllByType("button").find(node => node.children.includes("Verify access"))!.props.onPress());
     const toast = view.root.findByType(ErrorToast);
     assert.match(toast.props.message, /Could not verify access to Linear.*test-request/);
     assert.doesNotMatch(toast.props.message, /test-only-token/);
     assert.equal(toast.props.onRetry, undefined);
     assert.equal(view.root.findAllByProps({ role: "alert" }).length, 0);
-    await act(async () => view.root.findAllByType("button").find(node => node.children.includes("Verify access"))!.props.onClick());
+    await act(async () => view.root.findAllByType("button").find(node => node.children.includes("Verify access"))!.props.onPress());
     assert.equal(configurationLoads, 1);
     assert.equal(attempts.length, 2);
     assert.equal(attempts[1].secrets.apiToken, "test-only-token");
     assert.equal(attempts[1].settings.remoteId, "QA");
-    assert.match(JSON.stringify(view.toJSON()), /Linear QA/);
+    assert.ok(view.root.findAllByType("strong").some(node => node.children.includes("Linear QA")),
+      "successful discovery renders the verified Linear account");
     assert.equal(view.root.findByType(ErrorToast).props.message, undefined);
   } finally {
     await act(async () => view?.unmount());

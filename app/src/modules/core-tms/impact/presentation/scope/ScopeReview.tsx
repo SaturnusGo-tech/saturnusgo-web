@@ -1,3 +1,4 @@
+import { IntegrationButton } from "../../../presentation/common/integration-controls/button/IntegrationButton";
 import { useEffect, useRef, useState } from "react";
 import type { ImpactAnalysis, ImpactCommand, ImpactScope } from "../../model/impact-types";
 import { CasePicker } from "../scope-picker/CasePicker";
@@ -38,7 +39,7 @@ export function ScopeReview({ analysis, scope, ru, writable, pending, command }:
   return <section className={local.scope} id="impact-scope-review">
     <header className={local.heading}><div><h3>{ru ? "Состав проверки" : "Verification scope"}<span>{ids.length} / {analysis.scope.length}</span></h3>
       <p>{ru ? "Falcon предлагает тесты. QA проверяет причины и подтверждает итоговый состав." : "Falcon proposes tests. QA reviews the reasons and approves the final scope."}</p></div>
-      {editable && <button type="button" onClick={() => setPicking((value) => !value)}>{picking ? (ru ? "Закрыть выбор" : "Close picker") : (ru ? "Добавить тест" : "Add test")}</button>}</header>
+      {editable && <IntegrationButton type="button" onPress={() => setPicking((value) => !value)}>{picking ? (ru ? "Закрыть выбор" : "Close picker") : (ru ? "Добавить тест" : "Add test")}</IntegrationButton>}</header>
     {analysis.scope.length === 0 && <p className={css.empty}>{recommendations.length
       ? (ru ? "Рекомендации готовы, но состав прогона ещё не создан. Проверьте готовность сборки." : "Recommendations are available, but the run scope has not been created. Check build readiness.")
       : (ru ? "В составе ещё нет тестов. Добавьте готовый тест или создайте черновик для пробела покрытия." : "No tests in scope yet. Add a ready test or create a draft for a coverage gap.")}</p>}
@@ -60,7 +61,7 @@ export function ScopeReview({ analysis, scope, ru, writable, pending, command }:
         : (ru ? "Состав подтверждён. Результаты выполненных проверок сохраняются неизменными." : "Scope approved. Existing execution results remain unchanged."))
       : !analysis.canApprove ? (ru ? "Подтверждение пока недоступно. Проверьте анализ, готовность сборки и состав тестов." : "Approval is unavailable. Review analysis, build readiness, and test scope.")
         : (ru ? "Подтверждение разрешит запуск предложенного тест-рана." : "Approval allows the proposed test run to start.")}</p>
-      {!analysis.approved && writable && <button type="button" className={css.primary} disabled={!analysis.canApprove || busy}
-        onClick={() => void command({ action: "approve", body: {} })}>{ru ? "Подтвердить состав" : "Approve scope"}</button>}</footer>
+      {!analysis.approved && writable && <IntegrationButton type="button" className={css.primary} isDisabled={!analysis.canApprove || busy}
+        onPress={() => void command({ action: "approve", body: {} })}>{ru ? "Подтвердить состав" : "Approve scope"}</IntegrationButton>}</footer>
   </section>;
 }

@@ -1,3 +1,4 @@
+import { installIntegrationTestControls } from "../support/control-test-boundary";
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import { after, before, test } from "node:test";
@@ -11,12 +12,15 @@ import { analysis, scope } from "../fixtures/impact-fixture";
 const require = createRequire(import.meta.url), previousCss = require.extensions[".css"];
 const previousReact = Object.getOwnPropertyDescriptor(globalThis, "React");
 let AnalysisDetail: typeof import("../../presentation/detail/AnalysisDetail")["AnalysisDetail"];
+let restoreControls: () => void;
 before(async () => {
+  restoreControls = installIntegrationTestControls();
   require.extensions[".css"] = module => { module.exports = {}; };
   Object.assign(globalThis, { React });
   ({ AnalysisDetail } = await import("../../presentation/detail/AnalysisDetail"));
 });
 after(() => {
+  restoreControls();
   if (previousCss) require.extensions[".css"] = previousCss; else delete require.extensions[".css"];
   if (previousReact) Object.defineProperty(globalThis, "React", previousReact); else Reflect.deleteProperty(globalThis, "React");
 });
@@ -41,20 +45,20 @@ test("scope save retains the summary and Add test without showing an unresolved-
     await act(async () => { root = create(view); });
     const summary = root.root.findByType("h2");
     const add = () => root.root.findAllByType("button").find(node => node.children.includes("Add test"));
-    const inputs = () => root.root.findAllByType("input").filter(node => node.props.type === "checkbox");
+    const inputs = () => root.root.findAllByType("input").filter(node => typeof node.props.isSelected === "boolean");
     const firstInput = inputs()[0], secondInput = inputs()[1], addButton = add();
     assert.ok(addButton);
-    await act(async () => firstInput.props.onChange());
+    await act(async () => firstInput.props.onValueChange());
     assert.equal(posts, 1);
     assert.equal(root.root.findByType("h2"), summary);
     assert.equal(add(), addButton);
-    assert.ok(inputs().every(node => node.props.disabled !== true));
+    assert.ok(inputs().every(node => node.props.isDisabled !== true));
     assert.ok(inputs().every(node => node.props["aria-disabled"] === true));
-    assert.equal(JSON.stringify(root.toJSON()).includes("A previous action has no confirmed result yet"), false);
-    await act(async () => secondInput.props.onChange());
+    assert.equal(JSON.stringify(root.toJSON(), (_key, value) => React.isValidElement(value) ? undefined : value).includes("A previous action has no confirmed result yet"), false);
+    await act(async () => secondInput.props.onValueChange());
     assert.equal(posts, 1);
     await act(async () => release());
-    assert.equal(inputs()[0].props.checked, false); assert.equal(inputs()[1].props.checked, true);
+    assert.equal(inputs()[0].props.isSelected, false); assert.equal(inputs()[1].props.isSelected, true);
     assert.equal(add(), addButton);
   } finally { await act(async () => root?.unmount()); }
 });

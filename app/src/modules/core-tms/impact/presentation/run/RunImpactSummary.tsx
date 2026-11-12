@@ -1,3 +1,4 @@
+import { IntegrationButton } from "../../../presentation/common/integration-controls/button/IntegrationButton";
 import { useState } from "react";
 import { ArrowUpRight, ChevronRight, X } from "lucide-react";
 import { useOptionalTmsSession } from "../../../auth/presentation/session/TmsSessionContext";
@@ -51,9 +52,9 @@ export function RunImpactSummary({ state, scope, ru }: {
       </details>
       <a className={css.review} href={impactHref(typeof window === "undefined" ? "https://tms.invalid/work/" : window.location.href, scope, item.id)}>
         {ru ? "Причины и состав" : "Reasons and scope"}<ArrowUpRight size={14} strokeWidth={1.6} aria-hidden="true" /></a>
-      <button type="button" className={css.dismiss} onClick={() => dismiss(item)}
+      <IntegrationButton type="button" className={css.dismiss} onPress={() => dismiss(item)}
         aria-label={`${ru ? "Скрыть предложение анализа" : "Dismiss analysis proposal"}: ${item.change.repository}`}
-        title={ru ? "Скрыть это предложение" : "Dismiss this proposal"}><X size={15} strokeWidth={1.6} aria-hidden="true" /></button>
+        title={ru ? "Скрыть это предложение" : "Dismiss this proposal"}><X size={15} strokeWidth={1.6} aria-hidden="true" /></IntegrationButton>
     </article>)}
   </section>;
 }

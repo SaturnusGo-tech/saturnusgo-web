@@ -1,11 +1,12 @@
-import { Check, Copy, ExternalLink, Eye, EyeOff } from "lucide-react";
+import { ExternalLink, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
-import type { ReactNode } from "react";
 
 import type { YouTrackWebhookSetup } from "../../../../../youtrack/model/youtrack-settings";
 import surface from "../../../hooks.module.css";
 import type { HooksCopy } from "../../../shared/hooks-copy";
 import { SettingsSection } from "../../form/SettingsSection";
+import { IntegrationButton } from "../../../../common/integration-controls/button/IntegrationButton";
+import { WebhookValue } from "./WebhookValue";
 
 export function WebhookSection({ copy, setup, status }: {
   copy: HooksCopy;
@@ -36,10 +37,10 @@ export function WebhookSection({ copy, setup, status }: {
         <WebhookValue label={copy.webhookToken} value={setup.authentication.headerValue}
           type={revealed ? "text" : "password"} copied={copied === "token"} copy={copy}
           onCopy={() => void copyValue("token", setup.authentication.headerValue)}
-          action={<button type="button" onClick={() => setRevealed((value) => !value)}
+          action={<IntegrationButton isIconOnly variant="light" onPress={() => setRevealed((value) => !value)}
             aria-label={revealed ? copy.hideToken : copy.showToken}>
             {revealed ? <EyeOff size={15} aria-hidden="true" /> : <Eye size={15} aria-hidden="true" />}
-          </button>} />
+          </IntegrationButton>} />
       </div>
       <ol className={surface.webhookSteps}>
         {copy.webhookSteps.map((step) => <li key={step}>{step}</li>)}
@@ -51,26 +52,4 @@ export function WebhookSection({ copy, setup, status }: {
       </div>
     </>}
   </SettingsSection>;
-}
-
-function WebhookValue({ label, value, type = "text", copied, copy, action, onCopy }: {
-  label: string;
-  value: string;
-  type?: "text" | "password";
-  copied: boolean;
-  copy: HooksCopy;
-  action?: ReactNode;
-  onCopy: () => void;
-}) {
-  return <div className={surface.field}>
-    <span>{label}</span>
-    <span className={surface.webhookValue} data-input-shell>
-      <input type={type} value={value} readOnly spellCheck={false} aria-label={label} />
-      {action}
-      <button type="button" onClick={onCopy} aria-label={`${copy.copyValue}: ${label}`}>
-        {copied ? <Check size={15} aria-hidden="true" /> : <Copy size={15} aria-hidden="true" />}
-        <span>{copied ? copy.copiedValue : copy.copyValue}</span>
-      </button>
-    </span>
-  </div>;
 }

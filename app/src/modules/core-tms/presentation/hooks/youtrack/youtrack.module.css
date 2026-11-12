@@ -54,10 +54,8 @@
 .embedded .layout { display: block; }
 .embedded [data-youtrack-body] { padding: 20px 0 0; overflow: visible; }
 .embedded [data-youtrack-body] h2 { font-size: 16px; font-weight: 500; line-height: 24px; }
-.embedded [data-youtrack-body] :is(input, select) { border-radius: 8px; }
 .embeddedTabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 0 18px; border-bottom: 1px solid var(--plugin-line); }
 .embeddedTabs button { min-height: 32px; border: 0; border-radius: 8px; padding: 5px 10px; background: transparent; color: var(--plugin-muted); font: inherit; cursor: pointer; }
 .embeddedTabs button:hover, .embeddedTabs button[aria-current="page"] { background: var(--plugin-hover); color: var(--plugin-text); }
 .embeddedFooter { display: flex; justify-content: flex-end; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--plugin-line); }
-.embeddedFooter button { min-height: 36px; padding: 6px 12px; border: 0; border-radius: 10px; background: var(--plugin-action); color: var(--plugin-on-action); font: inherit; cursor: pointer; }
 .embeddedFooter button:disabled { opacity: .45; cursor: default; }

@@ -1,3 +1,4 @@
+import { IntegrationControlScope } from "../../common/integration-controls/scope/IntegrationControlScope";
 import { useEffect, useId, useRef, useState } from "react";
 import { BookOpen, ChevronRight } from "@openai/apps-sdk-ui/components/Icon";
 import { ConnectorSettings } from "../../../connectors/presentation/ConnectorSettings";
@@ -63,15 +64,15 @@ export function IntegrationPluginManager({ id, workspaceId, projectId, canManage
             }}><div className={css.clipped} data-settled={settled || undefined}>
               <div id={panelId} className={css.configuration} ref={element => { if (element) element.inert = !open; }}
                 onKeyDown={event => {
-                  if (event.key === "Escape" && !event.defaultPrevented && !(event.target as Element).closest?.('[role="dialog"], [role="menu"], select')) {
+                  if (event.key === "Escape" && !event.defaultPrevented && !(event.target as Element).closest?.('[role="dialog"], [role="menu"], [role="listbox"], [role="combobox"], [aria-haspopup="listbox"], select')) {
                     event.stopPropagation(); close();
                   }
                 }}>
-                {visited && (id === "youtrack" ? <YouTrackSettings embedded workspaceId={workspaceId} status={null} languageTag={ru ? "ru-RU" : "en-US"}
+                <IntegrationControlScope disabled={!open}>{visited && (id === "youtrack" ? <YouTrackSettings embedded workspaceId={workspaceId} status={null} languageTag={ru ? "ru-RU" : "en-US"}
                   russian={ru} canManage={canManage} onBack={close} onStatusChange={refresh} />
                   : id === "swagger" ? <p className={surface.notice}>{ru ? "Настройка API доступна администратору или QA-менеджеру." : "An administrator or QA manager can configure APIs."}</p>
                   : isProvider(id) && <ConnectorSettings embedded key={`${workspaceId}:${projectId}:${id}`} workspaceId={workspaceId} projectId={projectId} provider={id}
-                    ru={ru} canManage={canManage} capabilities={capabilities} connected={connected} onBack={close} onSaved={refresh} />)}
+                    ru={ru} canManage={canManage} capabilities={capabilities} connected={connected} onBack={close} onSaved={refresh} />)}</IntegrationControlScope>
               </div>
             </div></div>
             <IntegrationGuideLink article={id} className={`${surface.row} ${css.rowLink}`}><span className={surface.icon}><BookOpen width={22} height={22} /></span>

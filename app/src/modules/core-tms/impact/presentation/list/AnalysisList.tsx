@@ -1,9 +1,11 @@
+import { IntegrationButton } from "../../../presentation/common/integration-controls/button/IntegrationButton";
 import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, RefreshCw, Search, SearchX, X } from "lucide-react";
 import { useImpactList } from "../../application/list/useImpactList";
 import type { ImpactScope } from "../../model/impact-types";
 import { analysisCatalog, type AnalysisFilter } from "../../model/catalog/analysis-catalog";
-import { AnimatedSelect } from "../../../presentation/common/select/AnimatedSelect";
+import { IntegrationSelect } from "../../../presentation/common/integration-controls/select/IntegrationSelect";
+import { IntegrationInput } from "../../../presentation/common/integration-controls/input/IntegrationInput";
 import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { ImpactAiBanner } from "../banner/ImpactAiBanner";
 import { AnalysisRow } from "./AnalysisRow";
@@ -32,19 +34,18 @@ export function AnalysisList({ scope, ru, enabled, onSelect }: {
     <header className={css.header}>
       <div><h2>Impact Analysis <span>{state.items.length}{state.next ? "+" : ""}</span></h2>
         <p>{ru ? "Проверьте изменения, выберите кейсы и закройте пробелы покрытия." : "Review changes, select cases and close coverage gaps."}</p></div>
-      <button type="button" className={css.iconButton} aria-label={ru ? "Обновить анализы" : "Refresh analyses"}
-        title={ru ? "Обновить" : "Refresh"} disabled={state.loading} onClick={() => void state.refresh()}><RefreshCw size={16} /></button>
+      <IntegrationButton type="button" className={css.iconButton} aria-label={ru ? "Обновить анализы" : "Refresh analyses"}
+        title={ru ? "Обновить" : "Refresh"} isDisabled={state.loading} onPress={() => void state.refresh()}><RefreshCw size={16} /></IntegrationButton>
     </header>
     {state.aiEnabled === false && <ImpactAiBanner ru={ru} />}
     <div className={css.toolbar}>
-      <label className={css.search} data-input-shell><Search size={16} aria-hidden="true" />
-        <input type="search" aria-label={ru ? "Поиск по загруженным анализам" : "Search loaded analyses"} maxLength={300}
+      <IntegrationInput className={css.search} startContent={<Search size={16} aria-hidden="true" />}
+        type="search" aria-label={ru ? "Поиск по загруженным анализам" : "Search loaded analyses"} maxLength={300}
           placeholder={ru ? "Репозиторий, ветка или PR" : "Repository, branch or PR"} value={query}
-          onChange={event => { setQuery(event.target.value); setPage(1); }} />
-        {query && <button className={css.iconButton} type="button" aria-label={ru ? "Очистить поиск" : "Clear search"} onClick={() => { setQuery(""); setPage(1); }}><X size={14} /></button>}
-      </label>
-      <AnimatedSelect className={css.filter} compact label={ru ? "Статус анализа" : "Analysis status"} value={filter} options={options}
-        onChange={value => { setFilter(value as AnalysisFilter); setPage(1); }} />
+          onValueChange={value => { setQuery(value); setPage(1); }}
+          endContent={query ? <IntegrationButton className={css.iconButton} type="button" aria-label={ru ? "Очистить поиск" : "Clear search"} onPress={() => { setQuery(""); setPage(1); }}><X size={14} /></IntegrationButton> : undefined} />
+      <IntegrationSelect className={css.filter} aria-label={ru ? "Статус анализа" : "Analysis status"} value={filter} options={options}
+        onValueChange={value => { setFilter(value as AnalysisFilter); setPage(1); }} />
     </div>
     <ErrorToast message={state.error} retryLabel={ru ? "Повторить" : "Retry"} onRetry={() => void state.refresh()} />
     {state.loading && !state.ready && <p className={css.empty} role="status">{ru ? "Загружаем анализы…" : "Loading analyses…"}</p>}
@@ -57,16 +58,16 @@ export function AnalysisList({ scope, ru, enabled, onSelect }: {
     {state.ready && !rows.total && <div className={css.empty}><SearchX size={26} strokeWidth={1.5} aria-hidden="true" />
       <h3>{state.items.length ? (ru ? "Анализы не найдены" : "No matching analyses") : (ru ? "Анализов пока нет" : "No analyses yet")}</h3>
       <p>{state.items.length ? (ru ? "Измените запрос или статус." : "Try another search or status.") : (ru ? "Подключите репозиторий во вкладке «Репозитории». Изменения GitHub появятся здесь." : "Configure a repository in the Repositories tab. GitHub changes will appear here.")}</p>
-      {state.items.length > 0 && <button className={css.quiet} type="button" onClick={reset}>{ru ? "Сбросить фильтры" : "Reset filters"}</button>}
+      {state.items.length > 0 && <IntegrationButton className={css.quiet} type="button" onPress={reset}>{ru ? "Сбросить фильтры" : "Reset filters"}</IntegrationButton>}
     </div>}
     {state.ready && state.items.length > 0 && <footer className={css.footer}>
       <span role="status">{rows.start}–{rows.end} / {rows.total}{state.next ? (ru ? " загруженных · есть ещё" : " loaded · more available") : ""}</span>
       <nav aria-label={ru ? "Страницы анализов" : "Analysis pages"}>
-        <button className={css.iconButton} type="button" aria-label={ru ? "Предыдущая страница" : "Previous page"} disabled={rows.page === 1} onClick={() => movePage(rows.page - 1)}><ChevronLeft size={16} /></button>
+        <IntegrationButton className={css.iconButton} type="button" aria-label={ru ? "Предыдущая страница" : "Previous page"} isDisabled={rows.page === 1} onPress={() => movePage(rows.page - 1)}><ChevronLeft size={16} /></IntegrationButton>
         <span>{rows.page} / {rows.pages}</span>
-        <button className={css.iconButton} type="button" aria-label={ru ? "Следующая страница" : "Next page"} disabled={rows.page === rows.pages} onClick={() => movePage(rows.page + 1)}><ChevronRight size={16} /></button>
+        <IntegrationButton className={css.iconButton} type="button" aria-label={ru ? "Следующая страница" : "Next page"} isDisabled={rows.page === rows.pages} onPress={() => movePage(rows.page + 1)}><ChevronRight size={16} /></IntegrationButton>
       </nav>
-      {state.next && <button type="button" className={css.quiet} disabled={state.loading} onClick={() => void state.more()}>{state.loading ? (ru ? "Загружаем…" : "Loading…") : (ru ? "Загрузить ещё" : "Load more")}</button>}
+      {state.next && <IntegrationButton type="button" className={css.quiet} isDisabled={state.loading} onPress={() => void state.more()}>{state.loading ? (ru ? "Загружаем…" : "Loading…") : (ru ? "Загрузить ещё" : "Load more")}</IntegrationButton>}
     </footer>}
   </section>;
 }

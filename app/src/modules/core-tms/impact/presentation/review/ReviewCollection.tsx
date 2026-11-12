@@ -1,3 +1,5 @@
+import { IntegrationButton } from "../../../presentation/common/integration-controls/button/IntegrationButton";
+import { IntegrationInput } from "../../../presentation/common/integration-controls/input/IntegrationInput";
 import { useRef, type ReactNode } from "react";
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { useReviewList } from "../../application/review/useReviewList";
@@ -18,19 +20,19 @@ export function ReviewCollection<T>({ items, text, label, ru, children, searchab
   return <div className={css.collection} ref={container}>
     <div className={css.reviewToolbar}>
       <span className={css.muted} role="status">{label} · {state.start}–{state.end} / {state.total}</span>
-      {searchable && <label className={css.search}><Search size={15} aria-hidden="true" />
-        <input type="search" aria-label={`${ru ? "Поиск" : "Search"}: ${label}`} maxLength={300}
+      {searchable && <IntegrationInput className={css.search} startContent={<Search size={15} aria-hidden="true" />}
+        type="search" aria-label={`${ru ? "Поиск" : "Search"}: ${label}`} maxLength={300}
           placeholder={ru ? "Найти в списке" : "Search this list"} value={state.query}
-          onChange={(event) => state.setQuery(event.target.value)} /></label>}
+          onValueChange={state.setQuery} />}
     </div>
     <ul className={css.list} aria-label={label}>{state.items.map(children)}</ul>
     {!state.total && <p className={css.empty}>{ru ? "Совпадений нет. Измените поисковый запрос." : "No matches. Try a different search."}</p>}
     {state.pages > 1 && <nav className={css.pagination} aria-label={`${ru ? "Страницы" : "Pages"}: ${label}`}>
-      <button type="button" disabled={state.page === 1} onClick={() => openPage(state.page - 1)}>
-        <ChevronLeft size={15} aria-hidden="true" />{ru ? "Назад" : "Previous"}</button>
+      <IntegrationButton type="button" isDisabled={state.page === 1} onPress={() => openPage(state.page - 1)}>
+        <ChevronLeft size={15} aria-hidden="true" />{ru ? "Назад" : "Previous"}</IntegrationButton>
       <span className={css.muted}>{ru ? "Страница" : "Page"} {state.page} / {state.pages}</span>
-      <button type="button" disabled={state.page === state.pages} onClick={() => openPage(state.page + 1)}>
-        {ru ? "Далее" : "Next"}<ChevronRight size={15} aria-hidden="true" /></button>
+      <IntegrationButton type="button" isDisabled={state.page === state.pages} onPress={() => openPage(state.page + 1)}>
+        {ru ? "Далее" : "Next"}<ChevronRight size={15} aria-hidden="true" /></IntegrationButton>
     </nav>}
   </div>;
 }

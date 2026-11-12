@@ -1,3 +1,4 @@
+import { IntegrationButton } from "../../../presentation/common/integration-controls/button/IntegrationButton";
 import { useImpactHistory } from "../../application/history/useImpactHistory";
 import type { ImpactAnalysis } from "../../model/impact-types";
 import { impactLabel } from "../../model/impact-copy";
@@ -14,6 +15,6 @@ export function AnalysisHistory({ analysis, ru }: { analysis: ImpactAnalysis; ru
       <details><summary>{ru ? "Данные решения" : "Decision details"}</summary><pre className={css.code}>{JSON.stringify(item.details, null, 2)}</pre></details>
     </li>)}</ol>
     {!state.loading && !state.error && !state.items.length && <p className={css.muted}>{ru ? "Решений ещё нет." : "No decisions recorded yet."}</p>}
-    {state.next && <button type="button" disabled={state.loading} onClick={() => void state.more()}>{ru ? "Загрузить ещё" : "Load more"}</button>}
+    {state.next && <IntegrationButton type="button" isDisabled={state.loading} onPress={() => void state.more()}>{ru ? "Загрузить ещё" : "Load more"}</IntegrationButton>}
   </section>;
 }

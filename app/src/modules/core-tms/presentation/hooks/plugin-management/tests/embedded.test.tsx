@@ -14,9 +14,9 @@ test("embedded connector chrome keeps provider tabs and removes its duplicate na
   const props = { provider: "github" as const, ru: false, tab: "impact" as const, onTab: (tab: string) => selected.push(tab), onBack() {}, project: "Release", enabled: true, children: "configuration" };
   const all = nodes(h.render(() => View({ ...props, embedded: true })));
   assert.equal(all.some(node => node.type === "aside" || node.type === "h1"), false);
-  const tabs = all.filter(node => node.type === "button"); assert.equal(tabs.length, 4);
+  const tabs = all.filter(node => node.type === "IntegrationButton"); assert.equal(tabs.length, 4);
   assert.equal(tabs.find(node => node.props["aria-current"] === "page")?.props.children, "Impact Analysis");
-  for (const tab of tabs) invoke(tab, "onClick");
+  for (const tab of tabs) invoke(tab, "onPress");
   assert.deepEqual(selected, ["connection", "automation", "activity", "impact"]);
   assert.equal(nodes(h.render(() => View(props))).some(node => node.type === "aside"), true);
 });
@@ -35,7 +35,7 @@ test("embedded connector preserves scoped state, save, pending and reader permis
   let prevented = false; invoke(all.find(node => node.type === "form")!, "onSubmit", { preventDefault: () => { prevented = true; } });
   assert.equal(prevented, true); assert.equal(saves, 1);
   state.pending = "save"; all = nodes(h.render(() => View(props)));
-  assert.equal(all.find(node => node.type === "button" && node.props.type === "submit")?.props.disabled, true);
+  assert.equal(all.find(node => node.type === "IntegrationButton" && node.props.type === "submit")?.props.isDisabled, true);
   all = nodes(h.render(() => View({ ...props, canManage: false })));
   assert.equal(all.find(node => node.type === "fieldset")?.props.disabled, true);
   assert.equal(all.some(node => node.props.type === "submit" || node.type === "DisconnectPanel"), false);
@@ -54,11 +54,11 @@ test("embedded YouTrack retains real Save and its pending and read-only gates", 
   assert.equal(all.some(node => node.type === "YouTrackSettingsHeader"), false);
   const form = all.find(node => node.type === "YouTrackSettingsForm")!;
   assert.equal(form.props.embedded, true); assert.equal(form.props.state, state);
-  invoke(all.find(node => node.type === "button")!, "onClick"); assert.equal(saved, 1);
+  invoke(all.find(node => node.type === "IntegrationButton")!, "onPress"); assert.equal(saved, 1);
   state.action = "saving"; all = nodes(h.render(() => View(props)));
-  assert.equal(all.find(node => node.type === "button")?.props.disabled, true);
+  assert.equal(all.find(node => node.type === "IntegrationButton")?.props.isDisabled, true);
   all = nodes(h.render(() => View({ ...props, canManage: false })));
-  assert.equal(all.some(node => node.type === "button"), false);
+  assert.equal(all.some(node => node.type === "IntegrationButton"), false);
   assert.equal(all.find(node => node.type === "YouTrackSettingsForm")?.props.canManage, false);
 });
 test("embedded API source manager preserves create/edit scope and actual save refresh callbacks", () => {
