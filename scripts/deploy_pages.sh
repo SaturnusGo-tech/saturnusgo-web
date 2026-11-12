@@ -63,6 +63,25 @@ pages_sha=$(git -C "$pages_repo" rev-parse HEAD)
   exit 11
 }
 
+(
+  cd "$source_repo"
+  NODE_ENV=production node <<'NODE'
+const fail = (message) => { console.error(message); process.exit(18); };
+try {
+  const { loadEnvConfig } = require("@next/env");
+  loadEnvConfig(process.cwd(), false, {
+    info() {},
+    error() { throw new Error("Production environment could not be loaded."); },
+  });
+} catch {
+  fail("Unable to validate production environment configuration; install reviewed dependencies with npm ci and check local environment files.");
+}
+if (!process.env.NEXT_PUBLIC_FALCON_KLIPY_APP_KEY?.trim()) {
+  fail("NEXT_PUBLIC_FALCON_KLIPY_APP_KEY is required for a production release; set the public browser app key in the build environment or an ignored production environment file.");
+}
+NODE
+)
+
 api_hold_dir=$(mktemp -d)
 restore_api() {
   if [[ -d "$api_hold_dir/api" ]]; then mv "$api_hold_dir/api" "$source_repo/app/api"; fi
@@ -74,6 +93,7 @@ if [[ -d "$source_repo/app/api" ]]; then mv "$source_repo/app/api" "$api_hold_di
 (
   cd "$source_repo"
   npm run clean
+  NODE_ENV=production \
   BUILD_TARGET=export \
   NEXT_PUBLIC_AUTH0_DOMAIN=dev-4v1srvqwzp1m7cdl.us.auth0.com \
   NEXT_PUBLIC_AUTH0_CLIENT_ID=CQjoUKhO0f73Cb80jmWNiGXuyZt1TviC \

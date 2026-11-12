@@ -12,11 +12,13 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
+import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 import { requiredPublicAssets } from "./route-manifest.mjs";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
+const require = createRequire(import.meta.url);
 const expectedPagesRemote = "https://github.com/SaturnusGo-tech/saturnusgo-web.github.io.git";
 
 function run(command, args, options = {}) {
@@ -54,8 +56,11 @@ function createFixture(context) {
   const pages = join(sandbox, "pages");
   const remote = join(sandbox, "pages.git");
   const bin = join(sandbox, "bin");
+  const invocationLog = join(sandbox, "npm-invocations.log");
 
   initializeRepository(source);
+  write(join(source, ".gitignore"), "node_modules/\n.env*\nout/\n");
+  cpSync(dirname(require.resolve("@next/env/package.json")), join(source, "node_modules/@next/env"), { recursive: true });
   mkdirSync(join(source, "scripts"), { recursive: true });
   mkdirSync(join(source, "infrastructure/cloudflare/tms-origin"), { recursive: true });
   cpSync(join(repoRoot, "scripts/deploy_pages.sh"), join(source, "scripts/deploy_pages.sh"));
@@ -84,8 +89,9 @@ function createFixture(context) {
   git(pages, "push", "-u", "origin", "main");
 
   const npmStub = `#!/usr/bin/env node
-const { mkdirSync, rmSync, writeFileSync } = require("node:fs");
+const { appendFileSync, mkdirSync, rmSync, writeFileSync } = require("node:fs");
 const { dirname } = require("node:path");
+appendFileSync(process.env.NPM_INVOCATIONS_LOG, process.argv.slice(2).join(" ") + "\\n");
 const write = (path, value) => {
   mkdirSync(dirname(path), { recursive: true });
   writeFileSync(path, value);
@@ -95,6 +101,7 @@ if (process.argv.slice(2).join(" ") === "run clean") {
   process.exit(0);
 }
 if (process.argv.slice(2).join(" ") !== "run build") process.exit(2);
+write("out/build-node-env.txt", process.env.NODE_ENV ?? "");
 for (const name of ["privacy", "terms", "billing-terms", "trial-terms", "sandbox", "admin", "profile"]) write("out/" + name + "/index.html", "FALCON MANAGED ACCESS");
 write("out/ru/index.html", "FALCON RUSSIAN LANDING");
 write("out/docs/index.html", "FALCON PUBLIC DOCUMENTATION");
@@ -142,16 +149,18 @@ write("out/falcon/landing/hero.webp", "falcon hero\\n");
   git(source, "add", ".");
   git(source, "commit", "-m", "fixture: release source");
   const sourceSha = git(source, "rev-parse", "HEAD").stdout.trim();
-  return { bin, pages, remote, source, sourceSha };
+  return { bin, pages, remote, source, sourceSha, invocationLog };
 }
 
-function deploy(fixture, mode, extraEnvironment = {}) {
+function deploy(fixture, mode, extraEnvironment = {}, cwd = fixture.source) {
   return run("bash", [join(fixture.source, "scripts/deploy_pages.sh"), mode], {
-    cwd: fixture.source,
+    cwd,
     allowFailure: true,
     env: {
       ...process.env,
+      NEXT_PUBLIC_FALCON_KLIPY_APP_KEY: "fixture-public-klipy-key",
       ...extraEnvironment,
+      NPM_INVOCATIONS_LOG: fixture.invocationLog,
       PATH: `${fixture.bin}:${process.env.PATH}`,
       TMS_PAGES_REPO: fixture.pages,
       TMS_RELEASE_APPROVED: "YES",
@@ -159,6 +168,78 @@ function deploy(fixture, mode, extraEnvironment = {}) {
     },
   });
 }
+
+for (const [label, key] of [["missing", undefined], ["empty", ""], ["whitespace-only", " \t\n"]]) {
+  test(`rejects ${label} KLIPY configuration before cleaning, building or changing Pages`, (context) => {
+    const fixture = createFixture(context);
+    write(join(fixture.source, "out/keep.txt"), "previous export\n");
+    const pagesHead = git(fixture.pages, "rev-parse", "HEAD").stdout;
+    const remoteHead = git(fixture.pages, "ls-remote", "origin", "refs/heads/main").stdout;
+    const result = deploy(fixture, "--publish", { NEXT_PUBLIC_FALCON_KLIPY_APP_KEY: key });
+
+    assert.equal(result.status, 18, result.stderr);
+    assert.match(result.stderr, /NEXT_PUBLIC_FALCON_KLIPY_APP_KEY.*required.*production/i);
+    assert.equal(existsSync(fixture.invocationLog), false);
+    assert.equal(readFileSync(join(fixture.source, "out/keep.txt"), "utf8"), "previous export\n");
+    assert.equal(readFileSync(join(fixture.source, "app/api/route.ts"), "utf8"), "export const runtime = 'nodejs';\n");
+    assert.equal(git(fixture.source, "status", "--porcelain").stdout, "");
+    assert.equal(git(fixture.pages, "status", "--porcelain").stdout, "");
+    assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout, pagesHead);
+    assert.equal(git(fixture.pages, "ls-remote", "origin", "refs/heads/main").stdout, remoteHead);
+  });
+}
+
+test("requires production KLIPY configuration even when the caller uses NODE_ENV=test", (context) => {
+  const fixture = createFixture(context);
+  write(join(fixture.source, ".env.test.local"), "NEXT_PUBLIC_FALCON_KLIPY_APP_KEY=test-only-public-key\n");
+  const result = deploy(fixture, "--prepare", {
+    NEXT_PUBLIC_FALCON_KLIPY_APP_KEY: undefined,
+    NODE_ENV: "test",
+  });
+
+  assert.equal(result.status, 18, result.stderr);
+  assert.equal(existsSync(fixture.invocationLog), false);
+  assert.equal(git(fixture.pages, "status", "--porcelain").stdout, "");
+  assert.doesNotMatch(result.stdout + result.stderr, /test-only-public-key/);
+});
+
+test("an explicitly blank shell key cannot fall back to a production environment file", (context) => {
+  const fixture = createFixture(context);
+  write(join(fixture.source, ".env.production.local"), "NEXT_PUBLIC_FALCON_KLIPY_APP_KEY=file-public-klipy-key\n");
+  const result = deploy(fixture, "--publish", { NEXT_PUBLIC_FALCON_KLIPY_APP_KEY: " \t" });
+
+  assert.equal(result.status, 18, result.stderr);
+  assert.equal(existsSync(fixture.invocationLog), false);
+  assert.equal(git(fixture.pages, "status", "--porcelain").stdout, "");
+  assert.doesNotMatch(result.stdout + result.stderr, /file-public-klipy-key/);
+});
+
+test("loads production configuration from the source checkout when called elsewhere", (context) => {
+  const fixture = createFixture(context);
+  write(join(fixture.source, ".env.production.local"), "NEXT_PUBLIC_FALCON_KLIPY_APP_KEY=file-public-klipy-key\n");
+  const result = deploy(fixture, "--prepare", {
+    NEXT_PUBLIC_FALCON_KLIPY_APP_KEY: undefined,
+    NODE_ENV: "test",
+  }, fixture.pages);
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(readFileSync(fixture.invocationLog, "utf8"), "run clean\nrun build\n");
+  assert.equal(readFileSync(join(fixture.source, "out/build-node-env.txt"), "utf8"), "production");
+  assert.equal(git(fixture.pages, "status", "--porcelain").stdout, "");
+  assert.doesNotMatch(result.stdout + result.stderr, /file-public-klipy-key/);
+});
+
+test("a blank production-local key overrides lower-priority files", (context) => {
+  const fixture = createFixture(context);
+  write(join(fixture.source, ".env.production.local"), 'NEXT_PUBLIC_FALCON_KLIPY_APP_KEY="  "\n');
+  write(join(fixture.source, ".env.local"), "NEXT_PUBLIC_FALCON_KLIPY_APP_KEY=lower-priority-public-key\n");
+  const result = deploy(fixture, "--prepare", { NEXT_PUBLIC_FALCON_KLIPY_APP_KEY: undefined });
+
+  assert.equal(result.status, 18, result.stderr);
+  assert.equal(existsSync(fixture.invocationLog), false);
+  assert.equal(git(fixture.pages, "status", "--porcelain").stdout, "");
+  assert.doesNotMatch(result.stdout + result.stderr, /lower-priority-public-key/);
+});
 
 test("publishes Falcon routes into an isolated namespace without replacing Pages root", (context) => {
   const fixture = createFixture(context);

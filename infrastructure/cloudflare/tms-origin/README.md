@@ -48,6 +48,13 @@ unless the Pages checkout is clean, on `main`, points at the reviewed
 `origin/main` ref. The staged `/tms-origin/release.json` binds the public artifact to the reviewed
 source commit and is checked before any Worker deployment.
 
+The GIF gallery requires `NEXT_PUBLIC_FALCON_KLIPY_APP_KEY` at build time. Set the public browser
+app key in the release environment or ignored `.env.production.local` in the source checkout;
+never put a key value in tracked source. The Pages release preflight uses Next.js production
+environment-file precedence and rejects a missing or blank key before cleaning or building.
+Changing the key requires rebuilding. Provider production approval is separate: a KLIPY app in
+Testing remains limited to 100 requests per hour even when a key is configured.
+
 ## Production origin and authentication requirements
 
 - Backend `CORS_ORIGINS` must contain the exact origin `https://tms.saturnusgo.com`. Admin API
