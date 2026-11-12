@@ -65,7 +65,7 @@
 }
 
 .star {
-  fill: var(--falcon-caution-solid);
+  fill: var(--product-doc-star, var(--falcon-caution-border));
   color: var(--falcon-caution-border);
 }
 

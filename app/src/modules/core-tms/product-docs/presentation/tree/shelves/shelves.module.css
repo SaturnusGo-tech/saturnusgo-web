@@ -196,7 +196,7 @@
 .star {
   flex: none;
   align-self: center;
-  color: var(--product-doc-star, var(--falcon-caution-solid));
+  color: var(--product-doc-star, var(--falcon-caution-border));
   fill: currentColor;
   stroke: var(--falcon-caution-border);
 }

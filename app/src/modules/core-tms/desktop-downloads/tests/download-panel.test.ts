@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import type { DesktopDownloadsPanel } from "../presentation/DesktopDownloadsPanel";
 import release from "../model/release.json";
+import { parseDesktopRelease } from "../model/latest/release";
 import { componentHarness, nodes } from "../../portfolios/tests/support/component-harness";
+const currentRelease = parseDesktopRelease(release);
 
 test("download panel exposes the verified beta platforms and signing facts without automatic downloads", () => {
   const h = componentHarness(undefined, { document: { body: {} } });
@@ -21,7 +23,7 @@ test("download panel exposes the verified beta platforms and signing facts witho
     if (name.endsWith("release.json")) return { default: release };
   });
   // Evaluate the JSX before effects; geometry and dismissal are verified separately.
-  const all = nodes(openRender({ open: true, anchor: { current: null }, onClose() {} }));
+  const all = nodes(openRender({ open: true, anchor: { current: null }, onClose() {}, release: currentRelease }));
   const downloads = all.filter(node => node.type === "a" && typeof node.props.download === "string" && node.props.download !== release.checksums);
   assert.equal(downloads.length, 3);
   assert.deepEqual(downloads.map(node => node.props.href), release.artifacts.map(build => `${release.baseUrl}${build.file}`));
@@ -42,13 +44,13 @@ test("the Mac update chooser offers only Mac installers", () => {
     if (name.endsWith("release.json")) return { default: release };
   });
   const macFiles = release.artifacts.filter(build => build.platform === "mac").map(build => build.file);
-  const all = nodes(render({ open: true, anchor: { current: null }, onClose() {}, installerFiles: macFiles }));
+  const all = nodes(render({ open: true, anchor: { current: null }, onClose() {}, installerFiles: macFiles, release: currentRelease }));
   const downloads = all.filter(node => node.type === "a" && typeof node.props.download === "string" && node.props.download !== release.checksums);
   assert.deepEqual(downloads.map(node => node.props.download), macFiles);
 
   const actions: string[] = [];
   const chooser = nodes(render({
-    open: true, anchor: { current: null }, installerFiles: macFiles,
+    open: true, anchor: { current: null }, installerFiles: macFiles, release: currentRelease,
     onClose() { actions.push("close"); },
     onDownload(href) { actions.push(href); },
   }));

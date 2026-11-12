@@ -5,7 +5,8 @@ import { useEffect, useId, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { desktopDownloadsPosition } from "../model/position";
-import release from "../model/release.json";
+import { readLatestDesktopRelease } from "../model/latest/source";
+import type { DesktopRelease } from "../model/latest/release";
 import css from "./desktop-downloads.module.css";
 
 type Props = {
@@ -14,13 +15,24 @@ type Props = {
   readonly onClose: () => void;
   readonly installerFiles?: readonly string[];
   readonly onDownload?: (href: string) => void;
+  readonly release?: DesktopRelease;
 };
 
-export function DesktopDownloadsPanel({ open, anchor, onClose, installerFiles, onDownload }: Props) {
+export function DesktopDownloadsPanel({ open, anchor, onClose, installerFiles, onDownload, release: selectedRelease }: Props) {
   const { locale } = useTmsLocale(), ru = locale === "ru", id = useId();
   const panel = useRef<HTMLDivElement>(null), closeCallback = useRef(onClose);
   const [position, setPosition] = useState<ReturnType<typeof desktopDownloadsPosition> | null>(null);
+  const [loadedRelease, setRelease] = useState<DesktopRelease | null>(null), [failed, setFailed] = useState(false);
+  const release = selectedRelease ?? loadedRelease;
   closeCallback.current = onClose;
+
+  useEffect(() => {
+    if (!open) { setRelease(null); return; }
+    if (selectedRelease) return;
+    let active = true; setFailed(false);
+    void readLatestDesktopRelease().then(value => { if (active) setRelease(value); }, () => { if (active) setFailed(true); });
+    return () => { active = false; };
+  }, [open, selectedRelease]);
 
   useEffect(() => {
     if (!open) { setPosition(null); return; }
@@ -48,12 +60,12 @@ export function DesktopDownloadsPanel({ open, anchor, onClose, installerFiles, o
       window.removeEventListener("resize", place);
       window.removeEventListener("scroll", place, true);
     };
-  }, [open, anchor, id]);
+  }, [open, anchor, id, release, failed]);
 
   const visible = open && position !== null;
   useEffect(() => {
     if (visible) panel.current?.querySelector<HTMLElement>("[data-desktop-installer]")?.focus({ preventScroll: true });
-  }, [visible]);
+  }, [visible, release]);
 
   if (!open || typeof document === "undefined") return null;
   const close = () => { onClose(); anchor.current?.focus({ preventScroll: true }); };
@@ -62,11 +74,13 @@ export function DesktopDownloadsPanel({ open, anchor, onClose, installerFiles, o
       if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); close(); }
     }}>
     <header className={css.header}>
-      <div><h2 id={`${id}-title`}>{ru ? "Скачать приложение" : "Download app"}</h2><span className={css.version}>Beta · {release.version}</span></div>
+      <div><h2 id={`${id}-title`}>{ru ? "Скачать приложение" : "Download app"}</h2>{release && <span className={css.version}>Beta · {release.version}</span>}</div>
       <button type="button" className={css.close} onClick={close} aria-label={ru ? "Закрыть" : "Close"}><X size={18} strokeWidth={1.7} aria-hidden="true" /></button>
     </header>
     <div className={css.builds}>
-      {release.artifacts.filter(build => !installerFiles || installerFiles.includes(build.file)).map(build => {
+      {!release && <p role="status">{failed ? ru ? "Загрузка временно недоступна. Откройте меню ещё раз." : "Downloads are temporarily unavailable. Reopen this menu to try again."
+        : ru ? "Проверяем последнюю версию…" : "Checking the latest release…"}</p>}
+      {release?.artifacts.filter(build => !installerFiles || installerFiles.includes(build.file)).map(build => {
         const Platform = build.platform === "mac" ? Laptop : Monitor;
         const href = `${release.baseUrl}${build.file}`;
         return <a key={build.id} className={css.build} href={href} data-desktop-installer download={onDownload ? undefined : build.file}
@@ -80,7 +94,7 @@ export function DesktopDownloadsPanel({ open, anchor, onClose, installerFiles, o
     <footer className={css.footer}>
       <a className={css.installGuide} href="https://www.saturnusgo.com/falcon/desktop/install/macos.html" target="_blank" rel="noopener noreferrer">Install and open on macOS ↗</a>
       <p>{ru ? "macOS: локальная подпись, без нотариализации. Windows: без цифровой подписи." : "macOS: ad-hoc signed, not notarized. Windows: unsigned."}</p>
-      <a href={`${release.baseUrl}${release.checksums}`} download={release.checksums}>{ru ? "Контрольные суммы SHA-256" : "SHA-256 checksums"}</a>
+      {release && <a href={`${release.baseUrl}${release.checksums}`} download={release.checksums}>{ru ? "Контрольные суммы SHA-256" : "SHA-256 checksums"}</a>}
     </footer>
   </div>, document.body);
 }

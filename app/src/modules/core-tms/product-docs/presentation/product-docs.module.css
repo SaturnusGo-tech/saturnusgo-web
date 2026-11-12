@@ -1,7 +1,7 @@
 .workspace {
   --product-doc-header-inset: 18px;
   --library-height: 52px;
-  --product-doc-star: var(--falcon-caution-solid);
+  --product-doc-star: var(--falcon-caution-border);
   --contents-width: 250px;
   --line-enter: left;
   --line-leave: right;
@@ -14,6 +14,10 @@
   background: var(--falcon-surface);
   overflow: hidden;
   transition: grid-template-columns 240ms cubic-bezier(.22, .7, .2, 1);
+}
+
+:global(.dark) .workspace {
+  --product-doc-star: var(--falcon-caution-solid);
 }
 
 .libraryBar {

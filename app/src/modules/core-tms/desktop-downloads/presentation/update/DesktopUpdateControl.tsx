@@ -4,7 +4,7 @@ import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb"
 import { Download } from "lucide-react";
 import { useEffect, useRef, useState, type ReactElement } from "react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
-import { getDesktopUpdate, type DesktopUpdate } from "../../model/update";
+import { loadDesktopUpdate, type AvailableDesktopUpdate } from "../../model/update";
 import { DesktopDownloadsPanel } from "../DesktopDownloadsPanel";
 import css from "../desktop-downloads.module.css";
 
@@ -20,15 +20,20 @@ export function DesktopUpdateControl({ renderTooltip }: {
 } = {}) {
   const { locale } = useTmsLocale();
   const ru = locale === "ru";
-  const [update, setUpdate] = useState<DesktopUpdate | null>(null);
+  const [update, setUpdate] = useState<AvailableDesktopUpdate | null>(null);
   const [chooserOpen, setChooserOpen] = useState(false);
   const [handoff, setHandoff] = useState<"idle" | "opening" | "failed">("idle");
   const trigger = useRef<HTMLButtonElement>(null);
   const pending = useRef<DownloadHandoff | null>(null);
+  const checking = useRef(false), mounted = useRef(false);
 
   useEffect(() => {
-    let active = true;
-    void getDesktopUpdate(navigator).then(value => { if (active) setUpdate(value); });
+    mounted.current = true;
+    const refresh = () => {
+      if (pending.current || checking.current) return;
+      void loadDesktopUpdate(navigator).then(value => { if (mounted.current) setUpdate(value); }).catch(() => {});
+    };
+    refresh();
     function acknowledge(event: Event) {
       const result = (event as CustomEvent<{ requestId: string; opened: boolean }>).detail;
       const attempt = pending.current;
@@ -38,24 +43,38 @@ export function DesktopUpdateControl({ renderTooltip }: {
       attempt.timer = setTimeout(() => attempt.finish(!result.opened), Math.max(0, 220 - (Date.now() - attempt.startedAt)));
     }
     window.addEventListener("falcon:desktop-update-handoff", acknowledge);
+    window.addEventListener("focus", refresh);
     return () => {
-      active = false;
+      mounted.current = false;
       window.removeEventListener("falcon:desktop-update-handoff", acknowledge);
+      window.removeEventListener("focus", refresh);
       if (pending.current) clearTimeout(pending.current.timer);
       pending.current = null;
     };
   }, []);
 
   if (!update) return null;
-  function openInstaller(href: string) {
-    if (pending.current) return;
+  async function openInstaller(href: string) {
+    if (pending.current || checking.current) return;
+    checking.current = true;
     function finish(failed: boolean) {
       if (pending.current) clearTimeout(pending.current.timer);
       pending.current = null;
-      setHandoff(failed ? "failed" : "idle");
+      checking.current = false;
+      if (mounted.current) setHandoff(failed ? "failed" : "idle");
     }
     setHandoff("opening");
     try {
+      const chosen = update!.release.artifacts.find(build => `${update!.release.baseUrl}${build.file}` === href);
+      if (!chosen) throw new Error("Unknown desktop installer");
+      const current = await loadDesktopUpdate(navigator);
+      if (!mounted.current) return;
+      setUpdate(current);
+      if (!current) { finish(false); return; }
+      const build = current.release.artifacts.find(build => build.id === chosen.id);
+      const eligible = current.installer ? [current.installer.file] : current.macFiles;
+      if (!build || !eligible.includes(build.file)) throw new Error("Desktop installer unavailable");
+      href = `${current.release.baseUrl}${build.file}`;
       const requestId = navigator.userAgent.split(" ").includes("FalconUpdateHandoff/1") ? crypto.randomUUID() : null;
       pending.current = {
         requestId,
@@ -68,6 +87,8 @@ export function DesktopUpdateControl({ renderTooltip }: {
       window.open(address, "_blank", "noopener,noreferrer");
     } catch {
       finish(true);
+    } finally {
+      checking.current = false;
     }
   }
 
@@ -82,13 +103,13 @@ export function DesktopUpdateControl({ renderTooltip }: {
   const installer = update.installer;
   const action = installer ? <a {...attributes} href={installer.href} onClick={event => {
     event.preventDefault();
-    openInstaller(installer.href);
+    void openInstaller(installer.href);
   }}>{icon}</a> : <button {...attributes} ref={trigger} type="button" aria-haspopup="dialog" aria-expanded={chooserOpen}
-    onClick={() => { if (!pending.current) setChooserOpen(true); }}>{icon}</button>;
+    onClick={() => { if (!pending.current && !checking.current) setChooserOpen(true); }}>{icon}</button>;
   return <div className={css.updateControl}>
     {renderTooltip ? renderTooltip(label, action, !chooserOpen) : action}
     {!installer && <DesktopDownloadsPanel open={chooserOpen} anchor={trigger} onClose={() => setChooserOpen(false)} installerFiles={update.macFiles}
-      onDownload={openInstaller} />}
+      release={update.release} onDownload={href => void openInstaller(href)} />}
     <span className={css.updateAnnouncement} role="status">{busy ? openingLabel : ""}</span>
     {handoff === "failed" && <span className={css.updateError} role="alert">{ru ? "Не удалось открыть загрузку. Повторите попытку." : "Could not open the download. Try again."}</span>}
   </div>;

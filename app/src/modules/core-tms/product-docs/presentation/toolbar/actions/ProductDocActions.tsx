@@ -67,7 +67,7 @@ export function ProductDocActions({
   const editLabel = page.kind === "folder" ? copy.renameFolder : copy.edit;
   const pageActions = [
     ...(hasPublication ? [{ key: "star", label: starred ? copy.unstar : copy.star, icon: <Star className={styles.starIcon} size={16}
-      fill={starred ? "var(--falcon-caution-solid)" : "none"} aria-hidden="true" />, run: onStar }] : []),
+      fill={starred ? "var(--product-doc-star)" : "none"} aria-hidden="true" />, run: onStar }] : []),
     ...(canChange && page.canPublish ? [{ key: "move", label: copy.move, icon: <FolderInput size={16} aria-hidden="true" />, run: () => setMoving(true) }] : []),
     ...(hasPublication ? [{ key: "export", label: copy.exportMarkdown, icon: <Download size={16} aria-hidden="true" />, run: () => downloadMarkdown(page) }] : []),
     ...(canChange && page.canPublish ? [{ key: "archive", label: copy.archiveItem, icon: <Archive size={16} aria-hidden="true" />, run: () => setArchiving(true) }] : []),

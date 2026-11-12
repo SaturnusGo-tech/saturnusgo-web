@@ -1,10 +1,11 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { componentHarness, nodes } from "../../../portfolios/tests/support/component-harness";
-import { getDesktopUpdate } from "../../model/update";
+import { getDesktopUpdate, type AvailableDesktopUpdate } from "../../model/update";
+import type { DesktopRelease } from "../../model/latest/release";
 import release from "../../model/release.json";
 
-function setup(userAgent: string, locale = "en") {
+function setup(userAgent: string, locale = "en", check?: () => Promise<AvailableDesktopUpdate | null>) {
   const timers = new Set<() => void>();
   const h = componentHarness(undefined, {
     navigator: { userAgent },
@@ -14,7 +15,13 @@ function setup(userAgent: string, locale = "en") {
   const { DesktopUpdateControl } = h.load<{ DesktopUpdateControl: () => unknown }>(
     new URL("../../presentation/update/DesktopUpdateControl.tsx", import.meta.url), name => {
       if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale }) };
-      if (name.endsWith("/update")) return { getDesktopUpdate };
+      if (name.endsWith("/update")) {
+        const loadDesktopUpdate = check ?? (async () => {
+          const update = await getDesktopUpdate({ userAgent }, release);
+          return update ? { ...update, release: release as DesktopRelease } : null;
+        });
+        return { getDesktopUpdate: loadDesktopUpdate, loadDesktopUpdate };
+      }
     });
   const opened: string[] = [];
   const window = h.window as typeof h.window & { open: (href: string, target: string, options: string) => null };
@@ -49,6 +56,24 @@ test("an outdated Windows build offers a direct, versioned installer after hydra
   h.dispose();
 });
 
+test("clicking an existing update rechecks latest and skips an intermediate installer", async () => {
+  let checks = 0;
+  const userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) FalconDesktop/0.2.9";
+  const next = { ...release, version: "0.2.12", baseUrl: "https://saturnusgo.com/falcon/desktop/beta/0.2.12/",
+    artifacts: release.artifacts.map(artifact => ({ ...artifact, file: artifact.file.replace(release.version, "0.2.12") })) } as DesktopRelease;
+  const h = setup(userAgent, "en", async () => {
+    const current = checks++ ? next : release as DesktopRelease;
+    const update = await getDesktopUpdate({ userAgent }, current);
+    return update ? { ...update, release: current } : null;
+  });
+  h.render(); await new Promise(setImmediate);
+  const action = h.render().find(node => node.props["data-testid"] === "desktop-update")!;
+  (action.props.onClick as (event: unknown) => void)({ preventDefault() {} });
+  await new Promise(setImmediate);
+  assert.equal(checks, 2);
+  assert.deepEqual(h.opened, [`${next.baseUrl}Falcon-0.2.12-win-x64-beta-setup.exe`]); h.dispose();
+});
+
 test("the control stays absent in web and on current desktop builds", async () => {
   for (const userAgent of [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/150.0.0.0",
@@ -74,6 +99,7 @@ test("opening a desktop installer displays the loading orb and blocks duplicate 
   click(event);
   click(event);
   assert.equal(prevented, 2);
+  await new Promise(setImmediate);
   assert.deepEqual(h.opened.map(href => href.split("#")[0]), [action.props.href]);
   assert.equal(render().props["aria-label"], "Opening download");
   assert.equal(render().props["aria-busy"], true);
@@ -94,10 +120,12 @@ test("a browser launch error is announced and the Russian control can retry", as
   h.window.open = () => { throw new Error("Browser unavailable"); };
   const event = { preventDefault() {} };
   (render().props.onClick as (event: unknown) => void)(event);
+  await new Promise(setImmediate);
   assert.equal(render().props["aria-busy"], undefined);
   assert.match(String(h.render().find(node => node.props.role === "alert")?.props.children), /Не удалось открыть загрузку/);
   h.window.open = open;
   (render().props.onClick as (event: unknown) => void)(event);
+  await new Promise(setImmediate);
   assert.equal(h.opened.length, 1);
   assert.equal(render().props["aria-label"], "Открываем загрузку");
   h.dispose();
@@ -109,6 +137,7 @@ test("an acknowledgement-capable shell reports the matching native launch failur
   render();
   await new Promise(setImmediate);
   (render().props.onClick as (event: unknown) => void)({ preventDefault() {} });
+  await new Promise(setImmediate);
   const requestId = new URLSearchParams(new URL(h.opened[0]).hash.slice(1)).get("falcon-update");
   assert.ok(requestId);
   h.acknowledge({ requestId: "previous-attempt", opened: true });
@@ -143,7 +172,10 @@ test("company administration offers an update to an outdated Mac build", async (
   const { DesktopUpdateControl } = h.load<{ DesktopUpdateControl: () => unknown }>(
     new URL("../../presentation/update/DesktopUpdateControl.tsx", import.meta.url), name => {
       if (name.endsWith("useTmsLocale")) return { useTmsLocale };
-      if (name.endsWith("/update")) return { getDesktopUpdate };
+      if (name.endsWith("/update")) return { loadDesktopUpdate: async (identity: Parameters<typeof getDesktopUpdate>[0]) => {
+        const update = await getDesktopUpdate(identity, release);
+        return update ? { ...update, release } : null;
+      } };
     });
   const { CompanyAdminFrame } = h.load<{ CompanyAdminFrame: (props: { back: string }) => unknown }>(
     new URL("../../../company-administration/presentation/layout/CompanyAdminFrame.tsx", import.meta.url), name => {

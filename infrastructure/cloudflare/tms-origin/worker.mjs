@@ -18,6 +18,7 @@ import { proxyCompanyApi } from "./gateway/proxy-company-api.mjs";
 import { verifyCompanyDocument, unavailableCompanyDocument } from "./gateway/company-document.mjs";
 import { readConsentPolicy } from "./gateway/protocol/security/read-consent-policy.mjs";
 import { PUBLIC_SUPPORT_PATH } from "./gateway/protocol/route-policy.mjs";
+import { LATEST_DESKTOP_RELEASE_PATH, serveLatestDesktopRelease } from "./gateway/desktop/latest/response.mjs";
 
 const APP_PATH_NO_SLASH = APP_PATH.slice(0, -1);
 const FORWARDED_HEADERS = [
@@ -305,6 +306,9 @@ export default {
     }
     if (incoming.pathname.startsWith("/falcon/docs/audio/")) {
       return secureResponse(await serveDocsAudio(request, env?.DOCS_AUDIO));
+    }
+    if (incoming.pathname === LATEST_DESKTOP_RELEASE_PATH) {
+      return secureResponse(await serveLatestDesktopRelease(request, env?.DOCS_AUDIO));
     }
     if (!["GET", "HEAD"].includes(request.method)) {
       return notFoundResponse();

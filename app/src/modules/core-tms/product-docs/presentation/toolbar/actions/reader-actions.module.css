@@ -73,4 +73,8 @@
 @media (prefers-reduced-motion: reduce) {
   .icon, .menuRow { transition: none; }
 }
-.starIcon { color: var(--falcon-caution-border); }
+.starIcon {
+  --product-doc-star: var(--falcon-caution-border);
+  color: var(--falcon-caution-border);
+}
+:global(.dark) .starIcon { --product-doc-star: var(--falcon-caution-solid); }

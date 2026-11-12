@@ -87,8 +87,8 @@ and reject Falcon, Auth0 and online-validator targets. Specification credentials
 
 ## Saved documentation audio
 
-`DOCS_AUDIO` binds the existing public `cdn-saturnusgo` R2 bucket. The Worker reads only keys matching
-`falcon/docs/audio/ru/<article-id>/<64-lowercase-hex-version>.mp3` and never offers uploads or listing.
+`DOCS_AUDIO` binds the existing public `cdn-saturnusgo` R2 bucket. Audio reads accept only keys matching
+`falcon/docs/audio/ru/<article-id>/<64-lowercase-hex-version>.mp3` and never offer uploads or listing.
 The version identifies the article text and voice settings; upload new content to a new key.
 Set object `Content-Type` to `audio/mpeg`. Successful responses use an immutable one-year cache
 policy and support GET, HEAD, ETag revalidation and a single byte range for playback seeking.
@@ -99,6 +99,16 @@ Use the pinned local Wrangler with `CLOUDFLARE_ACCOUNT_ID=4b485e3b82c9e0b429aa9a
 commands. Publishing an MP3 uses `wrangler r2 object put cdn-saturnusgo/<key> --remote --file <mp3>`
 with `--content-type audio/mpeg --cache-control "public, max-age=31536000, immutable"`.
 Verify the stored object and public GET/HEAD/Range responses before referencing its URL in a release.
+
+## Latest desktop release
+
+The same public bucket binding also serves the single fixed key `falcon/desktop/beta/latest.json`
+at `/falcon/desktop/beta/latest.json` on approved Falcon hosts. GET and HEAD read R2 directly on every
+request, with `private, no-store, no-transform`; conditional requests never reuse an older pointer.
+Missing, invalid or unavailable metadata returns 503 without falling back to a bundled version.
+No bucket listing, upload route or user credentials are involved. The publisher updates this pointer
+only after verifying all immutable installers and checksums. Versioned installers retain their
+immutable cache policy; old releases are retained.
 
 ### Personal sign-in opt-in
 
