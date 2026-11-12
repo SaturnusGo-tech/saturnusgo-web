@@ -1,22 +1,24 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { TmsHttpClient } from "../../../../../core/tms/transport/http";
 import { getKlipyPage, registerKlipyShare } from "../data/klipy-api";
 import { KlipyError, type KlipyItem } from "../model/klipy-types";
 
-type State = { scope: string; items: KlipyItem[]; next: string; loading: boolean; error: KlipyError | null;
+type State = { scope: object; items: KlipyItem[]; next: string; loading: boolean; error: KlipyError | null;
   failedCursor: string; blockedUntil: number };
-export function useKlipyGallery(key: string, query: string, locale: "ru" | "en") {
-  const configured = Boolean(key.trim()), scope = JSON.stringify([key, query, locale]);
+export function useKlipyGallery(http: TmsHttpClient | null, workspaceId: string, query: string, locale: "ru" | "en") {
+  const configured = Boolean(http && /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(workspaceId));
+  const scope = useMemo(() => ({}), [http, workspaceId, query, locale]);
   const empty = (): State => ({ scope, items: [], next: "", loading: configured, error: null, failedCursor: "", blockedUntil: 0 });
   const [state, setState] = useState<State>(empty);
   const current = useRef(scope); current.current = scope;
   const request = useRef<AbortController | null>(null);
   const visible = state.scope === scope ? state : empty();
   function load(cursor: string) {
-    if (!configured || request.current || current.current !== scope || visible.blockedUntil > Date.now()) return;
+    if (!configured || !http || request.current || current.current !== scope || visible.blockedUntil > Date.now()) return;
     const controller = new AbortController(); request.current = controller;
     setState(previous => ({ ...previous, scope, items: cursor && previous.scope === scope ? previous.items : [],
       next: cursor ? previous.next : "", loading: true, error: null, blockedUntil: 0 }));
-    void getKlipyPage({ key, query, locale, cursor, signal: controller.signal }).then(page => {
+    void getKlipyPage({ http, workspaceId, query, locale, cursor, signal: controller.signal }).then(page => {
       if (controller.signal.aborted || current.current !== scope) return;
       if (cursor && page.next === cursor) throw new KlipyError("response");
       setState(previous => ({ ...previous, items: cursor ? [...previous.items, ...page.items] : page.items,
@@ -43,10 +45,10 @@ export function useKlipyGallery(key: string, query: string, locale: "ru" | "en")
     return () => clearTimeout(timer);
   }, [scope, visible.blockedUntil]);
   function share(item: KlipyItem) {
-    if (!configured || current.current !== scope) return;
+    if (!configured || !http || current.current !== scope) return;
     // A selection outlives the picker; the API's request deadline bounds reporting.
     const controller = new AbortController();
-    void registerKlipyShare({ key, query, id: item.appearance.id, signal: controller.signal })
+    void registerKlipyShare({ http, workspaceId, query, id: item.appearance.id, signal: controller.signal })
       .catch(() => { /* Reporting failure does not undo the user's selected GIF. */ });
   }
   return { ...visible, configured, more: () => { if (!visible.loading && visible.next) load(visible.next); },

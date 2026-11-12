@@ -6984,7 +6984,7 @@
         ],
         "operationId": "discoverConnectorResources",
         "summary": "Verify credentials and discover real service resources",
-        "description": "Performs read-only provider calls. Does not save credentials or create an external object. Swagger configuration has migrated to /integrations/api-sources. Legacy Swagger configuration, discovery, specification and disconnect return 409 API_SOURCE_MIGRATED; other providers are unchanged.",
+        "description": "Performs read-only provider calls. Does not save credentials or create an external object. Linear accepts an exact team UUID or case-insensitive team key. A rejected Linear credential or missing permission returns 422 LINEAR_ACCESS_DENIED. Swagger configuration has migrated to /integrations/api-sources. Legacy Swagger configuration, discovery, specification and disconnect return 409 API_SOURCE_MIGRATED.",
         "parameters": [
           {
             "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
@@ -14970,6 +14970,190 @@
             "$ref": "#/components/parameters/IfMatch"
           }
         ]
+      }
+    },
+    "/public/support/contact": {
+      "post": {
+        "tags": [
+          "Support"
+        ],
+        "operationId": "sendPublicSupportContact",
+        "summary": "Send a message to Falcon support without signing in",
+        "description": "Accepts browser requests through the public same-origin gateway. The submitted address is used for replies. The service does not automatically retry delivery.",
+        "security": [],
+        "parameters": [
+          {
+            "name": "X-Request-Id",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "message"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 254
+                  },
+                  "message": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "locale": {
+                    "type": "string",
+                    "enum": [
+                      "en",
+                      "ru"
+                    ],
+                    "default": "en"
+                  },
+                  "attachments": {
+                    "type": "array",
+                    "maxItems": 3,
+                    "description": "Up to 8 MiB combined. Supported formats are JPEG, PNG, GIF, WebP, MP4, MOV and WebM.",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "The SMTP server accepted the message for delivery to Falcon support.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "accepted"
+                      ],
+                      "properties": {
+                        "accepted": {
+                          "const": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "INVALID_SUPPORT_REQUEST. The form fields or uploaded files are invalid.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "PERSONAL_ACCESS_DENIED. The request did not come through the trusted public origin.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "PAYLOAD_TOO_LARGE. The multipart request exceeds 10 MiB.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "RATE_LIMITED. Too many support requests.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "description": "Seconds before retrying."
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "SUPPORT_UNAVAILABLE. Support delivery or its rate limit is temporarily unavailable.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "x-tms-idempotency": "not-applicable"
       }
     },
     "/support/requests": {
@@ -24371,7 +24555,7 @@
               },
               "Set-Cookie": {
                 "required": true,
-                "description": "Host-only Secure HttpOnly session cookie scoped to the verified target origin. No session token is returned in the response body.",
+                "description": "Host-only Secure HttpOnly session cookie scoped to the verified target origin. A second Set-Cookie expires the other Falcon session cookie on that origin. No session token is returned in the response body.",
                 "schema": {
                   "type": "string"
                 }
@@ -28075,7 +28259,7 @@
               },
               "Set-Cookie": {
                 "required": true,
-                "description": "Host-only Secure HttpOnly session cookie scoped to the verified target origin. No session token is returned in the response body.",
+                "description": "Host-only Secure HttpOnly session cookie scoped to the verified target origin. A second Set-Cookie expires the other Falcon session cookie on that origin. No session token is returned in the response body.",
                 "schema": {
                   "type": "string"
                 }
@@ -30961,6 +31145,160 @@
           }
         }
       }
+    },
+    "/workspaces/{workspaceId}/gifs": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Repository folders"
+        ],
+        "operationId": "listWorkspaceGifs",
+        "summary": "Read a bounded workspace GIF catalog",
+        "description": "Requires workspace:read with normal server authentication, tenant isolation, active workspace membership and billing policy. Provider requests use server-managed configuration only. An absent or whitespace-only q reads featured GIFs; search preserves the original query. Results retain provider order and permitted delivery URLs. Each page requests at most 12 items; oversized or malformed upstream pages are rejected in full. Only the documented item fields and opaque cursor are exposed.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Optional raw search query, at most 200 characters. Passed unchanged when searching; whitespace-only queries select featured GIFs.",
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            }
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "ru"
+              ],
+              "default": "en"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Optional opaque provider cursor, passed unchanged.",
+            "schema": {
+              "type": "string",
+              "maxLength": 1024
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bounded GIF catalog in provider order.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GifGalleryEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/GifRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/GifUnavailable"
+          }
+        }
+      }
+    },
+    "/workspaces/{workspaceId}/gifs/share": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Repository folders"
+        ],
+        "operationId": "registerWorkspaceGifShare",
+        "summary": "Report an intentionally selected workspace GIF",
+        "description": "Requires workspace:read with normal server authentication, tenant isolation, active workspace membership and billing policy. Provider requests use server-managed configuration only. Reports selection without persisting or changing a folder appearance. Client selection remains independent of reporting success. The body contains only the selected provider ID and optional original query; upstream response bodies are discarded. No concurrency or idempotency token is required for this non-durable reporting operation.",
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GifShareRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Selection reporting completed without a response body.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/GifRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/GifUnavailable"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -33654,6 +33992,43 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/QaWorkflowListEnvelope"
+            }
+          }
+        }
+      },
+      "GifRateLimited": {
+        "description": "GIF_RATE_LIMITED. GIF requests are temporarily rate limited. The standard error envelope contains a generic message and requestId; upstream bodies and credentials are never exposed.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          },
+          "Retry-After": {
+            "description": "Fixed retry delay in seconds.",
+            "schema": {
+              "type": "integer",
+              "const": 60
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorEnvelope"
+            }
+          }
+        }
+      },
+      "GifUnavailable": {
+        "description": "GIF_UNAVAILABLE. GIF service is unavailable, unconfigured, timed out or returned invalid content. The standard error envelope contains a generic message and requestId; upstream bodies, opaque errors and credentials are never exposed.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorEnvelope"
             }
           }
         }
@@ -37203,6 +37578,7 @@
           "INVALID_WEBHOOK_PAYLOAD",
           "INVALID_WORKFLOW_ID",
           "LEASE_LOST",
+          "LINEAR_ACCESS_DENIED",
           "LINK_CONFLICT",
           "NOTIFICATION_CONFLICT",
           "NOTIFICATION_LIMIT_REACHED",
@@ -37289,7 +37665,9 @@
           "BILLING_CONTACT_SALES",
           "BILLING_TEAM_UNAVAILABLE",
           "PERSONAL_OWNERSHIP_TRANSFER_UNAVAILABLE",
-          "PRODUCT_DOC_INVALID_TAXONOMY"
+          "PRODUCT_DOC_INVALID_TAXONOMY",
+          "GIF_RATE_LIMITED",
+          "GIF_UNAVAILABLE"
         ]
       },
       "ValidationIssue": {
@@ -62632,6 +63010,106 @@
             }
           }
         ]
+      },
+      "GifIdentifier": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200,
+        "pattern": "^[A-Za-z0-9_-]{1,200}$"
+      },
+      "GifMediaUrl": {
+        "type": "string",
+        "format": "uri",
+        "pattern": "^https://static(?:1|2)?\\.klipy\\.com/(?![^#]*[?&](?:[kK][eE][yY]|[aA][pP][iI][_-]?[kK][eE][yY]|[tT][oO][kK][eE][nN]|[aA][cC][cC][eE][sS][sS][_-]?[tT][oO][kK][eE][nN]|[sS][eE][cC][rR][eE][tT]|[aA][uU][tT][hH](?:[oO][rR][iI][zZ][aA][tT][iI][oO][nN])?|[pP][aA][sS][sS][wW][oO][rR][dD]|[cC][rR][eE][dD][eE][nN][tT][iI][aA][lL][sS]?)=)[^\\s#]*$",
+        "description": "Public GIF media on static.klipy.com, static1.klipy.com or static2.klipy.com. Exact HTTPS origin only, without user information, explicit port, fragment, whitespace or credential-bearing query parameters. Parameter names are checked after decoding and case folding; provider credentials are never returned. Original permitted delivery URL bytes are preserved."
+      },
+      "GifSourceUrl": {
+        "type": "string",
+        "format": "uri",
+        "pattern": "^https://klipy\\.com/(?![^#]*[?&](?:[kK][eE][yY]|[aA][pP][iI][_-]?[kK][eE][yY]|[tT][oO][kK][eE][nN]|[aA][cC][cC][eE][sS][sS][_-]?[tT][oO][kK][eE][nN]|[sS][eE][cC][rR][eE][tT]|[aA][uU][tT][hH](?:[oO][rR][iI][zZ][aA][tT][iI][oO][nN])?|[pP][aA][sS][sS][wW][oO][rR][dD]|[cC][rR][eE][dD][eE][nN][tT][iI][aA][lL][sS]?)=)[^\\s#]*$",
+        "description": "Optional attribution link on klipy.com. Exact HTTPS origin only, without user information, explicit port, fragment, whitespace or credential-bearing query parameters. Parameter names are checked after decoding and case folding; provider credentials are never returned. Original permitted delivery URL bytes are preserved."
+      },
+      "GifGalleryItem": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "url",
+          "title",
+          "description",
+          "credit"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/GifIdentifier"
+          },
+          "url": {
+            "$ref": "#/components/schemas/GifMediaUrl"
+          },
+          "sourceUrl": {
+            "$ref": "#/components/schemas/GifSourceUrl"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "credit": {
+            "type": "string"
+          }
+        }
+      },
+      "GifGalleryPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "next"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 12,
+            "items": {
+              "$ref": "#/components/schemas/GifGalleryItem"
+            }
+          },
+          "next": {
+            "type": "string",
+            "maxLength": 1024,
+            "description": "Opaque provider cursor, preserved unchanged. An empty string means no further page."
+          }
+        }
+      },
+      "GifGalleryEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/GifGalleryPage"
+          }
+        }
+      },
+      "GifShareRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/GifIdentifier"
+          },
+          "query": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Original optional search query, preserved without trimming."
+          }
+        }
       }
     }
   }

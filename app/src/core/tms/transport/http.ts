@@ -1,4 +1,5 @@
 import { resolveTmsApiBase } from "../config/api-base";
+import { retryAfterSeconds } from "../errors/retry-after/retry-after";
 import type { components } from "../generated/tms-api";
 type ApiError = components["schemas"]["Error"];
 export type TmsApiErrorCode = ApiError["code"] | "HTTP_ERROR";
@@ -42,6 +43,7 @@ export class TmsApiError extends Error {
     readonly code: TmsApiErrorCode = "HTTP_ERROR",
     readonly validationField: string | null = null,
     readonly details: Readonly<Record<string, unknown>> | null = null,
+    readonly retryAfterSeconds: number | null = null,
   ) {
     super(message);
     this.name = "TmsApiError";
@@ -73,15 +75,14 @@ async function responseError(response: Response): Promise<TmsApiError> {
   const field = details && typeof details === "object" && "field" in details
     ? boundedString(details.field, 128) : null;
   return new TmsApiError(message, response.status, requestId, code ?? "HTTP_ERROR", field,
-    details && typeof details === "object" && !Array.isArray(details) ? details as Readonly<Record<string, unknown>> : null);
+    details && typeof details === "object" && !Array.isArray(details) ? details as Readonly<Record<string, unknown>> : null,
+    retryAfterSeconds(response.headers.get("retry-after")));
 }
-
 function concurrencyEtag(response: Response): string | null {
   const value = response.headers.get("etag");
   if (!value || value.length > 512) return null;
   return value.startsWith('W/"') && value.endsWith('"') ? value.slice(2) : value;
 }
-
 async function bearer(provider: TmsAccessTokenProvider, signal?: AbortSignal): Promise<string> {
   try {
     const token = await provider(signal);
@@ -95,7 +96,6 @@ async function bearer(provider: TmsAccessTokenProvider, signal?: AbortSignal): P
     );
   }
 }
-
 export function createTmsHttpClient(
   configuration: TmsHttpClientConfiguration,
 ): TmsHttpClient {

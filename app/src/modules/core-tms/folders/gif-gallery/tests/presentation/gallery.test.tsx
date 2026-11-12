@@ -4,16 +4,23 @@ import { after, before, test } from "node:test";
 import React from "react";
 import { act, create } from "react-test-renderer";
 import type { KlipyAppearance } from "../../model/klipy-types";
+import { TmsHttpClientProvider } from "../../../../auth/http/TmsHttpClientContext";
+import { TmsSessionProvider } from "../../../../auth/presentation/session/TmsSessionContext";
+import { FolderAppearanceContext } from "../../../state/appearance/folder-appearance-context";
+import { galleryHttp, gifPage, type GalleryCall } from "../helpers/http";
 const require = createRequire(import.meta.url), oldCss = require.extensions[".css"], oldReact = Object.getOwnPropertyDescriptor(globalThis, "React");
 let Gallery: typeof import("../../presentation/KlipyGallery")["KlipyGallery"];
 before(async () => { require.extensions[".css"] = module => { module.exports = {}; }; Object.assign(globalThis, { React });
   ({ KlipyGallery: Gallery } = await import("../../presentation/KlipyGallery")); });
 after(() => { if (oldCss) require.extensions[".css"] = oldCss; else delete require.extensions[".css"];
   if (oldReact) Object.defineProperty(globalThis, "React", oldReact); else Reflect.deleteProperty(globalThis, "React"); });
+function authenticated(send: (call: GalleryCall) => Promise<unknown>, content: React.ReactNode) {
+  return <TmsHttpClientProvider client={galleryHttp(send)}><TmsSessionProvider value={{ kind: "managed", label: "Tester", subject: "user", workspaceId: "workspace", signOut: async () => {} }}>{content}</TmsSessionProvider></TmsHttpClientProvider>;
+}
 
-test("missing configuration is honest, attributed and makes no provider requests", async t => {
-  let calls = 0; t.mock.method(globalThis, "fetch", async () => { calls++; throw new Error("Unexpected request"); });
-  let view!: ReturnType<typeof create>; await act(async () => { view = create(<Gallery apiKey="" ru={false} onChoose={() => {}} />); });
+test("without authenticated scope the gallery stays attributed, disabled and sends no requests", async t => {
+  let calls = 0; t.mock.method(globalThis, "fetch", async () => { calls++; throw new Error("Unexpected browser provider request"); });
+  let view!: ReturnType<typeof create>; await act(async () => { view = create(<Gallery ru={false} onChoose={() => {}} />); });
   t.after(() => act(() => view.unmount()));
   assert.match(JSON.stringify(view.toJSON()), /GIF gallery is not available yet/); assert.equal(calls, 0);
   assert.equal(view.root.findByProps({ "aria-label": "Search GIFs on KLIPY" }).props.disabled, true);
@@ -21,52 +28,47 @@ test("missing configuration is honest, attributed and makes no provider requests
   assert.equal(view.root.findByProps({ href: "https://klipy.com" }).children.includes("Powered by KLIPY"), true);
 });
 
-test("selected GIF emits the generated appearance, retains source attribution and reports selection directly", async t => {
-  const urls: URL[] = [], choices: KlipyAppearance[] = [];
+test("authenticated selection preserves appearance and attribution and reports through the workspace API", async t => {
+  const calls: GalleryCall[] = [], choices: KlipyAppearance[] = [];
   const delivery = "https://static.klipy.com/actual.gif?delivery=preserved";
-  t.mock.method(globalThis, "fetch", async (input: URL) => { const url = new URL(input); urls.push(url);
-    return Response.json(url.pathname.endsWith("registershare") ? { result: true } : { results: [{ id: "123", title: "Wave", content_description: "A friendly wave",
-      content_description_source: "Artist", itemurl: "https://klipy.com/gifs/wave", media_formats: { tinygif: { url: delivery } } }], next: "" }); });
-  let view!: ReturnType<typeof create>; await act(async () => { view = create(<Gallery apiKey="key" ru={false} onChoose={value => choices.push(value)} />); });
+  const send = async (call: GalleryCall) => { calls.push(call); return call.method === "POST" ? undefined : { ...gifPage("123"), items: [{ id: "123", title: "Wave", description: "A friendly wave", credit: "Artist", sourceUrl: "https://klipy.com/gifs/wave", url: delivery }] }; };
+  let view!: ReturnType<typeof create>; await act(async () => { view = create(authenticated(send, <Gallery ru={false} onChoose={value => choices.push(value)} />)); });
   t.after(() => act(() => view.unmount()));
   assert.equal(view.root.findByProps({ href: "https://klipy.com/gifs/wave" }).children.includes("Source"), true);
   assert.match(JSON.stringify(view.toJSON()), /Artist/);
   await act(async () => view.root.findByProps({ "aria-label": "Use GIF: A friendly wave" }).props.onClick());
   assert.deepEqual(choices, [{ kind: "gif", provider: "klipy", id: "123", url: delivery, sourceUrl: "https://klipy.com/gifs/wave" }]);
-  assert.equal(urls[1].origin, "https://api.klipy.com"); assert.equal(urls[1].pathname, "/v2/registershare");
+  assert.equal(calls[1].path, "/workspaces/workspace/gifs/share"); assert.equal(calls[1].method, "POST");
 });
 
-test("the always-present search shell sends typed queries to KLIPY after debounce", async t => {
-  const urls: URL[] = [];
-  t.mock.method(globalThis, "fetch", async (input: URL) => { urls.push(new URL(input)); return Response.json({ results: [], next: "" }); });
-  let view!: ReturnType<typeof create>; await act(async () => { view = create(<Gallery apiKey="key" ru onChoose={() => {}} />); });
+test("the branded search shell sends typed queries through authenticated transport after debounce", async t => {
+  const calls: GalleryCall[] = []; const send = async (call: GalleryCall) => { calls.push(call); return { items: [], next: "" }; };
+  let view!: ReturnType<typeof create>; await act(async () => { view = create(authenticated(send, <Gallery ru onChoose={() => {}} />)); });
   t.after(() => act(() => view.unmount()));
   const search = view.root.findByProps({ type: "search" });
-  assert.equal(search.parent?.props["data-input-shell"], true, "search uses the shared field shell, visible without another toggle");
-  assert.equal(search.props.disabled, false); assert.equal(search.props.hidden, undefined);
-  assert.equal(search.props.placeholder, "Search KLIPY");
-  assert.equal(search.props["aria-label"], "Поиск GIF в KLIPY");
-  assert.equal(view.root.findAllByProps({ "aria-label": "Очистить поиск GIF" }).length, 0);
-  await act(async () => search.props.onChange({ target: { value: "happy" } }));
-  assert.equal(urls.length, 1, "typing does not bypass the debounce");
+  assert.equal(search.parent?.props["data-input-shell"], true); assert.equal(search.props.disabled, false);
+  assert.equal(search.props.placeholder, "Search KLIPY"); assert.equal(search.props["aria-label"], "Поиск GIF в KLIPY");
+  await act(async () => search.props.onChange({ target: { value: "happy" } })); assert.equal(calls.length, 1);
   await act(async () => { await new Promise(resolve => setTimeout(resolve, 330)); });
-  assert.equal(urls.length, 2); assert.equal(urls[1].pathname, "/v2/search");
-  assert.equal(urls[1].searchParams.get("q"), "happy"); assert.equal(urls[1].searchParams.get("limit"), "12");
+  const url = new URL(calls[1].path, "https://falcon.invalid"); assert.equal(url.searchParams.get("q"), "happy"); assert.equal(url.searchParams.get("locale"), "ru");
   await act(async () => view.root.findByProps({ "aria-label": "Очистить поиск GIF" }).props.onClick());
-  assert.equal(view.root.findByProps({ type: "search" }).props.value, "");
-  assert.equal(view.root.findAllByProps({ "aria-label": "Очистить поиск GIF" }).length, 0);
-  assert.equal(urls.length, 3); assert.equal(urls[2].pathname, "/v2/featured"); assert.equal(urls[2].searchParams.has("q"), false);
+  assert.equal(view.root.findByProps({ type: "search" }).props.value, ""); assert.equal(calls.length, 3);
+  assert.equal(new URL(calls[2].path, "https://falcon.invalid").searchParams.has("q"), false);
 });
 
-test("failed selection reporting keeps the chosen GIF and produces no gallery failure", async t => {
+test("failed reporting preserves the selected GIF and does not become a gallery failure", async t => {
   const choices: KlipyAppearance[] = [];
-  t.mock.method(globalThis, "fetch", async (input: URL) => {
-    if (new URL(input).pathname === "/v2/registershare") throw new Error("Provider unavailable");
-    return Response.json({ results: [{ id: "selected", media_formats: { tinygif: { url: "https://static.klipy.com/selected.gif" } } }], next: "" });
-  });
-  let view!: ReturnType<typeof create>; await act(async () => { view = create(<Gallery apiKey="key" ru={false} onChoose={value => choices.push(value)} />); });
+  const send = async (call: GalleryCall) => { if (call.method === "POST") throw new Error("Provider unavailable"); return gifPage("selected"); };
+  let view!: ReturnType<typeof create>; await act(async () => { view = create(authenticated(send, <Gallery ru={false} onChoose={value => choices.push(value)} />)); });
   t.after(() => act(() => view.unmount()));
-  await act(async () => view.root.findByProps({ "aria-label": "Use GIF: GIF" }).props.onClick());
-  assert.deepEqual(choices, [{ kind: "gif", provider: "klipy", id: "selected", url: "https://static.klipy.com/selected.gif" }]);
-  assert.doesNotMatch(JSON.stringify(view.toJSON()), /Could not load GIFs|Provider unavailable/);
+  await act(async () => view.root.findByProps({ "aria-label": "Use GIF: selected" }).props.onClick());
+  assert.equal(choices[0].id, "selected"); assert.doesNotMatch(JSON.stringify(view.toJSON()), /Could not load GIFs|Provider unavailable/);
+});
+
+test("folder appearance scope supplies its workspace when the session has no workspace", async t => {
+  const paths: string[] = []; const http = galleryHttp(async call => { paths.push(call.path); return { items: [], next: "" }; });
+  let view!: ReturnType<typeof create>; await act(async () => { view = create(<TmsHttpClientProvider client={http}>
+    <FolderAppearanceContext.Provider value={{ folders: [], workspaceId: "folder-workspace" }}><Gallery ru={false} onChoose={() => {}} /></FolderAppearanceContext.Provider>
+  </TmsHttpClientProvider>); }); t.after(() => act(() => view.unmount()));
+  assert.equal(paths[0], "/workspaces/folder-workspace/gifs?locale=en");
 });

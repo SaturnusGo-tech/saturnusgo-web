@@ -7,6 +7,6 @@ import { useFolderImageOperations } from "../../../state/appearance/useFolderIma
 export function FolderAppearanceProvider({ resource, workspaceId, projectId, children }: { resource: FolderResource; workspaceId: string; projectId?: string; children: ReactNode }) {
   const images = useFolderImageOperations();
   const catalog = useFolderAppearanceCatalog(workspaceId, resource.items, projectId);
-  return <FolderAppearanceContext.Provider value={{ ...catalog, projectId,
+  return <FolderAppearanceContext.Provider value={{ ...catalog, workspaceId, projectId,
     save: resource.canManage ? resource.saveAppearance : undefined, ...images }}>{children}</FolderAppearanceContext.Provider>;
 }

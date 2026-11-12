@@ -76,8 +76,8 @@ try {
 } catch {
   fail("Unable to validate production environment configuration; install reviewed dependencies with npm ci and check local environment files.");
 }
-if (!process.env.NEXT_PUBLIC_FALCON_KLIPY_APP_KEY?.trim()) {
-  fail("NEXT_PUBLIC_FALCON_KLIPY_APP_KEY is required for a production release; set the public browser app key in the build environment or an ignored production environment file.");
+if (Object.hasOwn(process.env, "NEXT_PUBLIC_FALCON_KLIPY_APP_KEY")) {
+  fail("NEXT_PUBLIC_FALCON_KLIPY_APP_KEY is obsolete and must be removed; KLIPY credentials belong only on the server.");
 }
 NODE
 )

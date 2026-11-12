@@ -2034,7 +2034,7 @@ export interface paths {
         put?: never;
         /**
          * Verify credentials and discover real service resources
-         * @description Performs read-only provider calls. Does not save credentials or create an external object. Swagger configuration has migrated to /integrations/api-sources. Legacy Swagger configuration, discovery, specification and disconnect return 409 API_SOURCE_MIGRATED; other providers are unchanged.
+         * @description Performs read-only provider calls. Does not save credentials or create an external object. Linear accepts an exact team UUID or case-insensitive team key. A rejected Linear credential or missing permission returns 422 LINEAR_ACCESS_DENIED. Swagger configuration has migrated to /integrations/api-sources. Legacy Swagger configuration, discovery, specification and disconnect return 409 API_SOURCE_MIGRATED.
          */
         post: operations["discoverConnectorResources"];
         delete?: never;
@@ -3745,6 +3745,26 @@ export interface paths {
          * @description Version-conditional mutation. A stale retry cannot repeat side effects. Repeated deletion returns its existing tombstone.
          */
         patch: operations["updateDefectComment"];
+        trace?: never;
+    };
+    "/public/support/contact": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send a message to Falcon support without signing in
+         * @description Accepts browser requests through the public same-origin gateway. The submitted address is used for replies. The service does not automatically retry delivery.
+         */
+        post: operations["sendPublicSupportContact"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/support/requests": {
@@ -7390,6 +7410,56 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/workspaces/{workspaceId}/gifs": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+            };
+            cookie?: never;
+        };
+        /**
+         * Read a bounded workspace GIF catalog
+         * @description Requires workspace:read with normal server authentication, tenant isolation, active workspace membership and billing policy. Provider requests use server-managed configuration only. An absent or whitespace-only q reads featured GIFs; search preserves the original query. Results retain provider order and permitted delivery URLs. Each page requests at most 12 items; oversized or malformed upstream pages are rejected in full. Only the documented item fields and opaque cursor are exposed.
+         */
+        get: operations["listWorkspaceGifs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/gifs/share": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Report an intentionally selected workspace GIF
+         * @description Requires workspace:read with normal server authentication, tenant isolation, active workspace membership and billing policy. Provider requests use server-managed configuration only. Reports selection without persisting or changing a folder appearance. Client selection remains independent of reporting success. The body contains only the selected provider ID and optional original query; upstream response bodies are discarded. No concurrency or idempotency token is required for this non-durable reporting operation.
+         */
+        post: operations["registerWorkspaceGifShare"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -8144,7 +8214,7 @@ export interface components {
             meta: components["schemas"]["AnalyticsPageMeta"];
         };
         /** @enum {string} */
-        ErrorCode: "PRODUCT_DOC_ACCESS_DENIED" | "PRODUCT_DOC_NOT_FOUND" | "PRODUCT_DOC_STALE_DRAFT" | "PRODUCT_DOC_TREE_CYCLE" | "PRODUCT_DOC_PARENT_UNPUBLISHED" | "PRODUCT_DOC_EMPTY" | "ACTOR_UNAVAILABLE" | "AI_ANALYSIS_RETRY" | "AI_AUTHENTICATION_FAILED" | "AI_CONTEXT_BUDGET_EXCEEDED" | "AI_DISABLED" | "AI_DUPLICATE_CASE_ID" | "AI_GUIDE_ACCESS_CHANGED" | "AI_GUIDE_CHAT_CONFLICT" | "AI_GUIDE_CHAT_NOT_FOUND" | "AI_GUIDE_HISTORY_LIMIT" | "AI_GUIDE_IDEMPOTENCY_CONFLICT" | "AI_GUIDE_SHARED_ANSWER_NOT_FOUND" | "AI_GUIDE_TURN_CANCELLED" | "AI_GUIDE_TURN_FAILED" | "AI_GUIDE_TURN_PENDING" | "AI_INVALID_JSON" | "AI_NOT_CONFIGURED" | "AI_OUTPUT_TRUNCATED" | "AI_PAID_MODEL_DISABLED" | "AI_PROVIDER_QUOTA_EXHAUSTED" | "AI_PROVIDER_REQUEST_REJECTED" | "AI_PROVIDER_RESPONSE_INVALID" | "AI_PROVIDER_RESPONSE_TOO_LARGE" | "AI_PROVIDER_UNAVAILABLE" | "AI_RATE_LIMITED" | "AI_REQUEST_BUDGET_EXCEEDED" | "AI_SCHEMA_INVALID" | "AI_UNKNOWN_CASE_ID" | "AI_UNKNOWN_CHANGED_FILE" | "AI_WRITING_OUTPUT_INVALID" | "AI_WRITING_RATE_LIMITED" | "AI_WRITING_REFUSED" | "AI_WRITING_UNAVAILABLE" | "AMBIGUOUS_WORKFLOW_NAME" | "ANALYSIS_BUSY" | "ANALYSIS_NOT_FOUND" | "ANALYSIS_RUN_CONFLICT" | "ANALYTICS_SCOPE_TOO_LARGE" | "ANALYTICS_TEMPORARILY_UNAVAILABLE" | "ANALYTICS_WINDOW_TOO_LARGE" | "API_SOURCE_ACCESS_DENIED" | "API_SOURCE_CONTEXT_REQUIRED" | "API_SOURCE_MIGRATED" | "API_SOURCE_NAME_REQUIRED" | "API_SOURCE_NOT_FOUND" | "API_SOURCE_SCOPE_INVALID" | "ATTACHMENT_DIGEST_MISMATCH" | "AUTHENTICATION_REQUIRED" | "BAD_REQUEST" | "BOT_CHANNEL_MEMBERSHIP_REQUIRED" | "BUILD_CONTEXT_MISMATCH" | "BUILD_NOT_SUCCESSFUL" | "CATALOG_LIMIT_EXCEEDED" | "CHANGED_PATHS_LIMIT_EXCEEDED" | "CHANGE_CONTEXT_MISMATCH" | "CLOUD_AUTH_ACCOUNT_CONFLICT" | "CLOUD_AUTH_AUTHENTICATION_FAILED" | "CLOUD_AUTH_IDEMPOTENCY_CONFLICT" | "CLOUD_AUTH_ORIGIN_DENIED" | "CLOUD_AUTH_PERSISTENCE_FAILED" | "CLOUD_AUTH_RATE_LIMITED" | "CLOUD_AUTH_SESSION_INVALID" | "COMMAND_IN_PROGRESS" | "CONFLICT" | "CONNECTION_BINDING_IMMUTABLE" | "CONNECTION_BUSY" | "CONNECTION_DISABLED" | "CONNECTION_LIMIT_EXCEEDED" | "CONNECTION_NOT_FOUND" | "CREDENTIALS_REQUIRED" | "CREDENTIALS_UNAVAILABLE" | "DEFECT_ALREADY_ROUTED" | "DEFECT_NOT_FOUND" | "DELIVERY_NOT_RECONCILABLE" | "DELIVERY_NOT_RETRYABLE" | "DELIVERY_OUTCOME_UNKNOWN" | "DESKTOP_AUTH_INVALID" | "DESTINATION_NOT_ACCESSIBLE" | "DICTATION_EMPTY" | "DICTATION_INVALID_AUDIO" | "DICTATION_RATE_LIMITED" | "DICTATION_UNAVAILABLE" | "DISCOVERY_LIMIT_EXCEEDED" | "DUPLICATE_RULE" | "EMPTY_SCOPE" | "ENCRYPTION_KEY_REQUIRED" | "ENVIRONMENT_NOT_FOUND" | "EVENT_DISABLED" | "FEDERATION_INVALID" | "FEDERATION_LINK_REQUIRED" | "FEDERATION_SUBJECT_UNAVAILABLE" | "FEDERATION_UNAVAILABLE" | "FORBIDDEN" | "GAP_GENERATING" | "GAP_NOT_FOUND" | "GENERATION_FAILED" | "GITHUB_CONNECTION_REQUIRED" | "IDEMPOTENCY_KEY_REUSED" | "IMAGE_NORMALIZATION_BUSY" | "IMAGE_NORMALIZATION_CANCELLED" | "IMAGE_NORMALIZATION_TIMEOUT" | "IMPACT_PROCESSING_FAILED" | "IMPORT_AI_UNAVAILABLE" | "IMPORT_LIMIT_EXCEEDED" | "IMPORT_MAPPING_INVALID" | "IMPORT_SOURCE_INVALID" | "INTEGRATION_ACTOR_UNAVAILABLE" | "INTEGRATION_DISABLED" | "INTERNAL_ERROR" | "INVALID_CHANGED_FILE" | "INVALID_CHANNEL" | "INVALID_COMMIT" | "INVALID_EVENT" | "INVALID_GITHUB_EVENT" | "INVALID_MESSAGE_ID" | "INVALID_PATH_PREFIX" | "INVALID_PULL_REQUEST" | "INVALID_REPOSITORY" | "INVALID_SERVICE_URL" | "INVALID_TRANSITION" | "INVALID_WEBHOOK_PAYLOAD" | "INVALID_WORKFLOW_ID" | "LEASE_LOST" | "LINK_CONFLICT" | "NOTIFICATION_CONFLICT" | "NOTIFICATION_LIMIT_REACHED" | "NOTIFICATION_LINK_EXPIRED" | "NOTIFICATION_LINK_PENDING" | "NOTIFICATION_SUBSCRIPTION_INVALID" | "NOTIFICATION_UNAVAILABLE" | "NOT_FOUND" | "NO_MATCHING_TESTS" | "PATH_FILTER_REQUIRES_PR_OR_PUSH" | "PAYLOAD_TOO_LARGE" | "PERSONAL_ACCESS_DENIED" | "PERSONAL_TRIAL_EXPIRED" | "PRECONDITION_FAILED" | "PRECONDITION_REQUIRED" | "PROCESSING_FAILED" | "PROJECT_NOT_FOUND" | "PROOF_INVALID" | "QUOTA_EXCEEDED" | "RATE_LIMITED" | "REAUTHENTICATION_REQUIRED" | "REMOTE_ARCHIVED" | "REMOTE_NOT_FOUND" | "REMOTE_SCOPE_MISMATCH" | "REMOTE_TRANSITION_UNAVAILABLE" | "REPOSITORY_BINDING_IMMUTABLE" | "REPOSITORY_LIMIT_EXCEEDED" | "RETEST_CASE_MISMATCH" | "RETEST_EVIDENCE_REQUIRED" | "RETEST_STEP_MISMATCH" | "RULE_EVENT_DISABLED" | "RUN_ITEM_NOT_FOUND" | "RUN_NOT_COMPLETED" | "RUN_NOT_FOUND" | "RUN_RULE_REQUIRED" | "SCOPE_NOT_REVIEWABLE" | "SERVICE_UNAVAILABLE" | "SIGNING_SECRET_REQUIRED" | "SIGNUP_REQUIRED" | "SPACE_PROOF_INVALID" | "SPACE_SELECTION_INVALID" | "SSO_CONFLICT" | "SSO_FORBIDDEN" | "SSO_REQUIRED" | "SSO_TEST_REQUIRED" | "STALE_COMMENT" | "STATUS_NOT_ACCESSIBLE" | "SUITE_NOT_FOUND" | "UNLINKED_REMOTE_ISSUE" | "UNSUPPORTED_MEDIA_TYPE" | "UNSUPPORTED_OPERATION" | "UPLOAD_INTENT_EXPIRED" | "UPSTREAM_ACCESS_DENIED" | "UPSTREAM_INVALID_RESPONSE" | "UPSTREAM_RATE_LIMITED" | "UPSTREAM_REJECTED" | "UPSTREAM_UNAVAILABLE" | "VALIDATION_ERROR" | "VALIDATION_FAILED" | "WEBHOOK_UNAUTHORIZED" | "WORKFLOW_ID_MISMATCH" | "WORKFLOW_LIMIT_EXCEEDED" | "WORKFLOW_NOT_FOUND" | "YOUTRACK_CONFIGURATION_CHANGED" | "YOUTRACK_LINK_REQUIRED" | "YOUTRACK_NOT_READY_FOR_TEST" | "YOUTRACK_SYNC_CONFLICT" | "YOUTRACK_WEBHOOK_SETUP_UNAVAILABLE" | "YOUTRACK_WEBHOOK_UNAUTHORIZED" | "YOUTRACK_WORKFLOW_GUARD_REQUIRED" | "BILLING_FORBIDDEN" | "BILLING_DISABLED" | "BILLING_NOT_FOUND" | "BILLING_CONFLICT" | "BILLING_VERSION_CONFLICT" | "BILLING_PLAN_INCOMPATIBLE" | "BILLING_SEATS_OCCUPIED" | "BILLING_CHECKOUT_EXPIRED" | "BILLING_STARTUP_SETUP_REQUIRED" | "BILLING_INVALID_STATE" | "BILLING_INVALID_EVENT" | "BILLING_SIGNATURE_INVALID" | "BILLING_READ_ONLY" | "BILLING_CONTACT_SALES" | "BILLING_TEAM_UNAVAILABLE" | "PERSONAL_OWNERSHIP_TRANSFER_UNAVAILABLE" | "PRODUCT_DOC_INVALID_TAXONOMY";
+        ErrorCode: "PRODUCT_DOC_ACCESS_DENIED" | "PRODUCT_DOC_NOT_FOUND" | "PRODUCT_DOC_STALE_DRAFT" | "PRODUCT_DOC_TREE_CYCLE" | "PRODUCT_DOC_PARENT_UNPUBLISHED" | "PRODUCT_DOC_EMPTY" | "ACTOR_UNAVAILABLE" | "AI_ANALYSIS_RETRY" | "AI_AUTHENTICATION_FAILED" | "AI_CONTEXT_BUDGET_EXCEEDED" | "AI_DISABLED" | "AI_DUPLICATE_CASE_ID" | "AI_GUIDE_ACCESS_CHANGED" | "AI_GUIDE_CHAT_CONFLICT" | "AI_GUIDE_CHAT_NOT_FOUND" | "AI_GUIDE_HISTORY_LIMIT" | "AI_GUIDE_IDEMPOTENCY_CONFLICT" | "AI_GUIDE_SHARED_ANSWER_NOT_FOUND" | "AI_GUIDE_TURN_CANCELLED" | "AI_GUIDE_TURN_FAILED" | "AI_GUIDE_TURN_PENDING" | "AI_INVALID_JSON" | "AI_NOT_CONFIGURED" | "AI_OUTPUT_TRUNCATED" | "AI_PAID_MODEL_DISABLED" | "AI_PROVIDER_QUOTA_EXHAUSTED" | "AI_PROVIDER_REQUEST_REJECTED" | "AI_PROVIDER_RESPONSE_INVALID" | "AI_PROVIDER_RESPONSE_TOO_LARGE" | "AI_PROVIDER_UNAVAILABLE" | "AI_RATE_LIMITED" | "AI_REQUEST_BUDGET_EXCEEDED" | "AI_SCHEMA_INVALID" | "AI_UNKNOWN_CASE_ID" | "AI_UNKNOWN_CHANGED_FILE" | "AI_WRITING_OUTPUT_INVALID" | "AI_WRITING_RATE_LIMITED" | "AI_WRITING_REFUSED" | "AI_WRITING_UNAVAILABLE" | "AMBIGUOUS_WORKFLOW_NAME" | "ANALYSIS_BUSY" | "ANALYSIS_NOT_FOUND" | "ANALYSIS_RUN_CONFLICT" | "ANALYTICS_SCOPE_TOO_LARGE" | "ANALYTICS_TEMPORARILY_UNAVAILABLE" | "ANALYTICS_WINDOW_TOO_LARGE" | "API_SOURCE_ACCESS_DENIED" | "API_SOURCE_CONTEXT_REQUIRED" | "API_SOURCE_MIGRATED" | "API_SOURCE_NAME_REQUIRED" | "API_SOURCE_NOT_FOUND" | "API_SOURCE_SCOPE_INVALID" | "ATTACHMENT_DIGEST_MISMATCH" | "AUTHENTICATION_REQUIRED" | "BAD_REQUEST" | "BOT_CHANNEL_MEMBERSHIP_REQUIRED" | "BUILD_CONTEXT_MISMATCH" | "BUILD_NOT_SUCCESSFUL" | "CATALOG_LIMIT_EXCEEDED" | "CHANGED_PATHS_LIMIT_EXCEEDED" | "CHANGE_CONTEXT_MISMATCH" | "CLOUD_AUTH_ACCOUNT_CONFLICT" | "CLOUD_AUTH_AUTHENTICATION_FAILED" | "CLOUD_AUTH_IDEMPOTENCY_CONFLICT" | "CLOUD_AUTH_ORIGIN_DENIED" | "CLOUD_AUTH_PERSISTENCE_FAILED" | "CLOUD_AUTH_RATE_LIMITED" | "CLOUD_AUTH_SESSION_INVALID" | "COMMAND_IN_PROGRESS" | "CONFLICT" | "CONNECTION_BINDING_IMMUTABLE" | "CONNECTION_BUSY" | "CONNECTION_DISABLED" | "CONNECTION_LIMIT_EXCEEDED" | "CONNECTION_NOT_FOUND" | "CREDENTIALS_REQUIRED" | "CREDENTIALS_UNAVAILABLE" | "DEFECT_ALREADY_ROUTED" | "DEFECT_NOT_FOUND" | "DELIVERY_NOT_RECONCILABLE" | "DELIVERY_NOT_RETRYABLE" | "DELIVERY_OUTCOME_UNKNOWN" | "DESKTOP_AUTH_INVALID" | "DESTINATION_NOT_ACCESSIBLE" | "DICTATION_EMPTY" | "DICTATION_INVALID_AUDIO" | "DICTATION_RATE_LIMITED" | "DICTATION_UNAVAILABLE" | "DISCOVERY_LIMIT_EXCEEDED" | "DUPLICATE_RULE" | "EMPTY_SCOPE" | "ENCRYPTION_KEY_REQUIRED" | "ENVIRONMENT_NOT_FOUND" | "EVENT_DISABLED" | "FEDERATION_INVALID" | "FEDERATION_LINK_REQUIRED" | "FEDERATION_SUBJECT_UNAVAILABLE" | "FEDERATION_UNAVAILABLE" | "FORBIDDEN" | "GAP_GENERATING" | "GAP_NOT_FOUND" | "GENERATION_FAILED" | "GITHUB_CONNECTION_REQUIRED" | "IDEMPOTENCY_KEY_REUSED" | "IMAGE_NORMALIZATION_BUSY" | "IMAGE_NORMALIZATION_CANCELLED" | "IMAGE_NORMALIZATION_TIMEOUT" | "IMPACT_PROCESSING_FAILED" | "IMPORT_AI_UNAVAILABLE" | "IMPORT_LIMIT_EXCEEDED" | "IMPORT_MAPPING_INVALID" | "IMPORT_SOURCE_INVALID" | "INTEGRATION_ACTOR_UNAVAILABLE" | "INTEGRATION_DISABLED" | "INTERNAL_ERROR" | "INVALID_CHANGED_FILE" | "INVALID_CHANNEL" | "INVALID_COMMIT" | "INVALID_EVENT" | "INVALID_GITHUB_EVENT" | "INVALID_MESSAGE_ID" | "INVALID_PATH_PREFIX" | "INVALID_PULL_REQUEST" | "INVALID_REPOSITORY" | "INVALID_SERVICE_URL" | "INVALID_TRANSITION" | "INVALID_WEBHOOK_PAYLOAD" | "INVALID_WORKFLOW_ID" | "LEASE_LOST" | "LINEAR_ACCESS_DENIED" | "LINK_CONFLICT" | "NOTIFICATION_CONFLICT" | "NOTIFICATION_LIMIT_REACHED" | "NOTIFICATION_LINK_EXPIRED" | "NOTIFICATION_LINK_PENDING" | "NOTIFICATION_SUBSCRIPTION_INVALID" | "NOTIFICATION_UNAVAILABLE" | "NOT_FOUND" | "NO_MATCHING_TESTS" | "PATH_FILTER_REQUIRES_PR_OR_PUSH" | "PAYLOAD_TOO_LARGE" | "PERSONAL_ACCESS_DENIED" | "PERSONAL_TRIAL_EXPIRED" | "PRECONDITION_FAILED" | "PRECONDITION_REQUIRED" | "PROCESSING_FAILED" | "PROJECT_NOT_FOUND" | "PROOF_INVALID" | "QUOTA_EXCEEDED" | "RATE_LIMITED" | "REAUTHENTICATION_REQUIRED" | "REMOTE_ARCHIVED" | "REMOTE_NOT_FOUND" | "REMOTE_SCOPE_MISMATCH" | "REMOTE_TRANSITION_UNAVAILABLE" | "REPOSITORY_BINDING_IMMUTABLE" | "REPOSITORY_LIMIT_EXCEEDED" | "RETEST_CASE_MISMATCH" | "RETEST_EVIDENCE_REQUIRED" | "RETEST_STEP_MISMATCH" | "RULE_EVENT_DISABLED" | "RUN_ITEM_NOT_FOUND" | "RUN_NOT_COMPLETED" | "RUN_NOT_FOUND" | "RUN_RULE_REQUIRED" | "SCOPE_NOT_REVIEWABLE" | "SERVICE_UNAVAILABLE" | "SIGNING_SECRET_REQUIRED" | "SIGNUP_REQUIRED" | "SPACE_PROOF_INVALID" | "SPACE_SELECTION_INVALID" | "SSO_CONFLICT" | "SSO_FORBIDDEN" | "SSO_REQUIRED" | "SSO_TEST_REQUIRED" | "STALE_COMMENT" | "STATUS_NOT_ACCESSIBLE" | "SUITE_NOT_FOUND" | "UNLINKED_REMOTE_ISSUE" | "UNSUPPORTED_MEDIA_TYPE" | "UNSUPPORTED_OPERATION" | "UPLOAD_INTENT_EXPIRED" | "UPSTREAM_ACCESS_DENIED" | "UPSTREAM_INVALID_RESPONSE" | "UPSTREAM_RATE_LIMITED" | "UPSTREAM_REJECTED" | "UPSTREAM_UNAVAILABLE" | "VALIDATION_ERROR" | "VALIDATION_FAILED" | "WEBHOOK_UNAUTHORIZED" | "WORKFLOW_ID_MISMATCH" | "WORKFLOW_LIMIT_EXCEEDED" | "WORKFLOW_NOT_FOUND" | "YOUTRACK_CONFIGURATION_CHANGED" | "YOUTRACK_LINK_REQUIRED" | "YOUTRACK_NOT_READY_FOR_TEST" | "YOUTRACK_SYNC_CONFLICT" | "YOUTRACK_WEBHOOK_SETUP_UNAVAILABLE" | "YOUTRACK_WEBHOOK_UNAUTHORIZED" | "YOUTRACK_WORKFLOW_GUARD_REQUIRED" | "BILLING_FORBIDDEN" | "BILLING_DISABLED" | "BILLING_NOT_FOUND" | "BILLING_CONFLICT" | "BILLING_VERSION_CONFLICT" | "BILLING_PLAN_INCOMPATIBLE" | "BILLING_SEATS_OCCUPIED" | "BILLING_CHECKOUT_EXPIRED" | "BILLING_STARTUP_SETUP_REQUIRED" | "BILLING_INVALID_STATE" | "BILLING_INVALID_EVENT" | "BILLING_SIGNATURE_INVALID" | "BILLING_READ_ONLY" | "BILLING_CONTACT_SALES" | "BILLING_TEAM_UNAVAILABLE" | "PERSONAL_OWNERSHIP_TRANSFER_UNAVAILABLE" | "PRODUCT_DOC_INVALID_TAXONOMY" | "GIF_RATE_LIMITED" | "GIF_UNAVAILABLE";
         ValidationIssue: {
             field: string;
             code: string;
@@ -13620,6 +13690,38 @@ export interface components {
                 rows: string[][];
             }[];
         };
+        GifIdentifier: string;
+        /**
+         * Format: uri
+         * @description Public GIF media on static.klipy.com, static1.klipy.com or static2.klipy.com. Exact HTTPS origin only, without user information, explicit port, fragment, whitespace or credential-bearing query parameters. Parameter names are checked after decoding and case folding; provider credentials are never returned. Original permitted delivery URL bytes are preserved.
+         */
+        GifMediaUrl: string;
+        /**
+         * Format: uri
+         * @description Optional attribution link on klipy.com. Exact HTTPS origin only, without user information, explicit port, fragment, whitespace or credential-bearing query parameters. Parameter names are checked after decoding and case folding; provider credentials are never returned. Original permitted delivery URL bytes are preserved.
+         */
+        GifSourceUrl: string;
+        GifGalleryItem: {
+            id: components["schemas"]["GifIdentifier"];
+            url: components["schemas"]["GifMediaUrl"];
+            sourceUrl?: components["schemas"]["GifSourceUrl"];
+            title: string;
+            description: string;
+            credit: string;
+        };
+        GifGalleryPage: {
+            items: components["schemas"]["GifGalleryItem"][];
+            /** @description Opaque provider cursor, preserved unchanged. An empty string means no further page. */
+            next: string;
+        };
+        GifGalleryEnvelope: {
+            data: components["schemas"]["GifGalleryPage"];
+        };
+        GifShareRequest: {
+            id: components["schemas"]["GifIdentifier"];
+            /** @description Original optional search query, preserved without trimming. */
+            query?: string;
+        };
     };
     responses: {
         /** @description Current authorized workbench facts and bounded matching records. */
@@ -14742,6 +14844,28 @@ export interface components {
             };
             content: {
                 "application/json": components["schemas"]["QaWorkflowListEnvelope"];
+            };
+        };
+        /** @description GIF_RATE_LIMITED. GIF requests are temporarily rate limited. The standard error envelope contains a generic message and requestId; upstream bodies and credentials are never exposed. */
+        GifRateLimited: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                /** @description Fixed retry delay in seconds. */
+                "Retry-After"?: 60;
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ErrorEnvelope"];
+            };
+        };
+        /** @description GIF_UNAVAILABLE. GIF service is unavailable, unconfigured, timed out or returned invalid content. The standard error envelope contains a generic message and requestId; upstream bodies, opaque errors and credentials are never exposed. */
+        GifUnavailable: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ErrorEnvelope"];
             };
         };
     };
@@ -22098,6 +22222,102 @@ export interface operations {
             500: components["responses"]["InternalError"];
         };
     };
+    sendPublicSupportContact: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Request-Id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: email */
+                    email: string;
+                    message: string;
+                    /**
+                     * @default en
+                     * @enum {string}
+                     */
+                    locale?: "en" | "ru";
+                    /** @description Up to 8 MiB combined. Supported formats are JPEG, PNG, GIF, WebP, MP4, MOV and WebM. */
+                    attachments?: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description The SMTP server accepted the message for delivery to Falcon support. */
+            202: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            /** @constant */
+                            accepted: true;
+                        };
+                    };
+                };
+            };
+            /** @description INVALID_SUPPORT_REQUEST. The form fields or uploaded files are invalid. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description PERSONAL_ACCESS_DENIED. The request did not come through the trusted public origin. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description PAYLOAD_TOO_LARGE. The multipart request exceeds 10 MiB. */
+            413: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description RATE_LIMITED. Too many support requests. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    /** @description Seconds before retrying. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+            /** @description SUPPORT_UNAVAILABLE. Support delivery or its rate limit is temporarily unavailable. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
     createSupportRequest: {
         parameters: {
             query: {
@@ -26653,7 +26873,7 @@ export interface operations {
                 headers: {
                     "X-Request-Id": components["headers"]["XRequestId"];
                     "Cache-Control": components["headers"]["CacheControlNoStore"];
-                    /** @description Host-only Secure HttpOnly session cookie scoped to the verified target origin. No session token is returned in the response body. */
+                    /** @description Host-only Secure HttpOnly session cookie scoped to the verified target origin. A second Set-Cookie expires the other Falcon session cookie on that origin. No session token is returned in the response body. */
                     "Set-Cookie": string;
                     [name: string]: unknown;
                 };
@@ -28435,7 +28655,7 @@ export interface operations {
                 headers: {
                     "X-Request-Id": components["headers"]["XRequestId"];
                     "Cache-Control": components["headers"]["CacheControlNoStore"];
-                    /** @description Host-only Secure HttpOnly session cookie scoped to the verified target origin. No session token is returned in the response body. */
+                    /** @description Host-only Secure HttpOnly session cookie scoped to the verified target origin. A second Set-Cookie expires the other Falcon session cookie on that origin. No session token is returned in the response body. */
                     "Set-Cookie": string;
                     [name: string]: unknown;
                 };
@@ -29698,6 +29918,81 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             500: components["responses"]["InternalError"];
+        };
+    };
+    listWorkspaceGifs: {
+        parameters: {
+            query?: {
+                /** @description Optional raw search query, at most 200 characters. Passed unchanged when searching; whitespace-only queries select featured GIFs. */
+                q?: string;
+                locale?: "en" | "ru";
+                /** @description Optional opaque provider cursor, passed unchanged. */
+                cursor?: string;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Bounded GIF catalog in provider order. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GifGalleryEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["GifRateLimited"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["GifUnavailable"];
+        };
+    };
+    registerWorkspaceGifShare: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GifShareRequest"];
+            };
+        };
+        responses: {
+            /** @description Selection reporting completed without a response body. */
+            204: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["GifRateLimited"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["GifUnavailable"];
         };
     };
 }

@@ -158,7 +158,7 @@ function deploy(fixture, mode, extraEnvironment = {}, cwd = fixture.source) {
     allowFailure: true,
     env: {
       ...process.env,
-      NEXT_PUBLIC_FALCON_KLIPY_APP_KEY: "fixture-public-klipy-key",
+      NEXT_PUBLIC_FALCON_KLIPY_APP_KEY: undefined,
       ...extraEnvironment,
       NPM_INVOCATIONS_LOG: fixture.invocationLog,
       PATH: `${fixture.bin}:${process.env.PATH}`,
@@ -169,8 +169,8 @@ function deploy(fixture, mode, extraEnvironment = {}, cwd = fixture.source) {
   });
 }
 
-for (const [label, key] of [["missing", undefined], ["empty", ""], ["whitespace-only", " \t\n"]]) {
-  test(`rejects ${label} KLIPY configuration before cleaning, building or changing Pages`, (context) => {
+for (const [label, key] of [["present", "retired-public-klipy-key"], ["empty", ""], ["whitespace-only", " \t\n"]]) {
+  test(`rejects ${label} obsolete browser-key configuration before cleaning, building or changing Pages`, (context) => {
     const fixture = createFixture(context);
     write(join(fixture.source, "out/keep.txt"), "previous export\n");
     const pagesHead = git(fixture.pages, "rev-parse", "HEAD").stdout;
@@ -178,7 +178,7 @@ for (const [label, key] of [["missing", undefined], ["empty", ""], ["whitespace-
     const result = deploy(fixture, "--publish", { NEXT_PUBLIC_FALCON_KLIPY_APP_KEY: key });
 
     assert.equal(result.status, 18, result.stderr);
-    assert.match(result.stderr, /NEXT_PUBLIC_FALCON_KLIPY_APP_KEY.*required.*production/i);
+    assert.match(result.stderr, /NEXT_PUBLIC_FALCON_KLIPY_APP_KEY.*obsolete.*server/i);
     assert.equal(existsSync(fixture.invocationLog), false);
     assert.equal(readFileSync(join(fixture.source, "out/keep.txt"), "utf8"), "previous export\n");
     assert.equal(readFileSync(join(fixture.source, "app/api/route.ts"), "utf8"), "export const runtime = 'nodejs';\n");
@@ -186,59 +186,38 @@ for (const [label, key] of [["missing", undefined], ["empty", ""], ["whitespace-
     assert.equal(git(fixture.pages, "status", "--porcelain").stdout, "");
     assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout, pagesHead);
     assert.equal(git(fixture.pages, "ls-remote", "origin", "refs/heads/main").stdout, remoteHead);
+    assert.doesNotMatch(result.stdout + result.stderr, /retired-public-klipy-key/);
   });
 }
 
-test("requires production KLIPY configuration even when the caller uses NODE_ENV=test", (context) => {
+test("production releases ignore obsolete key configuration in test-only environment files", (context) => {
   const fixture = createFixture(context);
   write(join(fixture.source, ".env.test.local"), "NEXT_PUBLIC_FALCON_KLIPY_APP_KEY=test-only-public-key\n");
-  const result = deploy(fixture, "--prepare", {
-    NEXT_PUBLIC_FALCON_KLIPY_APP_KEY: undefined,
-    NODE_ENV: "test",
-  });
-
-  assert.equal(result.status, 18, result.stderr);
-  assert.equal(existsSync(fixture.invocationLog), false);
+  const result = deploy(fixture, "--prepare", { NODE_ENV: "test" });
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(readFileSync(join(fixture.source, "out/build-node-env.txt"), "utf8"), "production");
   assert.equal(git(fixture.pages, "status", "--porcelain").stdout, "");
   assert.doesNotMatch(result.stdout + result.stderr, /test-only-public-key/);
 });
 
-test("an explicitly blank shell key cannot fall back to a production environment file", (context) => {
+test("obsolete production environment keys fail before building even when called elsewhere", (context) => {
   const fixture = createFixture(context);
-  write(join(fixture.source, ".env.production.local"), "NEXT_PUBLIC_FALCON_KLIPY_APP_KEY=file-public-klipy-key\n");
-  const result = deploy(fixture, "--publish", { NEXT_PUBLIC_FALCON_KLIPY_APP_KEY: " \t" });
-
+  write(join(fixture.source, ".env.production.local"), "NEXT_PUBLIC_FALCON_KLIPY_APP_KEY=retired-file-public-key\n");
+  const result = deploy(fixture, "--publish", {}, fixture.pages);
   assert.equal(result.status, 18, result.stderr);
   assert.equal(existsSync(fixture.invocationLog), false);
   assert.equal(git(fixture.pages, "status", "--porcelain").stdout, "");
-  assert.doesNotMatch(result.stdout + result.stderr, /file-public-klipy-key/);
+  assert.doesNotMatch(result.stdout + result.stderr, /retired-file-public-key/);
 });
 
-test("loads production configuration from the source checkout when called elsewhere", (context) => {
+test("a release without browser provider credentials continues through the standard build", (context) => {
   const fixture = createFixture(context);
-  write(join(fixture.source, ".env.production.local"), "NEXT_PUBLIC_FALCON_KLIPY_APP_KEY=file-public-klipy-key\n");
-  const result = deploy(fixture, "--prepare", {
-    NEXT_PUBLIC_FALCON_KLIPY_APP_KEY: undefined,
-    NODE_ENV: "test",
-  }, fixture.pages);
-
+  write(join(fixture.source, ".env.production.local"), "NEXT_PUBLIC_UNRELATED=local-setting\n");
+  const result = deploy(fixture, "--prepare", { NODE_ENV: "test" }, fixture.pages);
   assert.equal(result.status, 0, result.stderr);
   assert.equal(readFileSync(fixture.invocationLog, "utf8"), "run clean\nrun build\n");
   assert.equal(readFileSync(join(fixture.source, "out/build-node-env.txt"), "utf8"), "production");
   assert.equal(git(fixture.pages, "status", "--porcelain").stdout, "");
-  assert.doesNotMatch(result.stdout + result.stderr, /file-public-klipy-key/);
-});
-
-test("a blank production-local key overrides lower-priority files", (context) => {
-  const fixture = createFixture(context);
-  write(join(fixture.source, ".env.production.local"), 'NEXT_PUBLIC_FALCON_KLIPY_APP_KEY="  "\n');
-  write(join(fixture.source, ".env.local"), "NEXT_PUBLIC_FALCON_KLIPY_APP_KEY=lower-priority-public-key\n");
-  const result = deploy(fixture, "--prepare", { NEXT_PUBLIC_FALCON_KLIPY_APP_KEY: undefined });
-
-  assert.equal(result.status, 18, result.stderr);
-  assert.equal(existsSync(fixture.invocationLog), false);
-  assert.equal(git(fixture.pages, "status", "--porcelain").stdout, "");
-  assert.doesNotMatch(result.stdout + result.stderr, /lower-priority-public-key/);
 });
 
 test("publishes Falcon routes into an isolated namespace without replacing Pages root", (context) => {

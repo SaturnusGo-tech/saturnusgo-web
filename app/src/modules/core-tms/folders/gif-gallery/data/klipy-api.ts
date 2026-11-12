@@ -1,40 +1,38 @@
+import { TmsApiError, type TmsHttpClient } from "../../../../../core/tms/transport/http";
+import type { components } from "../../../../../core/tms/generated/tms-api";
 import { KlipyError } from "../model/klipy-types";
 import { readKlipyPage } from "./klipy-response";
 export { KlipyError } from "../model/klipy-types";
 
-type Input = { key: string; query: string; signal: AbortSignal };
-async function request(path: string, input: Input, params: Record<string, string>, fetcher: typeof fetch) {
-  if (!input.key.trim()) throw new KlipyError("missing_key");
+type Input = { http: TmsHttpClient; workspaceId: string; query: string; signal: AbortSignal };
+type GifGalleryPage = components["schemas"]["GifGalleryPage"];
+type GifShareRequest = components["schemas"]["GifShareRequest"];
+function path(input: Input) {
   input.signal.throwIfAborted();
-  const url = new URL(`https://api.klipy.com/v2/${path}`);
-  url.search = new URLSearchParams({ key: input.key, ...params }).toString();
-  let response: Response;
+  if (!/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(input.workspaceId) || input.query.length > 200) throw new KlipyError("access");
+  return `/workspaces/${encodeURIComponent(input.workspaceId)}/gifs`;
+}
+async function request<T>(input: Input, operation: (signal: AbortSignal) => Promise<T>) {
+  const signal = AbortSignal.any([input.signal, AbortSignal.timeout(10_000)]);
   try {
-    response = await fetcher(url, { headers: { accept: "application/json" }, credentials: "omit", mode: "cors",
-      redirect: "error", cache: "no-store", referrerPolicy: "strict-origin-when-cross-origin",
-      signal: AbortSignal.any([input.signal, AbortSignal.timeout(10_000)]) });
-  } catch { input.signal.throwIfAborted(); throw new KlipyError("network"); }
-  input.signal.throwIfAborted();
-  if (!response.ok) {
-    await response.body?.cancel();
-    if (response.status === 429) {
-      const value = response.headers.get("retry-after") ?? "";
-      const seconds = /^\d+$/.test(value) ? Number(value) : (Date.parse(value) - Date.now()) / 1000;
-      throw new KlipyError("rate", Math.min(86_400, Math.max(1, Math.ceil(Number.isFinite(seconds) ? seconds : 30))));
-    }
-    throw new KlipyError([401, 403].includes(response.status) ? "access" : "network");
+    const result = await operation(signal); signal.throwIfAborted(); return result;
+  } catch (error) {
+    input.signal.throwIfAborted();
+    if (error instanceof KlipyError) throw error;
+    if (error instanceof TmsApiError && error.status === 429) throw new KlipyError("rate", error.retryAfterSeconds ?? 30);
+    throw new KlipyError(error instanceof TmsApiError && [401, 403].includes(error.status) ? "access" : "network");
   }
-  return response;
 }
-export async function getKlipyPage(input: Input & { locale: "ru" | "en"; cursor?: string }, fetcher: typeof fetch = fetch) {
-  const searching = Boolean(input.query.trim());
-  const response = await request(searching ? "search" : "featured", input, {
-    locale: input.locale, limit: "12", media_filter: "tinygif,gif", ...(searching ? { q: input.query } : {}),
-    ...(input.cursor ? { pos: input.cursor } : {}),
-  }, fetcher);
-  const page = await readKlipyPage(response); input.signal.throwIfAborted(); return page;
+export async function getKlipyPage(input: Input & { locale: "ru" | "en"; cursor?: string }) {
+  const endpoint = path(input);
+  if (input.cursor && input.cursor.length > 1024) throw new KlipyError("response");
+  const query = new URLSearchParams({ locale: input.locale, ...(input.query.trim() ? { q: input.query } : {}),
+    ...(input.cursor ? { cursor: input.cursor } : {}) });
+  return request(input, async signal => readKlipyPage((await input.http.getResource<GifGalleryPage>(`${endpoint}?${query}`, signal)).data));
 }
-export async function registerKlipyShare(input: Input & { id: string }, fetcher: typeof fetch = fetch) {
-  const response = await request("registershare", input, { id: input.id, ...(input.query ? { q: input.query } : {}) }, fetcher);
-  await response.body?.cancel();
+export async function registerKlipyShare(input: Input & { id: string }) {
+  const endpoint = path(input);
+  if (!/^[A-Za-z0-9_-]{1,200}$/.test(input.id)) throw new KlipyError("response");
+  const body: GifShareRequest = { id: input.id, ...(input.query ? { query: input.query } : {}) };
+  return request(input, signal => input.http.mutate<void>(`${endpoint}/share`, "POST", body, signal));
 }

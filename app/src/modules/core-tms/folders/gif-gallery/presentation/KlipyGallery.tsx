@@ -3,15 +3,15 @@ import { useRef, useState } from "react";
 import { Search, X } from "lucide-react";
 import type { FolderAppearance } from "../../model/appearance/folder-appearance";
 import type { KlipyAppearance } from "../model/klipy-types";
-import { useKlipyGallery } from "../state/useKlipyGallery";
+import { useAuthenticatedKlipyGallery } from "../state/useAuthenticatedKlipyGallery";
 import css from "./gallery.module.css";
 
-export function KlipyGallery({ ru, onChoose, selected, apiKey = process.env.NEXT_PUBLIC_FALCON_KLIPY_APP_KEY ?? "" }: {
-  ru: boolean; onChoose: (value: KlipyAppearance) => void; selected?: FolderAppearance; apiKey?: string;
+export function KlipyGallery({ ru, onChoose, selected }: {
+  ru: boolean; onChoose: (value: KlipyAppearance) => void; selected?: FolderAppearance;
 }) {
   const [query, setQuery] = useState("");
   const search = useRef<HTMLInputElement>(null);
-  const gallery = useKlipyGallery(apiKey, query, ru ? "ru" : "en");
+  const gallery = useAuthenticatedKlipyGallery(query, ru ? "ru" : "en");
   const error = gallery.error?.kind === "rate"
     ? (ru ? "KLIPY занят. Повторите чуть позже." : "KLIPY is busy. Try again shortly.")
     : gallery.error?.kind === "access"

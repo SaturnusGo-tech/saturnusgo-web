@@ -2,6 +2,7 @@ import { createContext, useContext } from "react";
 import type { RepositoryFolder, FolderResource } from "../../model/folder";
 export type FolderAppearanceContextValue = {
   folders: readonly RepositoryFolder[];
+  workspaceId?: string;
   projectId?: string;
   loadProjects?: (projectIds: readonly string[], signal: AbortSignal) => Promise<void>;
   save?: FolderResource["saveAppearance"];
