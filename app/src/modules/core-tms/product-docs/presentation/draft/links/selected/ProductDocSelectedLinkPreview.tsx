@@ -9,8 +9,8 @@ import { ProductDocLinkPreviewContent } from "../../../article/links/preview/Pro
 import styles from "../link-dialog.module.css";
 import { productDocLinkAction } from "../../../../navigation/links/product-doc-link-action";
 
-export function ProductDocSelectedLinkPreview({ href, url, ru, onEdit, onRemove }: {
-  href?: string; url: string; ru: boolean; onEdit(): void; onRemove(): void;
+export function ProductDocSelectedLinkPreview({ href, url, ru, authoredText, onEdit, onRemove }: {
+  href?: string; url: string; ru: boolean; authoredText?: string; onEdit(): void; onRemove(): void;
 }) {
   const [status, setStatus] = useState<"copied" | "failed">();
   const { preview, target, workspace, follow } = useProductDocLinkPreview(href);
@@ -21,7 +21,7 @@ export function ProductDocSelectedLinkPreview({ href, url, ru, onEdit, onRemove 
       : (ru ? "Скопировать ссылку" : "Copy link");
   return <div className={styles.linkDetails}>
     <ProductDocLinkPreviewContent href={url} locale={ru ? "ru" : "en"} target={target} preview={preview}
-      workspaceId={workspace?.scope.workspaceId} />
+      authoredText={target?.kind === "document" ? authoredText : undefined} workspaceId={workspace?.scope.workspaceId} />
     <div className={styles.preview}>
       <a href={href} target={external ? "_blank" : undefined} rel={external ? "noopener noreferrer" : undefined} onClick={follow}>
         <ActionIcon size={13} aria-hidden="true" /><span>{productDocLinkAction(target?.kind, ru)}</span>

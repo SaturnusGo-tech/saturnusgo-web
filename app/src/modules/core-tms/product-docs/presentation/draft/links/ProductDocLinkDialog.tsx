@@ -9,7 +9,7 @@ import {
   removeLink$, switchFromPreviewToLinkEdit$, updateLink$, type EditLinkDialog,
 } from "@mdxeditor/editor";
 import { Cell, useCellValues, useRealm } from "@mdxeditor/gurx";
-import { $getRoot, $getSelection, $isRangeSelection } from "lexical";
+import { $getNodeByKey, $getRoot, $getSelection, $isRangeSelection } from "lexical";
 import { Link2 } from "lucide-react";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { TmsLocale } from "../../../../localization/model/locale";
@@ -135,6 +135,10 @@ export function ProductDocLinkDialog() {
     {open && state.type === "preview" && <FreeSoloPopover {...overlay} isOpen disableDialogFocus shouldCloseOnBlur={false}
       dialogProps={{ "aria-label": label }} classNames={{ content: `${styles.panel} ${styles.previewPanel}` }} data-editor-dialog>
       <ProductDocSelectedLinkPreview key={state.url} href={isProductDocLink(state.url) ? state.url : undefined} url={state.url} ru={ru}
+        authoredText={editor?.getEditorState().read(() => {
+          const node = $getNodeByKey(state.linkNodeKey);
+          return $isLinkNode(node) && node.getURL() === state.url ? node.getTextContent() : undefined;
+        })}
         onEdit={() => realm.pub(switchFromPreviewToLinkEdit$, undefined)}
         onRemove={() => {
           realm.pub(removeLink$, undefined);
