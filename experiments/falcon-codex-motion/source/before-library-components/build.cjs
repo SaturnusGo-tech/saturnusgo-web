@@ -1,0 +1,2 @@
+const esbuild=require('/Users/mercuryrucks/.codex/worktrees/falcon-oauth-reconnect-gateway/falcon-reactflow-docs/node_modules/esbuild');
+esbuild.buildSync({entryPoints:[__dirname+'/main.jsx'],bundle:true,outfile:__dirname+'/app.js',loader:{'.woff2':'file'},nodePaths:['/Users/mercuryrucks/.codex/worktrees/falcon-oauth-reconnect-gateway/falcon-reactflow-docs/node_modules'],external:["/Geist.woff2","/reference-grid.png"],sourcemap:true,minify:false});

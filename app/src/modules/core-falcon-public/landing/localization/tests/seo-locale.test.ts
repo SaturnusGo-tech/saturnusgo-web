@@ -41,7 +41,7 @@ test('both search titles identify the complete product and its testing purpose',
 
 test('social previews and structured data use the landing language product capture', () => {
   for (const locale of ['en', 'ru'] as const) {
-    const expected = `https://tms.saturnusgo.com/falcon/landing/2026-11/${locale}/product-repository.webp`;
+    const expected = `https://tms.saturnusgo.com/falcon/landing/2026-11/themes/dark/${locale}/product-repository.webp`;
     const metadata = falconLandingMetadata(locale);
     const images = metadata.openGraph?.images as { url: string; width: number; height: number }[];
     assert.equal(images[0].url, expected);

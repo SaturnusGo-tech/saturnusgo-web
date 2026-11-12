@@ -1,0 +1,30 @@
+/* Delivery slate: exact supplied brand marks, typography from the film header. */
+.brand-previous { position:absolute; inset:0; pointer-events:none; }
+.brand-slate {
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:48px;
+  color:var(--film-text);
+  font-family:Film,Arial,sans-serif;
+}
+.brand-lockup { display:flex; align-items:center; gap:22px; }
+.brand-lockup span { font-size:76px; font-weight:600; line-height:1; letter-spacing:-.035em; }
+.brand-lockup img { width:108px; height:108px; object-fit:contain; }
+.brand-falcon img { width:118px; height:118px; filter:invert(1); }
+.brand-multiply { font-size:54px; line-height:1; font-weight:300; color:#8e9098; }
+.export-mode { width:100%; max-width:none; }
+.export-mode .review-toolbar,
+.export-mode .review-controls,
+.export-mode .scene-controls { display:none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .scene [style*="translateY"],
+  .brand-slate [style*="translateY"] {
+    transform:none !important;
+    filter:none !important;
+  }
+  .click-ring { display:none; }
+}

@@ -1,0 +1,320 @@
+/* Theme layer. Loaded last so the accepted graphite film remains the default. */
+:root,
+:root[data-theme="dark"] {
+  --film-accent-blue: #3a83f7;
+  --film-accent-purple: #924ff7;
+  --film-accent-green: #00a240;
+  --film-accent-orange: #e25507;
+  --film-accent-red: #e02e2a;
+  color-scheme: dark;
+  --film-grid: #ffffff12;
+  --film-list-frame: #202021;
+  --film-list-tile: linear-gradient(180deg, #29292b, #242426);
+  --film-list-well: #ffffff09;
+  --film-list-tile-edge: #ffffff07;
+  --film-list-tile-highlight: #ffffff05;
+  --film-list-tile-shadow: 0 3px 8px -5px #0007;
+  --film-list-frame-shadow: 0 12px 28px -18px #0009;
+  --film-list-frame-edge: #ffffff07;
+  --film-list-frame-highlight: #ffffff05;
+  --film-list-muted: #a8a8ae;
+  --film-list-ring: #b8b0d350;
+  --film-list-ring-fill: #b8b0d308;
+  --film-dock-panel: #242426ed;
+  --film-dock-tile: linear-gradient(180deg, #363638, #29292b);
+  --film-dock-panel-edge: #ffffff07;
+  --film-dock-panel-highlight: #ffffff05;
+  --film-dock-tile-edge: #ffffff07;
+  --film-dock-tile-highlight: #ffffff08;
+  --film-dock-label: #303032;
+}
+
+:root[data-theme="light"] {
+  /* Neutral shell / semantic roles: core-tms/presentation/theme/falcon-theme.css. */
+  color-scheme: light;
+  --film-canvas: #f3f3f3;
+  --film-chrome: #f7f7f7;
+  --film-panel: #f7f7f7;
+  --film-elevated: #fcfcfc;
+  --film-control: #f3f3f3;
+  --film-text: #0d0d0d;
+  --film-secondary: #5d5d5d;
+  --film-muted: #5d5d5d;
+  --film-border: transparent;
+  --film-border-strong: transparent;
+  --film-action: #0d0d0d;
+  --film-on-action: #ffffff;
+  --film-codex: #6b3ab4;
+  --film-amber: #b9480d;
+  --film-teal: #008635;
+  --film-failed: #ba2623;
+  --film-chart: #3a83f7;
+  --film-chart-secondary: #5d5d5d;
+  --film-grid: #0d0d0d18;
+  --film-list-frame: var(--film-panel);
+  --film-list-tile: var(--film-elevated);
+  --film-list-well: #0d0d0d04;
+  --film-list-tile-edge: transparent;
+  --film-list-tile-highlight: transparent;
+  --film-list-tile-shadow: none;
+  --film-list-frame-shadow: none;
+  --film-list-frame-edge: transparent;
+  --film-list-frame-highlight: transparent;
+  --film-list-muted: #5d5d5d;
+  --film-list-ring: #0000001a;
+  --film-list-ring-fill: #00000003;
+  --film-dock-panel: #f7f7f7ed;
+  --film-dock-tile: var(--film-elevated);
+  --film-dock-panel-edge: transparent;
+  --film-dock-panel-highlight: transparent;
+  --film-dock-tile-edge: transparent;
+  --film-dock-tile-highlight: transparent;
+  --film-dock-label: #ffffff;
+}
+
+.review-toolbar { gap: 12px; }
+.preview-settings { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.preview-languages { display: flex; align-items: center; gap: 2px; }
+.preview-languages button,
+.review-toolbar .theme-switch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  height: 30px;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #a9a9af;
+  font-size: 11px;
+  line-height: 1;
+}
+.preview-languages button.on { background: #29292d; color: #ededed; }
+.review-toolbar .theme-switch { width: 30px; padding: 0; }
+.review-toolbar .theme-switch svg { width: 16px; height: 16px; }
+.preview-languages button:hover,
+.review-toolbar .theme-switch:hover { background: #ffffff0b; color: #ededed; }
+
+/* Canvas and chrome use actual light surfaces; no film-wide color filters. */
+[data-theme="light"] body { background: var(--film-canvas); color: var(--film-text); }
+[data-theme="light"] ::selection { background: #6b3ab425; color: var(--film-text); }
+[data-theme="light"] .film-stage {
+  background: var(--film-canvas);
+}
+[data-theme="light"] .film-app {
+  background-color: #ffffff;
+  border-color: #0d0d0d1f;
+  box-shadow: 0 28px 64px -24px #0d0d0d38;
+}
+[data-theme="light"] .film-app,
+[data-theme="light"] .workflow-surface {
+  background-image: radial-gradient(circle, #0000000d .85px, transparent 1.2px);
+  background-size: 16px 16px;
+}
+[data-theme="light"] .film-header { color: var(--film-text); }
+[data-theme="light"] .nav-tab,
+[data-theme="light"] .nav-divider,
+[data-theme="light"] .nav-square,
+[data-theme="light"] .nav-avatar,
+[data-theme="light"] .film-rail>div:not(.rail-bottom),
+[data-theme="light"] .rail-bottom>div,
+[data-theme="light"] .film-back,
+[data-theme="light"] .ag-back { background: #f7f7f7; color: var(--film-secondary); }
+[data-theme="light"] .nav-active,
+[data-theme="light"] .film-rail>div.selected { background: var(--film-action); color: var(--film-on-action); }
+[data-theme="light"] .film-brand { background: #f7f7f7; }
+[data-theme="light"] .health { background: #f7f7f7; color: var(--film-text); }
+[data-theme="light"] .health i { background: var(--film-teal); }
+[data-theme="light"] .home-updated b { color: var(--film-secondary); }
+[data-theme="light"] .stat,
+[data-theme="light"] .ag-live-metrics section { background: var(--film-panel); box-shadow: none; }
+
+/* Nodes and inspection panels retain the same hierarchy and geometry. */
+[data-theme="light"] .workforce,
+[data-theme="light"] .home-agent,
+[data-theme="light"] .home-agent.warm,
+[data-theme="light"] .home-event,
+[data-theme="light"] .home-risk,
+[data-theme="light"] .film-app .library-node {
+  background: var(--film-panel);
+  border-color: var(--film-border-strong);
+  box-shadow: none;
+}
+[data-theme="light"] .film-app .workforce { background: var(--film-panel); box-shadow: none; }
+[data-theme="light"] .film-app .codex-node { background: var(--film-panel); }
+[data-theme="light"] .agent-data { background: var(--film-panel); }
+[data-theme="light"] .on-toggle { color: var(--film-text); }
+[data-theme="light"] .node-list .animated-list__lead { background: #0d0d0d04; }
+[data-theme="light"] .node-list .animated-list__meta { color: #5d5d5d; }
+[data-theme="light"] .film-app .node-facts { border-color: #0d0d0d0d; }
+[data-theme="light"] .film-app .node-note,
+[data-theme="light"] .film-app .risk-evidence { color: var(--film-muted); }
+[data-theme="light"] .node-facts strong i { background: var(--film-teal); }
+[data-theme="light"] .node-facts strong.risk-medium i { background: var(--film-amber); }
+[data-theme="light"] .film-app .event-timeline { border-left-color: #0d0d0d1a; }
+[data-theme="light"] .film-app .event-timeline>div i { background: #8f8f8f; box-shadow: 0 0 0 3px var(--film-panel); }
+[data-theme="light"] .film-app .event-timeline span { color: var(--film-secondary); }
+[data-theme="light"] .event-timeline small { color: var(--film-muted); }
+[data-theme="light"] .risk-title>svg { color: #5d5d5d; }
+[data-theme="light"] .film-app .home-right,
+[data-theme="light"] .film-app .policy-side.library-inspector {
+  background: var(--film-panel);
+  box-shadow: none;
+}
+[data-theme="light"] .film-search,
+[data-theme="light"] .ag-risk-search { background: #f7f7f7; color: var(--film-muted); }
+[data-theme="light"] .run-chart,
+[data-theme="light"] .insights,
+[data-theme="light"] .policy-test,
+[data-theme="light"] .policy-summary,
+[data-theme="light"] .ag-risk-card,
+[data-theme="light"] .ag-recent-activity { background: var(--film-panel); }
+[data-theme="light"] .film-app .run-chart,
+[data-theme="light"] .film-app .library-insights { background: transparent; }
+[data-theme="light"] .film-app .library-insights,
+[data-theme="light"] .inspector>section+section { border-color: #0d0d0d0d; }
+[data-theme="light"] .library-insights>header { color: var(--film-secondary); }
+[data-theme="light"] .insight-count { color: var(--film-muted); }
+
+/* Native Magic UI response panes have their own light paper and header strip. */
+[data-theme="light"] .film-app .response-diff {
+  --color-background: var(--film-panel);
+  --color-foreground: var(--film-text);
+  --color-accent: #f7f7f7;
+  --color-border: #0d0d0d0d;
+  --color-primary: #5d5d5d;
+}
+[data-theme="light"] .response-diff>div { border-color: transparent; box-shadow: none; }
+[data-theme="light"] .response-diff .rightside { border-left-color: #0d0d0d0d; }
+[data-theme="light"] .film-app .response-diff .leftside>div,
+[data-theme="light"] .film-app .response-diff .rightside>div { background: var(--film-panel); border-color: #0d0d0d0d; color: var(--film-muted); }
+[data-theme="light"] .response-diff pre { background: var(--film-elevated); color: var(--film-muted); }
+[data-theme="light"] .response-diff pre::first-line { color: var(--film-text); }
+[data-theme="light"] .response-diff .rightside pre::first-line { color: var(--film-failed); }
+[data-theme="light"] .film-app .film-button:hover,
+[data-theme="light"] .film-app .film-button[data-hover=true] { background: #0d0d0d08; color: var(--film-text); }
+[data-theme="light"] .film-app .film-button-primary:hover,
+[data-theme="light"] .film-app .film-button-primary[data-hover=true] { background: #303030; color: var(--film-on-action); }
+[data-theme="light"] .film-app .magic-action { background: #f3f3f3; color: var(--film-text); box-shadow: 0 3px 8px -5px #0d0d0d24; }
+[data-theme="light"] .film-app .magic-action>div:first-child>div { background: var(--film-action); }
+[data-theme="light"] .film-app .magic-action>div:last-child { color: var(--film-on-action); }
+
+/* Flow canvas and the real React Bits Dock. */
+[data-theme="light"] .workflow-surface { background-color: #ffffff; border-color: var(--film-border-strong); }
+[data-theme="light"] .workflow-heading { background: var(--film-panel); }
+[data-theme="light"] .when { background: var(--film-panel); }
+[data-theme="light"] .workflow-node,
+[data-theme="light"] .node-green,
+[data-theme="light"] .node-warm,
+[data-theme="light"] .node-cream { background: var(--film-panel); border-color: transparent; box-shadow: none; }
+[data-theme="light"] .node-content { background: transparent; }
+[data-theme="light"] .node-tag { border-color: #0d0d0d0d; }
+[data-theme="light"] .node-pin { background: var(--film-secondary); border-color: #fcfcfc; }
+[data-theme="light"] .automation-tray { background: #f7f7f7ed; }
+[data-theme="light"] .automation-tray button { color: var(--film-text); }
+[data-theme="light"] .film-app .verification-toolbar { background: transparent; box-shadow: none; }
+[data-theme="light"] .film-app .verification-dock .dock-item { color: var(--film-secondary); }
+[data-theme="light"] .film-app .verification-dock .dock-label { background: var(--film-dock-label); color: var(--film-text); border-color: transparent; box-shadow: 0 5px 14px #0d0d0d1a; }
+[data-theme="light"] .test-result,
+[data-theme="light"] .test-amounts button { background: var(--film-panel); }
+[data-theme="light"] .policy-ai { background: var(--film-panel); border-color: #6b3ab430; }
+[data-theme="light"] .policy-ai>div { background: var(--film-panel); }
+[data-theme="light"] .policy-ai button { background: #0d0d0d03; }
+[data-theme="light"] .policy-summary span { color: var(--film-text); }
+
+/* Agent access, status meters and live activity. */
+[data-theme="light"] .ag-outline-button { border-color: var(--film-border-strong); }
+[data-theme="light"] .ag-pill.active { background: #0086350a; border-color: #00863540; }
+[data-theme="light"] .ag-pill.medium { background: #b9480d0a; border-color: #b9480d40; }
+[data-theme="light"] .film-app .ag-agent-card { background: var(--film-panel); box-shadow: none; }
+[data-theme="light"] .film-app .ag-agent-name { border-bottom-color: #0d0d0d0d; }
+[data-theme="light"] .ag-agent-meta { background: var(--film-panel); }
+[data-theme="light"] .ag-detail-stats>div { background: var(--film-panel); }
+[data-theme="light"] .ag-wire { stroke: #5d5d5d2b; }
+[data-theme="light"] .ag-access-panel { background: var(--film-panel); box-shadow: none; }
+[data-theme="light"] .ag-access-body { background: var(--film-elevated); }
+[data-theme="light"] .ag-risk-sidebar { background: var(--film-panel); box-shadow: none; }
+[data-theme="light"] .ag-risk-meter strong { color: var(--film-text); }
+[data-theme="light"] .ag-meter-track { background: #e5e5e5; }
+[data-theme="light"] .ag-meter-track .pale { background: #5d5d5d; }
+[data-theme="light"] .ag-risk-findings { background: var(--film-elevated); }
+[data-theme="light"] .ag-risk-findings>div+div { border-color: #0d0d0d09; }
+[data-theme="light"] .ag-activity-filters { background: #f7f7f7; }
+[data-theme="light"] .ag-activity-filters button { color: var(--film-secondary); }
+[data-theme="light"] .ag-activity-filters button.selected { color: var(--film-on-action); }
+[data-theme="light"] .ag-activity-timeline { background: var(--film-panel); color: var(--film-text); box-shadow: none; }
+[data-theme="light"] .ag-timeline-rule { border-color: #0d0d0d26; }
+[data-theme="light"] .ag-timeline-row time,
+[data-theme="light"] .ag-timeline-event p { color: var(--film-muted); }
+[data-theme="light"] .ag-timeline-status { box-shadow: 0 0 0 4px var(--film-panel); }
+[data-theme="light"] .ag-timeline-row.blocked .ag-timeline-status { background: #fff0f0; color: var(--film-failed); }
+[data-theme="light"] .ag-timeline-row.allowed .ag-timeline-status { background: #edfaf2; color: var(--film-teal); }
+[data-theme="light"] .ag-timeline-row.approval .ag-timeline-status { background: #fff5f0; color: var(--film-amber); }
+[data-theme="light"] .ag-event-heading { color: var(--film-text); }
+[data-theme="light"] .ag-event-action { color: #0169cc; }
+[data-theme="light"] .ag-event-badge.blocked { color: var(--film-failed); background: #ba26230d; }
+[data-theme="light"] .ag-event-badge.allowed { color: var(--film-teal); background: #0086350d; }
+[data-theme="light"] .ag-event-badge.approval { color: var(--film-amber); background: #b9480d0d; }
+[data-theme="light"] .ag-actions-chart,
+[data-theme="light"] .ag-evidence-chart { background: var(--film-panel); }
+
+/* Card silhouettes come from their surface tone, not gray outlines. */
+[data-theme="light"] .when,
+[data-theme="light"] .ag-agent-meta,
+[data-theme="light"] .ag-agent-meta>div,
+[data-theme="light"] .ag-detail-stats>div,
+[data-theme="light"] .ag-access-panel,
+[data-theme="light"] .test-result,
+[data-theme="light"] .policy-ai,
+[data-theme="light"] .policy-ai>div { border-color: transparent; box-shadow: none; }
+
+/* Bright data accents stay separate from neutral card and text roles. */
+.ag-meter-track .info { background: var(--film-accent-blue); }
+.ag-meter-track .warning { background: var(--film-accent-orange); }
+.ag-meter-track .danger { background: var(--film-accent-red); }
+.ag-meter-track .success { background: var(--film-accent-green); }
+[data-theme="light"] .ag-access-row .ag-dot { background: var(--film-muted); }
+[data-theme="light"] .workflow-node .node-tag { color: var(--film-secondary); }
+[data-theme="light"] .ag-event-badge.allowed { background: #edfaf2; }
+[data-theme="light"] .ag-event-badge.blocked { background: #fff0f0; }
+[data-theme="light"] .ag-event-badge.approval { background: #fff5f0; }
+
+/* Prompt, authentic marks, cursor and closing slate. */
+[data-theme="light"] .codex-composer { background: #ffffffde; box-shadow: 0 18px 55px -20px #0d0d0d30, 0 3px 14px #0d0d0d0a; }
+[data-theme="light"] .composer-bottom>.composer-falcon,
+[data-theme="light"] .brand-falcon img { filter: none; }
+[data-theme="light"] .composer-send { background: #0d0d0d08; color: var(--film-muted); }
+[data-theme="light"] .composer-send[data-ready=true] { background: var(--film-action); color: var(--film-on-action); }
+[data-theme="light"] .composer-agent-cursor { color: var(--film-amber); filter: drop-shadow(0 2px 3px #0d0d0d20); }
+[data-theme="light"] .composer-agent-cursor>span { background: #b9480d; }
+[data-theme="light"] .film-cursor { filter: drop-shadow(1px 3px 2px #0d0d0d20); }
+[data-theme="light"] .film-cursor path { fill: var(--film-text); stroke: #ffffff; }
+[data-theme="light"] .brand-multiply { color: #8f8f8f; }
+
+/* Local review controls are part of the theme, including native form chrome. */
+[data-theme="light"] .review-toolbar { background: #ffffff; border-color: #0d0d0d13; color: var(--film-muted); }
+[data-theme="light"] .review-toolbar a { color: var(--film-secondary); }
+[data-theme="light"] .review-tabs button,
+[data-theme="light"] .review-controls button,
+[data-theme="light"] .scene-controls button { color: var(--film-muted); }
+[data-theme="light"] .review-tabs button.on { background: #f3f3f3; color: var(--film-text); }
+[data-theme="light"] .review-controls,
+[data-theme="light"] .scene-controls { background: #ffffff; }
+[data-theme="light"] .review-controls output { color: var(--film-muted); }
+[data-theme="light"] .review-controls input { accent-color: var(--film-secondary); }
+[data-theme="light"] .review-toolbar select { background: #f3f3f3; color: var(--film-text); border-color: #0d0d0d1a; }
+[data-theme="light"] .preview-languages button,
+[data-theme="light"] .review-toolbar .theme-switch { color: var(--film-muted); }
+[data-theme="light"] .preview-languages button.on { background: #f3f3f3; color: var(--film-text); }
+[data-theme="light"] .preview-languages button:hover,
+[data-theme="light"] .review-toolbar .theme-switch:hover { background: #0d0d0d08; color: var(--film-text); }
+[data-theme="light"] :is(button, input, a, select):focus-visible { outline-color: var(--film-codex); }
+
+@media (max-width: 700px) {
+  .review-toolbar { gap: 8px; }
+  .review-toolbar>a { flex: 1 1 210px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .review-toolbar .review-tabs { flex-wrap: wrap; }
+  .preview-settings { gap: 6px; margin-left: auto; }
+  .preview-languages button { padding: 0 7px; }
+}

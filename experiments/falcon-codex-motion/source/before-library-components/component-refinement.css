@@ -1,0 +1,135 @@
+/* HeroUI primitives in Falcon's documentation/property visual language. */
+.film-app .film-button {
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  position:relative; flex:none; min-width:0; height:32px;
+  padding:0 11px; margin:0; border:0; border-radius:8px;
+  background:transparent; color:var(--film-secondary); box-shadow:none;
+  font:500 12px/1 Film,Arial,sans-serif; white-space:nowrap; vertical-align:middle;
+  transition:background-color .18s ease,color .18s ease,transform .18s ease;
+  cursor:pointer;
+}
+.film-app .film-button svg { flex:none; }
+.film-app .film-button:hover,.film-app .film-button[data-hover=true] { background:#ffffff0b; color:var(--film-text); }
+.film-app .film-button:active,.film-app .film-button[data-pressed=true] { transform:scale(.98); }
+.film-app .film-button-primary { background:var(--film-action); color:var(--film-on-action); }
+.film-app .film-button-primary:hover { background:#fff; color:#111; }
+.film-app .film-button-secondary { background:#ffffff0c; color:var(--film-text); }
+.film-app .film-button[data-focus-visible=true],.film-app .film-tab[data-focus-visible=true] {
+  outline:2px solid var(--film-secondary); outline-offset:3px;
+}
+.film-app .film-surface { display:block; overflow:visible; box-sizing:border-box; }
+.film-app .home-agent,.film-app .home-event,.film-app .home-risk,.film-app .workforce {
+  background:#202021; border:0; border-radius:16px; box-shadow:0 8px 22px -10px #0009;
+}
+.film-app .workforce { padding:14px 12px; }
+.film-app .workforce h3 { font-size:13px; line-height:18px; white-space:normal; letter-spacing:-.015em; }
+.film-app .workforce span { display:block; font-size:11px; margin-top:3px; }
+.film-app .home-agent { padding:16px; }
+.film-app .node-identity { display:flex; align-items:center; min-width:0; gap:8px; height:24px; padding:0; background:none; border:0; }
+.film-app .node-identity>svg { color:var(--film-muted); flex:none; }
+.film-app .node-identity img { width:23px; height:23px; object-fit:contain; }
+.film-app .node-identity h3 { font-size:15px; line-height:21px; letter-spacing:-.015em; white-space:nowrap; }
+.film-app .node-identity .node-connected { margin-left:auto; color:var(--film-muted); }
+.film-app .node-description { margin-top:5px; font-size:12px; line-height:18px; color:var(--film-muted); }
+.film-properties { display:grid; gap:0; padding:0; margin:13px 0 0; }
+.film-properties>div { display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:27px; }
+.film-properties dt { display:flex; align-items:center; gap:7px; color:var(--film-muted); min-width:0; font-size:11px; line-height:16px; }
+.film-properties dt svg { flex:none; opacity:.85; }
+.film-properties dd { min-width:0; margin:0; color:var(--film-text); font-size:12px; line-height:17px; text-align:right; }
+.film-app .home-event { padding:15px 16px; }
+.film-app .home-event .node-identity h3 { font-size:15px; }
+.film-app .home-event>.node-description { margin:5px 0 0; }
+.film-app .home-event .film-properties { margin-top:9px; }
+.film-app .home-event .film-properties>div { min-height:25px; }
+.film-app .home-event .film-properties dd { font-size:11px; }
+.film-app .home-risk { padding:15px 16px; }
+.film-app .home-risk .node-identity h3 { font-size:14px; }
+.film-app .home-risk>.node-description { margin-top:3px; font-size:11px; }
+.response-comparison { margin:18px 0 0; display:grid; gap:0; }
+.response-comparison>div { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:38px; }
+.response-comparison dt { color:var(--film-muted); font-size:12px; }
+.response-comparison dd { display:flex; align-items:center; gap:7px; margin:0; font-size:13px; line-height:20px; color:var(--film-text); }
+.response-comparison dd svg { color:var(--film-muted); }
+.response-comparison .response-failed,.response-comparison .response-failed svg { color:var(--film-failed); }
+.response-comparison.compact { margin-top:8px; }
+.response-comparison.compact>div { min-height:26px; }
+.response-comparison.compact dt,.response-comparison.compact dd { font-size:11px; }
+.film-app .home-risk .risk-evidence { display:flex; align-items:flex-start; gap:5px; margin-top:8px; font-size:10px; line-height:15px; color:var(--film-muted); }
+.risk-evidence svg { flex:none; margin-top:1px; }
+
+/* One flat inspector, divided by spacing instead of nested containers. */
+.film-app .policy-side.inspector {
+  min-height:0; height:auto; padding:22px; background:#1c1c1d;
+  border:0; border-radius:16px; box-shadow:0 10px 26px -14px #000a;
+}
+.inspector>section+section { margin-top:24px; padding-top:24px; border-top:1px solid #ffffff0c; }
+.inspector-heading { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.film-app .inspector h3 { font-size:15px; line-height:21px; font-weight:550; margin:0; }
+.inspector-heading h3 { display:flex; align-items:center; gap:8px; }
+.inspector-heading img { width:22px; height:22px; }
+.failure-indicator { display:inline-flex; align-items:center; gap:5px; font-size:11px; color:var(--film-failed); }
+.film-app .inspector-caption { font-size:12px; margin:4px 0 16px; color:var(--film-muted); }
+.film-tabs { display:flex; flex-direction:column; width:100%; }
+.film-tab-list { display:flex; position:relative; gap:2px; padding:3px; background:#ffffff05; border-radius:9px; width:100%; }
+.film-app .film-tab {
+  display:flex; align-items:center; justify-content:center; position:relative; flex:1;
+  border:0; height:30px; padding:0 10px; background:transparent; border-radius:7px;
+  font:500 11px/18px Film,Arial,sans-serif; color:var(--film-muted); cursor:pointer;
+}
+.film-tab-label { position:relative; z-index:1; }
+.film-tab-cursor { position:absolute; inset:0; background:#3a3a3b; border-radius:7px; box-shadow:0 2px 5px #0002; }
+.film-app .film-tab[data-selected=true] { color:var(--film-text); }
+.film-app .film-tab[data-hover=true] { color:var(--film-text); }
+.film-tab-panel { display:none; }
+.request-transition { height:44px; margin-top:12px; }
+.film-app .request-context { color:var(--film-muted); font-size:12px; line-height:18px; }
+.film-app .inspector .response-comparison { margin:5px 0 0; }
+.film-app .inspector-insight>p { font-size:12px; line-height:19px; margin-top:12px; color:var(--film-muted); }
+.film-app .inspector-insight>.inspector-finding { color:var(--film-text); font-size:14px; line-height:21px; margin-top:14px; }
+.inspector-footnote { display:flex; align-items:flex-start; gap:7px; margin-top:13px; font-size:11px; line-height:17px; color:var(--film-muted); }
+.inspector-footnote svg { flex:none; margin-top:2px; color:var(--film-failed); }
+.film-app .inspector-insight>.film-button { margin-top:12px; padding:0 8px; margin-left:-8px; }
+.inspector-summary .film-properties { margin-top:12px; }
+.inspector-summary .film-properties>div { min-height:31px; }
+
+/* HeroUI ButtonGroup as a compact block toolbar, not eight bordered pills. */
+.film-app .verification-toolbar {
+  padding:18px 20px 14px; height:108px; border-radius:14px; background:#242425f5;
+  box-shadow:0 10px 25px -12px #0008; backdrop-filter:none;
+}
+.film-app .verification-toolbar h3 { font-size:13px; line-height:18px; }
+.film-app .verification-toolbar h3 span { font-size:11px; }
+.film-app .verification-tools { display:flex; align-items:center; justify-content:space-between; gap:3px; width:100%; margin-top:13px; }
+.film-app .verification-tools .film-button { height:34px; padding:0 9px; font-size:12px; background:none; border:0; border-radius:7px; }
+.film-app .verification-tools .film-button:hover { background:#ffffff0b; }
+.verification-tools .film-button svg { color:var(--film-muted); }
+.film-app .policy-actions { gap:4px; }
+
+/* Keep chart labels outside the plot and reduce the oversized insight action. */
+.film-app .home-right { min-height:0; padding:18px; background:#1c1c1d; border-radius:16px; }
+.film-app .run-chart { padding:20px 0 5px; margin:0; background:none; border-radius:0; }
+.film-app .line-chart { display:block; overflow:hidden; height:220px; margin:15px 0 0; }
+.film-app .chart-value { font-size:20px; line-height:25px; margin-top:10px; }
+.film-app .chart-value small { font-size:10px; gap:2px; }
+.film-app .chart-value span { font-size:9px; }
+.film-app .insights { margin-top:15px; padding:20px 0 0; border-top:1px solid #ffffff0c; background:none; border-radius:0; }
+.film-app .insights>p:first-child { color:var(--film-muted)!important; font-size:12px; margin-bottom:12px; }
+.film-app .insights h3 { font-size:17px; line-height:24px; margin-bottom:8px; }
+.film-app .insights>p { font-size:12px; line-height:19px; }
+.film-app .insights .film-button { margin-top:11px; padding-left:0; }
+
+/* Agent status is information; actions are neutral HeroUI controls. */
+.agent-statuses { display:flex; align-items:center; gap:13px; margin-right:4px; color:var(--film-muted); }
+.agent-statuses>span { display:flex; align-items:center; gap:6px; font-size:12px; line-height:20px; white-space:nowrap; }
+.agent-action-group { display:flex; align-items:center; gap:4px; }
+.film-app .ag-agent-card { background:#202021; border:0; box-shadow:0 8px 22px -10px #0009; }
+.film-app .ag-agent-card dl { background:none; padding:4px 11px; }
+.film-app .ag-agent-card dl>div { justify-content:space-between; }
+.film-app .ag-agent-card dt { color:var(--film-muted); }
+.film-app .ag-agent-name { border-bottom-color:#ffffff0a; }
+.film-app .ag-agent-name p { color:var(--film-muted); }
+
+@media (prefers-reduced-motion:reduce) {
+  .film-app .film-button { transition:none; }
+  .request-transition>div { transform:none!important; }
+}

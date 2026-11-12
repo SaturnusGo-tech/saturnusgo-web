@@ -5,6 +5,7 @@ const filenames = {
   terms: "terms-of-service.md",
   privacy: "privacy-policy.md",
   billing: "subscription-and-billing.md",
+  deletion: "data-deletion-policy.md",
 } as const;
 
 export type LegalDocument = keyof typeof filenames;

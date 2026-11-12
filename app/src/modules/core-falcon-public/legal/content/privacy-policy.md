@@ -1,6 +1,6 @@
 # Falcon Privacy Policy
 
-**Version dated 10 November 2026**
+**Version dated 11 November 2026**
 
 This policy takes effect when published and covers the Falcon website, cloud workspaces and desktop application. Falcon is operated by **Mercury Rucks**, an individual. For privacy questions and requests, email [falcon@saturnusgo.com](mailto:falcon@saturnusgo.com). Postal correspondence can be sent to Balcarce 3154, Mar del Plata, Argentina.
 
@@ -62,7 +62,9 @@ Falcon uses cookies and similar storage to sign you in, secure and resume sessio
 
 Falcon retains account data for as long as needed to administer your account and retains workspace content for as long as necessary to provide the service, subject to the workspace agreement, applicable instructions and legal obligations. When the personal trial ends, viewing and export remain available under the [Personal Trial Terms](https://tms.saturnusgo.com/trial-terms/?lang=en). Trial expiry does not automatically delete your data.
 
-Unsubmitted in-app support drafts expire after 24 hours and are removed during routine cleanup. Submitted support records, plan requests and security logs are retained for the time needed to handle the request, maintain security and comply with legal obligations. Where necessary, records may be retained for a dispute or another legal purpose. Backup copies may remain until they are rotated in accordance with applicable retention and deletion requirements.
+When a member loses access to an organization’s workspace, the organization’s records and their original author attribution remain in the workspace, subject to applicable law. An authorized administrator may request deletion of the workspace. The [Data Deletion Policy](/data-deletion/?lang=en) explains the process, the deadline for active systems, and the rules for backups and retained records.
+
+Unsubmitted in-app support drafts, including draft text and uploaded attachments, expire after 24 hours and are removed during routine cleanup. Submitted support requests and attachments, plan requests and security logs are retained for the time needed to handle the request, maintain security and comply with legal obligations. Where lawful and necessary, records may be retained for a dispute or another legal purpose.
 
 Falcon uses authenticated sessions, permission checks and restricted access to workspace content and private files. Contact support if you suspect unauthorized access to an account, connection or attachment.
 
@@ -80,7 +82,7 @@ Falcon publishes revisions with their effective date and provides additional not
 
 # Политика конфиденциальности Falcon
 
-**Редакция от 10 ноября 2026 года**
+**Редакция от 11 ноября 2026 года**
 
 Политика вступает в силу с момента публикации и распространяется на сайт Falcon, облачные рабочие пространства и настольное приложение. Оператор Falcon — **Меркурий Рукс (Mercury Rucks)**, физическое лицо. Вопросы и запросы о персональных данных направляйте на [falcon@saturnusgo.com](mailto:falcon@saturnusgo.com). Почтовый адрес для корреспонденции — Balcarce 3154, Мар-дель-Плата, Аргентина.
 
@@ -142,7 +144,9 @@ Falcon использует cookies и аналогичные средства �
 
 Falcon хранит данные аккаунта, пока они нужны для управления аккаунтом, и содержимое рабочего пространства, пока оно необходимо для предоставления сервиса, с учётом применимого договора, поручений и требований закона. По окончании личного пробного периода сохраняются просмотр и экспорт в соответствии с [Условиями личного пробного доступа](https://tms.saturnusgo.com/trial-terms/?lang=ru). Истечение пробного периода не приводит к автоматическому удалению данных.
 
-Неотправленные обращения в поддержку в приложении истекают через 24 часа и удаляются при плановой очистке. Отправленные обращения, заявки на тариф и журналы безопасности хранятся, пока это необходимо для обработки запроса, обеспечения безопасности и исполнения требований закона. При необходимости отдельные записи могут храниться для разрешения спора или иных юридических целей. Резервные копии могут сохраняться до их плановой замены с учётом применимых требований к хранению и удалению.
+При отзыве доступа участника к рабочему пространству организации её записи и сведения об исходном авторстве сохраняются в пространстве с учётом применимого закона. Уполномоченный администратор может запросить удаление рабочего пространства. [Политика удаления данных](/data-deletion/?lang=ru) описывает порядок, срок удаления из действующих систем и правила хранения резервных копий и отдельных записей.
+
+Неотправленные черновики обращений в поддержку в приложении, включая текст и загруженные вложения, истекают через 24 часа и удаляются при плановой очистке. Отправленные обращения и их вложения, заявки на тариф и журналы безопасности хранятся, пока это необходимо для обработки запроса, обеспечения безопасности и исполнения требований закона. Отдельные записи могут храниться для разрешения спора или иных юридических целей, если такое хранение законно и необходимо.
 
 Falcon использует аутентифицированные сеансы, проверку полномочий и ограниченный доступ к рабочему содержимому и закрытым файлам. Если вы подозреваете несанкционированный доступ к аккаунту, подключению или вложению, сообщите в поддержку.
 

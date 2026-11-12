@@ -10,10 +10,10 @@ import type { LegalDocument } from "./readLegalDocument";
 type Locale = "en" | "ru";
 
 const labels = {
-  en: { home: "Falcon home", language: "Document language", related: "Related policies", terms: "Terms of Service", privacy: "Privacy Policy", billing: "Subscription and Billing" },
-  ru: { home: "Главная Falcon", language: "Язык документа", related: "Другие документы", terms: "Условия использования", privacy: "Политика конфиденциальности", billing: "Условия подписки и оплаты" },
+  en: { home: "Falcon home", language: "Document language", related: "Related policies", terms: "Terms of Service", privacy: "Privacy Policy", billing: "Subscription and Billing", deletion: "Data Deletion Policy" },
+  ru: { home: "Главная Falcon", language: "Язык документа", related: "Другие документы", terms: "Условия использования", privacy: "Политика конфиденциальности", billing: "Условия подписки и оплаты", deletion: "Политика удаления данных" },
 };
-const routes: Record<LegalDocument, string> = { terms: "/terms/", privacy: "/privacy/", billing: "/billing-terms/" };
+const routes: Record<LegalDocument, string> = { terms: "/terms/", privacy: "/privacy/", billing: "/billing-terms/", deletion: "/data-deletion/" };
 
 export function FalconLegalPage({ document, versions }: { document: LegalDocument; versions: Record<Locale, string> }) {
   const [locale, setLocale] = useState<Locale>("en");

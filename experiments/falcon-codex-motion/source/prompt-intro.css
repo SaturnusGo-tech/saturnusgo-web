@@ -1,0 +1,18 @@
+/* Composer styling reused from Falcon's current ChangeStory landing intro. */
+.story-stage{position:absolute;inset:0;width:1600px;height:1200px;overflow:hidden;background:var(--film-canvas);isolation:isolate}
+.story-content{position:absolute;inset:0}
+.prompt-intro{position:absolute;inset:0;z-index:5;pointer-events:none;color:var(--film-text);font-family:Film,Arial,sans-serif}
+.codex-composer{position:absolute;top:490px;left:calc(50% - 370px);width:740px;min-height:170px;padding:27px 27px 19px;border:0;border-radius:39px;background:color-mix(in srgb,var(--film-control) 62%,transparent);backdrop-filter:blur(24px);box-shadow:0 18px 55px -14px #0009,0 3px 14px #0003;transform-origin:center}
+.composer-text{min-height:63px;font-size:22px;font-weight:400;line-height:1.5;letter-spacing:-.015em}
+.composer-word{display:inline-block;white-space:pre}.composer-glyph{display:inline-block}
+.composer-bottom{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--film-muted);margin-top:13px}
+.composer-bottom>img{width:24px;height:24px;object-fit:contain}.composer-bottom strong{color:var(--film-text);font-weight:500}
+.composer-bottom>.composer-falcon{width:22px;height:22px;filter:invert(1)}
+.composer-divider{height:16px;width:1px;background:var(--film-border-strong);margin:0 3px}
+.composer-attachment{margin-left:auto}
+.composer-send{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;margin-left:4px;background:#ffffff08;color:var(--film-muted);transition:color .4s,background .4s}
+.composer-send[data-ready=true]{background:var(--film-text);color:var(--film-canvas)}
+.composer-cursor{position:absolute;right:88px;bottom:-15px;pointer-events:none}
+.composer-agent-cursor{position:relative;display:block;width:25px;height:30px;color:var(--film-amber);filter:drop-shadow(0 2px 3px #0003)}
+.composer-agent-cursor>span{position:absolute;left:15px;top:25px;color:#fff;background:#a67a46;border-radius:6px;padding:4px 9px;font-size:11px;line-height:1.2;white-space:nowrap;box-shadow:0 2px 5px #0002}
+@media(prefers-reduced-motion:reduce){.codex-composer,.composer-glyph{transform:none!important;filter:none!important}.composer-send{transition:none}}

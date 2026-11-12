@@ -1,0 +1,1 @@
+const q=new URLSearchParams(location.search);document.documentElement.dataset.theme=q.get('theme')==='light'?'light':'dark';document.documentElement.lang=q.get('lang')==='ru'?'ru':'en';

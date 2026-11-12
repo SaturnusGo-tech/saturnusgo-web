@@ -1,0 +1,7 @@
+/* The landing owns layout and controls; this frame isolates the approved film. */
+html[data-embedded="true"],
+html[data-embedded="true"] body,
+html[data-embedded="true"] #root { width:100%; height:100%; margin:0; overflow:hidden; background:transparent; }
+.embedded-film { position:relative; width:100%; height:100%; max-width:none; margin:0; overflow:hidden; }
+html[data-embedded="true"] .story-stage,
+html[data-embedded="true"] .film-stage { background:transparent; }

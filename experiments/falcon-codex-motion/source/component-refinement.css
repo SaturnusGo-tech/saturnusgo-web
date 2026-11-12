@@ -1,0 +1,124 @@
+/* Real React Bits / Magic UI components, using Falcon's existing neutral palette. */
+.film-app .film-button {display:inline-flex;align-items:center;justify-content:center;gap:7px;position:relative;flex:none;min-width:0;height:32px;padding:0 11px;margin:0;border:0;border-radius:9px;background:transparent;color:var(--film-secondary);box-shadow:none;font:500 12px/1 Film,Arial,sans-serif;white-space:nowrap;cursor:pointer;transition:background .18s,color .18s,transform .18s}
+.film-app .film-button:hover,.film-app .film-button[data-hover=true]{background:#ffffff0b;color:var(--film-text)}
+.film-app .film-button:active{transform:scale(.98)}
+.film-app .film-button-primary{background:var(--film-action);color:var(--film-on-action)}
+.film-app .film-button[data-focus-visible=true],.film-app .magic-action:focus-visible{outline:2px solid var(--film-secondary);outline-offset:3px}
+.film-app .film-surface{display:block;overflow:visible;box-sizing:border-box}
+.film-app .magic-action{position:relative;display:inline-block;flex:none;width:auto;height:33px;padding:0 15px;overflow:hidden;background:#323234;border:0;border-radius:999px;color:#eee;font:500 11px/1 Film,Arial,sans-serif;box-shadow:0 3px 8px -4px #0008;white-space:nowrap;isolation:isolate}
+.magic-action>div:first-child{height:100%}.magic-action>div:last-child{padding:0 15px;left:0;box-sizing:content-box}
+.magic-action>div:last-child svg{width:14px;height:14px;flex:none}
+.film-app .magic-action>div:first-child>div{width:5px;height:5px;background:#ededed}
+.film-app .magic-action>div:last-child{color:#171719}
+.film-app .workforce{padding:13px 12px;background:#242426;border:0;box-shadow:0 7px 20px -10px #000b;border-radius:15px}
+.film-app .workforce h3{font-size:13px;line-height:18px;white-space:normal;letter-spacing:-.02em}
+.film-app .workforce span{font-size:10px;line-height:15px;display:block;margin-top:2px}
+
+/* The upstream row composition supplies icon wells, typography and selection. */
+.film-app .library-node{padding:0;background:#202022;border:0;border-radius:17px;overflow:visible;box-shadow:0 7px 24px -12px #000b}
+.film-app .codex-node{background:#232227}
+.native-list .animated-list__viewport{padding:0}
+.native-list .animated-list__item{padding:11px 12px;gap:10px}
+.native-list .animated-list__title{font-size:12px;line-height:17px;font-weight:550}
+.native-list .animated-list__description{font-size:10px;line-height:15px;letter-spacing:0}
+.native-list .animated-list__meta{font-size:10px;line-height:16px}
+.native-list .animated-list__lead{width:30px;height:30px;border-radius:9px}
+.native-list .animated-list__lead svg{width:17px;height:17px;stroke-width:1.6}
+.native-list .animated-list__lead img{object-fit:contain;padding:1px}
+.film-app .node-list{padding:8px 8px 0;border:0}
+.node-list .animated-list__item{padding:11px 9px;background:transparent;box-shadow:none}
+.node-list .animated-list__rim{box-shadow:none}
+.node-list .animated-list__title{font-size:15px;line-height:20px}
+.node-list .animated-list__description{font-size:11px;line-height:17px}
+.home-event .node-list .animated-list__title{white-space:normal;overflow:visible;text-overflow:clip}
+.node-list .animated-list__lead{width:35px;height:35px;background:#ffffff06;border-radius:10px}
+.node-list .animated-list__lead svg{width:20px;height:20px}
+.node-list .animated-list__meta{color:#9b96b0}
+.film-app .node-facts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 17px 0;padding-top:12px;border-top:1px solid #ffffff09}
+.node-facts>div{display:flex;flex-direction:column;gap:7px}
+.film-app .node-facts span{font-size:10px;line-height:13px;color:var(--film-muted)}
+.node-facts strong{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:450;line-height:18px}
+.node-facts strong i{width:5px;height:5px;border-radius:50%;background:#8faaa7}
+.node-facts strong.risk-medium i{background:var(--film-amber)}
+.film-app .node-note{display:flex;align-items:center;gap:5px;position:absolute;left:17px;bottom:14px;font-size:10px;line-height:14px;color:#a3a3a8}
+.connection-dot{display:inline-block;flex:none;width:5px;height:5px;border-radius:50%;background:var(--film-teal)}
+.film-app .event-timeline{margin:7px 18px 0;padding:0 0 0 9px;border:0;border-left:1px solid #ffffff10}
+.film-app .event-timeline>div{display:flex;align-items:center;gap:7px;position:relative;min-height:30px;font-size:11px}
+.film-app .event-timeline>div i{position:absolute;left:-12px;width:5px;height:5px;background:#77777f;border-radius:50%;box-shadow:0 0 0 3px #202022}
+.film-app .event-timeline span{color:#d4d4d8;font-size:11px;margin:0}
+.event-timeline small{margin-left:auto;font-size:9px;color:#929299}.event-timeline svg{margin-left:auto;color:var(--film-teal)}
+.film-app .home-risk{padding:15px 14px}
+.risk-title{display:flex;align-items:center;gap:7px;margin-bottom:14px}
+.film-app .risk-title h3{font-size:13px;line-height:18px}
+.risk-title>svg{color:#b4a3a1}.risk-title>span{font-size:9px;line-height:16px;margin-left:auto;color:var(--film-failed)}
+.film-app .home-risk>.response-diff{display:block;padding:0}
+.film-app .risk-evidence{display:flex;align-items:center;gap:5px;margin-top:12px;font-size:10px;color:#a3a3a8;line-height:15px}
+
+/* Magic UI Code Comparison, compact HTTP text instead of a wall of JSON. */
+.film-app .response-diff{--color-background:#1b1b1d;--color-accent:#29292c;--color-border:#ffffff08;--color-primary:#777780;max-width:none}
+.response-diff>div{border-radius:12px;border-color:#ffffff08;box-shadow:0 3px 8px -6px #0009}
+.response-diff>div>.grid{display:grid;grid-template-columns:1fr 1fr}
+.response-diff .leftside,.response-diff .rightside{min-width:0;border:0}
+.response-diff .rightside{border-left:1px solid #ffffff0c}
+.film-app .response-diff .leftside>div,.film-app .response-diff .rightside>div{padding:9px 12px;gap:5px;font:450 10px/14px Film,Arial,sans-serif;color:#a5a5ad;border-color:#ffffff08;background:#29292c}
+.response-diff .leftside>div>svg,.response-diff .rightside>div>svg{width:11px;height:11px;margin:0}
+.response-diff pre{margin:0;padding:12px 11px 13px;height:auto;white-space:pre;font-size:9px;line-height:21px;letter-spacing:-.02em;overflow:hidden;color:#96969e;min-height:68px}
+.response-diff pre::first-line{font-size:13px;color:var(--film-text);font-weight:500}
+.response-diff .rightside pre::first-line{color:var(--film-failed)}
+.response-diff>div>div:last-child:not(.grid){display:none}
+.response-diff.compact pre{min-height:60px;padding:7px 11px 9px;line-height:19px;font-size:10px}
+.response-diff.compact pre::first-line{font-size:22px;font-weight:500;line-height:25px}
+.response-diff.compact .leftside>div,.response-diff.compact .rightside>div{padding:6px 10px;font-size:9px;line-height:12px}
+
+/* Inspector uses the actual animated selection list instead of nested alert boxes. */
+.film-app .policy-side.library-inspector{height:auto;min-height:0;padding:20px;background:#1b1b1d;border:0;border-radius:18px;box-shadow:0 14px 30px -18px #000b}
+.inspector>section+section{margin-top:21px;padding-top:21px;border-top:1px solid #ffffff09}
+.inspector-heading{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.film-app .inspector h3{font-size:14px;line-height:20px;font-weight:550;margin:0}
+.inspector-heading h3{display:flex;align-items:center;gap:7px}
+.inspector-heading img{width:21px;height:21px}
+.failure-indicator{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--film-failed)}
+.film-app .inspector-caption{font-size:11px;line-height:17px;margin:4px 0 15px;color:var(--film-muted)}
+.request-checks{margin-top:12px}.request-checks .animated-list__item{padding:9px 10px;min-height:54px}
+.request-checks .animated-list__lead{width:27px;height:27px}.request-checks .animated-list__lead svg{width:16px;height:16px}
+.request-checks .animated-list__item:last-of-type .animated-list__lead{color:var(--film-failed)}
+.check-failed{color:var(--film-failed)}
+.insight-count{font-size:10px;color:#777780;font-variant-numeric:tabular-nums}
+.film-app .inspector-insight>p{font-size:11px;line-height:18px;margin:8px 0 0;color:var(--film-muted)}
+.film-app .inspector-insight>.inspector-finding{font-size:17px;line-height:23px;color:var(--film-text);letter-spacing:-.025em;margin-top:14px;max-width:245px}
+.inspector-insight .magic-action{margin-top:14px}
+.summary-list{margin-top:12px}.summary-list .animated-list__item{background:transparent;box-shadow:none;padding:9px 0}.summary-list .animated-list__rim{box-shadow:none}
+.summary-list .animated-list__title{font-size:11px}.summary-list .animated-list__description{font-size:10px}
+
+/* Full React Bits Dock implementation: spring magnification + native labels. */
+.film-app .verification-toolbar{height:110px;padding:0 22px;background:transparent;border:0;border-radius:0;box-shadow:none;backdrop-filter:none}
+.film-app .verification-toolbar>.block-library-caption{display:block;position:absolute;left:24px;top:35px;margin:0}
+.film-app .block-library-caption h3{display:block;font-size:13px;line-height:18px}
+.film-app .block-library-caption p{font-size:10px;line-height:16px;margin-top:4px;color:var(--film-muted)}
+.film-app .verification-toolbar>.verification-dock{left:64%;top:18px;bottom:auto;margin:0;gap:var(--dock-gap);padding:var(--dock-pad);backdrop-filter:blur(20px) saturate(1.3)}
+.film-app .verification-dock .dock-item{width:var(--dock-base);height:var(--dock-base);padding:0;border:0;border-radius:0;font-size:12px;background:none;color:#ddd}
+.film-app .verification-dock .dock-tile{border:0;padding:0}
+.film-app .verification-dock .dock-label{background:#303032;color:#eee;font-size:11px;font-weight:450;border-color:#ffffff0b;box-shadow:0 5px 14px #0006}
+.film-app .policy-actions{gap:5px}
+
+/* Plot geometry leaves a dedicated label gutter. */
+.film-app .home-right{min-height:0;padding:18px;background:#1b1b1d;border-radius:18px;box-shadow:0 12px 28px -18px #000a}
+.film-app .run-chart{padding:20px 0 5px;margin:0;background:none;border-radius:0}
+.film-app .line-chart{display:block;overflow:hidden;height:220px;margin:16px 0 0}
+.film-app .chart-value{font-size:25px;line-height:30px;margin-top:10px;align-items:center}
+.film-app .chart-value small{font-size:10px;gap:2px}.film-app .chart-value span{font-size:9px}
+.film-app .library-insights{padding:19px 0 0;margin-top:13px;border-top:1px solid #ffffff09;background:none;border-radius:0}
+.library-insights>header{display:flex;align-items:center;gap:7px;margin-bottom:13px;font-size:12px;color:#d4d1dd}
+.library-insights>header img{width:21px;height:21px}
+.library-insights .animated-list__item{padding:12px 10px}
+.library-insights .animated-list__title{font-size:13px}.library-insights .animated-list__description{font-size:11px}
+.film-app .library-insights .magic-action{margin-top:14px}
+
+.agent-statuses{display:flex;align-items:center;gap:14px;margin-right:10px;color:var(--film-muted)}
+.agent-statuses>span{display:flex;align-items:center;gap:6px;font-size:11px;line-height:20px;white-space:nowrap}
+.agent-action-group{display:flex;align-items:center;gap:7px}
+.film-app .ag-agent-card{background:#202022;border:0;box-shadow:0 8px 22px -10px #0009}
+.film-app .ag-agent-card dl{background:none;padding:4px 11px}
+.film-app .ag-agent-card dl>div{justify-content:space-between}.film-app .ag-agent-card dt{color:var(--film-muted)}
+.film-app .ag-agent-name{border-bottom-color:#ffffff0a}.film-app .ag-agent-name p{color:var(--film-muted)}
+@media(prefers-reduced-motion:reduce){.film-app .film-button,.magic-action *{transition:none!important}.native-list .animated-list__item{transform:none!important;opacity:1!important}}

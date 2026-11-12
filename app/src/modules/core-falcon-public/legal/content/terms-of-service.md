@@ -1,6 +1,6 @@
 # Falcon Terms of Service
 
-**Version dated 10 November 2026**
+**Version dated 11 November 2026**
 
 These Terms govern the Falcon website, cloud workspaces and desktop application. Falcon is operated by **Mercury Rucks**, an individual. Send postal correspondence to Balcarce 3154, Mar del Plata, Argentina. Contact [Falcon support](mailto:falcon@saturnusgo.com) for questions about the service. The [Privacy Policy](https://tms.saturnusgo.com/privacy/?lang=en) explains how Falcon handles personal data.
 
@@ -18,6 +18,8 @@ Use Falcon only with systems and data you are authorized to access, test, collec
 
 You or the applicable rights holder retain rights in test cases, documentation, files and other content supplied to Falcon. You authorize Falcon and its service providers to host, process, secure, transmit and display that content as needed to provide the service, support your requests and comply with law. The authority is limited to these purposes and lasts for the applicable service, retention and deletion periods. You are responsible for having the rights and permissions needed to submit content and to give others access. Access, export and removal depend on workspace permissions and the applicable plan. Shared exports or copies already delivered to authorized users or external systems are managed by their recipients.
 
+When an organization removes a member from its workspace, Falcon revokes that member’s access to the workspace. Company records and their original author attribution remain in the workspace, subject to applicable law.
+
 ## 4. Integrations and AI features
 
 When you enable or use an integration, Falcon exchanges the data required for your requested operation with the connected service. Manage scopes and permissions in Falcon and the connected service. The service’s own terms apply to your use of it. AI-assisted features can produce inaccurate, incomplete or unsafe results. Review generated cases, diagrams and suggestions, and approve testing and other consequential actions within your authority. Use the product’s permission and approval controls for agent-driven actions. Falcon’s Privacy Policy describes the data involved.
@@ -32,7 +34,9 @@ Features may depend on platform, plan, workspace configuration or availability o
 
 ## 7. Suspension, termination and data export
 
-You may stop using Falcon and request account closure through support. A paid customer uses the cancellation method disclosed with the subscription. Falcon may suspend affected access to address a material violation, an imminent security risk, a legal requirement or an unpaid amount due under an accepted paid order after any applicable payment recovery period. Where practicable and lawful, Falcon will explain the reason and give a reasonable opportunity to resolve it. Restrictions are limited to the scope reasonably required. Use available export tools before closure and contact support if you need assistance with an authorized export. The order, Privacy Policy and applicable law govern access, retention and deletion after termination.
+You may stop using Falcon and request account closure through support. A paid customer uses the cancellation method disclosed with the subscription. Deletion of an entire workspace requires a separate confirmed request from an authorized administrator under the [Data Deletion Policy](/data-deletion/?lang=en).
+
+Falcon may suspend affected access to address a material violation, an imminent security risk, a legal requirement or an unpaid amount due under an accepted paid order after any applicable payment recovery period. Where practicable and lawful, Falcon will explain the reason and give a reasonable opportunity to resolve it. Restrictions are limited to the scope reasonably required. Use available export tools before closure and contact support if you need assistance with an authorized export. The order, Privacy Policy, Data Deletion Policy and applicable law govern access, retention and deletion after termination.
 
 ## 8. Warranties and responsibility
 
@@ -46,7 +50,7 @@ Revised Terms state their effective date. Falcon will notify you of material cha
 
 # Условия использования Falcon
 
-**Редакция от 10 ноября 2026 года**
+**Редакция от 11 ноября 2026 года**
 
 Эти Условия регулируют использование сайта Falcon, облачных рабочих пространств и настольного приложения. Falcon предоставляет **Меркурий Рукс (Mercury Rucks)**, физическое лицо. Почтовые обращения можно направить по адресу Balcarce 3154, Мар-дель-Плата, Аргентина. По вопросам о сервисе обращайтесь в [поддержку Falcon](mailto:falcon@saturnusgo.com). [Политика конфиденциальности](https://tms.saturnusgo.com/privacy/?lang=ru) описывает, как Falcon обрабатывает персональные данные.
 
@@ -64,6 +68,8 @@ Revised Terms state their effective date. Falcon will notify you of material cha
 
 Права на тест-кейсы, документацию, файлы и другие переданные материалы сохраняются у вас или соответствующего правообладателя. Вы разрешаете Falcon и его поставщикам хранить, обрабатывать, защищать, передавать и показывать эти материалы для работы сервиса, обработки ваших запросов и соблюдения закона. Разрешение ограничено указанными целями и действует в пределах необходимых сроков работы, хранения и удаления. Вы отвечаете за право передавать материалы и предоставлять к ним доступ. Возможности доступа, экспорта и удаления зависят от прав и тарифа. Копиями, уже переданными уполномоченным получателям или во внешние системы, управляют их получатели.
 
+Когда организация исключает участника, Falcon отзывает его доступ к её рабочему пространству. Записи организации и сведения об исходном авторстве сохраняются в пространстве с учётом применимого закона.
+
 ## 4. Интеграции и функции ИИ
 
 При включении или использовании интеграции Falcon передаёт подключённому сервису данные, необходимые для запрошенного действия. Вы управляете разрешениями и областью доступа в Falcon и подключённом сервисе. На работу внешнего сервиса распространяются его условия. ИИ может выдавать неточные, неполные или небезопасные результаты. Проверяйте созданные кейсы, диаграммы и рекомендации, согласуйте тестирование и значимые действия в пределах своих полномочий. Управляйте действиями агентов через предусмотренные разрешения и подтверждения. Состав данных описан в Политике конфиденциальности.
@@ -78,7 +84,9 @@ Revised Terms state their effective date. Falcon will notify you of material cha
 
 ## 7. Приостановление, прекращение и экспорт
 
-Вы можете прекратить использование и запросить закрытие аккаунта через поддержку. Отмена платной подписки выполняется способом, раскрытым при покупке. Falcon может ограничить затронутый доступ при существенном нарушении, непосредственном риске безопасности, обязательном требовании закона или неоплате суммы, подлежащей уплате по принятому заказу, по истечении применимого срока восстановления платежа. Когда это возможно и допустимо, Falcon сообщит причину и предоставит разумный срок на устранение. Ограничения действуют в пределах необходимого. Используйте доступные средства экспорта до закрытия и обращайтесь в поддержку за помощью с разрешённой выгрузкой. Доступ, хранение и удаление после прекращения регулируются заказом, Политикой конфиденциальности и законом.
+Вы можете прекратить использование и запросить закрытие аккаунта через поддержку. Отмена платной подписки выполняется способом, раскрытым при покупке. Для удаления всего рабочего пространства требуется отдельный подтверждённый запрос уполномоченного администратора в соответствии с [Политикой удаления данных](/data-deletion/?lang=ru).
+
+Falcon может ограничить затронутый доступ при существенном нарушении, непосредственном риске безопасности, обязательном требовании закона или неоплате суммы, подлежащей уплате по принятому заказу, по истечении применимого срока восстановления платежа. Когда это возможно и допустимо, Falcon сообщит причину и предоставит разумный срок на устранение. Ограничения действуют в пределах необходимого. Используйте доступные средства экспорта до закрытия и обращайтесь в поддержку за помощью с разрешённой выгрузкой. Доступ, хранение и удаление после прекращения регулируются заказом, Политикой конфиденциальности, Политикой удаления данных и законом.
 
 ## 8. Гарантии и ответственность
 

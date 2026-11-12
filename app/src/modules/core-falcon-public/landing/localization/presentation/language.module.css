@@ -63,3 +63,15 @@
 @media (prefers-reduced-motion: reduce) {
   .trigger { transition: none; }
 }
+
+:global(html[data-falcon-landing-theme="light"]) .menuSurface {
+  border-color: #e0e2e7;
+  background: #ffffff;
+  color: #1b1c20;
+  box-shadow: 0 8px 24px #171b2b1a;
+  color-scheme: light;
+}
+:global(html[data-falcon-landing-theme="light"]) .option[data-hover="true"],
+:global(html[data-falcon-landing-theme="light"]) .option[data-focus-visible="true"] {
+  background: #f0f1f4;
+}
