@@ -53,3 +53,32 @@ test("missing configuration sends nothing and rate-limited retries wait for the 
   await act(async () => { await new Promise(resolve => setTimeout(resolve, 1050)); });
   await act(async () => { state.retry(); await frame(); }); assert.equal(calls, 2);
 });
+
+for (const transition of ["unmount", "query change"] as const) {
+  test(`selected GIF reporting completes after ${transition} while catalog reads abort`, async t => {
+    const calls: { url: URL; signal: AbortSignal; resolve(value: Response): void }[] = [];
+    t.mock.method(globalThis, "fetch", (url: URL, init: RequestInit) => new Promise<Response>((resolve, reject) => {
+      const signal = init.signal!;
+      signal.addEventListener("abort", () => reject(signal.reason), { once: true });
+      calls.push({ url, signal, resolve });
+    }));
+    let state!: ReturnType<typeof useKlipyGallery>;
+    function Probe({ query }: { query: string }) { state = useKlipyGallery("key", query, "en"); return null; }
+    let view!: ReactTestRenderer; await act(async () => { view = create(<Probe query="" />); });
+    t.after(() => act(() => view.unmount()));
+    await act(async () => { calls[0].resolve(page("selected", "next-page")); await frame(); });
+    act(() => { state.share(state.items[0]); state.more(); });
+    const share = calls.find(call => call.url.pathname === "/v2/registershare")!;
+    const read = calls.find(call => call.url.searchParams.get("pos") === "next-page")!;
+    assert.equal(share.signal.aborted, false);
+    await act(async () => { if (transition === "unmount") view.unmount(); else view.update(<Probe query="new query" />); });
+    assert.equal(read.signal.aborted, true, "catalog reads belong to the old gallery scope");
+    assert.equal(share.signal.aborted, false, "selection reporting survives the gallery scope");
+    let completed = false;
+    await act(async () => {
+      share.resolve(new Response(new ReadableStream({ cancel() { completed = true; } })));
+      await frame();
+    });
+    assert.equal(completed, true, "the reporting response finishes after the gallery transition");
+  });
+}

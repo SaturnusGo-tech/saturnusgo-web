@@ -9,7 +9,7 @@ export function useKlipyGallery(key: string, query: string, locale: "ru" | "en")
   const empty = (): State => ({ scope, items: [], next: "", loading: configured, error: null, failedCursor: "", blockedUntil: 0 });
   const [state, setState] = useState<State>(empty);
   const current = useRef(scope); current.current = scope;
-  const request = useRef<AbortController | null>(null), shares = useRef(new Set<AbortController>());
+  const request = useRef<AbortController | null>(null);
   const visible = state.scope === scope ? state : empty();
   function load(cursor: string) {
     if (!configured || request.current || current.current !== scope || visible.blockedUntil > Date.now()) return;
@@ -34,7 +34,6 @@ export function useKlipyGallery(key: string, query: string, locale: "ru" | "en")
     if (!query.trim() && configured) load("");
     return () => {
       clearTimeout(timer); request.current?.abort(); request.current = null;
-      for (const controller of shares.current) controller.abort(); shares.current.clear();
     };
   }, [scope]);
   useEffect(() => {
@@ -45,10 +44,10 @@ export function useKlipyGallery(key: string, query: string, locale: "ru" | "en")
   }, [scope, visible.blockedUntil]);
   function share(item: KlipyItem) {
     if (!configured || current.current !== scope) return;
-    const controller = new AbortController(); shares.current.add(controller);
+    // A selection outlives the picker; the API's request deadline bounds reporting.
+    const controller = new AbortController();
     void registerKlipyShare({ key, query, id: item.appearance.id, signal: controller.signal })
-      .catch(() => { /* Reporting failure does not undo the user's selected folder appearance. */ })
-      .finally(() => shares.current.delete(controller));
+      .catch(() => { /* Reporting failure does not undo the user's selected GIF. */ });
   }
   return { ...visible, configured, more: () => { if (!visible.loading && visible.next) load(visible.next); },
     retry: () => { if (!visible.loading) load(visible.failedCursor); }, share };

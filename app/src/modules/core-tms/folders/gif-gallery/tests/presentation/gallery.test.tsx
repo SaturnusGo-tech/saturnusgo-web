@@ -17,6 +17,7 @@ test("missing configuration is honest, attributed and makes no provider requests
   t.after(() => act(() => view.unmount()));
   assert.match(JSON.stringify(view.toJSON()), /GIF gallery is not available yet/); assert.equal(calls, 0);
   assert.equal(view.root.findByProps({ "aria-label": "Search GIFs on KLIPY" }).props.disabled, true);
+  assert.equal(view.root.findByProps({ type: "search" }).props.placeholder, "Search KLIPY");
   assert.equal(view.root.findByProps({ href: "https://klipy.com" }).children.includes("Powered by KLIPY"), true);
 });
 
@@ -43,7 +44,8 @@ test("the always-present search shell sends typed queries to KLIPY after debounc
   const search = view.root.findByProps({ type: "search" });
   assert.equal(search.parent?.props["data-input-shell"], true, "search uses the shared field shell, visible without another toggle");
   assert.equal(search.props.disabled, false); assert.equal(search.props.hidden, undefined);
-  assert.equal(search.props.placeholder, "Найти GIF");
+  assert.equal(search.props.placeholder, "Search KLIPY");
+  assert.equal(search.props["aria-label"], "Поиск GIF в KLIPY");
   assert.equal(view.root.findAllByProps({ "aria-label": "Очистить поиск GIF" }).length, 0);
   await act(async () => search.props.onChange({ target: { value: "happy" } }));
   assert.equal(urls.length, 1, "typing does not bypass the debounce");
@@ -54,4 +56,17 @@ test("the always-present search shell sends typed queries to KLIPY after debounc
   assert.equal(view.root.findByProps({ type: "search" }).props.value, "");
   assert.equal(view.root.findAllByProps({ "aria-label": "Очистить поиск GIF" }).length, 0);
   assert.equal(urls.length, 3); assert.equal(urls[2].pathname, "/v2/featured"); assert.equal(urls[2].searchParams.has("q"), false);
+});
+
+test("failed selection reporting keeps the chosen GIF and produces no gallery failure", async t => {
+  const choices: KlipyAppearance[] = [];
+  t.mock.method(globalThis, "fetch", async (input: URL) => {
+    if (new URL(input).pathname === "/v2/registershare") throw new Error("Provider unavailable");
+    return Response.json({ results: [{ id: "selected", media_formats: { tinygif: { url: "https://static.klipy.com/selected.gif" } } }], next: "" });
+  });
+  let view!: ReturnType<typeof create>; await act(async () => { view = create(<Gallery apiKey="key" ru={false} onChoose={value => choices.push(value)} />); });
+  t.after(() => act(() => view.unmount()));
+  await act(async () => view.root.findByProps({ "aria-label": "Use GIF: GIF" }).props.onClick());
+  assert.deepEqual(choices, [{ kind: "gif", provider: "klipy", id: "selected", url: "https://static.klipy.com/selected.gif" }]);
+  assert.doesNotMatch(JSON.stringify(view.toJSON()), /Could not load GIFs|Provider unavailable/);
 });

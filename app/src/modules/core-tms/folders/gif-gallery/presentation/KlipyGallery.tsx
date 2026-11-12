@@ -19,7 +19,7 @@ export function KlipyGallery({ ru, onChoose, selected, apiKey = process.env.NEXT
       : (ru ? "Не удалось загрузить GIF." : "Could not load GIFs.");
   return <section className={css.gallery} aria-label={ru ? "GIF из KLIPY" : "KLIPY GIF gallery"}>
     <div className={css.search} data-input-shell><Search size={15} aria-hidden="true" />
-      <input ref={search} type="search" placeholder={ru ? "Найти GIF" : "Search GIFs"} maxLength={200} value={query} disabled={!gallery.configured}
+      <input ref={search} type="search" placeholder="Search KLIPY" maxLength={200} value={query} disabled={!gallery.configured}
         aria-label={ru ? "Поиск GIF в KLIPY" : "Search GIFs on KLIPY"} onChange={event => setQuery(event.target.value)} />
       {query && <button type="button" className={css.clear} aria-label={ru ? "Очистить поиск GIF" : "Clear GIF search"}
         onClick={() => { setQuery(""); search.current?.focus(); }}><X size={14} aria-hidden="true" /></button>}

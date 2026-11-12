@@ -58,3 +58,20 @@ test("HTTP-date rate limits retain the provider's future retry deadline", async 
     async () => new Response("Limit", { status: 429, headers: { "retry-after": after } })),
   error => error instanceof KlipyError && error.kind === "rate" && error.retryAfter >= 119 && error.retryAfter <= 120);
 });
+
+test("selection reporting omits credentials and stops at the existing ten-second deadline", async t => {
+  const deadline = new AbortController(), durations: number[] = [];
+  t.mock.method(AbortSignal, "timeout", (duration: number) => { durations.push(duration); return deadline.signal; });
+  let requestSignal!: AbortSignal;
+  const pending = registerKlipyShare({ key: "key", query: "hello", id: "selected", signal: new AbortController().signal },
+    async (_input, init) => {
+      assert.equal(init?.credentials, "omit"); assert.equal(init?.redirect, "error");
+      assert.equal(new Headers(init?.headers).has("authorization"), false);
+      requestSignal = init?.signal as AbortSignal;
+      return new Promise<Response>((_resolve, reject) => requestSignal.addEventListener("abort", () => reject(requestSignal.reason), { once: true }));
+    });
+  assert.deepEqual(durations, [10_000]); assert.equal(requestSignal.aborted, false);
+  deadline.abort(new DOMException("Deadline elapsed", "TimeoutError"));
+  await assert.rejects(pending, error => error instanceof KlipyError && error.kind === "network");
+  assert.equal(requestSignal.aborted, true);
+});
