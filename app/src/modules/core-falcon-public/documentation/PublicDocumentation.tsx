@@ -15,6 +15,7 @@ import { ArticleCopyButton } from "./ArticleContent";
 import { publicDocLabels } from "./copy";
 import type { PublicDocCatalog, PublicDocLocale } from "./model";
 import { PublicDocsIcon } from "./PublicDocsIcon";
+import { DocumentationOpenAppAction } from "./DocumentationOpenAppAction";
 import { PublicDocsNavigation } from "./PublicDocsNavigation";
 import { PublicDocsSearch } from "./PublicDocsSearch";
 import styles from "./documentation.module.css";
@@ -157,7 +158,7 @@ export function DocumentationReader({ catalog: { articles, groups }, locale, act
       <button className={`${styles.iconButton} ${styles.mobileSearch}`} type="button" onClick={() => setSearchOpen(true)} aria-label={labels.search} title={labels.search}><PublicDocsIcon name="search" /></button>
       {!panel && <button className={styles.iconButton} type="button" onClick={changeTheme} aria-label={labels.theme} title={labels.theme} aria-pressed={lightTheme}><PublicDocsIcon name="theme" /></button>}
       <button className={styles.copyPage} type="button" onClick={copyPage} aria-label={copied ? labels.copied : labels.copyPage} title={copied ? labels.copied : labels.copyPage}><PublicDocsIcon name={copied ? "check" : "copy"} /><span aria-live="polite">{copied ? labels.copied : labels.copyPage}</span></button>
-      {!panel && <a className={styles.openApp} href={appHref ?? `/cloud-login/?lang=${locale}`}>{labels.open}<PublicDocsIcon name="arrow" /></a>}
+      {!panel && <DocumentationOpenAppAction href={appHref ?? `/cloud-login/?lang=${locale}`} label={labels.open} />}
     </div>
   </header>;
 

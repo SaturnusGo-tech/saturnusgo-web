@@ -1,0 +1,13 @@
+.preview { min-height:100dvh; color:var(--falcon-text); background:var(--falcon-surface); }
+.controls { min-height:42px; padding:7px 20px; display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--falcon-border-subtle); font-size:12px; }
+.controls > span { margin-inline-end:auto; color:var(--falcon-text-muted); }
+.controls button,.tabs button { color:inherit; background:var(--falcon-hover); border-radius:10px; padding:7px 12px; }
+.tabs { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:18px 24px; }
+.tabs button[aria-pressed=true] { background:var(--falcon-action); color:var(--falcon-on-action); }
+.tabs span { margin-inline-start:auto; color:var(--falcon-text-muted); font-size:12px; }
+.settings { width:min(100%,1100px); margin:16px auto 0; padding:0 24px 60px; }
+.requests { max-width:1240px; margin:12px auto 0; padding:0 24px 60px; }
+.requests h1 { margin:0 24px; font-size:24px; font-weight:600; }
+.warning { margin:12px 24px 0; color:var(--falcon-text-secondary); font-size:13px; }
+.warning code { font-family:monospace; }
+@media(max-width:600px) { .controls { flex-wrap:wrap; padding-inline:12px; }.controls>span { width:100%; }.settings,.requests { padding-inline:12px; }.tabs { padding-inline:12px; } }

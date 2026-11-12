@@ -38,8 +38,8 @@ test("saved API appears in the real connection list and can be reopened or reloa
   assert.equal(f.counts().refreshed, 1); assert.equal(f.counts().saved, f.source);
   let all = f.render(); assert.equal(all.find(node => node.type === "button" && node.props.children === "Swagger")?.props.disabled, false);
   assert.equal(all.some(node => node.type === "SourceEditor" || node.type === "input"), false);
-  const row = all.find(node => node.type === "button" && nodes(node.props.children).some(child => child.type === "strong" && child.props.children === "Booking API"))!;
-  invoke(row, "onClick"); all = f.render(); const edit = all.find(node => node.type === "SourceEditor")!;
+  const row = all.find(node => node.type === "Button" && nodes(node.props.children).some(child => child.type === "strong" && child.props.children === "Booking API"))!;
+  invoke(row, "onPress"); all = f.render(); const edit = all.find(node => node.type === "SourceEditor")!;
   assert.equal(edit.props.source, f.source); invoke(edit, "onReload"); assert.equal(f.counts().refreshed, 2);
   assert.equal(f.render().some(node => node.type === "SourceEditor"), false);
 });

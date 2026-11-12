@@ -72,12 +72,12 @@ test("embedded API source manager preserves create/edit scope and actual save re
   const props = { workspaceId: "w", projectId: "p", onBack() {}, onSaved: (value: unknown) => { saved = value; }, embedded: true };
   let all = nodes(h.render(() => View(props)));
   assert.equal(scope, "w"); assert.equal(all.some(node => node.type === "h1"), false);
-  const add = all.find(node => node.type === "button" && Array.isArray(node.props.children) && node.props.children.includes("Connect API"))!;
-  invoke(add, "onClick"); all = nodes(h.render(() => View(props)));
+  const add = all.find(node => node.type === "Button" && Array.isArray(node.props.children) && node.props.children.includes("Connect API"))!;
+  invoke(add, "onPress"); all = nodes(h.render(() => View(props)));
   const editor = all.find(node => node.type === "SourceEditor")!;
   assert.equal(editor.props.workspaceId, "w"); assert.equal(editor.props.projectId, "p"); assert.equal(editor.props.source, null);
   invoke(editor, "onSaved", source); assert.equal(refreshed, 1); assert.equal(saved, source);
   all = nodes(h.render(() => View(props))); assert.equal(all.some(node => node.type === "SourceEditor"), false);
-  invoke(all.find(node => node.type === "button" && Array.isArray(node.props.children) && nodes(node.props.children).some(child => child.type === "strong" && child.props.children === "Billing API"))!, "onClick");
+  invoke(all.find(node => node.type === "Button" && Array.isArray(node.props.children) && nodes(node.props.children).some(child => child.type === "strong" && child.props.children === "Billing API"))!, "onPress");
   assert.equal(nodes(h.render(() => View(props))).find(node => node.type === "SourceEditor")?.props.source, source);
 });
