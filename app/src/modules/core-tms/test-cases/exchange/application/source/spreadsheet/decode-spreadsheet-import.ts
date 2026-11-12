@@ -9,6 +9,8 @@ export async function decodeSpreadsheetImport(file: File, extension: "xlsx" | "x
   const workbook = read(await file.arrayBuffer(), { type: "array", nodim: true, WTF: true,
     cellHTML: false, cellStyles: false, cellFormula: true, cellText: false, cellDates: false });
   if (!workbook.SheetNames.length || workbook.SheetNames.length > 32) throw new ImportSourceError("IMPORT_LIMIT_EXCEEDED");
+  // SheetJS also decodes Excel's _xHHHH_ escapes, which can alias distinct XML names.
+  if (new Set(workbook.SheetNames.map(name => name.toLowerCase())).size !== workbook.SheetNames.length) throw new ImportSourceError("IMPORT_INVALID_WORKBOOK");
   const sheets: ImportSheet[] = []; let count = 0; let cellCount = 0;
   for (const name of workbook.SheetNames) {
     const sheet = workbook.Sheets[name];

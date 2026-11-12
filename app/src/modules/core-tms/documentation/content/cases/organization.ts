@@ -94,8 +94,8 @@ export const caseOrganization: DocArticle[] = [
       section("access", "Permissions and concurrent changes", paragraph("Viewing the tree does not grant permission to change it. If actions are unavailable, check your project case permissions and finish editing any open case. If data has changed, refresh the tree and list, review the selection, and repeat the action.")),
       section("maintenance", "Maintain the repository", bullets("Use agreed product catalog values and tags.", "Split overly long scenarios into independent tests.", "Archive outdated cases and review suites before a release.", "For significant changes, leave a comment explaining the test's new purpose.")),
     ] },
-  { id: "import-export", title: "Import and export cases", group: "cases", description: "Upload JSON and import cases with automatic folder preparation.",
-    keywords: ["import", "export", "JSON", "v2", "folders", "file history", "download", "preview", "empty folder", "transfer", "continue import", "backup"], related: ["organize-cases", "create-test-case", "workspace"],
+  { id: "import-export", title: "Import and export cases", group: "cases", description: "Import JSON, CSV, TSV, XML or Excel files and preserve the original source with the prepared case structure.",
+    keywords: ["import", "export", "JSON", "CSV", "TSV", "XML", "XLSX", "XLS", "v2", "folders", "file history", "download", "preview", "empty folder", "transfer", "continue import", "backup"], related: ["codex-capabilities-exchange", "codex-prompts-repository", "organize-cases", "create-test-case", "workspace"],
     sections: [
       section("walkthrough", "Walkthrough: project and folder", importFoldersWalkthrough),
       section("export", "Export a project", steps(
@@ -104,11 +104,11 @@ export const caseOrganization: DocArticle[] = [
         ["Check the file", "Verify the case count and project before using the file to transfer data."])),
       section("import", "Import cases", steps(
         ["Open the import page", "In **Test cases**, click import in the repository header or go through **Settings → Import and export**. A dedicated **Import and export** page opens. Check the selected **Project**."],
-        ["Choose a file", "Click **Choose file** or drag in JSON. You can use a Falcon export or external test case JSON. The limits are 5 MB and 2,000 recognized cases."],
+        ["Choose a file", "Click **Choose file** or drag in JSON, CSV, TSV, XML, XLSX or XLS. Use a Falcon export or a supported external test-case structure. The limits are 5 MB and 2,000 recognized cases; exceeding them rejects the file rather than importing a prefix."],
         ["Choose the destination", "In **Folder**, expand the tree or search by folder name; choose **Project root** for the top level. Opening import from a selected folder prefills that destination; check it before starting."],
-        ["Start the import", "Click **Import**. Falcon automatically recognizes external JSON, prepares folders, and creates cases. The server uses OpenAI if needed. A preparation error stops case creation. After completion, check the case count, expand the structure tree, and open a few scenarios."])),
-      section("file-history", "Source file history", paragraph("Below the form is the selected project's **File history**. New imports retain the original JSON; each row shows the filename, size, author, time, and destination. Search with **Find a file**; click **Load more** for earlier records."),
-        bullets("The file menu offers **Open**, **Download**, and **Copy link**. Open shows the source JSON; links lead into Falcon and still require access permission.",
+        ["Start the import", "Click **Import**. Falcon parses the complete file, maps supported source content, prepares folders, and creates cases. Deterministic mapping runs first; the server can use OpenAI for unresolved structure when configured. Incomplete or lossy mappings stop preparation before case creation. After completion, check the case count, expand the structure tree, and open a few scenarios."])),
+      section("file-history", "Source file history", paragraph("Below the form is the selected project's **File history**. New imports retain the exact original file bytes; each row shows the filename, size, author, time, and destination. Search with **Find a file**; click **Load more** for earlier records."),
+        bullets("The file menu offers **Open**, **Download**, and **Copy link**. Open previews supported source content; the original file can be downloaded; links lead into Falcon and still require access permission.",
           "**Delete file** requires case management permission. After confirmation, the source file becomes unavailable, but imported cases, folders, and the history record remain.",
           "Read permission allows viewing history and downloading available files. New imports require case management permission. File history does not prove every case in the file was imported successfully; check the operation's result.")),
       section("destination", "How the structure is added", table(["Path in file", "Selected destination", "Result"],
@@ -129,6 +129,6 @@ export const caseOrganization: DocArticle[] = [
       section("archive-state", "Archived cases during transfer", paragraph("Export includes archived case contents, but the exchange file does not carry archive state. Import creates active records. If part of the source repository should remain retired, review and archive those cases in the destination project.")),
       section("limits", "Transfer scope", paragraph("JSON transfers the title, description, preconditions, scenario or checklist, test data, type, readiness, priority, tags, time estimate, and location. The compatible text field component contains the product name."),
         warning("A case file is not a TMS backup", "Export does not transfer the custom field catalog, field identifiers and selected values, product/group relationships, regression flags, assignees, attachments, or earlier revisions. Users, integration secrets, runs, and defect history are also excluded. Review classification and assignments separately after transfer."),
-        paragraph("CSV is not supported. External JSON structure is recognized automatically, but verify completeness when using a new format. Missing expected results are not generated: the source procedure is preserved in the description, and external cases are created as drafts.")),
+        paragraph("Supported external structures include authored procedures and checklists; unknown fields remain in source metadata. Missing expected results are not generated: the source procedure can remain in the description. Source completion/status is not an execution result. Unknown DocQA/DockQA labels do not establish a verified schema. Partial provider pages, missing checklist/shared-step joins, duplicate identities or unsafe numeric values are rejected rather than dropped.")),
     ] },
 ];

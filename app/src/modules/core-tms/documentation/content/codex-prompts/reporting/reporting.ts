@@ -6,7 +6,7 @@ export const reportingPrompts: DocArticle = {
   description: "Investigate a metric, adjust your private view, and schedule a report or threshold alert.",
   group: "codex-prompts",
   keywords: ["dashboard", "report", "metric", "threshold", "automation", "schedule", "reminder"],
-  related: ["codex-prompts", "dashboard", "codex-prompts-runs"],
+  related: ["codex-capabilities-reporting", "codex-prompts", "dashboard", "codex-prompts-runs"],
   sections: [
     section("investigate-metric", "Find the runs behind a dashboard number",
       paragraph("Use this when a dashboard number needs an explanation. Compare the server summary with the records behind the same period."),
@@ -28,5 +28,10 @@ export const reportingPrompts: DocArticle = {
       paragraph("Use this for a personal alert based on a supported metric. The first sample sets the baseline. Future polls notify you when Falcon reports a new crossing."),
       code("prompt", "Set an alert for a shared dashboard",
         `On [shared dashboard] with [all member projects], set up a personal Falcon alert when open defects reach at least [count] for the 7-day period. Use the same anchor project and full member list for every check. Review the rule and check every hour in [IANA time zone] through an authorized Codex schedule. Save the first reading as the baseline. Alert me only when Falcon returns a new alert, including value, threshold and dashboard link.`)),
+
+    section("report-pages", "Read every page behind a report",
+      code("prompt", "Read every page behind a report", "For [project/report/period], read the server summary and every relevant record page with the same filters. Show authoritative totals separately from the inspected detail. Report remaining cursors or access restrictions and never compute whole-project totals from the first page. Keep this read-only.")),
+    section("manage-reminder", "Pause or retire an existing reminder",
+      code("prompt", "Pause or retire an existing reminder", "Read my existing reminder [id] for the complete [project selection] and its current version. Apply [pause/resume/remove] and update the matching host schedule if available. Preserve the owner and scope; establish a fresh baseline on resume. Verify actual saved state and explain any unsupported schedule operation.")),
   ],
 };

@@ -1,17 +1,38 @@
 import { XMLParser, XMLValidator } from "fast-xml-parser";
 import { ImportSourceError } from "../../import-source-error";
+import { assertImportNumber } from "../../json/assert-import-number";
 export type WorkbookBudget = { cells: number; nodes: number };
 
 export async function checkWorkbookXml(bytes: Uint8Array, budget: WorkbookBudget): Promise<void> {
   const { utils } = await import("xlsx");
   const xml = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
   if (/<!\s*(?:DOCTYPE|ENTITY)\b/i.test(xml)) throw new ImportSourceError("IMPORT_INVALID_WORKBOOK");
-  let worksheet = false; let row = 0; let column = -1;
+  const entityText = xml.replace(/<!\[CDATA\[[\s\S]*?\]\]>|<!--[\s\S]*?-->/g, "");
+  if (/&(?!(?:amp|lt|gt|apos|quot|#\d+|#x[0-9a-fA-F]+);)[^;\s<&]*;/.test(entityText)) throw new ImportSourceError("IMPORT_INVALID_WORKBOOK");
+  let worksheet = false; let row = 0; let column = -1; let numericCell = false;
   const addresses = new Set<string>();
+  const sheetNames = new Set<string>(), sheetIds = new Set<string>(), sheetRelationships = new Set<string>();
+  const relationshipIds = new Set<string>();
+  // Numeric XML references share FXP's htmlEntities option; the guard above keeps named entities XML-only.
   const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "", removeNSPrefix: true,
-    parseTagValue: false, parseAttributeValue: false, processEntities: false, maxNestedTags: 100,
+    parseTagValue: false, parseAttributeValue: false, processEntities: true, htmlEntities: true, maxNestedTags: 100,
+    tagValueProcessor(tag, value, path) {
+      if (numericCell && path === "worksheet.sheetData.row.c.v") assertImportNumber(value, Number(value));
+      return value;
+    },
     updateTag(tag, path, attributes) {
       if (++budget.nodes > 500_000) throw new ImportSourceError("IMPORT_LIMIT_EXCEEDED");
+      if (path === "Relationships.Relationship") {
+        const id = attributes.Id;
+        if (!id?.trim() || relationshipIds.has(id)) throw new ImportSourceError("IMPORT_INVALID_WORKBOOK");
+        relationshipIds.add(id);
+      }
+      if (path === "workbook.sheets.sheet") {
+        const { name, sheetId, id } = attributes;
+        if (!name?.trim() || !sheetId?.trim() || !id?.trim() || sheetNames.has(name.toLowerCase())
+          || sheetIds.has(sheetId) || sheetRelationships.has(id)) throw new ImportSourceError("IMPORT_INVALID_WORKBOOK");
+        sheetNames.add(name.toLowerCase()); sheetIds.add(sheetId); sheetRelationships.add(id);
+      }
       if (path === "worksheet") worksheet = true;
       if (!worksheet) return tag;
       if (path === "worksheet.sheetData.row") {
@@ -19,6 +40,7 @@ export async function checkWorkbookXml(bytes: Uint8Array, budget: WorkbookBudget
         if (!Number.isSafeInteger(row) || row < 1 || row > 2001) throw new ImportSourceError("IMPORT_LIMIT_EXCEEDED");
       }
       if (path === "worksheet.sheetData.row.c") {
+        numericCell = attributes.t === undefined || attributes.t === "n";
         if (++budget.cells > 100_000) throw new ImportSourceError("IMPORT_LIMIT_EXCEEDED");
         let location = { r: row - 1, c: column + 1 };
         if (attributes.r !== undefined) {

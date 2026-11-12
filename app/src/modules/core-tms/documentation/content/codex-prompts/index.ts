@@ -14,7 +14,7 @@ const overview: DocArticle = {
   description: "Copy a practical request for Codex and adapt it to your Falcon workspace.",
   group: "codex-prompts",
   keywords: ["Codex", "playbook", "prompt", "examples", "templates", "QA", "Falcon"],
-  related: ["codex-web-qa", ...topics.map(topic => topic.id)],
+  related: ["codex-capabilities-overview", "codex-web-qa", ...topics.map(topic => topic.id)],
   sections: [
     section("start", "Run a prompt in Codex",
       paragraph("Connect Falcon in Codex, open the topic that matches your task, and copy a prompt. Replace the details in square brackets with your project, link or expected outcome. Paste the completed request into a Codex chat."),

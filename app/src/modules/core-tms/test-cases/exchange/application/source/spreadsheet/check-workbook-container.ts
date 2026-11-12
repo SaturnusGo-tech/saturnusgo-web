@@ -22,7 +22,7 @@ export async function checkWorkbookContainer(file: File, extension: "xlsx" | "xl
       if (entry.filename === "xl/workbook.xml") hasWorkbook = true;
       if (entry.directory) continue;
       let entryBytes = 0;
-      const xmlChunks: Uint8Array[] | undefined = /\.xml$/i.test(entry.filename) ? [] : undefined;
+      const xmlChunks: Uint8Array[] | undefined = /\.(?:xml|rels)$/i.test(entry.filename) ? [] : undefined;
       await entry.getData(new WritableStream<Uint8Array>({ write(chunk) {
         actual += chunk.byteLength; entryBytes += chunk.byteLength;
         xmlChunks?.push(chunk.slice());

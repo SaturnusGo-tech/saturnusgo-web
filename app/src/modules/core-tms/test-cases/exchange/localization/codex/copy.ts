@@ -1,0 +1,26 @@
+export const codexImportCopy = {
+  en: {
+    title: "Import and export with Codex",
+    ready: "Your project access is granted. In Codex, enable the Falcon plugin and ask it to prepare an import or export. Review the plan before applying changes.",
+    available: "Use the Falcon plugin in Codex to prepare a file, review its contents and import cases into this project.",
+    limited: "Export is available through your connection. Update its project permissions before importing cases.",
+    readOnly: "You can prepare files and review exports with Codex. Importing requires permission to manage test cases.",
+    unavailable: "Falcon MCP is unavailable for this workspace. Check its settings or contact your administrator.",
+    checking: "Checking access to this project…",
+    unknown: "Couldn’t check project access. You can still open the connection instructions.",
+    upload: "For file uploads, add attachment access to the same connection.",
+    install: "Install the Falcon plugin", setup: "Configure Falcon MCP", guide: "Import and export guide",
+  },
+  ru: {
+    title: "Импорт и экспорт с Codex",
+    ready: "Доступ к проекту выдан. В Codex включите плагин Falcon и попросите подготовить импорт или экспорт. Проверьте план перед применением изменений.",
+    available: "С плагином Falcon в Codex можно подготовить файл, проверить содержимое и импортировать кейсы в этот проект.",
+    limited: "Экспорт доступен через ваше подключение. Для импорта кейсов обновите его разрешения на проект.",
+    readOnly: "С Codex можно подготовить файлы и проверить экспорт. Для импорта нужны права на управление кейсами.",
+    unavailable: "Falcon MCP недоступен в этом пространстве. Проверьте настройки или обратитесь к администратору.",
+    checking: "Проверяем доступ к этому проекту…",
+    unknown: "Не удалось проверить доступ к проекту. Инструкция по подключению остаётся доступна.",
+    upload: "Для загрузки файлов добавьте доступ к вложениям в это же подключение.",
+    install: "Установить плагин Falcon", setup: "Настроить Falcon MCP", guide: "Руководство по импорту и экспорту",
+  },
+} as const;

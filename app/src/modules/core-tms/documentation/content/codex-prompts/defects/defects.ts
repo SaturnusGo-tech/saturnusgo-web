@@ -6,7 +6,7 @@ export const defectPrompts: DocArticle = {
   description: "Check for duplicates, prepare a traceable report, and verify a fix against observed evidence.",
   group: "codex-prompts",
   keywords: ["bug", "duplicate", "triage", "YouTrack", "Jira", "evidence", "retest"],
-  related: ["codex-prompts", "create-defect", "link-defect", "codex-prompts-web-qa"],
+  related: ["codex-capabilities-defects", "codex-prompts", "create-defect", "link-defect", "codex-prompts-web-qa"],
   sections: [
     section("find-duplicate", "Check whether a bug is already tracked",
       paragraph("Use this before opening a report. Codex compares actual symptoms and linked occurrences."),
@@ -28,5 +28,10 @@ export const defectPrompts: DocArticle = {
       paragraph("Use this once the relevant attempt has been run. A passing retest for the exact occurrence is the basis for confirmation."),
       code("prompt", "Review an observed fix",
         `Review [defect link] against the saved retest at [run link and case]. Match the original occurrence and applicable step to the actual passing evidence in the latest attempt. If the evidence is sufficient, propose the exact fix confirmation and any tracker effect for approval. Otherwise show which checks or evidence are missing. Confirm only after the review and required authorization.`)),
+
+    section("defect-discussion", "Discuss an observed defect",
+      code("prompt", "Discuss an observed defect", "In [project], read [defect] and all relevant comment pages. Add the exact reply [text] to [comment], mentioning only [recipients] after resolving real eligible actors. Link [real case/run item/attachment] through the supported tool. Do not change severity, lifecycle or test results.")),
+    section("connector-state", "Check tracker setup before a defect handoff",
+      code("prompt", "Check tracker setup before a defect handoff", "In [project], inspect the actual project connectors and [defect] current version. Explain which tracker is configured and what can be verified about its linkage. Apply only the requested supported transition [transition/reason] with the observed version and verify it. Do not claim that a status change proves a fix or create an external ticket without a request.")),
   ],
 };

@@ -6,7 +6,7 @@ export const runPrompts: DocArticle = {
   description: "Review a run before creating it, prepare a retest, and explain what really happened.",
   group: "codex-prompts",
   keywords: ["smoke", "batch", "release", "owner", "run", "retest", "attempt"],
-  related: ["codex-prompts", "codex-prompts-web-qa", "create-run", "retest"],
+  related: ["codex-capabilities-execution", "codex-prompts", "codex-prompts-web-qa", "create-run", "retest"],
   sections: [
     section("draft-smoke", "Prepare a release smoke run",
       paragraph("Use this when a build is ready for QA. Codex checks the scope and creates a draft once you approve the selection."),
@@ -28,5 +28,10 @@ export const runPrompts: DocArticle = {
       paragraph("Use this to brief a release owner. It separates recorded failures, blockers and checks that still need to be run."),
       code("prompt", "Summarize a run from saved results",
         `Summarize Falcon run [run link] for [release]. Use its actual lifecycle state and item results. List passed, failed, blocked and unexecuted counts separately. For each failure or blocker, give the latest attempt, reason or failing step, and evidence or defect link if available. Say which facts are missing and what checks still need to run. Keep this read-only.`)),
+
+    section("assign-items", "Assign explicit run items",
+      code("prompt", "Assign explicit run items", "In [project], read [run] and the exact items [IDs] with current versions. Resolve [owner] through the actor catalog and assign only those items using the advertised tool. Read back assignments. Keep run snapshots, lifecycle and execution verdicts unchanged.")),
+    section("archive-runs", "Archive an explicit run batch",
+      code("prompt", "Archive an explicit run batch", "In [workspace], inspect runs [IDs] and their complete project scope/current versions. Archive this exact set through the supported batch or run-archive tool. Explain lifecycle blockers before writing, preserve results and verify every returned run. Do not replace inaccessible runs with a smaller silent selection.")),
   ],
 };

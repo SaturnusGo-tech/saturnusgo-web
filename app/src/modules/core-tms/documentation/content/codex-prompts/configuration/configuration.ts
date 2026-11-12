@@ -6,7 +6,7 @@ export const configurationPrompts: DocArticle = {
   description: "Configure reusable QA scope, organize projects and understand what your Codex connection permits.",
   group: "codex-prompts",
   keywords: ["suite", "environment", "staging", "portfolio", "custom field", "permissions", "access"],
-  related: ["codex-prompts", "test-suites", "portfolios", "custom-fields", "permissions"],
+  related: ["codex-capabilities-configuration", "codex-prompts", "test-suites", "portfolios", "custom-fields", "permissions"],
   sections: [
     section("dynamic-suite", "Build a dynamic smoke suite",
       paragraph("Use this when membership should follow case filters. Review the rule independently of the cases it matches today."),
@@ -28,5 +28,10 @@ export const configurationPrompts: DocArticle = {
       paragraph("Use this when an action is unavailable or denied. Codex can identify whether the issue is with the connection, project selection or allowed action."),
       code("prompt", "Diagnose Falcon access without changing it",
         `In [workspace] and [project], I tried to [action] and got [error code or message]. Check the Falcon connection and the capabilities it advertises. Tell me whether this looks like a missing connection, a project outside the grant, or a missing capability or role. Separate what you can verify from what an administrator must confirm. Keep this read-only and tell me the supported way to reconnect if needed.`)),
+
+    section("choose-project", "Resolve a project before writes",
+      code("prompt", "Resolve a project before writes", "Check my current Falcon context for [task]. If I already named the project in this chat, reuse it. If more than one granted project is available and none is specified, ask me which one before writes. Do not choose the first project. Explain any missing scope or role and continue independent reads.")),
+    section("create-project", "Create a project in an empty workspace",
+      code("prompt", "Create a project in an empty workspace", "In [workspace], create a standalone project named [name] with permanent key [key] and description [description], if the advertised project-creation consent and capability allow it. Use the supplied metadata and host approval. If creation does not grant access to its contents, return the created ID/link and explain the separate project authorization needed next. Do not invent a portfolio or environment.")),
   ],
 };

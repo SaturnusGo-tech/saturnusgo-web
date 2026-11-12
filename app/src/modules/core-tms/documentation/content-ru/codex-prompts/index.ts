@@ -14,7 +14,7 @@ const overview: DocArticle = {
   description: "Скопируйте готовый запрос для Codex и подставьте данные своего рабочего пространства Falcon.",
   group: "codex-prompts",
   keywords: ["Codex", "сценарии", "промпт", "примеры", "шаблоны", "QA", "Falcon"],
-  related: ["codex-web-qa", ...topics.map(topic => topic.id)],
+  related: ["codex-capabilities-overview", "codex-web-qa", ...topics.map(topic => topic.id)],
   sections: [
     section("start", "Как использовать готовый запрос",
       paragraph("Подключите Falcon в Codex, откройте подходящий раздел и скопируйте запрос. Замените текст в квадратных скобках на свой проект, ссылку или ожидаемый результат. Вставьте готовый запрос в чат Codex."),

@@ -8,6 +8,7 @@ import { useImportCases } from "../../../state/import/use-import-cases";
 import { ImportHistory } from "../history/ImportHistory";
 import { ImportComposer } from "../upload/ImportComposer";
 import { ImportProgress } from "../upload/ImportProgress";
+import { ImportCodexHint } from "../codex/ImportCodexHint";
 import type { ImportCasesPageProps } from "./ImportCasesPage";
 import css from "./import-page.module.css";
 
@@ -24,6 +25,7 @@ export function ImportSession(props: ImportCasesPageProps & { projects: readonly
     return () => window.removeEventListener("beforeunload", warn);
   }, [state.busy]);
   return <>
+    <ImportCodexHint workspaceId={props.workspaceId} projectId={props.project.id} canManage={props.canManage} busy={state.busy} />
     {props.canManage ? <>
       <ImportComposer state={state} projects={props.projects} projectId={props.project.id} onProjectChange={props.onProjectChange} ru={ru} />
       <ImportProgress state={state} ru={ru} />

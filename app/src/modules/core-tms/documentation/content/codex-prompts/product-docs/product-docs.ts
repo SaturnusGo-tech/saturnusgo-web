@@ -6,7 +6,7 @@ export const productDocPrompts: DocArticle = {
   description: "Turn requirements into QA pages, review changes against the source and prepare a draft for publication.",
   group: "codex-prompts",
   keywords: ["product documentation", "QA requirements", "source PDF", "page draft", "manage-product-docs", "Codex"],
-  related: ["codex-prompts", "product-docs-authoring", "codex-web-qa"],
+  related: ["codex-capabilities-product-docs", "codex-prompts", "product-docs-authoring", "codex-web-qa"],
   sections: [
     section("requirements", "Draft requirements from a source",
       paragraph("Use an attached specification, a design or an approved set of notes to draft a rule that testers can verify."),
@@ -24,5 +24,12 @@ export const productDocPrompts: DocArticle = {
       paragraph("Use a release brief and run results to prepare a guide another tester can follow."),
       code("prompt", "Draft a release verification guide",
         `In Falcon project [project], use [release brief] and [run or report] to draft a verification guide for [release]. Include the build, environment, smoke checks, stop conditions and owners where they are known. Link to the exact run and relevant product pages. Identify missing information and wait for my review before saving the draft. I’ll publish it in Falcon.`)),
+
+    section("publish-review", "Review and publish an exact document version",
+      code("prompt", "Review and publish an exact document version", "In [project], inspect the draft/publication of [page] and request a review of [exact version/sections] from [eligible reviewers]. Show concurrent changes. After the assigned reviewers decide, publish the exact approved version if I have authorized that publication and the host permits it. An approval of an older draft must not publish a newer draft.")),
+    section("snapshot-links", "Save a release snapshot with coverage links",
+      code("prompt", "Save a release snapshot with coverage links", "In [project], update [Product Docs page] with a supported snapshot of [run/dashboard] and links from [exact requirement sections] to [case IDs]. Preserve section IDs and existing drafts, use current versions and read back the saved snapshot. State its timestamp and scope; do not represent the snapshot as live or a coverage link as a passed test.")),
+    section("organize-docs", "Reorganize a documentation subtree",
+      code("prompt", "Reorganize a documentation subtree", "In [project], inventory the whole Product Docs tree including child pages and cursor pages. Move [page/subtree] under [existing parent], preserving stable links and child hierarchy. Apply only this move with the current version; do not republish or archive content. Read back the parent and children and report any inaccessible branches.")),
   ],
 };
