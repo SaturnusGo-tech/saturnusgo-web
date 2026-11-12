@@ -1,6 +1,6 @@
 import { ErrorToast } from "../../../../../../common/error/ErrorToast";
-import { Button } from "@heroui/react";
-import { Box, Clock3, FlaskConical, Inbox } from "lucide-react";
+import { Button, Listbox, ListboxItem } from "@heroui/react";
+import { Box, ChevronRight, Clock3, FlaskConical, Inbox } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { DefectTriageRow, DefectTriageScope, DefectTriageView } from "../../../../../../../defects/triage/defect-triage-source";
 import { useDefectIntake } from "../../../../../../../defects/triage/useDefectIntake";
@@ -8,6 +8,7 @@ import { useDashboardWidgetPending } from "../../../../../loading/readiness/Dash
 import { useTmsLocale } from "../../../../../../../localization/context/useTmsLocale";
 import { MemberAvatar } from "../../../../../../../workspace/members/avatar/MemberAvatar";
 import { useMemberName } from "../../../../../../../workspace/members/state/useMemberName";
+import { PriorityIcon, priorityLabel } from "../../../../../../common/properties/PriorityIcon";
 import type { DashboardViewProps } from "../../../../../dashboard-view";
 import { triageCopy } from "../copy/triage-copy";
 import shared from "../triage.module.css";
@@ -28,7 +29,7 @@ export function DefectIntake({ scope, view, canManage, onChange, onOpenRow }: Pr
   const detailId = useId();
   const queueRef = useRef<HTMLDivElement>(null);
   const detailRef = useRef<HTMLElement>(null);
-  const opener = useRef<HTMLButtonElement | null>(null);
+  const opener = useRef<Element | null>(null);
   const [selection, setSelection] = useState<string | null>(null);
   const intake = useDefectIntake(scope, view, onChange);
   const { list, saving, error, completed } = intake;
@@ -51,7 +52,7 @@ export function DefectIntake({ scope, view, canManage, onChange, onOpenRow }: Pr
   function dismiss() {
     setSelection(null);
     intake.clearDecision();
-    requestAnimationFrame(() => opener.current?.focus());
+    requestAnimationFrame(() => (opener.current as HTMLElement | null)?.focus());
   }
 
   return <section className={styles.layout} data-detail={Boolean(selected) || undefined} aria-label={copy.intake}>
@@ -70,15 +71,26 @@ export function DefectIntake({ scope, view, canManage, onChange, onOpenRow }: Pr
           <p>{view === "inbox" ? copy.inboxEmptyHint : copy.snoozedEmptyHint}</p>
         </div>
       </div>}
-      {list.rows.length > 0 && <ul className={styles.rows} aria-label={copy[view]}>
-        {list.rows.map(row => <IntakeRow key={row.id} row={row} workspaceId={scope.workspaceId}
-          active={selected?.id === row.id} disabled={saving} detailId={detailId} onSelect={(button) => {
-            opener.current = button;
-            intake.clearDecision();
-            setSelection(row.id);
-            requestAnimationFrame(() => detailRef.current?.focus());
-          }} />)}
-      </ul>}
+      {list.rows.length > 0 && <Listbox aria-label={copy[view]} variant="light" selectionMode="single"
+        hideSelectedIcon disallowEmptySelection selectedKeys={selection ? [selection] : []}
+        disabledKeys={saving ? list.rows.map(row => row.id) : []}
+        classNames={{ base: styles.listbox, list: styles.rows }}
+        itemClasses={{ base: styles.row, wrapper: styles.rowWrapper, title: styles.rowTitle }}
+        onSelectionChange={keys => {
+          if (keys === "all") return;
+          const [key] = keys;
+          const row = list.rows.find(item => item.id === key);
+          if (!row || saving) return;
+          opener.current = document.activeElement;
+          intake.clearDecision();
+          setSelection(row.id);
+          requestAnimationFrame(() => detailRef.current?.focus());
+        }}>
+        {list.rows.map(row => <ListboxItem key={row.id} textValue={`${row.title} ${row.key}`}
+          aria-controls={selected?.id === row.id ? detailId : undefined}>
+          <IntakeRowContent row={row} workspaceId={scope.workspaceId} />
+        </ListboxItem>)}
+      </Listbox>}
       {!list.error && list.nextCursor && <footer className={styles.footer}>
         <Button size="sm" variant="light" className={shared.button} isDisabled={list.loading || saving}
           onPress={() => void intake.load(list.nextCursor ?? undefined)}>
@@ -98,10 +110,7 @@ export function DefectIntake({ scope, view, canManage, onChange, onOpenRow }: Pr
   </section>;
 }
 
-function IntakeRow({ row, workspaceId, active, disabled, detailId, onSelect }: {
-  row: DefectTriageRow; workspaceId: string; active: boolean; disabled: boolean; detailId: string;
-  onSelect: (button: HTMLButtonElement) => void;
-}) {
+function IntakeRowContent({ row, workspaceId }: { row: DefectTriageRow; workspaceId: string }) {
   const { locale, languageTag } = useTmsLocale();
   const copy = triageCopy[locale];
   const linked = Boolean(row.externalIssue);
@@ -110,10 +119,12 @@ function IntakeRow({ row, workspaceId, active, disabled, detailId, onSelect }: {
   const date = new Date(row.updatedAt);
   const dateLabel = new Intl.DateTimeFormat(languageTag, { dateStyle: "medium", timeStyle: "short" }).format(date);
 
-  return <li>
-    <button type="button" className={styles.row} aria-pressed={active} aria-controls={active ? detailId : undefined}
-      disabled={disabled} onClick={event => onSelect(event.currentTarget)}>
-      <strong title={row.title}>{row.title}</strong>
+  const priority = priorityLabel(locale, row.priority);
+  return <span className={styles.rowContent}>
+      <span className={styles.priority} role="img" aria-label={priority} title={priority}>
+        <PriorityIcon level={row.priority} empty="circle" size={15} />
+      </span>
+      <strong className={styles.title} title={row.title}>{row.title}</strong>
       <span className={styles.key}>{row.key}</span>
       <span className={styles.source}>
         {linked ? <Box size={17} aria-hidden="true" />
@@ -123,9 +134,9 @@ function IntakeRow({ row, workspaceId, active, disabled, detailId, onSelect }: {
           : <Box size={16} aria-hidden="true" />}
         <span>{source}</span>
       </span>
-      <time dateTime={row.updatedAt} title={dateLabel}>{formatAge(date, languageTag)}</time>
-    </button>
-  </li>;
+      <time className={styles.age} dateTime={row.updatedAt} title={dateLabel}>{formatAge(date, languageTag)}</time>
+      <ChevronRight className={styles.chevron} size={14} aria-hidden="true" />
+  </span>;
 }
 
 function formatAge(date: Date, locale: string) {

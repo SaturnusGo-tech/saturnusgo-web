@@ -1,13 +1,13 @@
 .shell {
-  --triage-rail: 475px;
-  --triage-pad: 25px;
+  --triage-rail: 42%;
+  --triage-pad: 20px;
   --triage-ink: var(--dashboard-card-text, var(--ink));
   --triage-muted: var(--dashboard-card-muted, var(--falcon-text-secondary));
-  --triage-line: var(--dashboard-card-border, var(--line));
+  --triage-line: color-mix(in srgb, var(--dashboard-card-border, var(--line)) 50%, transparent);
   --triage-surface: var(--dashboard-card-bg, var(--paper));
   --triage-subtle: var(--dashboard-card-subtle, var(--control));
   --triage-hover: color-mix(in srgb, var(--triage-ink) 7%, var(--triage-surface));
-  --triage-line-strong: color-mix(in srgb, var(--triage-muted) 55%, var(--triage-line));
+  --triage-line-strong: color-mix(in srgb, var(--triage-muted) 35%, var(--triage-line));
   min-inline-size: 0;
   color: var(--triage-ink);
   background: var(--triage-surface);
@@ -21,10 +21,9 @@
   align-items: center;
   justify-content: space-between;
   min-inline-size: 0;
-  min-block-size: 44px;
-  gap: 8px;
-  padding: 6px var(--triage-pad);
-  border-block-end: 1px solid var(--triage-line);
+  min-block-size: 60px;
+  gap: 12px;
+  padding: 12px var(--triage-pad) 8px;
 }
 .toolbar h2 {
   min-inline-size: 0;
@@ -39,26 +38,25 @@
   display: flex;
   max-inline-size: 100%;
   flex-wrap: wrap;
-  gap: 3px;
-  padding: 2px;
+  gap: 4px;
+  padding: 0;
   overflow: visible;
-  border: 1px solid var(--triage-line);
-  border-radius: 7px;
-  background: var(--triage-subtle);
+  border: 0;
+  background: transparent;
 }
 .toolbar .surfaceTab {
   width: auto;
-  min-block-size: 27px;
-  padding-inline: 8px;
-  border-radius: 5px;
+  min-block-size: 30px;
+  padding-inline: 10px;
+  border-radius: 8px;
   color: var(--triage-muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 .toolbar .surfaceTab[data-selected="true"] { color: var(--triage-ink); }
 .toolbar .surfaceTab:focus-visible { outline: 1px solid var(--triage-muted); outline-offset: 1px; }
 .toolbar .surfaceTabs { --dashboard-tab-cursor: var(--triage-hover); }
-.panelContent { animation: triage-panel-in 150ms ease-out both; }
-@keyframes triage-panel-in { from { opacity: .65; } }
+.panelContent { animation: triage-panel-in 220ms ease-out both; }
+@keyframes triage-panel-in { from { opacity: .65; transform: translateY(2px); } }
 @media (prefers-reduced-motion: reduce) { .panelContent { animation: none; } }
 .placeholder, .workbench { margin: 0; padding: 14px var(--triage-pad) 18px; }
 .workbench, .workbenchPanel { display: grid; min-inline-size: 0; gap: 8px; }

@@ -13,11 +13,11 @@ import { createDashboardLoadingFixture, previewScope, type PreviewMode } from ".
 import styles from "./dashboard-loading-preview.module.css";
 
 export function DashboardLoadingPreview() {
-  const [mode, setMode] = useState<PreviewMode>("slow"), [revision, setRevision] = useState(0), [refresh, setRefresh] = useState(0);
+  const [mode, setMode] = useState<PreviewMode>("triage"), [revision, setRevision] = useState(0), [refresh, setRefresh] = useState(0);
   const [locale, setLocale] = useState<TmsLocale>("en"), [events, setEvents] = useState<string[]>([]);
   const { resolvedTheme, setTheme } = useTheme();
   const log = useCallback((message: string) => setEvents(previous => [...previous.slice(-19), `${new Date().toLocaleTimeString()} ${message}`]), []);
-  const fixture = useMemo(() => createDashboardLoadingFixture(mode, log), [mode, revision, log]);
+  const fixture = useMemo(() => createDashboardLoadingFixture(mode, log, locale), [mode, revision, log, locale]);
   const analytics = useMemo(() => ({ ...fixture.analytics }), [fixture, refresh]);
   const localeContext = useMemo(() => ({ locale, languageTag: locale === "ru" ? "ru-RU" as const : "en-US" as const, setLocale,
     t: (key: keyof typeof tmsMessages.en, variables?: Record<string, string | number>) => interpolateMessage(tmsMessages[locale][key], variables) }), [locale]);
@@ -29,6 +29,7 @@ export function DashboardLoadingPreview() {
         <div className={styles.preview} data-falcon-workspace>
           <nav className={styles.controls} aria-label="Local dashboard QA controls">
             <strong>Dashboard QA · local memory only</strong>
+            <button onClick={() => restart("triage")}>Triage only · reset</button>
             <button onClick={() => restart("slow")}>Restart slow</button>
             <button onClick={() => restart("fast")}>Restart fast</button>
             <button onClick={() => restart("legacy")}>Legacy layout</button>

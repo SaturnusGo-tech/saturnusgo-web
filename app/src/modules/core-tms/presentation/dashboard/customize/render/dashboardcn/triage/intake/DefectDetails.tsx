@@ -6,6 +6,8 @@ import type { DefectTriageDecision, DefectTriageRow, DefectTriageSource, DefectT
 import { useTmsLocale } from "../../../../../../../localization/context/useTmsLocale";
 import { localizedLabel } from "../../../../../../../localization/format/labels";
 import { ResponsibleName } from "../../../../../../../workspace/members/presentation/ResponsibleName";
+import { PriorityIcon, priorityLabel } from "../../../../../../common/properties/PriorityIcon";
+import { DefectStatusIcon } from "../../../../../../common/properties/defect/DefectStatusIcon";
 import { triageCopy } from "../copy/triage-copy";
 import { DefectDecision } from "../decision/DefectDecision";
 import shared from "../triage.module.css";
@@ -49,8 +51,8 @@ export function DefectDetails({ id, panelRef, row, workspaceId, view, canManage,
     </header>
     <h3>{row.title}</h3>
     <dl className={styles.properties}>
-      <div><dt>{t("reports.status")}</dt><dd>{localizedLabel(locale, row.status)}</dd></div>
-      <div><dt>{t("reports.priority")}</dt><dd>{localizedLabel(locale, row.priority)}</dd></div>
+      <div><dt>{t("reports.status")}</dt><dd><DefectStatusIcon status={row.status} />{localizedLabel(locale, row.status)}</dd></div>
+      <div><dt>{t("reports.priority")}</dt><dd><PriorityIcon level={row.priority} empty="circle" />{priorityLabel(locale, row.priority)}</dd></div>
       <div><dt>{t("reports.severity")}</dt><dd>{localizedLabel(locale, row.severity)}</dd></div>
       {row.component && <div><dt>{t("reports.component")}</dt><dd>{row.component}</dd></div>}
       <div><dt>{t("reports.created")}</dt><dd><time dateTime={row.createdAt}>{date.format(new Date(row.createdAt))}</time></dd></div>

@@ -39,6 +39,9 @@ export function DashboardContent({ onOpenRow, data, layout, model, projectName }
   const sections = dashboardSections.filter(section => widgets.some(widget => widgetSection(widgetKey(widget)) === section));
   const selected = sections.length === 1 ? sections[0] : preferences.value.section === "all" || sections.includes(preferences.value.section)
     ? preferences.value.section : sections[0] ?? "overview";
+  const renderedSections = selected === "all"
+    ? [...sections.filter(section => section !== "overview"), ...sections.filter(section => section === "overview")]
+    : sections;
   const previousView = useRef({ selected, editing });
   useLayoutEffect(() => {
     const sectionChanged = previousView.current.selected !== selected;
@@ -76,7 +79,7 @@ export function DashboardContent({ onOpenRow, data, layout, model, projectName }
       retryLabel={t("dashboardLayout.retry")} onRetry={() => void preferences.refresh()} />
     <div ref={sectionsRef} className={styles.sections} id={workflow ? panelId : undefined}
       role={workflow ? "tabpanel" : undefined} aria-labelledby={workflow ? dashboardTabId(panelId, selected) : undefined}>
-      {sections.filter(section => workflow || selected === "all" || section === selected).map(section =>
+      {renderedSections.filter(section => workflow || selected === "all" || section === selected).map(section =>
         <section key={section} className={styles.dashboardSection} data-dashboard-section={section}
           hidden={selected !== "all" && selected !== section}>
         {(!workflow || selected === "all") && <div className={styles.sectionHeading}><div><h2>{workflow && section === "overview" ? t("dashboardWorkbench.context") : sectionLabels[section][locale]}</h2>
