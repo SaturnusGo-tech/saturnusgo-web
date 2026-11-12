@@ -75,7 +75,7 @@ test("single and multiple menus fade without changing geometry and honor reduced
       setSelectReducedMotion(false);
       await act(async () => { view = create(render()); });
       const control = () => view.root.findByProps({ "data-test-select": true });
-      assert.equal(control().props.disableAnimation, false);
+      assert.equal(control().props.disableAnimation, undefined, "default animation policy remains inheritable from HeroUIProvider");
       const motion = control().props.popoverProps.motionProps;
       assert.deepEqual(Object.keys(motion.variants).sort(), ["enter", "exit", "initial"]);
       for (const [state, variant] of Object.entries(motion.variants)) {

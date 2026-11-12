@@ -1,7 +1,8 @@
 "use client";
+import { AnchoredPopover as Popover } from "../../../../../../../shared/components/anchored-popup/popover/AnchoredPopover";
 
 import { LoadingOrb } from "../../../../../../../shared/components/loading/LoadingOrb";
-import { Button, Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
+import { Button, PopoverContent, PopoverTrigger } from "@heroui/react";
 import { useReducedMotion } from "framer-motion";
 import { ExternalLink, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";

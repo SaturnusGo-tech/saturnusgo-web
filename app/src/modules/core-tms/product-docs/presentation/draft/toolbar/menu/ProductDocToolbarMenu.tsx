@@ -1,7 +1,8 @@
 "use client";
+import { AnchoredDropdown as Dropdown } from "../../../../../../../shared/components/anchored-popup/dropdown/AnchoredDropdown";
 
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
-import { useReducedMotion, type Variants } from "framer-motion";
+import { Button, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
+import { useReducedMotion } from "framer-motion";
 import { Check, ChevronDown } from "lucide-react";
 import { forwardRef, type ComponentProps, type ReactNode } from "react";
 import { ProductDocTooltip } from "../../../overlay/ProductDocTooltip";
@@ -9,12 +10,6 @@ import { useProductDocToolbarSelection } from "./useProductDocToolbarSelection";
 import styles from "./toolbar-menu.module.css";
 
 type Item<Value> = { value: Value; label: string; content?: ReactNode };
-
-export const toolbarMenuMotion: Variants = {
-  initial: { opacity: 0, y: -4, scale: .98 },
-  enter: { opacity: 1, y: 0, scale: 1, transition: { duration: .18, ease: [.22, .7, .2, 1] } },
-  exit: { opacity: 0, y: -2, scale: .985, transition: { duration: .13, ease: [.4, 0, 1, 1] } },
-};
 
 type ToolButtonProps = Omit<ComponentProps<typeof Button>, "ref"> & { label: string };
 
@@ -41,7 +36,7 @@ export function ProductDocToolbarMenu<Value extends string>({ title, children, i
   const selection = useProductDocToolbarSelection();
 
   return <Dropdown placement="bottom-start" offset={6} containerPadding={10} shouldBlockScroll={false} shouldCloseOnScroll={false}
-    portalContainer={portalContainer} disableAnimation={Boolean(reduced)} motionProps={{ variants: toolbarMenuMotion }}
+    portalContainer={portalContainer} disableAnimation={Boolean(reduced)}
     data-doc-toolbar-overlay={menuId} classNames={{ base: styles.positioner, content: styles.surface }} style={{ zIndex: 160 }}>
     <DropdownTrigger>
       <ProductDocToolbarButton label={title} isDisabled={disabled} className={className ? `${styles.trigger} ${className}` : styles.trigger}

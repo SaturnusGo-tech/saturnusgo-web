@@ -1,6 +1,7 @@
 "use client";
+import { AnchoredPopover as Popover } from "../../../../../../shared/components/anchored-popup/popover/AnchoredPopover";
 
-import { Listbox, Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
+import { Listbox, PopoverContent, PopoverTrigger } from "@heroui/react";
 import { useReducedMotion } from "framer-motion";
 import { activeEditor$, currentSelection$, editorInTable$, readOnly$, useCellValue } from "@mdxeditor/editor";
 import { $getNodeByKey, $getRoot, $getSelection, $isRangeSelection, $setSelection, type RangeSelection } from "lexical";
@@ -11,7 +12,7 @@ import { productDocMacShortcuts } from "../commands/keyboard/commandShortcuts";
 import { productDocCommandRows } from "../commands/menu/ProductDocCommandRows";
 import { useProductDocInsertCommands, type ProductDocInsertCommand } from "../commands/registry/useProductDocInsertCommands";
 import commandStyles from "../commands/menu/commands.module.css";
-import { ProductDocToolbarButton, toolbarMenuMotion } from "./menu/ProductDocToolbarMenu";
+import { ProductDocToolbarButton } from "./menu/ProductDocToolbarMenu";
 
 export function ProductDocInsertMenu({ locale, onImport }: { locale: TmsLocale; onImport(): void }) {
   const ru = locale === "ru";
@@ -54,7 +55,7 @@ export function ProductDocInsertMenu({ locale, onImport }: { locale: TmsLocale; 
 
   const label = ru ? "Вставить" : "Insert";
   return <Popover isOpen={open && !readOnly} onOpenChange={changeOpen} placement="bottom-start" offset={6} containerPadding={10}
-    shouldBlockScroll={false} shouldCloseOnScroll={false} disableAnimation={Boolean(reduced)} motionProps={{ variants: toolbarMenuMotion }}
+    shouldBlockScroll={false} shouldCloseOnScroll={false} disableAnimation={Boolean(reduced)}
     classNames={{ content: `${commandStyles.menu} ${commandStyles.toolbarMenu}` }} style={{ zIndex: 160 }}>
     <PopoverTrigger>
       <ProductDocToolbarButton label={label} isIconOnly isDisabled={readOnly} onPointerDownCapture={remember} onKeyDownCapture={(event) => {

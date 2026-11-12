@@ -1,4 +1,5 @@
-import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
+import { AnchoredDropdown as Dropdown } from "../../../../../../../shared/components/anchored-popup/dropdown/AnchoredDropdown";
+import { DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
 import { ChevronDown, CodeXml } from "lucide-react";
 import { productDocLanguageOptions } from "../engine/codeLanguage";
 import { ProductDocToolbarButton } from "../../toolbar/menu/ProductDocToolbarMenu";

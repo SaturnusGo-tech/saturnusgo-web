@@ -2,11 +2,13 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import type { ExportCasesAction } from "../../library/presentation/export/ExportCasesAction";
 import { componentHarness, invoke, nodes } from "../../../../portfolios/tests/support/component-harness";
+import { AnchoredSelect } from "../../../../../../shared/components/anchored-popup/select/AnchoredSelect";
 
 const projects = [{ id: "a", key: "A", name: "Alpha" }, { id: "b", key: "B", name: "Другой проект" }];
 function fixture(ru = false, disabled = false, initial = projects[0], reducedMotion = false) {
   const h = componentHarness(); let selected = "", starts = 0, cancels = 0;
   const { ExportCasesAction: View } = h.load<{ ExportCasesAction: typeof ExportCasesAction }>(new URL("../../library/presentation/export/ExportCasesAction.tsx", import.meta.url), name => {
+    if (name.endsWith("AnchoredSelect")) return { AnchoredSelect };
     if (name === "framer-motion") return { useReducedMotion: () => reducedMotion };
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: ru ? "ru" : "en", t: (key: string) => key }) };
     if (name.endsWith("use-export-cases")) return { useExportCases: (project: typeof projects[number]) => {
@@ -14,7 +16,8 @@ function fixture(ru = false, disabled = false, initial = projects[0], reducedMot
       return { busy: false, error: "", completed: null, start: async () => { starts++; }, cancel: () => { cancels++; } };
     } };
   });
-  const render = () => nodes(h.render(() => View({ projects, project: initial, enabled: true, disabled })));
+  const render = () => nodes(h.render(() => View({ projects, project: initial, enabled: true, disabled })))
+    .map(node => (node.type as unknown) === AnchoredSelect ? { ...node, type: "Select", facade: AnchoredSelect } : node);
   return { render, state: () => ({ selected, starts, cancels }) };
 }
 
@@ -64,7 +67,27 @@ test("an unavailable initial project requires a real selection instead of choosi
 
 test("the export modal honors reduced motion", () => {
   const f = fixture(false, false, projects[0], true); invoke(f.render().find(node => node.type === "Button")!, "onPress");
-  const modal = f.render().find(node => node.type === "Modal")!;
+  const dialog = f.render(), modal = dialog.find(node => node.type === "Modal")!;
   assert.equal(modal.props.disableAnimation, true);
   assert.equal((modal.props.motionProps as { transition: { duration: number } }).transition.duration, 0);
+  assert.equal(dialog.find(node => node.type === "Select")!.props.disableAnimation, true);
+});
+
+test("the export project uses the stable popup facade and preserves its modal portal", () => {
+  const f = fixture();
+  invoke(f.render().find(node => node.type === "Button")!, "onPress");
+  const portal = { role: "dialog" };
+  invoke(f.render().find(node => node.type === "h2")!, "ref", { closest: (selector: string) => {
+    assert.equal(selector, '[role="dialog"]');
+    return portal;
+  } });
+  const dialog = f.render();
+  const picker = dialog.find(node => node.type === "Select")!;
+  assert.equal("facade" in picker && picker.facade, AnchoredSelect);
+  const popover = picker.props.popoverProps as { portalContainer: unknown; isNonModal: boolean };
+  assert.equal(popover.portalContainer, portal);
+  assert.equal(popover.isNonModal, true);
+  assert.equal(picker.props.disableAnimation, false);
+  const modal = dialog.find(node => node.type === "Modal")!;
+  assert.equal((modal.props.motionProps as { initial: { scale: number } }).initial.scale, .98);
 });

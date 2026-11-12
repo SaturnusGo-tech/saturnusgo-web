@@ -1,7 +1,8 @@
 "use client";
+import { AnchoredPopover as Popover } from "../../../../../../shared/components/anchored-popup/popover/AnchoredPopover";
+import { AnchoredFreeSoloPopover as FreeSoloPopover } from "../../../../../../shared/components/anchored-popup/free-solo/AnchoredFreeSoloPopover";
 
-import { Button, Input, Popover, PopoverContent } from "@heroui/react";
-import { FreeSoloPopover } from "@heroui/popover";
+import { Button, Input, PopoverContent } from "@heroui/react";
 import { $isLinkNode } from "@lexical/link";
 import { useReducedMotion } from "framer-motion";
 import {

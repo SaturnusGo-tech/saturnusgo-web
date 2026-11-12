@@ -1,6 +1,7 @@
 "use client";
+import { AnchoredPopover as Popover } from "../../../../../../shared/components/anchored-popup/popover/AnchoredPopover";
 
-import { Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
+import { PopoverContent, PopoverTrigger } from "@heroui/react";
 import { activeEditor$, currentSelection$, readOnly$, rootEditor$ } from "@mdxeditor/editor";
 import { useCellValues } from "@mdxeditor/gurx";
 import { useRef, useState } from "react";

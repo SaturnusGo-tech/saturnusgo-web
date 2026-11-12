@@ -1,4 +1,5 @@
-import { BreadcrumbItem, Breadcrumbs, Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
+import { AnchoredDropdown as Dropdown } from "../../../../../shared/components/anchored-popup/dropdown/AnchoredDropdown";
+import { BreadcrumbItem, Breadcrumbs, Button, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
 import { ChevronRight, Ellipsis } from "lucide-react";
 import { type ReactNode, useRef } from "react";
 import styles from "./workspace-breadcrumbs.module.css";

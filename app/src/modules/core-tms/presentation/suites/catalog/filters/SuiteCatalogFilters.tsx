@@ -1,4 +1,5 @@
-import { Button, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup } from "@heroui/react";
+import { AnchoredPopover as Popover } from "../../../../../../shared/components/anchored-popup/popover/AnchoredPopover";
+import { Button, PopoverContent, PopoverTrigger, Radio, RadioGroup } from "@heroui/react";
 import { SettingsSlider } from "@openai/apps-sdk-ui/components/Icon";
 import type { SuiteCatalogFilter, SuiteCatalogSort } from "../../../../suites/catalog/suite-catalog";
 import css from "../catalog.module.css";

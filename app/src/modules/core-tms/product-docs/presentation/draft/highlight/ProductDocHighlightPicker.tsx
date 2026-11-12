@@ -1,7 +1,9 @@
 "use client";
+import { AnchoredPopover as Popover } from "../../../../../../shared/components/anchored-popup/popover/AnchoredPopover";
 
-import { Popover, PopoverContent } from "@heroui/react";
+import { PopoverContent } from "@heroui/react";
 import { Highlighter } from "lucide-react";
+import { useReducedMotion } from "framer-motion";
 import { useRef, useState } from "react";
 import type { HighlightColor } from "../../../../presentation/cases/inspector/markdown/highlight/model/highlightColors";
 import { HighlightPalette } from "../../../../presentation/cases/inspector/markdown/highlight/palette/HighlightPalette";
@@ -18,24 +20,30 @@ type Props = {
 };
 
 export function ProductDocHighlightPicker({ locale, onChoose, onOpen, disabled, portalContainer, ...props }: Props) {
+  const reduced = useReducedMotion();
   const [open, setOpen] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null!);
   const choice = useRef<{ color: HighlightColor | null }>(null);
+  const applying = useRef(false);
   function remember() {
     if (!choice.current) onOpen?.();
+  }
+  function applyChoice() {
+    if (!choice.current || applying.current) return;
+    applying.current = true;
+    const { color } = choice.current;
+    // Restore the editor selection after the overlay releases its focus scope.
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      choice.current = null; applying.current = false;
+      onChoose(color);
+    }));
   }
   const label = props.label ?? (locale === "ru" ? "Маркер" : "Highlight");
   return <Popover triggerRef={trigger} isOpen={open && !disabled} onOpenChange={setOpen} placement="bottom-start" offset={6}
     shouldBlockScroll={false} shouldCloseOnBlur={false} shouldCloseOnScroll={false} portalContainer={portalContainer}
     classNames={{ base: styles.positioner, content: styles.palette }}
     motionProps={{ onAnimationComplete: (variant) => {
-      if (variant !== "exit" || !choice.current) return;
-      const { color } = choice.current;
-      // Restore the editor selection after the overlay releases its focus scope.
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        choice.current = null;
-        onChoose(color);
-      }));
+      if (variant === "exit") applyChoice();
     } }}>
     <ProductDocToolbarButton ref={trigger} label={label} isIconOnly isDisabled={disabled} className={styles.trigger}
       aria-haspopup="dialog" aria-expanded={open && !disabled}
@@ -49,6 +57,7 @@ export function ProductDocHighlightPicker({ locale, onChoose, onOpen, disabled, 
         if (choice.current) return;
         choice.current = { color };
         setOpen(false);
+        if (reduced) applyChoice();
       }} />
     </PopoverContent>
   </Popover>;

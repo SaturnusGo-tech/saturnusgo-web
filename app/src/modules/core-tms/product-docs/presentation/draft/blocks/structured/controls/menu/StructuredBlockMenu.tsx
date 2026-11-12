@@ -1,6 +1,7 @@
 "use client";
+import { AnchoredDropdown as Dropdown } from "../../../../../../../../../shared/components/anchored-popup/dropdown/AnchoredDropdown";
 
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
+import { Button, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
 import { Copy, EllipsisVertical, MousePointer2, Trash2 } from "lucide-react";
 import styles from "../../product-doc-structured.module.css";
 

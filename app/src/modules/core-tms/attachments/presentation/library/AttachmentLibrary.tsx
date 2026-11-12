@@ -1,7 +1,8 @@
 "use client";
+import { AnchoredDropdown as Dropdown } from "../../../../../shared/components/anchored-popup/dropdown/AnchoredDropdown";
 
 import { useMemo, useRef, useState } from "react";
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Tab, Tabs, Tooltip, addToast } from "@heroui/react";
+import { Button, DropdownItem, DropdownMenu, DropdownTrigger, Input, Tab, Tabs, Tooltip, addToast } from "@heroui/react";
 import { Archive, AudioLines, BookOpen, File, FileSpreadsheet, FileText, Image, LayoutGrid, List, ListFilter, Search, Star, Video } from "lucide-react";
 import { useOptionalTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";

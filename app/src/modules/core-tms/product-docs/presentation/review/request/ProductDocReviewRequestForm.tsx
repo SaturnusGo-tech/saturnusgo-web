@@ -1,5 +1,6 @@
+import { AnchoredSelect as Select } from "../../../../../../shared/components/anchored-popup/select/AnchoredSelect";
 import { ErrorToast } from "../../../../presentation/common/error/ErrorToast";
-import { Button, Input, Select, SelectItem } from "@heroui/react";
+import { Button, Input, SelectItem } from "@heroui/react";
 import { Check, ChevronDown, Search } from "lucide-react";
 import { useRef, useState } from "react";
 import { MemberAvatar } from "../../../../workspace/members/avatar/MemberAvatar";

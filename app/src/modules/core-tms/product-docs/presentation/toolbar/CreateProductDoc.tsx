@@ -1,8 +1,9 @@
 "use client";
+import { AnchoredPopover as Popover } from "../../../../../shared/components/anchored-popup/popover/AnchoredPopover";
 
 import { ErrorToast, showErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
-import { Button, Input, Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
+import { Button, Input, PopoverContent, PopoverTrigger } from "@heroui/react";
 import { Check, ListPlus, Plus, X } from "lucide-react";
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import type { ProductDocNode, ProductDocsApi, ProductDocScope } from "../../domain/product-docs";

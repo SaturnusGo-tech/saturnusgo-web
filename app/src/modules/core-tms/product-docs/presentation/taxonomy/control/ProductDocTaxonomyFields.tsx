@@ -1,7 +1,8 @@
 "use client";
+import { AnchoredPopover as Popover } from "../../../../../../shared/components/anchored-popup/popover/AnchoredPopover";
 
-import { Button, Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
-import { useReducedMotion, type Variants } from "framer-motion";
+import { Button, PopoverContent, PopoverTrigger } from "@heroui/react";
+import { useReducedMotion } from "framer-motion";
 import { Layers, Package, SlidersHorizontal } from "lucide-react";
 import { useRef, useState } from "react";
 import { useOptionalTmsHttpClient } from "../../../../auth/http/TmsHttpClientContext";
@@ -10,18 +11,6 @@ import type { ProductDocTaxonomy } from "../../../domain/product-doc-taxonomy";
 import type { ProductDocScope } from "../../../domain/product-docs";
 import styles from "../taxonomy.module.css";
 import { ProductDocTaxonomySelector, type TaxonomyDimension } from "./ProductDocTaxonomySelector";
-
-const filterMotion: Variants = {
-  initial: { opacity: 1, y: -4, scale: .985 },
-  enter: { opacity: 1, y: 0, scale: 1, transition: { duration: .18, ease: [.16, 1, .3, 1] } },
-  exit: { y: -2, opacity: 0, transition: { duration: .11 } },
-};
-
-const popoverMotion: Variants = {
-  initial: { opacity: 0, y: -3, scale: .985 },
-  enter: { opacity: 1, y: 0, scale: 1, transition: { duration: .17, ease: [.22, .7, .2, 1] } },
-  exit: { opacity: 0, y: -2, scale: .99, transition: { duration: .11 } },
-};
 
 type Props = {
   scope: ProductDocScope;
@@ -53,7 +42,6 @@ function TaxonomyFields({ scope, value, onChange, filter = false, disabled = fal
   };
   const selected = [value.productGroup?.label, value.product?.label].filter(Boolean).join(", ");
 
-
   function select(dimension: TaxonomyDimension, next: ProductDocTaxonomy[TaxonomyDimension]) {
     if (dimension === "productGroup") {
       if ((next?.id ?? null) !== (value.productGroup?.id ?? null)) onChange({ productGroup: next, product: null });
@@ -69,7 +57,7 @@ function TaxonomyFields({ scope, value, onChange, filter = false, disabled = fal
     return <Popover isOpen={open === field && !disabled}
       onOpenChange={(next) => setOpen((current) => next ? field : current === field ? undefined : current)}
       placement={filtering ? "bottom-end" : "bottom-start"} offset={7} containerPadding={12}
-      disableAnimation={Boolean(reducedMotion)} motionProps={{ variants: filtering ? filterMotion : popoverMotion }}
+      disableAnimation={Boolean(reducedMotion)}
       shouldBlockScroll={false} shouldCloseOnScroll={false}
       classNames={{ base: filtering ? `${styles.popover} ${styles.searchPopover}` : `${styles.popover} ${styles.propertyPopover}`, content: styles.panel }}>
       {filtering ? <PopoverTrigger>

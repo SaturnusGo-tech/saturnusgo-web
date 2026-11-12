@@ -1,6 +1,8 @@
 "use client";
+import { AnchoredDropdown as Dropdown } from "../../../../../../shared/components/anchored-popup/dropdown/AnchoredDropdown";
+import { AnchoredPopover as Popover } from "../../../../../../shared/components/anchored-popup/popover/AnchoredPopover";
 
-import { addToast, Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Popover, PopoverContent } from "@heroui/react";
+import { addToast, Button, DropdownItem, DropdownMenu, DropdownTrigger, Input, PopoverContent } from "@heroui/react";
 import { Archive, Clock3, Download, Ellipsis, FolderInput, Link2, MessageSquare, Pencil, Star } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { writeClipboardText } from "../../../../../../shared/lib/clipboard";

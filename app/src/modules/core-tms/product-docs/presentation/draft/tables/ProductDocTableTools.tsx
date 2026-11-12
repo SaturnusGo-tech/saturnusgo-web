@@ -1,6 +1,7 @@
 "use client";
+import { AnchoredPopover as Popover } from "../../../../../../shared/components/anchored-popup/popover/AnchoredPopover";
 
-import { Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
+import { PopoverContent, PopoverTrigger } from "@heroui/react";
 import { useReducedMotion } from "framer-motion";
 import {
   editorInTable$, insertTable$, readOnly$, useCellValue, usePublisher,
@@ -8,7 +9,7 @@ import {
 import { ChevronDown, Table2 } from "lucide-react";
 import { useRef, useState, type KeyboardEvent } from "react";
 import type { TmsLocale } from "../../../../localization/model/locale";
-import { ProductDocToolbarButton, toolbarMenuMotion } from "../toolbar/menu/ProductDocToolbarMenu";
+import { ProductDocToolbarButton } from "../toolbar/menu/ProductDocToolbarMenu";
 import { useProductDocToolbarSelection } from "../toolbar/menu/useProductDocToolbarSelection";
 import styles from "./tables.module.css";
 
@@ -66,7 +67,7 @@ export function ProductDocTableTools({ locale }: { locale: TmsLocale }) {
       if (next) setSize(defaultSize);
       setOpen(next);
     }} placement="bottom-end" offset={6} containerPadding={10} shouldBlockScroll={false} shouldCloseOnScroll={false}
-      disableAnimation={Boolean(reduced)} motionProps={{ variants: toolbarMenuMotion }} style={{ zIndex: 160 }}
+      disableAnimation={Boolean(reduced)} style={{ zIndex: 160 }}
       classNames={{ content: styles.sizePicker }}>
       <PopoverTrigger>
         <ProductDocToolbarButton label={title} isIconOnly className={styles.sizeTrigger} isDisabled={disabled} onPointerDownCapture={selection.remember} onKeyDownCapture={selection.rememberOnKey}>

@@ -1,7 +1,8 @@
 "use client";
+import { AnchoredPopover as Popover } from "../../../../../../shared/components/anchored-popup/popover/AnchoredPopover";
 
 import { ErrorToast } from "../../../../presentation/common/error/ErrorToast";
-import { Button, Popover, PopoverContent, PopoverTrigger, Skeleton } from "@heroui/react";
+import { Button, PopoverContent, PopoverTrigger, Skeleton } from "@heroui/react";
 import { ArrowUpRight, History, PanelRight, PlayCircle } from "lucide-react";
 import { useContext, useMemo, useRef, type CSSProperties } from "react";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";

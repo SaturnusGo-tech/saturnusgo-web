@@ -1,6 +1,7 @@
 "use client";
+import { AnchoredPopover as Popover } from "../../../../../../shared/components/anchored-popup/popover/AnchoredPopover";
 
-import { Button, Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
+import { Button, PopoverContent, PopoverTrigger } from "@heroui/react";
 import { useReducedMotion } from "framer-motion";
 import { lazy, Suspense, useCallback, useRef, useState } from "react";
 import type { FolderAppearance } from "../../../../folders/model/appearance/folder-appearance";

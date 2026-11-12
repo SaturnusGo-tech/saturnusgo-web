@@ -1,6 +1,7 @@
 "use client";
+import { AnchoredDropdown as Dropdown } from "../../../../../../shared/components/anchored-popup/dropdown/AnchoredDropdown";
 
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
+import { Button, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
 import { ChevronDown, Download, File, FileArchive, FileText, Grid2X2, Image, Music2, Video, X } from "lucide-react";
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";

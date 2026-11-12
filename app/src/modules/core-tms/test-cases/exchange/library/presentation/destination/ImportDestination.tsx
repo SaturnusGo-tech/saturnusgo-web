@@ -1,4 +1,6 @@
-import { Autocomplete, AutocompleteItem, BreadcrumbItem, Breadcrumbs, Button, Select, SelectItem } from "@heroui/react";
+import { AutocompleteItem, BreadcrumbItem, Breadcrumbs, Button, SelectItem } from "@heroui/react";
+import { AnchoredSelect as Select } from "../../../../../../../shared/components/anchored-popup/select/AnchoredSelect";
+import { AnchoredAutocomplete as Autocomplete } from "../../../../../../../shared/components/anchored-popup/autocomplete/AnchoredAutocomplete";
 import { ChevronLeft, Folder } from "lucide-react";
 import type { Project } from "../../../../../../../core/tms/contracts/legacy-contract";
 import { ErrorToast } from "../../../../../presentation/common/error/ErrorToast";

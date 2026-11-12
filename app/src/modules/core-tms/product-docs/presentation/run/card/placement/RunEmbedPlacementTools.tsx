@@ -1,10 +1,10 @@
 "use client";
+import { AnchoredDropdown as Dropdown } from "../../../../../../../shared/components/anchored-popup/dropdown/AnchoredDropdown";
 
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownSection, DropdownTrigger } from "@heroui/react";
+import { Button, DropdownItem, DropdownMenu, DropdownSection, DropdownTrigger } from "@heroui/react";
 import { useReducedMotion } from "framer-motion";
 import { AlignCenter, AlignLeft, AlignRight, Check, ChevronDown, Columns3, PanelLeft, PanelRight, StretchHorizontal, X } from "lucide-react";
 import { useEffect, useRef, useState, type PointerEvent, type RefObject } from "react";
-import { toolbarMenuMotion } from "../../../draft/toolbar/menu/ProductDocToolbarMenu";
 import menu from "../../../draft/toolbar/menu/toolbar-menu.module.css";
 import { ProductDocTooltip } from "../../../overlay/ProductDocTooltip";
 import { maxRunEmbedWidth, minRunEmbedWidth, type RunEmbedPlacement } from "../../markdown/runDirective";
@@ -119,7 +119,7 @@ export function RunEmbedPlacementTools({ placement, onChange, onRemove, onCompos
       onMouseDown={(event) => event.preventDefault()}>
       <Dropdown placement="bottom-end" offset={6} containerPadding={10} shouldBlockScroll={false} shouldCloseOnScroll={false}
         onOpenChange={(open) => { setMenuOpen(open); if (!open && reduced) composeAfterClose(); }}
-        disableAnimation={Boolean(reduced)} motionProps={{ variants: toolbarMenuMotion,
+        disableAnimation={Boolean(reduced)} motionProps={{
           onAnimationComplete: (variant) => { if (variant === "exit") composeAfterClose(); } }}
         classNames={{ base: menu.positioner, content: menu.surface }} style={{ zIndex: 160 }}>
         <DropdownTrigger>

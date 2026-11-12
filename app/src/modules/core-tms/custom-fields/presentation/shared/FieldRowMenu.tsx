@@ -1,4 +1,5 @@
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
+import { AnchoredDropdown as Dropdown } from "../../../../../shared/components/anchored-popup/dropdown/AnchoredDropdown";
+import { Button, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
 import { Archive, MoreHorizontal, Pencil, RotateCcw } from "lucide-react";
 import css from "./customFields.module.css";
 

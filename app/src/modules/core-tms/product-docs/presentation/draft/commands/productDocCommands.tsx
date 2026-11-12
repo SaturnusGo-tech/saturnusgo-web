@@ -8,7 +8,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { useCallback, useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
-import { toolbarMenuMotion } from "../toolbar/menu/ProductDocToolbarMenu";
+import { anchoredPopupMotion } from "../../../../../../shared/components/anchored-popup/motion/anchored-popup-motion";
 import { productDocCommandQuery } from "./commandQuery";
 import { productDocMacShortcuts, productDocShortcutCommand } from "./keyboard/commandShortcuts";
 import { productDocCommandRows } from "./menu/ProductDocCommandRows";
@@ -22,7 +22,7 @@ type CommandMenu = Parameters<MenuRenderFn<InsertOption>>[1];
 
 function InsertMenu({ anchor, menu, closing }: { anchor: RefObject<HTMLElement>; menu: CommandMenu; closing: boolean }) {
   const { locale } = useTmsLocale();
-  const reduced = useReducedMotion();
+  const reduced = useReducedMotion(), menuMotion = anchoredPopupMotion();
   const viewport = useRef<HTMLDivElement>(null);
   const previous = useRef(menu);
   if (!closing && menu.options.length) previous.current = menu;
@@ -48,8 +48,8 @@ function InsertMenu({ anchor, menu, closing }: { anchor: RefObject<HTMLElement>;
   }, [options, selectedIndex]);
 
   return createPortal(<div {...getPopoverProps({ style: { zIndex: 160 } })} data-doc-slash-menu>
-    <motion.div className={styles.menu} initial={reduced ? false : "initial"} animate={closing ? "exit" : "enter"}
-      variants={toolbarMenuMotion} aria-hidden={closing || undefined} inert={closing || undefined}>
+    <motion.div {...menuMotion} className={styles.menu} initial={reduced ? false : "initial"} animate={closing ? "exit" : "enter"}
+      transition={reduced ? { duration: 0 } : menuMotion.transition} aria-hidden={closing || undefined} inert={closing || undefined}>
       <div ref={viewport} className={styles.viewport} onPointerMoveCapture={(event) => {
         if (!(event.target instanceof Element)) return;
         const item = event.target.closest<HTMLElement>("[data-doc-command-index]");

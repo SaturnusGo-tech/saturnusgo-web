@@ -1,4 +1,5 @@
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem } from "@heroui/react";
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, SelectItem } from "@heroui/react";
+import { AnchoredSelect as Select } from "../../../../../../../shared/components/anchored-popup/select/AnchoredSelect";
 import { useReducedMotion } from "framer-motion";
 import { LoadingOrb } from "../../../../../../../shared/components/loading/LoadingOrb";
 import { ChevronDown, Download, X } from "lucide-react";

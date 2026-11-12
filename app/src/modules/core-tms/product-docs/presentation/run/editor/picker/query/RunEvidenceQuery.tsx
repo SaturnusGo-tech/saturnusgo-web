@@ -1,6 +1,7 @@
 "use client";
+import { AnchoredPopover as Popover } from "../../../../../../../../shared/components/anchored-popup/popover/AnchoredPopover";
 
-import { Button, Input, Listbox, ListboxItem, Popover, PopoverContent } from "@heroui/react";
+import { Button, Input, Listbox, ListboxItem, PopoverContent } from "@heroui/react";
 import { useReducedMotion } from "framer-motion";
 import { CodeXml, X } from "lucide-react";
 import { useId, useRef, useState } from "react";
@@ -8,7 +9,6 @@ import type { TmsLocale } from "../../../../../../localization/model/locale";
 import type { QueryMember } from "../../../../../../presentation/cases/model/query/match";
 import { parseCaseQuery } from "../../../../../../presentation/cases/model/query/parse";
 import { insertQuerySuggestion, querySuggestions, type QuerySuggestion } from "../../../../../../presentation/cases/toolbar/ql/suggestions/query-suggestions";
-import { toolbarMenuMotion } from "../../../../draft/toolbar/menu/ProductDocToolbarMenu";
 import pickerStyles from "../run-evidence-inspector.module.css";
 import styles from "./run-evidence-query.module.css";
 
@@ -34,7 +34,7 @@ export function RunEvidenceQuery({ open, instantClose, onOpenChange, ...props }:
   return <Popover triggerRef={trigger} isOpen={open} onOpenChange={onOpenChange}
     placement="bottom-end" offset={10} containerPadding={14} shouldBlockScroll={false}
     shouldCloseOnScroll={false} disableAnimation={instantClose || Boolean(reduced)}
-    motionProps={{ variants: toolbarMenuMotion }} portalContainer={trigger.current?.closest<HTMLElement>('[role="dialog"]') ?? undefined}
+    portalContainer={trigger.current?.closest<HTMLElement>('[role="dialog"]') ?? undefined}
     shouldCloseOnInteractOutside={(element) => !element.closest("[data-run-picker-tool]")}
     classNames={{ base: styles.positioner, content: styles.panel }} style={{ zIndex: 5 }}>
     <Button ref={trigger} className={pickerStyles.searchTool} variant="light" size="sm" disableRipple

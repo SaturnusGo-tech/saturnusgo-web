@@ -1,6 +1,7 @@
 "use client";
+import { AnchoredPopover as Popover } from "../../../../../shared/components/anchored-popup/popover/AnchoredPopover";
 
-import { Button, Popover, PopoverContent } from "@heroui/react";
+import { Button, PopoverContent } from "@heroui/react";
 import { useReducedMotion } from "framer-motion";
 import { ClipboardCheck } from "lucide-react";
 import { useId, useRef, useState } from "react";

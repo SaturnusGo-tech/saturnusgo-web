@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { dirname, extname, join, relative } from "node:path";
 
-const roots = ["app/src/core/tms", "app/src/modules/core-tms"];
+const roots = ["app/src/core/tms", "app/src/modules/core-tms", "app/src/shared/components/anchored-popup"];
 const codeExtensions = new Set([".ts", ".tsx"]);
 const files = [];
 

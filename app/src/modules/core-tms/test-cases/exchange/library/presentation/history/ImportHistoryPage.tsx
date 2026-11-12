@@ -1,4 +1,5 @@
-import { Select, SelectItem } from "@heroui/react";
+import { SelectItem } from "@heroui/react";
+import { AnchoredSelect as Select } from "../../../../../../../shared/components/anchored-popup/select/AnchoredSelect";
 import { useState } from "react";
 import type { Project } from "../../../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../../../localization/context/useTmsLocale";
