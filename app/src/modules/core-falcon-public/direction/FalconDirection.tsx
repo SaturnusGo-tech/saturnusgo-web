@@ -72,7 +72,7 @@ export function FalconDirection() {
         </div>
         <ProductScene kind="hero" locale={locale} />
       </section>
-      <DirectionMarquee title={c.tools} note={c.toolsNote} pause={c.pause} resume={c.resume} />
+      <DirectionMarquee title={c.tools} note={c.toolsNote} />
       <section className={styles.principles} aria-labelledby="principles-title">
         <h2 id="principles-title"><ResponsiveCopy desktop={<>{c.statement[0]} <span>{c.statement[1]}</span></>} phone={phone.statement} /></h2>
         <p className={`${styles.phoneCopy} ${styles.principlesLead}`}>{phone.statementLead}</p>

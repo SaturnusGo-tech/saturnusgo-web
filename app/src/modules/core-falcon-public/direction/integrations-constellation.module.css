@@ -1,0 +1,58 @@
+/* Brand marks orbit a stable composition; only their inner surfaces drift. */
+.integrations{position:relative;max-width:1280px;margin:42px auto 0;padding:0 40px 24px}
+.constellation{position:relative;width:100%;height:420px;isolation:isolate;--constellation-grid:#ffffff0b}
+.constellation::before{content:"";position:absolute;inset:-36px -100px;z-index:0;pointer-events:none;background-image:linear-gradient(to right,var(--constellation-grid) 1px,transparent 1px),linear-gradient(to bottom,var(--constellation-grid) 1px,transparent 1px);background-size:36px 36px;mask-image:radial-gradient(ellipse at center,#000 36%,transparent 73%);-webkit-mask-image:radial-gradient(ellipse at center,#000 36%,transparent 73%)}
+:global([data-theme="light"]) .constellation,:global(html[data-falcon-landing-theme="light"]) .constellation{--constellation-grid:#1b1c200a}
+.integrationCopy{position:absolute;left:50%;top:50%;width:410px;max-width:36%;transform:translate(-50%,-50%);z-index:2;text-align:center}
+.integrations h2{font-size:32px;line-height:1.2;font-weight:500;letter-spacing:-.025em;text-wrap:balance;color:var(--landing-text)}
+.integrationNote{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:14px;line-height:1.5;color:var(--landing-muted)!important;margin-top:18px}
+.integrationNote:hover{color:var(--landing-text)!important}
+.integrationNote svg{flex:none;transition:transform .2s ease}
+.integrationNote:hover svg{transform:translateX(3px)}
+.logoConstellation{position:absolute;inset:0;z-index:1;margin:0;padding:0;list-style:none;pointer-events:none}
+.logoConstellation li{position:absolute;left:var(--logo-x);top:var(--logo-y);width:var(--logo-size);height:var(--logo-size);transform:translate(-50%,-50%)}
+.logoFloat{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;background:#17181a;box-shadow:0 8px 26px #0005,inset 0 1px 0 #ffffff08;animation:logo-drift var(--logo-duration,12s) ease-in-out var(--logo-delay,-4s) infinite}
+.logoFloat img,.logoFloat svg{display:block;width:50%;height:50%;object-fit:contain;color:var(--landing-logo-icon,#c9cacf)}
+.logoConstellation li[data-brand="codex"] img{width:72%;height:72%}
+.logoConstellation li[data-brand="trello"] svg{color:#0c66e4}
+.logoConstellation li[data-brand="gitlab"] svg{color:#fc6d26}
+.logoConstellation li[data-brand="jenkins"] svg{color:#d33833}
+.logoConstellation li[data-brand="swagger"] svg{color:#85ea2d}
+.logoConstellation li:nth-child(1){--logo-x:10%;--logo-y:49%;--logo-size:84px;--logo-duration:10s;--logo-delay:-5s;--drift-x:14px;--drift-y:-16px}
+.logoConstellation li:nth-child(2){--logo-x:20%;--logo-y:16%;--logo-size:64px;--logo-duration:9s;--logo-delay:-8s;--drift-x:-12px;--drift-y:14px}
+.logoConstellation li:nth-child(3){--logo-x:28%;--logo-y:40%;--logo-size:72px;--logo-duration:11s;--logo-delay:-2s;--drift-x:10px;--drift-y:14px}
+.logoConstellation li:nth-child(4){--logo-x:28%;--logo-y:77%;--logo-size:80px;--logo-duration:8.5s;--logo-delay:-9s;--drift-x:-14px;--drift-y:-12px}
+.logoConstellation li:nth-child(5){--logo-x:14%;--logo-y:85%;--logo-size:64px;--logo-duration:10s;--logo-delay:-3s;--drift-x:12px;--drift-y:-14px}
+.logoConstellation li:nth-child(6){--logo-x:6%;--logo-y:20%;--logo-size:72px;--logo-duration:10.5s;--logo-delay:-10s;--drift-x:10px;--drift-y:14px}
+.logoConstellation li:nth-child(7){--logo-x:90%;--logo-y:47%;--logo-size:84px;--logo-duration:8.5s;--logo-delay:-6s;--drift-x:-16px;--drift-y:12px}
+.logoConstellation li:nth-child(8){--logo-x:80%;--logo-y:16%;--logo-size:72px;--logo-duration:10.5s;--logo-delay:-3s;--drift-x:14px;--drift-y:-10px}
+.logoConstellation li:nth-child(9){--logo-x:72%;--logo-y:40%;--logo-size:64px;--logo-duration:9s;--logo-delay:-7s;--drift-x:-10px;--drift-y:16px}
+.logoConstellation li:nth-child(10){--logo-x:72%;--logo-y:78%;--logo-size:72px;--logo-duration:11s;--logo-delay:-4s;--drift-x:14px;--drift-y:-15px}
+.logoConstellation li:nth-child(11){--logo-x:87%;--logo-y:85%;--logo-size:80px;--logo-duration:10s;--logo-delay:-9s;--drift-x:-12px;--drift-y:-14px}
+.logoConstellation li:nth-child(12){--logo-x:94%;--logo-y:20%;--logo-size:64px;--logo-duration:10s;--logo-delay:-2s;--drift-x:-10px;--drift-y:15px}
+.constellation[data-visible="false"] .logoFloat{animation-play-state:paused}
+:global([data-theme="light"]) .logoFloat,:global(html[data-falcon-landing-theme="light"]) .logoFloat{background:#fff;box-shadow:0 8px 28px #20273912,0 1px 5px #2027390a}
+@keyframes logo-drift{
+  0%,100%{transform:translate3d(calc(var(--drift-x)*var(--drift-scale,1)*-.5),calc(var(--drift-y)*var(--drift-scale,1)*-.5),0)}
+  34%{transform:translate3d(calc(var(--drift-x)*var(--drift-scale,1)),calc(var(--drift-y)*var(--drift-scale,1)*-.35),0)}
+  68%{transform:translate3d(calc(var(--drift-x)*var(--drift-scale,1)*.25),calc(var(--drift-y)*var(--drift-scale,1)),0)}
+}
+@media(min-width:761px) and (max-width:1100px){.integrationCopy{max-width:36%;width:320px}.integrations h2{font-size:28px}.logoConstellation li:nth-child(3),.logoConstellation li:nth-child(4){--logo-x:23%}.logoConstellation li:nth-child(9),.logoConstellation li:nth-child(10){--logo-x:77%}}
+
+@media(max-width:760px){
+  .integrations{margin-top:18px;padding:0 var(--landing-edge) 36px}
+  /* Keep the desktop constellation's exact left/right ordering on phones. */
+  .constellation{height:clamp(170px,50vw,240px);--drift-scale:.3}
+  .constellation::before{inset:-20px -24px;background-size:24px 24px}
+  .integrationCopy{width:34%;max-width:34%;top:50%}
+  .integrations h2{font-size:clamp(12px,3.2vw,16px);line-height:1.2;letter-spacing:-.025em}
+  .integrationNote{font-size:11px;line-height:1.45;gap:4px;margin-top:12px;max-width:100%;text-wrap:balance}
+  .integrationNote svg{width:12px;height:12px}
+  .logoConstellation li{width:calc(var(--logo-size)*.4);height:calc(var(--logo-size)*.4)}
+  .logoConstellation li:nth-child(3),.logoConstellation li:nth-child(4){--logo-x:25%}
+  .logoConstellation li:nth-child(9),.logoConstellation li:nth-child(10){--logo-x:75%}
+}
+@media(prefers-reduced-motion:reduce){
+  .logoFloat{animation:none}
+  .integrationNote svg{transition:none}
+}
