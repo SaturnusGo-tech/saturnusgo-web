@@ -23,7 +23,15 @@
 }
 .avatar { display: grid; place-items: center; width: 14px; height: 14px; margin-top: 2px; }
 .avatar > :where(span, img) { width: 14px; height: 14px; font-size: 8px; }
-.avatar > span > button { min-width: 0; width: 18px; height: 18px; padding: 2px; }
+/* Preserve the 14px avatar inside the shared profile button's 28px hit area. */
+.feed .entry .avatar > span > button {
+  min-width: 0;
+  max-inline-size: none;
+  width: 28px;
+  height: 28px;
+  padding: 7px;
+  margin: -7px;
+}
 .avatar > span > button > :where(span, img) { width: 14px; height: 14px; font-size: 8px; }
 .content { min-width: 0; overflow-wrap: anywhere; }
 .metadata { display: flex; flex-wrap: wrap; align-items: baseline; gap: 1px 6px; color: var(--falcon-text-secondary); }
