@@ -3,6 +3,8 @@
 import { editorRootElementRef$, rootEditor$ } from "@mdxeditor/editor";
 import { useCellValues } from "@mdxeditor/gurx";
 import { useEffect, useId, useLayoutEffect } from "react";
+import type { ProductDocScope } from "../../../../domain/product-docs";
+import { readProductDocSmartTarget } from "../../../../navigation/product-doc-smart-link";
 import { useProductDocLinkHover } from "../../../../state/links/hover/useProductDocLinkHover";
 import { useProductDocLinkPreview } from "../../../../state/links/useProductDocLinkPreview";
 import { ProductDocLinkHoverCard } from "../../../article/links/preview/ProductDocLinkHoverCard";
@@ -13,9 +15,15 @@ function editableLink(target: EventTarget | null) {
   return link?.closest("[contenteditable]")?.getAttribute("contenteditable") === "true" ? link : null;
 }
 
-function markEditorLinks(element: Element) {
-  if (element instanceof HTMLAnchorElement) element.toggleAttribute("data-doc-editor-link", Boolean(editableLink(element)));
-  else for (const link of element.querySelectorAll("a[href]")) link.toggleAttribute("data-doc-editor-link", Boolean(editableLink(link)));
+function markEditorLinks(element: Element, scope: ProductDocScope | undefined) {
+  const links = element instanceof HTMLAnchorElement ? [element] : element.querySelectorAll<HTMLAnchorElement>("a[href]");
+  for (const link of links) {
+    const editable = Boolean(editableLink(link));
+    link.toggleAttribute("data-doc-editor-link", editable);
+    const target = editable && scope ? readProductDocSmartTarget(link.href, window.location.href, scope) : null;
+    if (target?.kind === "document") link.dataset.linkKind = "document";
+    else link.removeAttribute("data-link-kind");
+  }
 }
 
 export function ProductDocEditorLinkHover({ blocked }: { blocked: boolean }) {
@@ -33,21 +41,21 @@ export function ProductDocEditorLinkHover({ blocked }: { blocked: boolean }) {
       previous?.classList.remove(styles.editorScope);
       if (!root) return;
       root.classList.add(styles.editorScope);
-      markEditorLinks(root);
+      markEditorLinks(root, workspace?.scope);
       changes = new MutationObserver(records => {
         for (const record of records) {
           if (record.type === "attributes" && record.target instanceof HTMLAnchorElement) {
             record.target.removeAttribute("data-link-status");
-            markEditorLinks(record.target);
+            markEditorLinks(record.target, workspace?.scope);
             if (trigger.current === record.target) close();
           }
-          for (const node of record.addedNodes) if (node instanceof Element) markEditorLinks(node);
+          for (const node of record.addedNodes) if (node instanceof Element) markEditorLinks(node, workspace?.scope);
         }
       });
       changes.observe(root, { subtree: true, childList: true, attributes: true, attributeFilter: ["href"] });
     });
     return () => { changes?.disconnect(); unregister(); };
-  }, [close, editor, trigger]);
+  }, [close, editor, trigger, workspace?.scope]);
 
   useEffect(() => {
     close();

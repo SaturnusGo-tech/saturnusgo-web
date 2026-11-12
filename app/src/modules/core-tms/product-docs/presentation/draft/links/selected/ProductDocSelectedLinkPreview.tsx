@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@heroui/react";
-import { Check, Copy, ExternalLink, Pencil, Unlink } from "lucide-react";
+import { Check, ChevronRight, Copy, ExternalLink, Pencil, Unlink } from "lucide-react";
 import { useState } from "react";
 import { writeClipboardText } from "../../../../../../../shared/lib/clipboard";
 import { useProductDocLinkPreview } from "../../../../state/links/useProductDocLinkPreview";
@@ -15,6 +15,7 @@ export function ProductDocSelectedLinkPreview({ href, url, ru, onEdit, onRemove 
   const [status, setStatus] = useState<"copied" | "failed">();
   const { preview, target, workspace, follow } = useProductDocLinkPreview(href);
   const external = target?.kind === "external";
+  const ActionIcon = target?.kind === "document" ? ChevronRight : ExternalLink;
   const copyLabel = status === "copied" ? (ru ? "Ссылка скопирована" : "Link copied")
     : status === "failed" ? (ru ? "Не удалось скопировать ссылку" : "Couldn't copy link")
       : (ru ? "Скопировать ссылку" : "Copy link");
@@ -23,7 +24,7 @@ export function ProductDocSelectedLinkPreview({ href, url, ru, onEdit, onRemove 
       workspaceId={workspace?.scope.workspaceId} />
     <div className={styles.preview}>
       <a href={href} target={external ? "_blank" : undefined} rel={external ? "noopener noreferrer" : undefined} onClick={follow}>
-        <ExternalLink size={13} aria-hidden="true" /><span>{productDocLinkAction(target?.kind, ru)}</span>
+        <ActionIcon size={13} aria-hidden="true" /><span>{productDocLinkAction(target?.kind, ru)}</span>
       </a>
       <Button type="button" isIconOnly disableRipple onPointerDown={(event) => event.preventDefault()} onPress={onEdit}
         aria-label={ru ? "Редактировать ссылку" : "Edit link"} title={ru ? "Редактировать ссылку" : "Edit link"}>

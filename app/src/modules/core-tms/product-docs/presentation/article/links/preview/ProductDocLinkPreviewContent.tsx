@@ -17,7 +17,8 @@ export function productDocLinkSummary(href: string, locale: TmsLocale, target: P
     : target?.kind === "document" ? (ru ? "Документация" : "Documentation")
       : target?.kind === "repository" ? (ru ? "Репозиторий" : "Repository") : (ru ? "Ссылка" : "Link");
   const label = authoredText?.trim() === href ? undefined : authoredText?.trim();
-  const title = preview?.title || label || domain || kindLabel;
+  const resolvedTitle = target?.kind === "document" ? preview?.title?.trim() : preview?.title;
+  const title = resolvedTitle || label || domain || kindLabel;
   const status = preview?.status === "published" ? (ru ? "Опубликовано" : "Published")
     : preview?.status ? localizedLabel(locale, preview.status) : null;
   return { title, label, status, priority: preview?.priority && localizedLabel(locale, preview.priority),
@@ -59,7 +60,9 @@ export function ProductDocLinkPreviewContent({ href, locale, target, preview, au
         <ResponsibleName workspaceId={workspaceId} identityId={preview.ownerIdentityId} />
       </span>}
     </div>
-    <strong>{title}</strong>
+    {target?.kind === "document" ? <div className={styles.documentTitle}>
+      <BookOpen size={16} aria-hidden="true" /><strong>{title}</strong>
+    </div> : <strong>{title}</strong>}
     {description && <span className={styles.description}>{description}</span>}
     {(status || priority) && <div className={styles.details}>
       {status && <span><Icon size={14} data-link-status={preview?.status} aria-hidden="true" />{status}</span>}

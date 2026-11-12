@@ -170,3 +170,24 @@ a.link.link.link[data-link-kind="repository"] {
 .details svg { flex: none; inline-size: 14px; block-size: 14px; color: var(--falcon-text-secondary); }
 :global(html.dark) .details { --doc-link-divider: var(--falcon-doc-tooltip-divider); }
 :global(html.dark) .details svg:not([data-link-priority]):not([data-link-status="ready"], [data-link-status="published"]) { color: var(--falcon-doc-link-icon); }
+
+/* Documentation references stay on the reading surface rather than becoming status chips. */
+:global(html) :is(a.link.link.link, .editorScope.editorScope a[data-doc-editor-link])[data-link-kind="document"] {
+  padding: .08em 0; border-radius: 0; background: transparent; box-shadow: none; color: var(--falcon-text);
+}
+a.link.link.link[data-link-kind="document"] {
+  display: inline-flex; align-items: flex-start; gap: .4em; max-inline-size: 100%; vertical-align: baseline;
+}
+.link[data-link-kind="document"] > svg { flex: none; margin: .2em 0 0; color: var(--falcon-text-secondary); }
+.link[data-link-kind="document"] > span { min-inline-size: 0; overflow-wrap: anywhere; }
+.link[data-link-kind="document"]:is(:hover, :focus-visible) > span,
+.editorScope.editorScope a[data-doc-editor-link][data-link-kind="document"]:hover { text-decoration: underline; text-underline-offset: .18em; }
+/* Lucide BookOpen, matching the React icon used by the reader and link preview. */
+.editorScope.editorScope a[data-doc-editor-link][data-link-kind="document"]::before {
+  inline-size: .95em; block-size: .95em; border: 0; border-radius: 0; vertical-align: -.16em;
+  color: var(--falcon-text-secondary); background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 7v14'/%3E%3Cpath d='M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.documentTitle { display: flex; align-items: flex-start; gap: 7px; min-inline-size: 0; }
+.documentTitle > svg { flex: none; color: var(--falcon-text-secondary); }
+.documentTitle > strong { min-inline-size: 0; }
