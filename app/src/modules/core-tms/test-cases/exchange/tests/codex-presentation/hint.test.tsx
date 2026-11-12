@@ -11,9 +11,9 @@ function text(value: unknown): string {
   if (value && typeof value === "object" && "props" in value) return text((value as { props: { children?: unknown } }).props.children);
   return typeof value === "string" ? value : "";
 }
-function fixture(status: ImportCodexState["status"], ru = false, busy = false) {
+function fixture(status: ImportCodexState["status"], ru = false, busy = false, pluginUrl: string | null = "https://chatgpt.com/plugins/falcon-current") {
   const h = componentHarness("https://tenant.example/work/?workspaceId=w&projectId=p&view=imports", { URLSearchParams });
-  const state: ImportCodexState = { status, pluginUrl: "https://chatgpt.com/plugins/falcon-current", canConnect: true,
+  const state: ImportCodexState = { status, pluginUrl, canConnect: true,
     canUpload: false, canExport: status === "ready" || status === "limited" };
   const { ImportCodexHint: View } = h.load<{ ImportCodexHint: typeof ImportCodexHint }>(new URL("../../library/presentation/codex/ImportCodexHint.tsx", import.meta.url), name => {
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: ru ? "ru" : "en" }) };
@@ -35,6 +35,18 @@ test("unconnected guidance exposes the real installation, current MCP setup and 
   assert.equal(result.all.find(node => node.type === "IntegrationGuideLink")?.props.article, "codex-capabilities-exchange");
 });
 
+test("missing public plugin URLs keep installation and MCP setup reachable in both locales", () => {
+  for (const ru of [false, true]) {
+    const result = fixture("available", ru, false, null);
+    const install = result.all.find(node => node.type === "IntegrationGuideLink" && node.props.article === "codex-web-qa");
+    assert.ok(install);
+    assert.equal(text(install), codexImportCopy[ru ? "ru" : "en"].install);
+    assert.equal(result.all.some(node => node.type === "a" && String(node.props.href).startsWith("https://chatgpt.com/plugins/")), false);
+    assert.match(String(result.all.find(node => node.type === "a" && String(node.props.href).includes("pluginSetup=connect"))?.props.href), /projectId=p/);
+    assert.ok(result.all.some(node => node.type === "IntegrationGuideLink" && node.props.article === "codex-capabilities-exchange"));
+  }
+});
+
 test("ready grants keep the guidance visible and disclose missing file-upload rights", () => {
   const result = fixture("ready");
   assert.match(result.text, /project access/i); assert.match(result.text, /enable.*Falcon plugin/i);
@@ -51,8 +63,10 @@ test("Russian guidance and honest unresolved states use the same compact surface
 });
 
 test("busy imports retain the guidance while preventing navigation away from the operation", () => {
-  const result = fixture("available", false, true);
-  assert.match(result.text, /Falcon plugin/);
-  assert.equal(result.all.some(node => node.type === "a" || node.type === "IntegrationGuideLink"), false);
-  assert.ok(result.all.some(node => node.props["aria-disabled"] === true));
+  for (const pluginUrl of [null, "https://chatgpt.com/plugins/falcon-current"]) {
+    const result = fixture("available", false, true, pluginUrl);
+    assert.match(result.text, /Falcon plugin/);
+    assert.equal(result.all.some(node => node.type === "a" || node.type === "IntegrationGuideLink"), false);
+    assert.ok(result.all.some(node => String(node.props["aria-disabled"]) === "true"));
+  }
 });

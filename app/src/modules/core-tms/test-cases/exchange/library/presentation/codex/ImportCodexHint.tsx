@@ -34,8 +34,8 @@ export function ImportCodexHint({ workspaceId, projectId, canManage, busy }: {
       <p role="status" aria-live="polite">{description}{ready && !state.canUpload && <> {copy.upload}</>}</p>
       <ol className={css.links}>
         {!ready && <>
-          <li>{state.pluginUrl && !busy ? <a href={state.pluginUrl} target="_blank" rel="noopener noreferrer">{copy.install}</a>
-            : <span aria-disabled={busy || !state.pluginUrl}>{copy.install}</span>}<ChevronRight size={12} aria-hidden="true" /></li>
+          <li>{busy ? <span aria-disabled="true">{copy.install}</span> : state.pluginUrl ? <a href={state.pluginUrl} target="_blank" rel="noopener noreferrer">{copy.install}</a>
+            : <IntegrationGuideLink article="codex-web-qa">{copy.install}</IntegrationGuideLink>}<ChevronRight size={12} aria-hidden="true" /></li>
           <li>{busy ? <span aria-disabled="true">{copy.setup}</span> : <a href={setupHref} onClick={setup}>{copy.setup}</a>}
             <ChevronRight size={12} aria-hidden="true" /></li>
         </>}
