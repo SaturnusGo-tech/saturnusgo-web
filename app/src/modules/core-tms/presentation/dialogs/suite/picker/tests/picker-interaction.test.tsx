@@ -23,7 +23,7 @@ function setup(readonly = false) {
         if (name === "react/jsx-runtime") return jsxRuntime;
         if (name.endsWith(".css")) return { default: new Proxy({}, { get: (_object, key) => String(key) }) };
         if (name.endsWith("/Icon")) return new Proxy({}, { get: () => () => <svg /> });
-        if (name === "react-icons/pi" || name === "lucide-react") return createRequire(import.meta.url)(name);
+        if (name === "react-icons/pi" || name === "lucide-react" || name === "@heroui/react") return createRequire(import.meta.url)(name);
         if (name.endsWith("picker-model")) return model;
         if (name.endsWith("useAnchoredPopup")) return { useAnchoredPopup() {} };
         const next = [".tsx", ".ts"].map(extension => new URL(`${name}${extension}`, url)).find(value => existsSync(value));

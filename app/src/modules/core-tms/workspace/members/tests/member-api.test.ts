@@ -27,7 +27,7 @@ test("selected member names resolve by identity without listing the workspace", 
 
 test("profile details remain scoped to an exact human actor lookup", async () => {
   const signedIn = "2026-11-09T04:58:00.000Z";
-  const profile = { lastSignedInAt: signedIn, presence: "online", timeZone: "Asia/Almaty", workspaceName: "Umbrella Host" };
+  const profile = { lastSignedInAt: signedIn, presence: "online", timeZone: "Asia/Almaty", workspaceName: "Umbrella Host", role: "qa_manager" };
   const human = { identityId: "member-1", kind: "human", name: "QA Admin", email: null, ...profile };
   const agent = { identityId: "agent-1", kind: "agent", name: "Codex", provider: "codex", status: "active", ...profile };
   const other = { ...human, identityId: "member-2" };

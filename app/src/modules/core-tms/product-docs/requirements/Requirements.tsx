@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { FileText } from "lucide-react";
 import { useProductDocsWorkspace } from "../composition/context/ProductDocsContext";
 import type { ProductDocRequirements } from "../domain/product-docs";
-import { subscribeCaseRequirementsChanged } from "./save/case-requirements-events";
+import { notifyCaseRequirementsChanged, subscribeCaseRequirementsChanged } from "./save/case-requirements-events";
 import { CaseRequirementLinks } from "./case/CaseRequirementLinks";
 import { CaseRequirementPicker } from "./case/CaseRequirementPicker";
 import styles from "./requirements.module.css";
@@ -84,7 +84,7 @@ function ScopedRequirements({docs, subject, ru}: {
       if (sectionId === undefined) await api.unlinkRequirement(scope, caseId, docId);
       else await api.linkRequirement(scope, caseId, docId, sectionId);
       setPickerOpen(false);
-      setReload(value => value + 1);
+      notifyCaseRequirementsChanged(scope, caseId);
     } catch { setMutationFailed(true); }
     finally { setBusy(false); }
   }

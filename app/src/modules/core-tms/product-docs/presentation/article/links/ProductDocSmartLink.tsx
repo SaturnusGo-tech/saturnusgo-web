@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, type ReactNode } from "react";
-import { BookOpen } from "lucide-react";
+import { FileText } from "lucide-react";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import { useProductDocLinkHover } from "../../../state/links/hover/useProductDocLinkHover";
 import { useProductDocLinkPreview } from "../../../state/links/useProductDocLinkPreview";
@@ -24,7 +24,7 @@ export function ProductDocSmartLink({ href, title, children }: { href?: string; 
     : target?.kind === "case" ? preview?.title || summary.label || summary.title
     : authoredText ? summary.label || summary.title : children || summary.title;
   const document = target?.kind === "document";
-  const Icon = document ? BookOpen : productDocLinkIcon(target?.kind, preview?.status);
+  const Icon = document ? FileText : productDocLinkIcon(target?.kind, preview?.status);
   return <>
     <a className={styles.link} data-link-kind={target?.kind} href={href} target={external ? "_blank" : undefined}
       rel={external ? "noopener noreferrer" : undefined} aria-controls={hover.anchor ? previewId : undefined} aria-haspopup="dialog"

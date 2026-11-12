@@ -1,17 +1,20 @@
 "use client";
 
-import { Button, Modal, ModalBody, ModalContent, ModalHeader } from "@heroui/react";
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@heroui/react";
 import { X } from "lucide-react";
 import { useRef, type ReactNode } from "react";
 import styles from "./product-doc-overlay.module.css";
 
-export function ProductDocModal({ title, subtitle, closeLabel, onClose, busy, children, className, bodyClassName, wrapperClassName, hideHeader = false, isOpen = true }: {
+export function ProductDocModal({ title, subtitle, closeLabel, onClose, busy, children, className, bodyClassName, wrapperClassName, footer, footerClassName, isDismissable = true, hideHeader = false, isOpen = true }: {
   title: string;
   subtitle?: string;
   closeLabel: string;
   onClose(): void;
   busy?: boolean;
   isOpen?: boolean;
+  isDismissable?: boolean;
+  footer?: ReactNode | ((dismiss: () => void) => ReactNode);
+  footerClassName?: string;
   children: ReactNode | ((dismiss: () => void) => ReactNode);
   className?: string;
   bodyClassName?: string;
@@ -39,7 +42,8 @@ export function ProductDocModal({ title, subtitle, closeLabel, onClose, busy, ch
     }, () => { exit.current = null; });
   }
 
-  return <Modal ref={dialog} isOpen={isOpen} onClose={dismiss} isDismissable={!busy} isKeyboardDismissDisabled={busy}
+  return <Modal ref={dialog} isOpen={isOpen} onClose={dismiss} isDismissable={isDismissable && !busy} isKeyboardDismissDisabled={busy}
+    placement="center" scrollBehavior="inside"
     hideCloseButton disableAnimation backdrop="transparent"
     classNames={{ wrapper: `${styles.wrapper} ${wrapperClassName ?? ""}`, base: `${styles.dialog} ${className ?? ""}` }}>
     <ModalContent>
@@ -49,6 +53,7 @@ export function ProductDocModal({ title, subtitle, closeLabel, onClose, busy, ch
           aria-label={closeLabel} onPress={dismiss}><X size={17} aria-hidden="true" /></Button>}
       </ModalHeader>
       <ModalBody className={`${styles.body} ${bodyClassName ?? ""}`}>{typeof children === "function" ? children(dismiss) : children}</ModalBody>
+      {footer && <ModalFooter as="footer" className={footerClassName}>{typeof footer === "function" ? footer(dismiss) : footer}</ModalFooter>}
     </ModalContent>
   </Modal>;
 }

@@ -30,7 +30,7 @@
 .header p { margin: 4px 0 0; color: var(--falcon-text-secondary); font-size: 13px; overflow-wrap: anywhere; }
 .header .close { flex: none; display: grid; place-items: center; width: 28px; height: 28px; min-width: 0; padding: 0; border: 0; border-radius: 50%; color: var(--falcon-icon); background: transparent; cursor: pointer; }
 .header .close:is(:hover, :focus-visible) { background: var(--falcon-hover); color: var(--falcon-text); }
-.body { padding: 0; min-height: 0; overflow: auto; }
+.body { padding: 0; min-height: 0; overflow: auto; overscroll-behavior: contain; }
 .confirmActions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; padding: 8px 18px 16px; }
 .confirmActions button { border-radius: 999px; }
 .error { margin: 0; padding: 4px 18px; color: var(--falcon-danger); font-size: 13px; }

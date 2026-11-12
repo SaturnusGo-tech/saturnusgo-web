@@ -127,7 +127,39 @@
 .tableAppearance :global(.mdxeditor-root-contenteditable) table {
   border-collapse: separate;
   border-spacing: 0;
+  table-layout: auto;
+  width: max-content;
+  min-width: 100%;
 }
+.tableAppearance :global(.mdxeditor-root-contenteditable) div:has(> table) {
+  max-inline-size: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+  isolation: isolate;
+}
+.tableAppearance :global(.mdxeditor-root-contenteditable) table > tbody > tr > :is(td, th)[data-active] {
+  min-inline-size: 11rem;
+  max-inline-size: 34rem;
+  overflow-wrap: anywhere;
+  background: var(--falcon-surface);
+}
+.tableAppearance :global(.mdxeditor-root-contenteditable) table > tbody > tr > [data-tool-cell]:first-child {
+  position: sticky;
+  inset-inline-start: 0;
+  z-index: 2;
+  background: var(--falcon-surface);
+}
+.tableAppearance :global(.mdxeditor-root-contenteditable) table > tbody > tr > :is(td, th)[data-active]:nth-child(2),
+.tableAppearance :global(.mdxeditor-root-contenteditable) table:not(:has([data-tool-cell])) > tbody > tr > :first-child {
+  position: sticky;
+  inset-inline-start: 24px;
+  z-index: 1;
+  min-inline-size: 9rem;
+  max-inline-size: 15rem;
+  background: var(--falcon-surface);
+}
+.tableAppearance :global(.mdxeditor-root-contenteditable) table:not(:has([data-tool-cell])) > tbody > tr > :first-child { inset-inline-start: 0; }
 .tableAppearance :global(.mdxeditor-root-contenteditable) table > tbody > tr > :is(td, th)[data-active] {
   border-color: var(--falcon-border);
 }

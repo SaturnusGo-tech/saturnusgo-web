@@ -5,6 +5,7 @@ import { Button, Listbox, ListboxItem } from "@heroui/react";
 import { Check, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { TmsLocale } from "../../../../localization/model/locale";
+import { MemberProfilePreview } from "../../../../workspace/members/presentation/profile/MemberProfilePreview";
 import { MemberAvatar } from "../../../../workspace/members/avatar/MemberAvatar";
 import { useWorkspaceMembers } from "../../../../workspace/members/state/useWorkspaceMembers";
 import { PropertyPopover, PropertySearch, PropertyValue } from "../select/PropertySelect";
@@ -13,7 +14,7 @@ import styles from "../property-controls.module.css";
 type Assignee = { identityId: string; displayName: string } | null;
 
 export function PropertyAssigneeField({
-  workspaceId, locale, value, onChange, disabled, compact, autoOpen, offline, includeAgents, onRequestEdit, portalContainer,
+  workspaceId, locale, value, onChange, disabled, compact, autoOpen, offline, includeAgents, onRequestEdit, portalContainer, profilePreview = false,
 }: {
   workspaceId: string;
   locale: TmsLocale;
@@ -25,6 +26,7 @@ export function PropertyAssigneeField({
   offline?: boolean;
   includeAgents?: boolean;
   portalContainer?: HTMLElement;
+  profilePreview?: boolean;
   onRequestEdit?(): void;
 }) {
   const [open, setOpen] = useState(false);
@@ -41,13 +43,18 @@ export function PropertyAssigneeField({
   const members = useWorkspaceMembers(workspaceId, open && !disabled && !offline);
   const people = members.items.filter((member) => includeAgents || member.kind !== "agent");
   const options = [{ id: "unassigned", name: ru ? unassigned : "No assignee", email: null, kind: "human" as const }, ...people];
+  const avatar = value && <MemberAvatar workspaceId={workspaceId} identityId={value.identityId} name={value.displayName} offline={offline} />;
   const current = value ? <span className={styles.member}>
-    <MemberAvatar workspaceId={workspaceId} identityId={value.identityId} name={value.displayName} offline={offline} />
+    {profilePreview && (onChange || onRequestEdit) ? <MemberProfilePreview workspaceId={workspaceId} identityId={value.identityId} name={value.displayName}
+      locale={locale} offline={offline} hoverOnly disabled={open}>{avatar}</MemberProfilePreview> : avatar}
   </span>
     : <UserRound size={15} aria-hidden="true" />;
   const content = <>{current}<span>{value?.displayName ?? (compact ? label : unassigned)}</span></>;
   const name = `${label}, ${value?.displayName ?? unassigned}`;
-  if (!onChange) return <PropertyValue label={name} compact={compact} disabled={disabled || offline} onEdit={onRequestEdit}>{content}</PropertyValue>;
+  if (!onChange) return <PropertyValue label={name} compact={compact} disabled={disabled || offline} onEdit={onRequestEdit}>
+    {profilePreview && value && !onRequestEdit ? <MemberProfilePreview workspaceId={workspaceId} identityId={value.identityId}
+      name={value.displayName} locale={locale} offline={offline} triggerLabel={name}>{content}</MemberProfilePreview> : content}
+  </PropertyValue>;
   function setMenu(next: boolean) {
     setOpen(next);
     if (!next) members.setSearch("");

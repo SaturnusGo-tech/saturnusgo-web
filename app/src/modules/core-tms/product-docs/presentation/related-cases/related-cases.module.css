@@ -1,0 +1,41 @@
+.property { display: grid; gap: 5px; min-inline-size: 0; }
+.property > h2 { margin: 0 0 2px; padding-inline: 7px; color: var(--falcon-text-secondary); font-size: 13px; font-weight: 500; line-height: 1.45; }
+.preview { display: flex; flex-wrap: wrap; align-items: center; gap: 3px 7px; min-inline-size: 0; padding-inline: 7px; }
+.caseLink { display: inline-flex; align-items: flex-start; gap: 7px; min-inline-size: 0; max-inline-size: 100%; padding: 3px 0; border: 0; background: transparent; color: var(--falcon-text); font: inherit; font-size: 13px; line-height: 1.45; text-align: start; cursor: pointer; }
+.caseLink > svg { flex: none; margin-block-start: 3px; color: var(--falcon-text-secondary); }
+.caseLink > span { min-inline-size: 0; overflow-wrap: anywhere; }
+.caseLink:hover > span { text-decoration: underline; text-underline-offset: 3px; }
+.caseLink:disabled { opacity: 1; cursor: default; }
+.caseLink:disabled:hover > span { text-decoration: none; }
+.caseLink:focus-visible, .count:focus-visible, .textAction:focus-visible { outline: 2px solid var(--falcon-accent); outline-offset: 3px; border-radius: 3px; }
+.preview .caseLink { flex: 1 1 100%; }
+.count { display: inline-flex; align-items: center; justify-content: center; min-inline-size: 22px; min-block-size: 21px; padding: 1px 6px; border: 1px solid var(--falcon-border); border-radius: 6px; background: transparent; color: var(--falcon-text-secondary); font: inherit; font-size: 11px; cursor: pointer; }
+.textAction { display: inline-flex; align-items: center; gap: 5px; justify-self: start; padding: 3px 7px; border: 0; border-radius: 5px; background: transparent; color: var(--falcon-text-secondary); font: inherit; font-size: 12px; line-height: 1.4; cursor: pointer; }
+.textAction:hover { color: var(--falcon-text); background: var(--falcon-hover); }
+.textAction:disabled { cursor: default; opacity: .5; }
+.hint { color: var(--falcon-text-secondary); font-size: 12px; line-height: 1.5; }
+.property > .hint { padding-inline: 7px; }
+.wrapper, .backdrop { position: fixed; inset: max(var(--falcon-native-toolbar, 0px), var(--falcon-desktop-caption, 0px)) 0 0; }
+.wrapper { z-index: 172; }
+.backdrop { z-index: 171; background: var(--falcon-scrim); }
+.drawer { inline-size: min(480px, calc(100vw - 12px)); max-inline-size: calc(100vw - 12px); background: var(--falcon-surface); color: var(--falcon-text); border-inline-start: 1px solid var(--falcon-border); border-radius: 0; box-shadow: -12px 0 35px rgb(0 0 0 / 12%); }
+.pickerDrawer { inline-size: min(1024px, calc(100vw - 12px)); }
+.header { display: flex; flex: none; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; border-block-end: 1px solid var(--falcon-border); }
+.header h2 { display: flex; align-items: center; gap: 9px; margin: 0; padding: 0; font-size: 17px; font-weight: 600; }
+.total { color: var(--falcon-text-secondary); font-size: 12px; font-weight: 400; }
+.body { display: flex; flex-direction: column; gap: 12px; padding: 18px 20px; }
+.list { display: grid; gap: 5px; margin: 0; padding: 0; list-style: none; }
+.list > li { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; min-inline-size: 0; padding-block: 5px; border-block-end: 1px solid var(--falcon-border); }
+.list .caseLink { flex: 1; }
+.pickerBody { display: flex; flex-direction: column; gap: 12px; padding: 14px 18px; }
+.pickerBody > p { margin: 0; }
+.pickerFieldset { min-inline-size: 0; margin: 0; padding: 0; border: 0; }
+.footer { display: flex; align-items: center; gap: 8px; padding: 12px 18px; border-block-start: 1px solid var(--falcon-border); }
+.footer > span { margin-inline-end: auto; }
+.error { color: var(--falcon-danger); font-size: 13px; }
+.srOnly { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 600px) { .drawer { inline-size: 100vw; max-inline-size: 100vw; } .header { padding: 12px; } .pickerBody { padding: 12px; } }
+
+.propertyTitle { display: inline; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: start; cursor: pointer; }
+.propertyTitle:hover { color: var(--falcon-text); }
+.propertyTitle:focus-visible { outline: 2px solid var(--falcon-accent); outline-offset: 3px; border-radius: 3px; }

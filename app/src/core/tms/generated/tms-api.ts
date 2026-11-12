@@ -7205,7 +7205,10 @@ export interface paths {
             };
             cookie?: never;
         };
-        /** Read article coverage or compare an exact saved draft with the latest publication. */
+        /**
+         * Read article coverage or compare an exact saved draft with the latest publication.
+         * @description Published reads include publication-visible associations only. With draft=true, require draft edit access and return all active associations, including draft-only pages or sections, with an affected flag for each case. Association changes do not save content or increment draftVersion. Follow nextCursor to read every association.
+         */
         get: operations["getProductDocImpact"];
         put?: never;
         post?: never;
@@ -7329,6 +7332,7 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
+        /** @description Associate an active draft or published page with an authorized same-project test case. sectionId may be null for the whole article or identify a section in the current draft or latest publication. Requires document edit and test case manage permissions. Draft-only pages and never-published sections remain hidden from published requirements and new run pins until publication. Previously published removed sections retain the whole-article fallback. Does not save or publish content or increment draftVersion. */
         put: operations["linkCaseProductDocRequirement"];
         post?: never;
         delete: operations["unlinkCaseProductDocRequirement"];
@@ -12140,6 +12144,11 @@ export interface components {
             timeZone?: string | null;
             /** @description Profile-only. The actual name of the authorized workspace where the human has active membership. */
             workspaceName?: string | null;
+            /**
+             * @description Returned only on exact human identity lookup with includeSignIn=true. The actual active membership role in the authorized workspace, or null when that membership is inactive. Omitted from directory lists, ordinary identity lookups and agent actors.
+             * @enum {string|null}
+             */
+            role?: "workspace_admin" | "qa_manager" | "tester" | "reporter" | "viewer" | null;
         };
         AgentCatalogActor: {
             identityId: components["schemas"]["Identifier"];

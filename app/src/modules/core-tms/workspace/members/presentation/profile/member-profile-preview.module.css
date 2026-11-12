@@ -4,6 +4,7 @@
   min-inline-size: 0;
   max-inline-size: 100%;
 }
+.anchor[data-hover-only] > :first-child { inline-size: inherit; block-size: inherit; font-size: inherit; }
 .anchor .trigger {
   display: inline-flex;
   align-items: center;

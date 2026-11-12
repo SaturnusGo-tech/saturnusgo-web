@@ -12,13 +12,14 @@ import type { ProductDocsCopy } from "../../localization/copy";
 import reader from "./reader.module.css";
 import styles from "../product-docs.module.css";
 
-export function ProductDocArticle({ document, copy, scope, versionPinned, sectionId, projectName, locale, subdocs, context, onSelectSection }: {
+export function ProductDocArticle({ document, copy, scope, versionPinned, sectionId, projectName, locale, subdocs, context, relatedCases, onSelectSection }: {
   document: ProductDocDetail;
   copy: ProductDocsCopy;
   scope?: ProductDocScope;
   versionPinned?: boolean;
   sectionId?: string;
   context?: React.ReactNode;
+  relatedCases?: React.ReactNode;
   projectName?: string;
   locale?: TmsLocale;
   subdocs?: React.ReactNode;
@@ -77,7 +78,7 @@ export function ProductDocArticle({ document, copy, scope, versionPinned, sectio
     {Boolean(showProperties || outlineSections.length || context) && <aside className={styles.context} data-doc-properties={Boolean(showProperties) || undefined}>
       {showProperties && scope && projectName && locale && <div className={reader.properties}>
         <ProductDocPropertiesPanel scope={scope} projectName={projectName} locale={locale} status={status}
-          value={document.properties} taxonomy={document.taxonomy ?? emptyProductDocTaxonomy} />
+          value={document.properties} taxonomy={document.taxonomy ?? emptyProductDocTaxonomy} relatedCases={relatedCases} />
       </div>}
       {outlineSections.length > 0 && <nav aria-label={copy.outline} className={`${styles.outline} ${reader.outline}`}>
         <h2>{copy.outline}</h2>

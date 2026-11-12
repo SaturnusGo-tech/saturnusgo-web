@@ -29,11 +29,12 @@ export async function listWorkspaceActors(http: TmsHttpClient, workspaceId: stri
 }
 
 function profileDetails(actor: Readonly<components["schemas"]["HumanCatalogActor"]>) {
-    const { lastSignedInAt, presence, timeZone, workspaceName } = actor;
+    const { lastSignedInAt, presence, timeZone, workspaceName, role } = actor;
     return {
         ...(lastSignedInAt === undefined ? {} : { lastSignedInAt }),
         ...(presence === undefined ? {} : { presence }),
         ...(timeZone === undefined ? {} : { timeZone }),
         ...(workspaceName === undefined ? {} : { workspaceName }),
+        ...(role === undefined ? {} : { role }),
     };
 }

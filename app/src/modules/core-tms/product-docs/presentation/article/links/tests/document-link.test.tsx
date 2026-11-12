@@ -46,7 +46,7 @@ test("document references keep a document icon and resolved title instead of ado
   const {anchor} = await renderLink(t, "Правила возвратов", "Открыть документацию");
   assert.equal(anchor.props["data-link-kind"], "document");
   assert.equal(anchor.findByType("span").children.join(""), "Правила возвратов");
-  assert.match(anchor.findByType("svg").props.className, /lucide-book-open/);
+  assert.match(anchor.findByType("svg").props.className, /lucide-file-text/);
   assert.equal(anchor.findByType("svg").props["data-link-status"], undefined);
 });
 

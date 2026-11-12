@@ -7,6 +7,7 @@ import { ArrowUp } from "lucide-react";
 import { useCallback, useId, useRef, useState } from "react";
 import type { TmsLocale } from "../../../localization/model/locale";
 import { notificationTime } from "../../../notifications/inbox/model/presentation";
+import { MemberProfilePreview } from "../../../workspace/members/presentation/profile/MemberProfilePreview";
 import { MemberAvatar } from "../../../workspace/members/avatar/MemberAvatar";
 import type { ProductDocComment, ProductDocDetail, ProductDocScope, ProductDocsApi } from "../../domain/product-docs";
 import type { ProductDocsCopy } from "../../localization/copy";
@@ -97,8 +98,10 @@ export function ProductDocActivity({ api, scope, document, locale, copy }: {
     <ErrorToast message={moreError ? copy.unavailable : null} />
     {rows.length > 0 && <ol className={styles.feed} role="list">
       {rows.map((row) => <li className={styles.entry} data-comment={Boolean(row.body) || undefined} key={row.id}>
-        <span className={styles.avatar} aria-hidden="true">
-          <MemberAvatar workspaceId={workspaceId} identityId={row.author.identityId} name={row.author.displayName} />
+        <span className={styles.avatar}>
+          <MemberProfilePreview workspaceId={workspaceId} identityId={row.author.identityId} name={row.author.displayName} locale={locale}>
+            <MemberAvatar workspaceId={workspaceId} identityId={row.author.identityId} name={row.author.displayName} />
+          </MemberProfilePreview>
         </span>
         <div className={styles.content}>
           <div className={styles.metadata}>

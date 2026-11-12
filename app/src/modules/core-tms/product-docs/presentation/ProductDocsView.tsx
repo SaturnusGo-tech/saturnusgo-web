@@ -191,8 +191,8 @@ function ProjectDocumentation({ api, scope, locale, projectName, drafts, selecti
           onCloseDraft={closeDraft} onSaved={() => setTreeRefresh((value) => value + 1)}
           folderCreation={page.kind === "folder" && page.canEdit && !page.archivedAt ? <CreateProductDoc api={api} scope={scope} copy={copy}
             parentId={page.id} kind="page" inline projectName={projectName} pageLabel={newPageLabel} onCreated={onCreated} /> : undefined}
-          onSelectSection={(sectionId) => choose({ ...selection, sectionId })}
-          context={showComments ? <RelatedCases api={api} scope={scope} document={page} copy={copy} locale={locale}
+          onSelectSection={(sectionId) => choose({ ...selection, sectionId })} onOpenCase={onOpenCase}
+          context={showComments && selection.sectionId ? <RelatedCases api={api} scope={scope} document={page} copy={copy} locale={locale}
             sectionId={selection.sectionId} onOpenCase={onOpenCase} onCreateCase={onCreateCase} /> : undefined} />}
       </div>
     </div>

@@ -9,6 +9,9 @@ import { AppOverlay } from "../../../presentation/common/overlay/AppOverlay";
 import type { ProductDocsApi, ProductDocScope, ProductDocSelection } from "../../domain/product-docs";
 import { productDocsCopy } from "../../localization/copy";
 import { useProductDocSelection } from "../../state/useProductDocSelection";
+import { useProductDocList } from "../../state/tree/useProductDocList";
+import { useProductDocsWorkspace } from "../../composition/context/ProductDocsContext";
+import { ProductDocRelatedCases } from "../related-cases/ProductDocRelatedCases";
 import { ProductDocArticle } from "../article/ProductDocArticle";
 import { ReadState } from "../status/ReadState";
 import styles from "../product-docs.module.css";
@@ -36,12 +39,14 @@ export function ProductDocsPanel(props: Props) {
 function ArticlePanel({ api, scope, locale, projectName, selection, onClose, onOpenFull, trigger, contentRef }:
   Omit<Props, "selection"> & { selection: ProductDocSelection }) {
   const copy = productDocsCopy(locale);
+  const docs = useProductDocsWorkspace();
   const panel = useRef<HTMLElement>(null);
   const dismissed = useRef(false);
   const reduced = useReducedMotion();
   const present = useIsPresent();
   const size = useGuidePanelWidth(contentRef, "falcon.product-docs.width.v1");
-  const article = useProductDocSelection(api, scope, selection);
+  const project = useProductDocList(api, scope, { parentId: null, refresh: 0 });
+  const article = useProductDocSelection(api, scope, selection, false, 0, project.data?.canEdit ?? false);
   const modal = present && !size.desktop;
 
   useLayoutEffect(() => {
@@ -121,8 +126,11 @@ function ArticlePanel({ api, scope, locale, projectName, selection, onClose, onO
     </header>
     <div className={styles.scroll}>
       {article.status === "ready"
-        ? <ProductDocArticle document={article.data} copy={copy} scope={scope} locale={locale} projectName={projectName} versionPinned={selection.version !== undefined} sectionId={selection.sectionId} />
-        : <ReadState copy={copy} status={article.status} retry={article.retry} />}
+        ? <ProductDocArticle key={article.data.id + ":" + article.data.version} document={article.data} copy={copy} scope={scope} locale={locale} projectName={projectName} versionPinned={selection.version !== undefined} sectionId={selection.sectionId}
+          relatedCases={article.data.kind === "page" ? <ProductDocRelatedCases api={api} scope={scope} document={article.data}
+            locale={locale} projectName={projectName} onOpenCase={docs?.openCase ? ({ caseId, projectId }) =>
+              docs.openCase?.(caseId, document.activeElement instanceof HTMLElement ? document.activeElement : document.body, projectId) : undefined} /> : undefined} />
+        : <ReadState copy={copy} status={project.loading ? "loading" : article.status} retry={article.retry} />}
     </div>
   </motion.aside>;
 }

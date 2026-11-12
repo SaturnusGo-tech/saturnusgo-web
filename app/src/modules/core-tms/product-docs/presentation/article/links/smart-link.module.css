@@ -2,35 +2,25 @@ a.link.link.link,
 .editorScope.editorScope a[data-doc-editor-link] {
   --falcon-link: var(--falcon-text);
   --yt-link: var(--falcon-text);
-  --doc-link-outline: var(--falcon-border);
   border: 0;
-  border-radius: 4px;
-  padding: .165em .31em;
-  background: var(--falcon-elevated);
-  box-shadow: inset 0 0 0 .5px var(--doc-link-outline);
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
   color: var(--falcon-text);
   font-weight: 500;
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 32%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: .2em;
   overflow-wrap: anywhere;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
 }
 
-:global(html.dark) :is(a.link.link.link, .editorScope.editorScope a[data-doc-editor-link]) {
-  --doc-link-outline: var(--falcon-doc-link-border);
-  background: var(--falcon-doc-link-background);
-  color: var(--falcon-doc-link-text);
-}
-
-:global(html:not(.dark)) :is(a.link.link.link, .editorScope.editorScope a[data-doc-editor-link]) {
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--falcon-elevated) 97%, var(--falcon-text));
-  box-shadow: inset 0 0 0 .5px var(--falcon-border-strong), 0 1px 2px var(--falcon-border);
-}
-
 a.link.link.link:is(:hover, :focus-visible),
 .editorScope.editorScope a[data-doc-editor-link]:is(:hover, :focus-visible) {
-  text-decoration: none;
+  text-decoration-color: currentColor;
 }
 
 a.link.link.link:focus-visible,
@@ -171,22 +161,23 @@ a.link.link.link[data-link-kind="repository"] {
 :global(html.dark) .details { --doc-link-divider: var(--falcon-doc-tooltip-divider); }
 :global(html.dark) .details svg:not([data-link-priority]):not([data-link-status="ready"], [data-link-status="published"]) { color: var(--falcon-doc-link-icon); }
 
-/* Documentation references stay on the reading surface rather than becoming status chips. */
+/* References belong to the sentence; only the hover preview has a surface. */
 :global(html) :is(a.link.link.link, .editorScope.editorScope a[data-doc-editor-link])[data-link-kind="document"] {
-  padding: .08em 0; border-radius: 0; background: transparent; box-shadow: none; color: var(--falcon-text);
+  font-weight: 600;
+  text-decoration-color: color-mix(in srgb, var(--falcon-info) 60%, transparent);
 }
 a.link.link.link[data-link-kind="document"] {
   display: inline-flex; align-items: flex-start; gap: .4em; max-inline-size: 100%; vertical-align: baseline;
 }
-.link[data-link-kind="document"] > svg { flex: none; margin: .2em 0 0; color: var(--falcon-text-secondary); }
+.link[data-link-kind="document"] > svg { flex: none; margin: .2em 0 0; color: var(--falcon-info); }
 .link[data-link-kind="document"] > span { min-inline-size: 0; overflow-wrap: anywhere; }
 .link[data-link-kind="document"]:is(:hover, :focus-visible) > span,
 .editorScope.editorScope a[data-doc-editor-link][data-link-kind="document"]:hover { text-decoration: underline; text-underline-offset: .18em; }
-/* Lucide BookOpen, matching the React icon used by the reader and link preview. */
+/* Lucide FileText, matching the reader document reference. */
 .editorScope.editorScope a[data-doc-editor-link][data-link-kind="document"]::before {
   inline-size: .95em; block-size: .95em; border: 0; border-radius: 0; vertical-align: -.16em;
-  color: var(--falcon-text-secondary); background: currentColor;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 7v14'/%3E%3Cpath d='M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z'/%3E%3C/svg%3E") center / contain no-repeat;
+  color: var(--falcon-info); background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z'/%3E%3Cpath d='M14 2v6h6M8 13h8M8 17h6'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 .documentTitle { display: flex; align-items: flex-start; gap: 7px; min-inline-size: 0; }
 .documentTitle > svg { flex: none; color: var(--falcon-text-secondary); }

@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { Box, Circle, CircleCheck, Clock3, Layers, Package } from "lucide-react";
 import type { TmsLocale } from "../../../localization/model/locale";
 import type { ProductDocTaxonomy } from "../../domain/product-doc-taxonomy";
@@ -13,7 +14,7 @@ import { PriorityField } from "../../../presentation/common/properties/PriorityF
 import styles from "./product-doc-properties.module.css";
 
 export function ProductDocPropertiesPanel({
-  scope, locale, projectName, status, value = emptyProductDocProperties, taxonomy, onChange, onTaxonomy, disabled,
+  scope, locale, projectName, status, value = emptyProductDocProperties, taxonomy, onChange, onTaxonomy, disabled, relatedCases,
 }: {
   scope: ProductDocScope;
   locale: TmsLocale;
@@ -24,6 +25,7 @@ export function ProductDocPropertiesPanel({
   onChange?(value: ProductDocProperties): void;
   onTaxonomy?(value: ProductDocTaxonomy): void;
   disabled?: boolean;
+  relatedCases?: ReactNode;
 }) {
   const ru = locale === "ru";
   const statusName = {
@@ -37,7 +39,7 @@ export function ProductDocPropertiesPanel({
     <section aria-label={ru ? "Свойства статьи" : "Article properties"}>
       <h2>{ru ? "Свойства" : "Properties"}</h2>
       <div className={`${styles.value} ${controls.value}`} data-status={status}><StatusIcon size={15} aria-hidden="true" /><span>{statusName}</span></div>
-      <PropertyAssigneeField workspaceId={scope.workspaceId} locale={locale} value={value.assignee}
+      <PropertyAssigneeField profilePreview workspaceId={scope.workspaceId} locale={locale} value={value.assignee}
         onChange={onChange && ((assignee) => onChange({ ...value, assignee }))} disabled={disabled} />
       <PriorityField locale={locale} value={value.priority} disabled={disabled}
         onChange={onChange && ((priority) => onChange({ ...value, priority }))} />
@@ -63,5 +65,6 @@ export function ProductDocPropertiesPanel({
           </div>}
         </>}
     </section>
+    {relatedCases}
   </div>;
 }

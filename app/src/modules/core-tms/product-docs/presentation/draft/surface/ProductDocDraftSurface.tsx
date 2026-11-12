@@ -21,7 +21,7 @@ const RichProductSection = dynamic(() => import("../RichProductSection"), {
 export function ProductDocDraftSurface({
   document, scope, copy, locale, projectName, subdocs, busy, isFreshPage, title, titleHighlights, taxonomy, properties,
   editorSeed, editorRef, importInput, withinLimits, validMarkup, error, onChange, onValidity, onImport, onImportText,
-  onMediaBusy, onTitle, onHighlight, onFolderSave, onTaxonomy, onProperties, onRecover,
+  onMediaBusy, onTitle, onHighlight, onFolderSave, onTaxonomy, onProperties, onRecover, relatedCases,
 }: {
   document: ProductDocDetail;
   scope: ProductDocScope;
@@ -29,6 +29,7 @@ export function ProductDocDraftSurface({
   locale: TmsLocale;
   projectName: string;
   subdocs?: ReactNode;
+  relatedCases?: ReactNode;
   busy: boolean;
   isFreshPage: boolean;
   title: string;
@@ -83,7 +84,7 @@ export function ProductDocDraftSurface({
     </div>
     <aside className={styles.properties}>
       <ProductDocPropertiesPanel scope={scope} locale={locale} projectName={projectName} status="draft" value={properties}
-        taxonomy={taxonomy} disabled={busy} onChange={onProperties} onTaxonomy={onTaxonomy} />
+        taxonomy={taxonomy} disabled={busy} onChange={onProperties} onTaxonomy={onTaxonomy} relatedCases={relatedCases} />
     </aside>
   </div>;
 }

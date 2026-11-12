@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, CircleCheck, CircleDashed, CircleMinus, ExternalLink, FolderOpen, Link2, ListChecks } from "lucide-react";
+import { FileText, CircleCheck, CircleDashed, CircleMinus, ExternalLink, FolderOpen, Link2, ListChecks } from "lucide-react";
 import type { TmsLocale } from "../../../../../localization/model/locale";
 import { localizedLabel } from "../../../../../localization/format/labels";
 import { ResponsibleName } from "../../../../../workspace/members/presentation/ResponsibleName";
@@ -29,7 +29,7 @@ export function productDocLinkIcon(kind: ProductDocSmartTarget["kind"] | undefin
   if (status === "ready" || status === "published") return CircleCheck;
   if (status === "draft") return CircleDashed;
   if (status === "archived" || status === "deprecated") return CircleMinus;
-  return kind === "case" ? ListChecks : kind === "document" ? BookOpen : kind === "repository" ? FolderOpen : kind === "external" ? ExternalLink : Link2;
+  return kind === "case" ? ListChecks : kind === "document" ? FileText : kind === "repository" ? FolderOpen : kind === "external" ? ExternalLink : Link2;
 }
 
 function LinkPriorityIcon({ priority }: { priority: string | undefined }) {
@@ -61,7 +61,7 @@ export function ProductDocLinkPreviewContent({ href, locale, target, preview, au
       </span>}
     </div>
     {target?.kind === "document" ? <div className={styles.documentTitle}>
-      <BookOpen size={16} aria-hidden="true" /><strong>{title}</strong>
+      <FileText size={16} aria-hidden="true" /><strong>{title}</strong>
     </div> : <strong>{title}</strong>}
     {description && <span className={styles.description}>{description}</span>}
     {(status || priority) && <div className={styles.details}>

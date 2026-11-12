@@ -2,25 +2,27 @@
 
 import { ErrorToast } from "../../../../presentation/common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
-import { Accordion, AccordionItem, Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@heroui/react";
+import { Accordion, AccordionItem, Button } from "@heroui/react";
 import { useReducedMotion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ChevronDown, X } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import type { TmsLocale } from "../../../../localization/model/locale";
 import { productDocErrorCode } from "../../../domain/errors/product-doc-response";
 import type { ProductDocImpactCase } from "../../../domain/impact/product-doc-impact";
 import type { ProductDocsApi, ProductDocScope } from "../../../domain/product-docs";
 import { useProductDocResource } from "../../../state/useProductDocResource";
+import { ProductDocModal } from "../../overlay/ProductDocModal";
 import chrome from "../../product-docs.module.css";
 import styles from "./publish-preview.module.css";
 
-export function ProductDocPublishPreview({ api, scope, docId, version, locale, isUpdate, onClose, onPublish }: {
+export function ProductDocPublishPreview({ api, scope, docId, version, locale, isUpdate, busy = false, onClose, onPublish }: {
   api: ProductDocsApi;
   scope: ProductDocScope;
   docId: string;
   version: number;
   locale: TmsLocale;
   isUpdate: boolean;
+  busy?: boolean;
   onClose(): void;
   onPublish(version: number): void;
 }) {
@@ -43,26 +45,16 @@ export function ProductDocPublishPreview({ api, scope, docId, version, locale, i
   const changeLabel = ru ? { added: "Добавлен", edited: "Изменён", removed: "Удалён" }
     : { added: "Added", edited: "Edited", removed: "Removed" };
 
-  return <Modal isOpen onClose={onClose} isDismissable={false} hideCloseButton disableAnimation={Boolean(reduceMotion)}
-    placement="center" scrollBehavior="inside" classNames={{
-      wrapper: styles.wrapper, backdrop: styles.backdrop, base: styles.dialog,
-      footer: styles.footer,
-    }}>
-    <ModalContent onKeyDownCapture={(event) => {
-      if (event.key !== "Escape") return;
-      event.stopPropagation();
-      onClose();
-    }}>
-      <header className={styles.header}>
-        <div>
-          <ModalHeader as="h2">{ru ? "Перед публикацией" : "Before publishing"}</ModalHeader>
-          <ModalBody as="p">{ru ? "Проверьте изменения и связанные тест-кейсы." : "Review changes and related test cases."}</ModalBody>
-        </div>
-        <Button isIconOnly className={chrome.iconButton} aria-label={ru ? "Закрыть" : "Close"} onPress={onClose}>
-          <X size={17} aria-hidden="true" />
-        </Button>
-      </header>
-      <div className={styles.body} aria-busy={resource.status === "loading"}>
+  return <ProductDocModal title={ru ? "Перед публикацией" : "Before publishing"}
+    subtitle={ru ? "Проверьте изменения и связанные тест-кейсы." : "Review changes and related test cases."}
+    closeLabel={ru ? "Закрыть" : "Close"} onClose={onClose} busy={busy} isDismissable={false}
+    className={styles.dialog} bodyClassName={styles.body} footerClassName={styles.footer}
+    footer={dismiss => <>
+      <Button className={chrome.action} isDisabled={busy} onPress={dismiss}>{ru ? "К редактору" : "Back to editor"}</Button>
+      <Button className={chrome.primary} isDisabled={busy || resource.status !== "ready" || !impact}
+        onPress={() => onPublish(version)}>{publishLabel}</Button>
+    </>}>
+      <div aria-busy={resource.status === "loading" || busy}>
         {impact && changes && <>
           {impact.publishedVersion !== null && <p>{ru ? "Сравнение с версией" : "Compared with version"} {impact.publishedVersion}</p>}
           {changes.pageChanged && <p>{ru ? "Изменены свойства страницы" : "Page properties changed"}</p>}
@@ -86,7 +78,7 @@ export function ProductDocPublishPreview({ api, scope, docId, version, locale, i
           <h3>{ru ? "Затронутые тест-кейсы" : "Potentially affected cases"} <span>{impact.affectedCases}</span></h3>
           {impact.affectedCases === 0
             ? <p>{ru ? "В связанных тест-кейсах нет потенциально затронутых." : "No linked test cases are affected by these changes."}</p>
-            : <ul className={styles.rows}>{cases.map(item => <li key={item.caseId}>
+            : <ul className={styles.rows}>{cases.filter(item => item.affected).map(item => <li key={item.caseId}>
               <span>{item.title}</span>
               {item.missingSection && <small>{ru ? "Раздел удалён" : "Section removed"}</small>}
             </li>)}</ul>}
@@ -99,11 +91,5 @@ export function ProductDocPublishPreview({ api, scope, docId, version, locale, i
             : (ru ? "Не удалось проверить этот черновик." : "Could not check this draft.")) : null}
           retryLabel={ru ? "Повторить" : "Retry"} onRetry={stale ? undefined : resource.retry} />
       </div>
-      <ModalFooter as="footer">
-        <Button className={chrome.action} onPress={onClose}>{ru ? "К редактору" : "Back to editor"}</Button>
-        <Button className={chrome.primary} isDisabled={resource.status !== "ready" || !impact}
-          onPress={() => onPublish(version)}>{publishLabel}</Button>
-      </ModalFooter>
-    </ModalContent>
-  </Modal>;
+  </ProductDocModal>;
 }

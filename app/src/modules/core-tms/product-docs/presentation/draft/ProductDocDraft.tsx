@@ -18,11 +18,12 @@ import { ProductDocPublishPreview } from "./impact/ProductDocPublishPreview";
 import { DraftActions } from "./actions/DraftActions";
 import { changeTitleHighlights, trimTitleHighlights } from "./title/model/productDocTitleHighlights";
 import styles from "./editor.module.css";
+import { ProductDocRelatedCases } from "../related-cases/ProductDocRelatedCases";
 import { ProductDocDraftSurface } from "./surface/ProductDocDraftSurface";
 import { editorMarkdownToSections, sectionsToEditorMarkdown } from "./sections/productDocMarkdown";
 export type RequestNewProductDoc = (create: () => void) => void;
 
-export function ProductDocDraft({ api, scope, document, copy, locale, drafts, editorActionsRef, requestNewPageRef, projectName, subdocs, onClose, onSaved, onPublished }: {
+export function ProductDocDraft({ api, scope, document, copy, locale, drafts, editorActionsRef, requestNewPageRef, projectName, subdocs, onClose, onSaved, onPublished, onOpenCase }: {
   api: ProductDocsApi;
   scope: ProductDocScope;
   document: ProductDocDetail;
@@ -33,6 +34,7 @@ export function ProductDocDraft({ api, scope, document, copy, locale, drafts, ed
   onClose(): void;
   onSaved(): void;
   onPublished(): void;
+  onOpenCase?(location: { projectId: string; caseId: string }): void;
   drafts: ProductDocDraftBuffer;
   editorActionsRef?: RefObject<HTMLDivElement | null>;
   requestNewPageRef?: RefObject<RequestNewProductDoc | null>;
@@ -91,7 +93,6 @@ export function ProductDocDraft({ api, scope, document, copy, locale, drafts, ed
     if (savingRef.current || mediaBusy || readingFile.current || !titleToSave || !withinLimits || !validMarkup
       || (publish ? !canPublish : !dirty)) return false;
     if (confirmedVersion !== undefined && (dirty || baseline.version !== confirmedVersion)) return false;
-    if (confirmedVersion !== undefined) setPreviewVersion(undefined);
     savingRef.current = true;
     setBusy(true);
     setError("");
@@ -175,9 +176,10 @@ export function ProductDocDraft({ api, scope, document, copy, locale, drafts, ed
         nextPage.create();
       }} />
     {previewVersion !== undefined && <ProductDocPublishPreview api={api} scope={scope} docId={document.id} locale={locale}
-      version={previewVersion} isUpdate={document.publishedVersion !== null} onClose={() => setPreviewVersion(undefined)}
+      version={previewVersion} busy={busy} isUpdate={document.publishedVersion !== null} onClose={() => setPreviewVersion(undefined)}
       onPublish={(version) => { void save(true, version); }} />}
-    <ProductDocDraftSurface document={document} scope={scope} copy={copy} locale={locale} projectName={projectName}
+    <ProductDocDraftSurface relatedCases={<ProductDocRelatedCases api={api} scope={scope} document={{ ...document, draftVersion: baseline.version }}
+      locale={locale} projectName={projectName} editable disabled={busy} onOpenCase={onOpenCase} />} document={document} scope={scope} copy={copy} locale={locale} projectName={projectName}
       subdocs={subdocs} busy={busy} isFreshPage={isFreshPage} title={title} titleHighlights={titleHighlights}
       taxonomy={taxonomy} properties={properties} editorSeed={editorSeed} editorRef={editorRef} importInput={importInput}
       withinLimits={withinLimits} validMarkup={validMarkup} error={error} onChange={changeMarkdown}
