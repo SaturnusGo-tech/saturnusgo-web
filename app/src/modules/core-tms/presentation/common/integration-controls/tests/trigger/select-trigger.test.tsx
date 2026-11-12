@@ -25,6 +25,11 @@ test("computed HeroUI label IDs remain resolvable while keyboard events, button 
     await act(async () => view.update(<IntegrationSelectTrigger aria-labelledby="value-id label-id" disabled/>));
     assert.equal(view.root.findByType("button").props["aria-labelledby"], "value-id label-id");
     assert.equal(view.root.findByType("button").props.disabled, true);
+    await act(async () => view.update(<IntegrationSelectTrigger data-disabled="true"/>));
+    assert.equal(view.root.findByType("button").props.disabled, true, "HeroUI supplies its disabled state as a data attribute to a custom trigger");
+    assert.equal(view.root.findByType("button").props["aria-disabled"], true);
+    await act(async () => view.update(<IntegrationSelectTrigger data-disabled="false"/>));
+    assert.equal(view.root.findByType("button").props.disabled, false);
   } finally { await act(async () => view?.unmount()); }
 });
 
@@ -43,6 +48,9 @@ test("pointer opening focuses its trigger before the overlay snapshots restorati
     trigger.props.onBlur();
     assert.deepEqual(order, ["capture", "trigger-focus", "overlay-open", "outside-focus"]);
     await act(async () => view.update(<IntegrationSelectTrigger disabled/>));
+    view.root.findByType("button").props.onPointerDownCapture(pointer);
+    assert.equal(order.filter(item => item === "trigger-focus").length, 1);
+    await act(async () => view.update(<IntegrationSelectTrigger data-disabled="true"/>));
     view.root.findByType("button").props.onPointerDownCapture(pointer);
     assert.equal(order.filter(item => item === "trigger-focus").length, 1);
     await act(async () => view.update(<IntegrationSelectTrigger/>));

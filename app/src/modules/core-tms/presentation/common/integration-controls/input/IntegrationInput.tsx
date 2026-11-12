@@ -2,11 +2,13 @@
 import { Input, type InputProps } from "@heroui/react";
 import { forwardRef } from "react";
 import { useIntegrationControlDisabled } from "../scope/useIntegrationControlDisabled";
+import { useInputShellRef } from "../refs/useInputShellRef";
 import css from "../styles/integration-controls.module.css";
 
-export const IntegrationInput = forwardRef<HTMLInputElement, InputProps>(function IntegrationInput({ classNames, isDisabled, ...props }, ref) {
+export const IntegrationInput = forwardRef<HTMLInputElement, InputProps>(function IntegrationInput({ classNames, isDisabled, wrapperRef, ...props }, ref) {
   const disabled = useIntegrationControlDisabled(isDisabled);
-  return <Input ref={ref} size="sm" variant="flat" labelPlacement="outside-top" {...props} isDisabled={disabled}
+  const shellRef = useInputShellRef(wrapperRef);
+  return <Input ref={ref} wrapperRef={shellRef} size="sm" variant="flat" labelPlacement="outside-top" {...props} isDisabled={disabled}
     classNames={{ ...classNames,
       base: `${css.field} ${classNames?.base ?? ""}`, label: `${css.label} ${classNames?.label ?? ""}`,
       mainWrapper: `${css.main} ${classNames?.mainWrapper ?? ""}`, inputWrapper: `${css.inputWrapper} ${classNames?.inputWrapper ?? ""}`,

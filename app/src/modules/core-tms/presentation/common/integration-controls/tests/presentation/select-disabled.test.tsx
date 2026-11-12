@@ -3,7 +3,7 @@ import test from "node:test";
 import React from "react";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { IntegrationControlScope } from "../../scope/IntegrationControlScope";
-import { installSelectFixture } from "./select-fixture";
+import { installSelectFixture, setSelectReducedMotion } from "./select-fixture";
 
 Object.assign(globalThis, { React });
 const restore = installSelectFixture();
@@ -63,4 +63,31 @@ test("visible labels are not duplicated by aria-label; unlabelled controls retai
     await act(async () => view.update(<IntegrationSelect aria-label="Destination" value="" options={[]} onValueChange={() => {}}/>));
     assert.equal(control().props["aria-label"], "Destination");
   } finally { await act(async () => view?.unmount()); }
+});
+
+test("single and multiple menus fade without changing geometry and honor reduced motion", async () => {
+  for (const multiple of [false, true]) {
+    let view!: ReactTestRenderer;
+    const render = () => multiple
+      ? <IntegrationMultiSelect aria-label="Statuses" options={[]} values={[]} onValuesChange={() => {}}/>
+      : <IntegrationSelect aria-label="Project" options={[]} value="" onValueChange={() => {}}/>;
+    try {
+      setSelectReducedMotion(false);
+      await act(async () => { view = create(render()); });
+      const control = () => view.root.findByProps({ "data-test-select": true });
+      assert.equal(control().props.disableAnimation, false);
+      const motion = control().props.popoverProps.motionProps;
+      assert.deepEqual(Object.keys(motion.variants).sort(), ["enter", "exit", "initial"]);
+      for (const [state, variant] of Object.entries(motion.variants)) {
+        assert.deepEqual(Object.keys(variant as object), ["opacity"], `${state} must not scale, translate or resize a positioned menu`);
+      }
+      assert.equal(motion.variants.enter.opacity, 1);
+      assert.equal(motion.variants.initial.opacity, 0);
+      assert.equal(motion.variants.exit.opacity, 0);
+      assert.ok(motion.transition.duration > 0 && motion.transition.duration <= .15, "the fade stays short and bounded");
+      setSelectReducedMotion(true);
+      await act(async () => view.update(render()));
+      assert.equal(control().props.disableAnimation, true, "HeroUI must skip its motion wrapper and exit animation");
+    } finally { setSelectReducedMotion(false); await act(async () => view?.unmount()); }
+  }
 });

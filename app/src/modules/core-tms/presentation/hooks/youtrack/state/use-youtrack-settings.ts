@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   disconnectYouTrack,
-  discoverYouTrack,
   getYouTrackConfiguration,
   saveYouTrackConfiguration,
 } from "../../../../application/integrations/getYouTrackIntegrationStatus";
@@ -26,9 +25,10 @@ import {
   reconcileDraftProjects,
   routeWithProject,
   saveError,
-  uniqueProjectIds,
   validationKey,
 } from "./settings-support";
+import { discoverWorkflowCatalog } from "./catalog/discover-workflow-catalog";
+import { catalogIssueFor, type YouTrackCatalogIssue } from "./catalog/errors/catalog-error";
 export type YouTrackSettingsState = ReturnType<typeof useYouTrackSettings>;
 export function useYouTrackSettings(
   workspaceId: string,
@@ -49,10 +49,11 @@ export function useYouTrackSettings(
   const [loadingProjectId, setLoadingProjectId] = useState<string | null>(null);
   const [notice, setNotice] = useState<{ tone: "success" | "error"; text: string } | null>(null);
   const [showToken, setShowToken] = useState(false);
+  const [catalogIssue, setCatalogIssue] = useState<YouTrackCatalogIssue>(null);
 
   useEffect(() => {
     const controller = new AbortController();
-    setLoading(true); setLoadFailed(false); setNotice(null);
+    setLoading(true); setLoadFailed(false); setNotice(null); setCatalogIssue(null);
     void getYouTrackConfiguration(http, workspaceId, controller.signal)
       .then(async (resource) => {
         if (controller.signal.aborted) return;
@@ -63,16 +64,13 @@ export function useYouTrackSettings(
         if (!canManage || !resource.data.baseUrl || !resource.data.tokenConfigured) return;
         try {
           const baseUrl = normalizeYouTrackBaseUrl(resource.data.baseUrl);
-          const catalog = await discoverYouTrack(http, workspaceId, { baseUrl }, controller.signal);
-          const ids = uniqueProjectIds(nextDraft.routes)
-            .filter((id) => catalog.projects.some((project) => project.id === id));
-          const details = await discoverProjectDetails(http, workspaceId, baseUrl, ids, "", controller.signal);
+          const { catalog, details } = await discoverWorkflowCatalog(http, workspaceId, baseUrl, nextDraft.routes, "", controller.signal);
           if (controller.signal.aborted) return;
           setProjects(mergeProjects(details, mergeProjects(catalog.projects, seeded)));
           setProjectsBaseUrl(catalog.baseUrl);
           setDraft((current) => current ? reconcileDraftProjects(current, catalog.projects, details) : current);
-        } catch {
-          // Keep the saved configuration editable while YouTrack is unavailable.
+        } catch (error: unknown) {
+          if (!controller.signal.aborted) setCatalogIssue(catalogIssueFor(error));
         }
       })
       .catch((error: unknown) => {
@@ -105,16 +103,16 @@ export function useYouTrackSettings(
       (apiToken && (apiToken.length < 32 || new TextEncoder().encode(apiToken).length > 2048))) {
       setNotice({ tone: "error", text: copy.validation.token }); return;
     }
-    setAction("connecting"); setNotice(null);
+    setAction("connecting"); setNotice(null); setCatalogIssue(null);
     try {
-      const catalog = await discoverYouTrack(http, workspaceId, { baseUrl, ...(apiToken ? { apiToken } : {}) });
-      const ids = uniqueProjectIds(draft.routes)
-        .filter((id) => catalog.projects.some((project) => project.id === id));
-      const details = await discoverProjectDetails(http, workspaceId, baseUrl, ids, apiToken);
+      const { catalog, details } = await discoverWorkflowCatalog(http, workspaceId, baseUrl, draft.routes, apiToken);
       setProjects(mergeProjects(details, catalog.projects)); setProjectsBaseUrl(catalog.baseUrl);
       setDraft((current) => current ? reconcileDraftProjects(current, catalog.projects, details) : current);
       setNotice({ tone: "success", text: copy.connectionSuccess(catalog.projects.length) });
-    } catch (error: unknown) { setNotice({ tone: "error", text: discoveryError(copy, error) }); }
+    } catch (error: unknown) {
+      if (catalogIssueFor(error) === "empty_fields") setCatalogIssue("empty_fields");
+      else setNotice({ tone: "error", text: discoveryError(copy, error) });
+    }
     finally { setAction("idle"); }
   };
 
@@ -173,7 +171,7 @@ export function useYouTrackSettings(
     setAction("disconnecting"); setNotice(null);
     try {
       const result = await disconnectYouTrack(http, workspaceId, configurationEtag);
-      const next = result.data.configuration;
+      const next = result.data.configuration; setCatalogIssue(null);
       setConfiguration(next); setConfigurationEtag(result.etag); setDraft(draftFromConfiguration(next));
       setProjects(projectsFromConfiguration(next)); setProjectsBaseUrl(next.baseUrl);
       setNotice({ tone: "success", text: copy.disconnected(result.data.detachedLinks) });
@@ -193,7 +191,7 @@ export function useYouTrackSettings(
   };
 
   return {
-    configuration, draft, selectedProjects, loading, loadFailed, action, loadingProjectId,
+    configuration, draft, selectedProjects, loading, loadFailed, action, loadingProjectId, catalogIssue,
     notice, showToken, setShowToken, updateDraft, connect, selectRouteProject, save, disconnect,
     retry: () => setReload((value) => value + 1),
   };

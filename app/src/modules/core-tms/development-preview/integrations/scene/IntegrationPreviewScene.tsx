@@ -10,6 +10,7 @@ import { IntegrationButton } from "../../../presentation/common/integration-cont
 import { createIntegrationPreviewClient } from "../network/integration-preview-client";
 import { integrationPreviewFetch } from "../network/integration-preview-fetch";
 import { sampleWorkspace } from "../samples/youtrack-sample";
+import appShell from "../../../tms.module.css";
 import css from "../integration-preview.module.css";
 const providers: IntegrationId[] = ["youtrack", "jira", "linear", "trello", "github", "slack", "confluence", "swagger"];
 const capabilities = ["integration:read", "integration:manage", "run:manage", "test_case:manage", "audit:read"];
@@ -30,7 +31,7 @@ export function IntegrationPreviewScene() {
     const next = resolvedTheme === "dark" ? "light" : "dark", url = new URL(window.location.href);
     url.searchParams.set("theme", next); window.history.replaceState(window.history.state, "", url); setTheme(next);
   };
-  return <div className={css.preview} data-falcon-workspace>
+  return <div className={`${appShell.app} ${css.preview}`} data-falcon-workspace>
     <nav className={css.tools} aria-label="Local preview controls"><strong>Local sample · real changes disabled</strong>
       {providers.map(id => <IntegrationButton key={id} size="sm" variant="light" aria-pressed={provider === id} onPress={() => setProvider(id)}>{id}</IntegrationButton>)}
       <IntegrationButton size="sm" onPress={changeTheme}>{resolvedTheme === "dark" ? "Light" : "Dark"}</IntegrationButton>

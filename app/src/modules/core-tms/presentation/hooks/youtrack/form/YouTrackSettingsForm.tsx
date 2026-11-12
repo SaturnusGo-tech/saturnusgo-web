@@ -35,6 +35,12 @@ export function YouTrackSettingsForm({ copy, state, webhook, canManage, onChange
       {!canManage ? <div className={surface.settingsNotice} data-tone="neutral" role="note">
         <strong>{copy.readOnly}</strong> {copy.readOnlyHint}
       </div> : null}
+      {state.catalogIssue && <p className={surface.projectLoading} role="status">
+        {state.catalogIssue === "empty_fields"
+          ? (russian ? "YouTrack не вернул поля статуса выбранных проектов. Текущие сопоставления не изменены." : "YouTrack returned no state fields for the selected projects. Current mappings are unchanged.")
+          : (russian ? "Не удалось загрузить поля и статусы YouTrack. Текущие сопоставления не изменены." : "Could not load YouTrack fields and statuses. Current mappings are unchanged.")}
+        {" "}{russian ? "Проверьте доступ к проектам и полям, затем нажмите «Обновить доступ» в разделе «Подключение»." : "Check project and field access, then use Refresh access in Connection."}
+      </p>}
       <IntegrationControlScope disabled={!canManage || state.action !== "idle"}><fieldset className={surface.settingsFields} disabled={!canManage || state.action !== "idle"}>
       {tab === "connection" && <ConnectionSection
         copy={copy}
