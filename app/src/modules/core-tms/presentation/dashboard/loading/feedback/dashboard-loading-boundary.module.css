@@ -1,0 +1,71 @@
+.boundary {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  inline-size: 100%;
+  min-inline-size: 0;
+  min-block-size: 100%;
+}
+
+.boundary[data-covered] {
+  block-size: 100%;
+  min-block-size: 260px;
+  overflow: clip;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  inline-size: 100%;
+  min-inline-size: 0;
+  animation: reveal 240ms ease-out both;
+}
+
+.content > * {
+  flex-shrink: 0;
+}
+
+.content[data-covered] {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  visibility: hidden;
+  pointer-events: none;
+  animation: none;
+}
+
+.feedback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--falcon-text);
+  opacity: 1;
+  transition: opacity 240ms ease-in-out;
+}
+
+.feedback[data-phase="leaving"] {
+  opacity: 0;
+}
+
+.artwork {
+  --falcon-brand-mark-size: 108px;
+  animation: arrive 240ms cubic-bezier(.2, .8, .2, 1) both;
+}
+
+@keyframes arrive {
+  from { opacity: 0; transform: scale(.94); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes reveal {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feedback { transition: none; }
+  .artwork, .content { animation: none; }
+}

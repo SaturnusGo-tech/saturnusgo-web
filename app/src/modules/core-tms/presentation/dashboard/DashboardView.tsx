@@ -19,7 +19,9 @@ import { WidgetCatalog } from "./customize/catalog/WidgetCatalog";
 import type { DashboardViewProps } from "./dashboard-view";
 import { DashboardDetail } from "./detail/route/DashboardDetail";
 import { useDrillNavigation } from "./navigation/useDrillNavigation";
-import { DeferredPane } from "../common/loading/feedback/DeferredPane";
+import { DashboardReadiness } from "./loading/readiness/DashboardReadiness";
+import { isDashboardInitialPending } from "./loading/readiness/initial-pending";
+import { DashboardLoadingBoundary } from "./loading/feedback/DashboardLoadingBoundary";
 import surface from "./dashboard.module.css";
 import styles from "./customize/layout.module.css";
 import shell from "../../tms.module.css";
@@ -49,7 +51,14 @@ function DashboardWorkspace(props: DashboardViewProps) {
   const scope = `${data.workspace.id}:${projectId}`;
   const board = layout.draft ?? layout.board;
   const editing = Boolean(layout.draft);
-  const loading = layout.loading || Boolean(personalBoard?.loading && !teamLayout.draft);
+  const loading = layout.loading || Boolean(!teamLayout.draft && (personalBoard?.loading || legacyLayout?.loading));
+  const initialPending = isDashboardInitialPending({
+    layoutPending: loading,
+    preferences: model.preferences,
+    analytics: { snapshot: model.snapshot, loading: model.analytics.summaryLoading },
+    workbench: model.workbench,
+  });
+  const loadingScope = JSON.stringify([model.query, model.workbench.filters.environmentId, model.workbench.filters.buildReference]);
   const disabled = layout.saving || layout.retryPending;
   const canEditPersonal = Boolean(personalBoard && !personalBoard.loading && !personalBoard.failure);
   const workflow = dashboardcnEnabled();
@@ -99,6 +108,8 @@ function DashboardWorkspace(props: DashboardViewProps) {
       }} />
   </div>;
   return <div key="dashboard" className={`${shell.pageScroll} ${surface.page} ${styles.page}`} data-dashboard-workspace="true" data-dashboard-workflow={workflow || undefined}>
+    <DashboardReadiness key={loadingScope} pending={initialPending}>{covered =>
+    <DashboardLoadingBoundary pending={covered} label={t("dashboardLayout.loading")}>
     <header className={styles.header}>
       <div className={styles.heading}>
         <span className={styles.eyebrow}>{currentProject}<span> / </span>{t("dashboard.analyticsTitle")}</span>
@@ -132,12 +143,11 @@ function DashboardWorkspace(props: DashboardViewProps) {
         const failed = layoutFailure ? layout : personalBoard?.failure ? personalBoard : legacyLayout;
         void failed?.controller.load();
       }} />
-    <DeferredPane pending={loading} variant="dashboard" label={t("dashboardLayout.loading")}>
       {!board ? !layoutFailure && !personalBoard?.failure && <DashboardEmpty editing={false} personal={canComposePersonal}
         canEdit={canEdit} onAdd={openCatalog} />
         : !board.widgets.length ? <DashboardEmpty editing={editing} personal={personalEditing || (!editing && canComposePersonal)}
           canEdit={canEdit && !disabled && layout.failure !== "conflict"} onAdd={openCatalog} />
         : <DashboardContent key={scope} {...props} layout={layout} model={model} projectName={currentProject} />}
-    </DeferredPane>
+    </DashboardLoadingBoundary>}</DashboardReadiness>
   </div>;
 }

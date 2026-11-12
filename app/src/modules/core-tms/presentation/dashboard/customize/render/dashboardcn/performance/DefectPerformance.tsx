@@ -10,6 +10,7 @@ import { readDashboardDefectLeadTime, type DefectLeadTimePage } from "../../../.
 import { useTmsLocale } from "../../../../../../localization/context/useTmsLocale";
 import type { DashboardViewProps } from "../../../../dashboard-view";
 import { LeadTimePlot, ReportedPlot } from "./PerformancePlots";
+import { useDashboardWidgetPending } from "../../../../loading/readiness/DashboardReadiness";
 import styles from "./performance.module.css";
 
 type Props = {
@@ -40,6 +41,7 @@ export function DefectPerformance({ snapshot, readBreakdown, openDrill, onOpenRo
   const [retry, setRetry] = useState(0);
   const activeReported = reported?.scope === scope ? reported : undefined;
   const activeLead = lead?.scope === scope ? lead : undefined;
+  useDashboardWidgetPending(Boolean(readBreakdown && (!activeReported || !activeLead)));
   const cursor = next?.scope === scope ? next.cursor : undefined;
   useEffect(() => {
     if (!readBreakdown) return;

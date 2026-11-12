@@ -4,6 +4,7 @@ import { Box, Clock3, FlaskConical, Inbox } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { DefectTriageRow, DefectTriageScope, DefectTriageView } from "../../../../../../../defects/triage/defect-triage-source";
 import { useDefectIntake } from "../../../../../../../defects/triage/useDefectIntake";
+import { useDashboardWidgetPending } from "../../../../../loading/readiness/DashboardReadiness";
 import { useTmsLocale } from "../../../../../../../localization/context/useTmsLocale";
 import { MemberAvatar } from "../../../../../../../workspace/members/avatar/MemberAvatar";
 import { useMemberName } from "../../../../../../../workspace/members/state/useMemberName";
@@ -31,6 +32,7 @@ export function DefectIntake({ scope, view, canManage, onChange, onOpenRow }: Pr
   const [selection, setSelection] = useState<string | null>(null);
   const intake = useDefectIntake(scope, view, onChange);
   const { list, saving, error, completed } = intake;
+  useDashboardWidgetPending(list.loading && list.rows.length === 0);
   const selected = list.rows.find(row => row.id === selection);
 
   useEffect(() => {

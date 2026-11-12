@@ -18,6 +18,7 @@ import { insightCopy } from "./controls/insight-copy";
 import { sliceDistribution, type SliceKind } from "./dashboardcn-slices";
 import { defectInsightView, sliceInsightView, type InsightMeasure } from "./model/insight-view";
 import { useDefectInsights } from "./model/useDefectInsights";
+import { useDashboardWidgetPending } from "../../../../loading/readiness/DashboardReadiness";
 import { InsightsRecords } from "./records/InsightsRecords";
 import styles from "./dashboardcn-slices.module.css";
 
@@ -76,6 +77,7 @@ export function DashboardcnSlices({ title, snapshot, kind, openDrill, onOpenRow,
     : sliceInsightView(all, buckets, locale, isDefect ? "all" : visibleFilter);
   const displayed = result.data && request ? { data: result.data, request }
     : grouped ? result.previous : undefined;
+  useDashboardWidgetPending(Boolean(request && result.loading && !displayed));
   const view = displayed ? defectInsightView(displayed.data, displayed.request, locale)
     : grouped ? { groups: [], total: undefined, groupCount: 0 } : fallbackView;
   const number = new Intl.NumberFormat(languageTag);

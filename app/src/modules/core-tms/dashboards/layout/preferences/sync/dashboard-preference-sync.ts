@@ -89,7 +89,9 @@ export class DashboardPreferenceSync {
   }
 
   private publish(stored: boolean) {
-    this.snapshot = { stored, ready: Boolean(this.resource), value: {
+    // A default server row is not the initial view until its legacy import settles.
+    const importing = this.resource?.data.rowVersion === 0 && Boolean(this.legacy || this.attempt?.migration);
+    this.snapshot = { stored, ready: this.snapshot.ready || Boolean(this.resource && (!stored || !importing)), value: {
       ...(this.resource?.data.preferences ?? this.legacy ?? defaultPreferences),
       ...(!this.attempt?.migration ? this.attempt?.patch : undefined), ...this.pending,
     } };
