@@ -54,7 +54,7 @@ export function createExchangeFixture(log: (message: string) => void) {
     }
     visit(source, ""); return records;
   }
-  const http = createTmsHttpClient({ apiBase: "http://127.0.0.1:4683/api/preview", production: false, credentials: "include",
+  const http = createTmsHttpClient({ apiBase: "https://exchange.example.invalid/api/preview", production: false, credentials: "include",
     fetch: async (input, init) => {
       init?.signal?.throwIfAborted(); await new Promise(resolve => setTimeout(resolve, 90)); init?.signal?.throwIfAborted();
       const url = new URL(String(input)); const path = url.pathname.replace("/api/preview", ""); const method = init?.method ?? "GET";
