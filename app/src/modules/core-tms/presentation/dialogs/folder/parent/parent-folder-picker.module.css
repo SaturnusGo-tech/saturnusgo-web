@@ -15,7 +15,9 @@
 .row .disclosure { flex: 0 0 20px; width: 20px; height: 32px; display: grid; place-items: center; color: var(--falcon-text-muted); padding: 0; }
 .disclosure:disabled { cursor: default; }
 .row > [role="option"] { min-width: 0; flex: 1; display: flex; align-items: center; gap: 9px; min-height: 34px; padding: 7px 9px; text-align: left; }
-.row > [role="option"] > span:not([data-folder-visual]) { min-width: 0; flex: 1; overflow-wrap: anywhere; line-height: 1.5; }
+.row .visual { display: inline-grid; place-items: center; flex: 0 0 18px; width: 18px; height: 18px; color: var(--falcon-icon-muted); }
+.row .label { min-width: 0; flex: 1; line-height: 1.5; }
+.row .name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .row small { display: block; font-size: 10px; }
 .row > [role="option"] > svg { color: var(--falcon-icon-muted); flex-shrink: 0; }
 .row > [role="option"] > .check { color: var(--falcon-action); }

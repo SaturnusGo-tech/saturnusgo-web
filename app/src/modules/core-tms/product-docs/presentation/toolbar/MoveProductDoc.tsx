@@ -1,7 +1,7 @@
 "use client";
 
 import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
-import { LayoutGrid } from "lucide-react";
+import { FileText, LayoutGrid } from "lucide-react";
 import { useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { Button } from "@heroui/react";
 import { ProductDocModal } from "../overlay/ProductDocModal";
@@ -71,7 +71,7 @@ export function MoveProductDoc({ api, scope, document: page, path, copy, onMoved
     onClose={() => { if (!pending.current) onClose(); }}>
     <form className={styles.form} onSubmit={(event) => void move(event)} aria-busy={saving}>
       <h3>{copy.chooseDestination}</h3>
-      <div className={folderStyles.browser} data-inline>
+      <div className={`${folderStyles.browser} ${styles.destinations}`} data-inline>
         <div className={folderStyles.list} role="listbox" aria-label={copy.chooseDestination} tabIndex={0} data-autofocus
           onKeyDown={movePickerKeys}>
           <FolderChoiceRow name={copy.projectRoot} icon={<LayoutGrid size={17} aria-hidden="true" />} depth={0}
@@ -119,7 +119,8 @@ function MoveBranch(props: BranchProps) {
       const expanded = open.has(node.id);
       const selected = destination === node.id;
       return <div key={node.id}>
-        <FolderChoiceRow name={node.title} icon={<ProductDocSectionIcon scope={scope} node={node} size={17} />}
+        <FolderChoiceRow name={node.title} icon={node.kind === "folder"
+          ? <ProductDocSectionIcon scope={scope} node={node} size={17} /> : <FileText size={17} />}
           depth={depth} selected={selected} tabIndex={selected ? 0 : -1} disabled={saving} expanded={expanded}
           onToggle={() => onToggle(node.id)} onChoose={() => onChoose(node.id)} />
         {expanded && <MoveBranch {...props} parentId={node.id} depth={depth + 1} />}
