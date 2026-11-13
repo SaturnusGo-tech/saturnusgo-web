@@ -31676,6 +31676,195 @@
           }
         ]
       }
+    },
+    "/me/profile/avatar-character": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "operationId": "selectSelfProfileAvatarCharacter",
+        "summary": "Select own Falcon avatar character",
+        "tags": [
+          "Self profile"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SelfProfileMediaVersion"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "description": "Own human identity only. Selects one of twenty approved characters and atomically retires the uploaded avatar. If-Match protects concurrent edits. Idempotency-Key replays the same command once. The persisted character remains when a custom photo is subsequently uploaded or removed.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SelfAvatarCharacterSelection"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "x-tms-concurrency": "required",
+        "x-tms-idempotency": "required"
+      }
+    },
+    "/workspaces/{workspaceId}/team": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workspaceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Workspaces"
+        ],
+        "operationId": "listWorkspaceTeam",
+        "summary": "List visible team members and recorded achievements",
+        "description": "Requires active workspace membership. Lists active human members and connected Codex employees in the same workspace, ordered by name and identity ID. No private contact fields are exposed. Earned badges reflect recorded achievements; at most three are included. Cursors bind workspace and search. Character fallback IDs are persisted; Codex uses its fixed brand identity.",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 120,
+              "default": ""
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 24,
+              "default": 24
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bounded typed actor page.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "X-Next-Cursor": {
+                "$ref": "#/components/headers/XNextCursor"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceTeamPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -57959,6 +58148,9 @@
           "version": {
             "type": "integer",
             "minimum": 1
+          },
+          "avatarCharacterId": {
+            "$ref": "#/components/schemas/AvatarCharacterId"
           }
         },
         "required": [
@@ -57976,7 +58168,8 @@
           "hasBanner",
           "avatar",
           "banner",
-          "version"
+          "version",
+          "avatarCharacterId"
         ]
       },
       "SelfProfileMediaVersion": {
@@ -63767,6 +63960,16 @@
               "active",
               "inactive"
             ]
+          },
+          "avatarCharacterId": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AvatarCharacterId"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -63779,9 +63982,245 @@
           "kind",
           "provider",
           "role",
-          "status"
+          "status",
+          "avatarCharacterId"
         ],
         "description": "Read-only professional profile visible only to an active member of the same workspace. No email, phone, contacts, location, sign-in, preferences or security fields. Avatar/banner URLs are private 60-second grants."
+      },
+      "AvatarCharacterId": {
+        "type": "string",
+        "enum": [
+          "mika",
+          "nora",
+          "ray",
+          "ada",
+          "leo",
+          "lina",
+          "omar",
+          "zoe",
+          "finn",
+          "maya",
+          "kai",
+          "iris",
+          "hugo",
+          "vera",
+          "ivo",
+          "yuna",
+          "sam",
+          "eva",
+          "elias",
+          "ayla"
+        ],
+        "description": "Stable Falcon character selection. Public character artwork is distinct from private uploaded profile media."
+      },
+      "SelfAvatarCharacterSelection": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "characterId": {
+            "$ref": "#/components/schemas/AvatarCharacterId"
+          }
+        },
+        "required": [
+          "characterId"
+        ]
+      },
+      "WorkspaceTeamMember": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "introduction": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "avatar": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "url",
+                  "expiresAt"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "avatarCharacterId": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AvatarCharacterId"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "human",
+              "agent"
+            ]
+          },
+          "provider": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "codex",
+              null
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "workspace_admin",
+              "qa_manager",
+              "tester",
+              "reporter",
+              "viewer"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "inactive"
+            ]
+          },
+          "presence": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "online",
+              "offline",
+              null
+            ],
+            "description": "Recorded presence when available. Null means unknown, never inferred from active membership."
+          },
+          "achievements": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "earned": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "total": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "remaining": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "items": {
+                "type": "array",
+                "maxItems": 3,
+                "items": {
+                  "$ref": "#/components/schemas/SelfProfileAchievement"
+                }
+              },
+              "lockedPreview": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/SelfProfileAchievement"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "The first actually locked achievement in catalogue order; null only when all are earned."
+              }
+            },
+            "required": [
+              "earned",
+              "total",
+              "remaining",
+              "items",
+              "lockedPreview"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "introduction",
+          "avatar",
+          "avatarCharacterId",
+          "kind",
+          "provider",
+          "role",
+          "status",
+          "presence",
+          "achievements"
+        ]
+      },
+      "WorkspaceTeamPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "array",
+            "maxItems": 24,
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceTeamMember"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "limit": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 24
+              },
+              "hasMore": {
+                "type": "boolean"
+              },
+              "nextCursor": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "limit",
+              "hasMore",
+              "nextCursor"
+            ]
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
       }
     }
   }

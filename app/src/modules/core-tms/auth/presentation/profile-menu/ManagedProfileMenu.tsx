@@ -4,7 +4,8 @@ import { BillingLink } from "../../../billing/presentation/link/BillingLink";
 import { BillingPlanLink } from "../../../billing/composition/menu/BillingPlanLink";
 import { memberRoleLabel } from "../../../company-administration/presentation/permissions/member-role-label";
 import { CompanyAdministrationLink } from "../../../company-administration/composition/menu/CompanyAdministrationLink";
-import { Building2, CreditCard, Download, LogOut, ShieldCheck, UserRound } from "lucide-react";
+import { Building2, CreditCard, Download, LogOut, ShieldCheck, UserRound, UsersRound } from "lucide-react";
+import { TeamLink } from "../../../team/presentation/TeamLink";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { TmsSessionIdentity } from "../session/TmsSessionContext";
@@ -65,6 +66,7 @@ export function ManagedProfileMenu({ session }: { readonly session: TmsSessionId
           : session.workspaceRole && <span className={styles.plan}>{memberRoleLabel(session.workspaceRole, locale)}</span>}
       </div>
       <ProfileLink role="menuitem" onClick={() => setAnchor(null)}><UserRound size={17} />{ru ? "Мой профиль" : "My profile"}</ProfileLink>
+      <TeamLink role="menuitem" onClick={() => setAnchor(null)}><UsersRound size={17} />{ru ? "Моя команда" : "My team"}</TeamLink>
       <ProfileLink role="menuitem" section="security" onClick={() => setAnchor(null)}><ShieldCheck size={17} />{ru ? "Безопасность" : "Security"}</ProfileLink>
       {billingWorkspaceId && <BillingLink role="menuitem" workspaceId={billingWorkspaceId} onClick={() => setAnchor(null)}><CreditCard size={17} />{ru ? "Тариф и оплата" : "Plan and billing"}</BillingLink>}
       {downloadsAvailable && <button role="menuitem" type="button" onClick={() => { setAnchor(null); trigger.current?.focus({ preventScroll: true }); setDownloadsOpen(true); }}><Download size={17} strokeWidth={1.7} />{ru ? "Скачать приложение" : "Download app"}</button>}

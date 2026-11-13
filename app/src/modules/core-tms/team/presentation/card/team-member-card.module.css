@@ -1,0 +1,15 @@
+.card { display:block; min-width:0; padding:26px; border:0; border-radius:16px; background:var(--falcon-selected); color:var(--falcon-text); text-decoration:none; transition:background 180ms ease,box-shadow 180ms ease; }
+:global(.dark) .card { background:var(--falcon-elevated); }
+.card:hover { background:var(--falcon-hover); box-shadow:var(--falcon-shadow); }
+.card:focus-visible { outline:2px solid var(--falcon-text); outline-offset:4px; }
+.identity { display:flex; align-items:center; gap:17px; min-width:0; }
+.person { min-width:0; flex:1; }
+.person h2 { margin:0; font-size:19px; font-weight:550; line-height:1.4; letter-spacing:-.4px; overflow-wrap:anywhere; }
+.person p { margin:4px 0 7px; font-size:13px; color:var(--falcon-text-secondary); }
+.status { display:inline-flex; align-items:center; gap:6px; font-size:11px; color:var(--falcon-text-muted); }
+.status i { width:5px; height:5px; border-radius:50%; background:var(--falcon-text-muted); }
+.status[data-active=true] i { background:var(--falcon-success); }
+.arrow { align-self:flex-start; flex:none; color:var(--falcon-icon-muted); opacity:.65; transition:opacity 180ms ease; }
+.card:hover .arrow { opacity:1; }
+@media(max-width:850px) { .card { padding:22px; } .identity { gap:13px; } .person h2 { font-size:18px; } }
+@media(prefers-reduced-motion:reduce) { .card,.arrow { transition:none; } }

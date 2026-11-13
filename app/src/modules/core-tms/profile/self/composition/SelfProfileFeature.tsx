@@ -37,7 +37,7 @@ export function SelfProfileFeature({ workspaceId }: {
       <div className={styles.overview}>
         <aside className={styles.person}>
           <ProfileIdentity key={profile.id} profile={profile} ru={ru} pending={resource.pending} onSave={resource.save}
-            onUpload={(kind, file) => { void resource.upload(kind, file); }} onRemove={kind => { void resource.remove(kind); }} />
+            onChooseAvatar={resource.chooseCharacter} onUpload={resource.upload} onRemove={kind => { void resource.remove(kind); }} />
           <ProfileAchievements value={insights.achievements.value} loading={insights.achievements.loading} error={insights.achievements.error} ru={ru} retry={insights.retry} />
         </aside>
         <div className={styles.insights}>

@@ -1,0 +1,4 @@
+.avatar { display:grid; place-items:center; width:80px; height:80px; flex:none; border-radius:50%; overflow:hidden; background:var(--falcon-control); color:var(--falcon-text-secondary); font-size:24px; }
+.avatar img { display:block; width:100%; height:100%; object-fit:cover; }
+.agent { width:58px; height:58px; }
+@media(max-width:850px) { .avatar { width:68px; height:68px; } .agent { width:48px; height:48px; } }

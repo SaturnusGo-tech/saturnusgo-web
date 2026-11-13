@@ -38,6 +38,7 @@ export function useSelfProfile(client: SelfProfilePort) {
     retry: () => setRevision(value => value + 1),
     save: (details: SelfProfileDetails) => profile ? execute(signal => client.update(profile, details, signal)) : Promise.resolve(false),
     upload: (kind: ProfileMediaKind, file: File) => profile ? execute(signal => client.upload(profile, kind, file, crypto.randomUUID(), signal)) : Promise.resolve(false),
+    chooseCharacter: (characterId: string) => profile ? execute(signal => client.chooseCharacter(profile, characterId, crypto.randomUUID(), signal)) : Promise.resolve(false),
     remove: (kind: ProfileMediaKind) => profile ? execute(signal => client.remove(profile, kind, signal)) : Promise.resolve(false),
   };
 }

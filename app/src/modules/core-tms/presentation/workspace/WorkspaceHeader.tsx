@@ -53,7 +53,7 @@ export function WorkspaceHeader({
 
       <HistoryControls />
       <FolderOpen className={shellStyles.contextIcon} width={22} height={22} aria-hidden="true" />
-      {(model.view === "portfolios" || model.view === "profile" || model.view === "notifications") || (!model.project && model.view !== "cases" && model.view !== "api") ? <div className={shellStyles.projectContext}><span className={shellStyles.workspaceName}>{workspaceName}</span></div> : <div className={shellStyles.projectContext}>
+      {(model.view === "portfolios" || model.view === "profile" || model.view === "team" || model.view === "notifications") || (!model.project && model.view !== "cases" && model.view !== "api") ? <div className={shellStyles.projectContext}><span className={shellStyles.workspaceName}>{workspaceName}</span></div> : <div className={shellStyles.projectContext}>
         <span className={shellStyles.projectEyebrow} aria-hidden="true">
           {model.view === "api" ? (languageTag.startsWith("ru") ? "Область" : "Scope") : model.view === "cases" && model.repositoryScope.portfolioId ? (languageTag.startsWith("ru") ? "Портфель" : "Portfolio") : t("header.project")}
         </span>

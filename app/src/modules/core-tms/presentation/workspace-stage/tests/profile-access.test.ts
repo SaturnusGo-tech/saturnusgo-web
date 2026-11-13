@@ -20,3 +20,16 @@ test("every authenticated account can open its profile without a loaded project"
     assert.equal(all.some(node => node.type === "WorkspaceLoadState"), false);
   }
 });
+
+test("team is available to ordinary members before any project is loaded", () => {
+  const h = componentHarness();
+  const { WorkspaceStage: render } = h.load<{ WorkspaceStage: typeof WorkspaceStage }>(new URL("../WorkspaceStage.tsx", import.meta.url), name => {
+    if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ t: (key: string) => key }) };
+    if (name.endsWith("useWorkspaceCapabilities")) return { useWorkspaceCapabilities: () => ({ value: null }) };
+    if (name.endsWith("TmsSessionContext")) return { useOptionalTmsSession: () => ({ kind: "managed", companyCapabilities: [] }) };
+    if (name.endsWith("company-features")) return { companyViewAvailable };
+  });
+  const model = { view: "team", connection: "loading", project: undefined,
+    data: { workspace: { id: "w", name: "Team" }, meta: { authorization: { capabilities: [] } } } };
+  assert.ok(nodes(h.render(() => render({ model: model as never }))).some(node => node.type === "TeamFeature"));
+});

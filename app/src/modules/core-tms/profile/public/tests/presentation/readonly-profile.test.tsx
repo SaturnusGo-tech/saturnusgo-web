@@ -6,6 +6,7 @@ import React from 'react';
 import * as jsx from 'react/jsx-runtime';
 import { act,create,type ReactTestRenderer } from 'react-test-renderer';
 import ts from 'typescript';
+import { avatarCharacter } from "../../../avatars/content/avatar-characters";
 import { profileCopy } from '../../../self/presentation/copy/profile-copy';
 function load(path:string) {
  const module={exports:{}};
@@ -14,6 +15,8 @@ function load(path:string) {
  }).outputText,{module,exports:module.exports,require(name:string){
   if(name==='react')return React;if(name==='react/jsx-runtime')return jsx;
   if(name==='lucide-react')return {Camera:'svg',Link2:'svg',Mail:'svg',Pencil:'svg',Trash2:'svg'};
+  if(name.endsWith('avatar-characters'))return {avatarCharacter};
+  if(name.endsWith('AvatarChooser'))return {AvatarChooser:()=>null};
   if(name.endsWith('profile-copy'))return {profileCopy};
   if(name.endsWith('CodexMark'))return {CodexMark:()=>React.createElement('span',{'data-codex-mark':true})};
   if(name.endsWith('ProfileEditor'))return {ProfileEditor:()=>React.createElement('form')};
@@ -31,6 +34,8 @@ test('shared profile identity and about render professional data without editing
  await act(async()=>{renderer=create(<><ProfileIdentity profile={profile} ru={false} readOnly/><ProfileAbout profile={profile} ru={false} readOnly/></>);});
  assert.equal(renderer.root.findAllByType('input').length,0);assert.equal(renderer.root.findAllByType('button').length,0);
  assert.match(JSON.stringify(renderer.toJSON()),/Professional bio/);assert.doesNotMatch(JSON.stringify(renderer.toJSON()),/Edit profile|Introduce yourself/);
+ await act(async()=>renderer.update(<ProfileIdentity profile={{...profile,avatarCharacterId:'nora'}} ru={false} readOnly/>));
+ assert.equal(renderer.root.findByType('img').props.src,avatarCharacter('nora')?.image);
  await act(async()=>renderer.update(<ProfileIdentity profile={{...profile,kind:'agent',provider:'codex',name:'Codex'}} ru={false} readOnly/>));
  assert.equal(renderer.root.findAllByProps({'data-codex-mark':true}).length,1);
  await act(async()=>renderer.unmount());

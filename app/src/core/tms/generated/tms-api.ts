@@ -7557,6 +7557,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/me/profile/avatar-character": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Select own Falcon avatar character
+         * @description Own human identity only. Selects one of twenty approved characters and atomically retires the uploaded avatar. If-Match protects concurrent edits. Idempotency-Key replays the same command once. The persisted character remains when a custom photo is subsequently uploaded or removed.
+         */
+        post: operations["selectSelfProfileAvatarCharacter"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/team": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        /**
+         * List visible team members and recorded achievements
+         * @description Requires active workspace membership. Lists active human members and connected Codex employees in the same workspace, ordered by name and identity ID. No private contact fields are exposed. Earned badges reflect recorded achievements; at most three are included. Cursors bind workspace and search. Character fallback IDs are persisted; Codex uses its fixed brand identity.
+         */
+        get: operations["listWorkspaceTeam"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -12622,6 +12670,7 @@ export interface components {
                 expiresAt: string;
             } | null;
             version: number;
+            avatarCharacterId: components["schemas"]["AvatarCharacterId"];
         };
         SelfProfileMediaVersion: {
             version: number;
@@ -13893,6 +13942,56 @@ export interface components {
             role: "workspace_admin" | "qa_manager" | "tester" | "reporter" | "viewer";
             /** @enum {string} */
             status: "active" | "inactive";
+            avatarCharacterId: components["schemas"]["AvatarCharacterId"] | null;
+        };
+        /**
+         * @description Stable Falcon character selection. Public character artwork is distinct from private uploaded profile media.
+         * @enum {string}
+         */
+        AvatarCharacterId: "mika" | "nora" | "ray" | "ada" | "leo" | "lina" | "omar" | "zoe" | "finn" | "maya" | "kai" | "iris" | "hugo" | "vera" | "ivo" | "yuna" | "sam" | "eva" | "elias" | "ayla";
+        SelfAvatarCharacterSelection: {
+            characterId: components["schemas"]["AvatarCharacterId"];
+        };
+        WorkspaceTeamMember: {
+            id: string;
+            name: string;
+            introduction: string;
+            avatar: {
+                /** Format: uri */
+                url: string;
+                /** Format: date-time */
+                expiresAt: string;
+            } | null;
+            avatarCharacterId: components["schemas"]["AvatarCharacterId"] | null;
+            /** @enum {string} */
+            kind: "human" | "agent";
+            /** @enum {string|null} */
+            provider: "codex" | null;
+            /** @enum {string} */
+            role: "workspace_admin" | "qa_manager" | "tester" | "reporter" | "viewer";
+            /** @enum {string} */
+            status: "active" | "inactive";
+            /**
+             * @description Recorded presence when available. Null means unknown, never inferred from active membership.
+             * @enum {string|null}
+             */
+            presence: "online" | "offline" | null;
+            achievements: {
+                earned: number;
+                total: number;
+                remaining: number;
+                items: components["schemas"]["SelfProfileAchievement"][];
+                /** @description The first actually locked achievement in catalogue order; null only when all are earned. */
+                lockedPreview: components["schemas"]["SelfProfileAchievement"] | null;
+            };
+        };
+        WorkspaceTeamPage: {
+            data: components["schemas"]["WorkspaceTeamMember"][];
+            meta: {
+                limit: number;
+                hasMore: boolean;
+                nextCursor: string | null;
+            };
         };
     };
     responses: {
@@ -30319,6 +30418,89 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    selectSelfProfileAvatarCharacter: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SelfAvatarCharacterSelection"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SelfProfileMediaVersion"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listWorkspaceTeam: {
+        parameters: {
+            query?: {
+                search?: string;
+                cursor?: string;
+                limit?: number;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Bounded typed actor page. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "X-Next-Cursor": components["headers"]["XNextCursor"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkspaceTeamPage"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
             500: components["responses"]["InternalError"];
         };
     };

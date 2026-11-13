@@ -13,6 +13,7 @@ export interface SelfProfilePort {
   read(signal: AbortSignal): Promise<SelfProfile>;
   update(profile: SelfProfile, details: SelfProfileDetails, signal: AbortSignal): Promise<SelfProfile>;
   upload(profile: SelfProfile, kind: ProfileMediaKind, file: File, key: string, signal: AbortSignal): Promise<SelfProfile>;
+  chooseCharacter(profile: SelfProfile, characterId: string, key: string, signal: AbortSignal): Promise<SelfProfile>;
   remove(profile: SelfProfile, kind: ProfileMediaKind, signal: AbortSignal): Promise<SelfProfile>;
   achievements(workspaceId: string, signal: AbortSignal): Promise<ProfileAchievements>;
   calendar(workspaceId: string, year: number, signal: AbortSignal): Promise<SelfProfileActivity>;

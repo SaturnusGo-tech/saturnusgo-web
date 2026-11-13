@@ -34,6 +34,9 @@ export const publicAssetPrefixes = Object.freeze([
 ]);
 
 export const requiredPublicAssets = Object.freeze([
+  ...['mika', 'nora', 'ray', 'ada', 'leo', 'lina', 'omar', 'zoe', 'finn', 'maya',
+    'kai', 'iris', 'hugo', 'vera', 'ivo', 'yuna', 'sam', 'eva', 'elias', 'ayla']
+    .map(id => `/falcon/avatars/v2/${id}.webp`),
   "/falcon/startup/company-setup-tiles-20261106.webp",
   ...["individual", "startup", "enterprise"].map(id => `/falcon/billing/${id}.webp`),
   "/falcon/achievements/01-first-scenario.webp",

@@ -7,6 +7,7 @@ import { CustomFieldsPage } from "../../custom-fields/presentation/catalog/Custo
 import { workspaceViewAllowed } from "../../auth/managed/domain/features/workspace-view-access";
 import { WorkspaceNotifications } from "../../notifications/composition/WorkspaceNotifications";
 import { WorkspaceProfile } from "../../profile/composition/WorkspaceProfile";
+import { TeamFeature } from "../../team/composition/TeamFeature";
 import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
 import { companyViewAvailable } from "../../auth/managed/domain/features/company-features";
 import { CompanyFeatureUnavailable } from "../../auth/managed/presentation/permissions/CompanyFeatureUnavailable";
@@ -84,6 +85,8 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
     : <CompanyFeatureUnavailable onReturn={() => navigateWorkspace(settingsSectionLink(window.location.href, "general"))} />);
   if (!companyViewAvailable(model.view === "notifications" ? "config" : model.view, session?.companyCapabilities, codexAvailable)) return <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
   if (model.view === "profile") return session ? <WorkspaceProfile workspaceId={model.data.workspace.id} />
+    : <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
+  if (model.view === "team") return session ? <TeamFeature key={model.data.workspace.id} workspaceId={model.data.workspace.id} workspaceName={model.data.workspace.name} />
     : <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
   if (model.view === "help") return <DocumentationEntry />;
   if (model.view === "config" || model.view === "notifications") {

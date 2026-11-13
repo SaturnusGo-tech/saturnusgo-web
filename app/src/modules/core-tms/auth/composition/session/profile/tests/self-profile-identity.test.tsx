@@ -62,3 +62,16 @@ void test("optional hydration never blocks access, and changing account cannot l
   assert.equal(renderer.root.findByType("div").props["data-name"], "Original");
   await act(async () => renderer.unmount());
 });
+
+void test("a persisted character is rendered in account avatars without treating it as an uploaded photo", async () => {
+  let state!: IdentityState, renderer!: ReactTestRenderer;
+  const value = { ...self, hasAvatar: false, avatar: null, avatarCharacterId: "nora" };
+  const http = client(async () => ({ data: value }));
+  function Probe() { state = useSelfProfileIdentity(http, "pat", fallback); return null; }
+  await act(async () => { renderer = create(<Probe />); });
+  assert.equal(state.profile.hasAvatar, true, "the shell can load a character portrait");
+  assert.match((await state.avatarLoader(new AbortController().signal))!.url, /\/nora\.webp$/);
+  await act(async () => state.updateProfile({ ...value, version: 5 }));
+  assert.equal(state.profile.hasAvatar, true);
+  await act(async () => renderer.unmount());
+});

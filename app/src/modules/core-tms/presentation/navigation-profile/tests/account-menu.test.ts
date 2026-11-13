@@ -55,6 +55,18 @@ test("managed account preserves profile and administration destinations inside t
   assert.ok(all.some(node => node.type === "span" && node.props.children === "QA manager"));
 });
 
+test("My team follows My profile for every signed-in account and closes the menu", () => {
+  for (const kind of ["cloud", "managed", "admin"] as const) {
+    const h = setup({ kind }), all = h.all();
+    const profile = all.findIndex(node => node.type === "ProfileLink");
+    const team = all.findIndex(node => node.type === "TeamLink");
+    assert.ok(team > profile);
+    invoke(all[team], "onClick");
+    assert.equal(h.dismissed(), 1);
+  }
+  assert.equal(setup(null).all().some(node => node.type === "TeamLink"), false);
+});
+
 test("only the active workspace administrator can open billing from the avatar menu", () => {
   const h = setup({ workspaceRole: "workspace_admin" });
   const links = h.all().filter(node => node.type === "BillingLink" || node.type === "BillingPlanLink");

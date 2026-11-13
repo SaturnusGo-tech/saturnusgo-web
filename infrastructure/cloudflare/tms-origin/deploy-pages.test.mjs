@@ -137,6 +137,7 @@ write("out/falcon/favicon.ico", "Falcon favicon");
 for (const id of ["hero-preview", "hero-velvet", "repository-stage", "run-stage", "ai-stage"]) write("out/falcon/landing/2026-10/" + id + ".png", "Figma asset");
 if (process.env.OMIT_LINE_MARK !== "1") write("out/falcon/landing/2026-11/falcon-line-mark.svg", "Falcon line mark");
 for (const path of ${JSON.stringify(requiredPublicAssets.filter(path => path.startsWith("/falcon/achievements/")))}) if (process.env.OMIT_ACHIEVEMENT !== path) write("out" + path, "Approved achievement");
+for (const path of ${JSON.stringify(requiredPublicAssets.filter(path => path.startsWith("/falcon/avatars/v2/")))}) if (process.env.OMIT_AVATAR !== path) write("out" + path, "Approved avatar");
 for (const path of ${JSON.stringify(requiredPublicAssets.filter(path => path.startsWith("/falcon/billing/")))}) if (process.env.OMIT_BILLING !== path) write("out" + path, "Billing artwork");
 for (const path of ${JSON.stringify(requiredPublicAssets.filter(path => path.startsWith("/falcon/startup/")))}) if (process.env.OMIT_STARTUP !== path) write("out" + path, "Company setup artwork");
 for (const id of ["coverage", "agents", "release"]) write("out/falcon/landing/2026-11/concept-" + id + ".webp", "Concept asset");
@@ -350,6 +351,16 @@ test("fails closed before publishing when an approved achievement image is absen
   assert.equal(result.status, 15);
   assert.match(result.stderr, /Required public asset is missing.*40-full-qa-cycle\.webp/);
   assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), before);
+});
+
+test("fails closed before publishing when an approved avatar portrait is absent", (context) => {
+  const fixture = createFixture(context);
+  const before = git(fixture.pages, "rev-parse", "HEAD").stdout.trim();
+  const result = deploy(fixture, "--publish", { OMIT_AVATAR: "/falcon/avatars/v2/mika.webp" });
+  assert.equal(result.status, 15);
+  assert.match(result.stderr, /Required public asset is missing.*avatars\/v2\/mika\.webp/);
+  assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), before);
+  assert.equal(git(fixture.pages, "status", "--porcelain").stdout, "");
 });
 
 test("fails closed before publishing when billing artwork is absent", (context) => {

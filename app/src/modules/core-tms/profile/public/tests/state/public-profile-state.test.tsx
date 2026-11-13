@@ -4,7 +4,7 @@ import React from 'react';
 import { act,create,type ReactTestRenderer } from 'react-test-renderer';
 import { usePublicProfile } from '../../application/usePublicProfile';
 import type { PublicActorProfile,PublicProfilePort } from '../../domain/public-profile';
-const profile:PublicActorProfile={id:'member',name:'Member',kind:'human',provider:null,role:'tester',status:'active',introduction:'QA',bio:'About',avatar:null,banner:null};
+const profile:PublicActorProfile={id:'member',name:'Member',kind:'human',provider:null,role:'tester',status:'active',introduction:'QA',bio:'About',avatar:null,banner:null,avatarCharacterId:'mika'};
 const base={activity:async()=>{throw new Error('unused');},calendar:async()=>{throw new Error('unused');},achievements:async()=>({catalogVersion:1 as const,items:[]})};
 test('switching profile cancels the old request and ignores its stale response',async()=>{
  let state!:ReturnType<typeof usePublicProfile>,renderer!:ReactTestRenderer,resolve!:(v:PublicActorProfile)=>void,signal!:AbortSignal;

@@ -63,6 +63,9 @@ jobs:
       - name: Test private TMS attachments
         run: npm run test:tms-attachments
 
+      - name: Test team and profile avatars
+        run: npm run test:tms-team
+
       - name: Test TMS Auth0 boundary
         run: npm run test:tms-auth
 

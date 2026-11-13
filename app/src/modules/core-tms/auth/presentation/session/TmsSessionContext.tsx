@@ -19,7 +19,7 @@ export interface TmsSessionIdentity {
   readonly companyCapabilities?: readonly string[];
   readonly avatarLoader?: ManagedAvatarLoader;
   readonly avatarVersion?: number;
-  readonly updateProfile?: (profile: { name: string; hasAvatar: boolean; version: number }) => void;
+  readonly updateProfile?: (profile: { name: string; hasAvatar: boolean; version: number; avatarCharacterId?: string | null }) => void;
   readonly signOut: () => Promise<void>;
 }
 

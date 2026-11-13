@@ -20,7 +20,7 @@ export function profileCopy(ru: boolean) {
     error: ru ? "Не удалось сохранить изменения. Попробуйте ещё раз." : "Changes could not be saved. Please try again.",
     conflict: ru ? "Профиль изменён в другом окне. Обновите данные перед сохранением." : "Your profile changed in another window. Reload before saving.",
     imageError: ru ? "Выберите изображение JPG, PNG или WebP до 25 МБ." : "Choose a JPG, PNG or WebP image up to 25 MB.",
-    avatar: ru ? "Изменить фото" : "Change photo", removeAvatar: ru ? "Удалить фото" : "Remove photo",
+    avatar: ru ? "Изменить аватар" : "Change avatar", removeAvatar: ru ? "Удалить фото" : "Remove photo",
     banner: ru ? "Изменить обложку" : "Change cover", removeBanner: ru ? "Вернуть стандартную обложку" : "Restore default cover",
     personal: ru ? "Личное пространство" : "Personal workspace", company: ru ? "Участник команды" : "Team member",
     activity: ru ? "Моя активность" : "My activity", period: ru ? "Период активности" : "Activity period",

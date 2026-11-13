@@ -16,6 +16,10 @@ export function createSelfProfileClient(http: TmsHttpClient): SelfProfilePort {
       await change<SelfProfileMediaVersion>(profile, `${path}/${kind}`, "POST", { imageBase64 }, signal, key);
       return read(signal);
     },
+    chooseCharacter: async (profile, characterId, key, signal) => {
+      await change<SelfProfileMediaVersion>(profile, `${path}/avatar-character`, "POST", { characterId }, signal, key);
+      return read(signal);
+    },
     remove: async (profile, kind, signal) => { await change<SelfProfileMediaVersion>(profile, `${path}/${kind}`, "DELETE", undefined, signal); return read(signal); },
     achievements: async (workspaceId, signal) => (await http.getResource<ProfileAchievements>(`${path}/achievements?${new URLSearchParams({ workspaceId })}`, signal)).data,
     calendar: async (workspaceId, year, signal) => (await http.getResource<SelfProfileActivity>(`${path}/activity?${new URLSearchParams({ workspaceId, year: String(year) })}`, signal)).data,

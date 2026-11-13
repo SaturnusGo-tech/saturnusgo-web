@@ -1,0 +1,10 @@
+.collection { margin-top:25px; }
+.badges { display:flex; align-items:center; gap:12px; }
+.badge { position:relative; width:62px; height:66px; display:grid; place-items:center; flex:none; }
+.badge img { width:62px; height:62px; object-fit:contain; }
+.badge[data-locked] img { filter:grayscale(1) blur(1.3px); opacity:.25; }
+.badge[data-preview] img { filter:grayscale(1) blur(3px); opacity:.2; }
+.badge svg { position:absolute; color:var(--falcon-text-secondary); }
+.collection p { margin:13px 0 0; color:var(--falcon-text-secondary); font-size:12px; line-height:1.6; }
+.collection p span { color:var(--falcon-text-muted); white-space:nowrap; }
+@media(max-width:850px) { .badges { gap:6px; } .badge,.badge img { width:54px; height:58px; } }

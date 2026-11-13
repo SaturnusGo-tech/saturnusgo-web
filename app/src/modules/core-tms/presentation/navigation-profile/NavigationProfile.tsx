@@ -2,7 +2,8 @@ import { ErrorToast } from "../common/error/ErrorToast";
 import { AvatarProfile, BuildingWorkspace, ChatTripleDots, Lifesaver, Logout, Settings } from "@openai/apps-sdk-ui/components/Icon";
 import { useId, useState } from "react";
 import { createPortal } from "react-dom";
-import { CreditCard, Download } from "lucide-react";
+import { CreditCard, Download, UsersRound } from "lucide-react";
+import { TeamLink } from "../../team/presentation/TeamLink";
 import { ProfileLink } from "../../profile/presentation/ProfileLink";
 import { BillingLink } from "../../billing/presentation/link/BillingLink";
 import { BillingPlanLink } from "../../billing/composition/menu/BillingPlanLink";
@@ -54,6 +55,9 @@ export function NavigationProfile({ collapsed, workspaceId, onOpenSettings, onOp
       {session && <ProfileLink role="menuitem" className={css.action} onClick={popup.dismiss}>
         <AvatarProfile width={20} height={20} aria-hidden="true"/><span>{ru ? "Мой профиль" : "My profile"}</span>
       </ProfileLink>}
+      {session && <TeamLink role="menuitem" className={css.action} onClick={popup.dismiss}>
+        <UsersRound size={20} strokeWidth={1.7} aria-hidden="true"/><span>{ru ? "Моя команда" : "My team"}</span>
+      </TeamLink>}
       <button role="menuitem" type="button" className={css.action} data-testid="nav-config" onClick={() => navigate(onOpenSettings)}>
         <Settings width={20} height={20} aria-hidden="true"/><span>{t("nav.config")}</span>
       </button>
