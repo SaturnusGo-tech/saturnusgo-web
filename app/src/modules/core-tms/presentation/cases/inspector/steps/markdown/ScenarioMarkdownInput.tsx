@@ -19,7 +19,7 @@ import { useTextareaEmoji } from "../../../../common/emoji/selection/useTextarea
 
 type Props = {
   id?: string; value: string; label: string; placeholder: string; ru: boolean;
-  autoFocus?: boolean; onChange: (value: string) => void;
+  autoFocus?: boolean; hideEditButton?: boolean; footerOnlyWhileEditing?: boolean; onChange: (value: string) => void;
   onPaste?: ClipboardEventHandler<HTMLTextAreaElement>;
   onDragOver?: DragEventHandler<HTMLDivElement>;
   onDrop?: DragEventHandler<HTMLDivElement>;
@@ -37,6 +37,7 @@ export function ScenarioMarkdownInput(props: Props) {
   }, history.boundary);
   const shell = useRef<HTMLDivElement>(null);
   const editButton = useRef<HTMLButtonElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
   const markerSelection = useRef({ value: "", start: 0, end: 0 });
   const sourceVisible = editing || !props.value;
   const captureWriting = useScenarioWriting(props.value, input, history, preview);
@@ -56,7 +57,7 @@ export function ScenarioMarkdownInput(props: Props) {
   }
   function preview() {
     setEditing(false);
-    requestAnimationFrame(() => editButton.current?.focus({ preventScroll: true }));
+    requestAnimationFrame(() => (props.hideEditButton ? previewRef.current : editButton.current)?.focus({ preventScroll: true }));
   }
   function format(kind: StepFormat) {
     const node = input.current;
@@ -103,14 +104,21 @@ export function ScenarioMarkdownInput(props: Props) {
         if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "b") { event.preventDefault(); format("bold"); }
         if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); preview(); }
       }} />
-    {!sourceVisible && <div className={css.preview} onClick={(event) => {
+    {!sourceVisible && <div ref={previewRef} className={css.preview}
+      role={props.hideEditButton ? "button" : undefined} tabIndex={props.hideEditButton ? 0 : undefined}
+      aria-label={props.hideEditButton ? `${props.ru ? "Изменить" : "Edit"}: ${props.label}` : undefined}
+      onKeyDown={props.hideEditButton ? event => {
+        if ((event.key === "Enter" || event.key === " ") && !(event.target as Element).closest("a, button")) {
+          event.preventDefault(); edit();
+        }
+      } : undefined} onClick={(event) => {
       if (!(event.target as Element).closest("a, button") && !window.getSelection()?.toString()) edit();
     }}>
       <ScenarioMarkdown value={props.value} label={props.label} />
-      <button ref={editButton} id={props.id ? `${props.id}-edit` : undefined} type="button" className={css.edit}
-        aria-label={`${props.ru ? "Изменить" : "Edit"}: ${props.label}`} onClick={edit}><Pencil size={13} /></button>
+      {!props.hideEditButton && <button ref={editButton} id={props.id ? `${props.id}-edit` : undefined} type="button" className={css.edit}
+        aria-label={`${props.ru ? "Изменить" : "Edit"}: ${props.label}`} onClick={edit}><Pencil size={13} /></button>}
     </div>}
-    {props.renderFooter ? props.renderFooter(<EmojiButton locale={props.ru ? "ru" : "en"} onOpen={emoji.remember} onSelect={emoji.insert} onOpenChange={setEmojiOpen} />)
-      : <EmojiButton locale={props.ru ? "ru" : "en"} onOpen={emoji.remember} onSelect={emoji.insert} onOpenChange={setEmojiOpen} />}
+    {(!props.footerOnlyWhileEditing || editing || emojiOpen) && (props.renderFooter ? props.renderFooter(<EmojiButton locale={props.ru ? "ru" : "en"} onOpen={emoji.remember} onSelect={emoji.insert} onOpenChange={setEmojiOpen} />)
+      : <EmojiButton locale={props.ru ? "ru" : "en"} onOpen={emoji.remember} onSelect={emoji.insert} onOpenChange={setEmojiOpen} />)}
   </div>;
 }

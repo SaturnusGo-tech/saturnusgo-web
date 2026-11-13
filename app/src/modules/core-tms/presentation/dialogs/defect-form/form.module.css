@@ -1,7 +1,7 @@
 .panel.panel.panel {
   width: min(1120px, calc(100vw - 80px)); max-width: none;
   color: var(--falcon-text); background: var(--falcon-surface);
-  container: defect-create / inline-size;
+  container-name: defect-create case-inspector; container-type: inline-size;
   --cases-text: var(--falcon-text); --cases-strong: var(--falcon-text);
   --cases-muted: var(--falcon-text-muted); --cases-secondary-text: var(--falcon-text-secondary);
   --cases-hover: var(--falcon-hover); --cases-primary: var(--falcon-action);
@@ -10,14 +10,14 @@
   --tms-focus-border: var(--falcon-text-muted);
   --tms-focus-ring: var(--falcon-border-strong);
 }
-.panel.panel > header { min-height: 66px; padding: 16px 28px; background: var(--falcon-surface); }
-.panel.panel > header h2 { font-size: 17px; font-weight: 600; }
+.panel.panel > header { min-height: 44px; padding: 7px 24px; background: var(--falcon-surface); }
+.panel.panel > header h2 { color: var(--falcon-text-muted); font-size: 13px; font-weight: 500; }
 .panel.panel > header p { color: var(--falcon-text-muted); }
 .closing { pointer-events: none; }
 .form { display: flex; flex: 1; flex-direction: column; min-height: 0; overflow: hidden; font-size: 13px; }
 .panel.panel > .form { padding: 0; overflow: hidden; }
-.body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 26px 28px 36px; scrollbar-gutter: stable; scrollbar-width: thin; }
-.titleField { min-width: 0; margin-bottom: 30px; }
+.body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 24px 24px 34px; scrollbar-gutter: stable; scrollbar-width: thin; }
+.titleField { flex: none; min-width: 0; padding: 12px 24px 16px; }
 .panel .titleShell[data-input-shell] {
   min-width: 0; border: 1px solid var(--falcon-border-strong); border-radius: 12px;
   background: var(--falcon-control); overflow: hidden;
@@ -30,22 +30,13 @@
 .titleInput::placeholder { color: var(--falcon-text-muted); opacity: 1; }
 .panel .titleShell[data-invalid="true"] { border-color: var(--falcon-danger-border); }
 .layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; align-items: start; gap: 28px; min-width: 0; }
-.content { display: flex; flex-direction: column; min-width: 0; gap: 28px; }
-.content > section { min-height: 84px; }
-.content > section > div[data-editing="true"] {
-  min-height: 104px; padding: 12px; border: 1px solid var(--falcon-border-strong);
-  border-radius: 12px; background: var(--falcon-control);
-}
-.content > section > div[data-editing="true"]:focus-within { border-color: var(--falcon-text-muted); }
-.content > section > div[data-invalid="true"] { border-color: var(--falcon-danger-border); }
+.content { min-width: 0; }
+.content > fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
 .content [contenteditable="true"]:is(:focus, :focus-visible) { outline: 0; box-shadow: none; }
 .validation { display: block; margin-top: 6px; color: var(--falcon-danger); font-size: 12px; }
-.actions { display: flex; flex: none; align-items: center; justify-content: flex-end; gap: 8px; padding: 14px 28px; border-top: 1px solid var(--falcon-border-subtle); background: var(--falcon-surface); }
-.actions button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 32px; padding: 6px 12px; border: 0; border-radius: 12px; font: inherit; font-weight: 500; cursor: pointer; white-space: nowrap; }
-.save { color: var(--falcon-on-action); background: var(--falcon-action); }
-.save:hover { background: var(--falcon-action-hover); }
-.cancel { color: var(--falcon-text-secondary); background: transparent; }
-.cancel:hover { color: var(--falcon-text); background: var(--falcon-hover); }
+.panel .actions { flex: none; padding: 8px 24px; }
+.actions button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; white-space: nowrap; }
+.actions button:hover:not(:disabled) { filter: brightness(.96); }
 .actions button:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 3px; }
 .actions button:disabled { opacity: .55; cursor: default; }
 @container defect-create (max-width: 680px) {
@@ -53,7 +44,8 @@
 }
 @media (max-width: 760px) {
   .panel.panel.panel { width: 100%; }
-  .panel.panel > header { padding-inline: 20px; }
-  .body { padding: 22px 20px 30px; }
-  .actions { padding-inline: 20px; }
+  .panel.panel > header { padding-inline: 18px; }
+  .titleField { padding-inline: 18px; }
+  .body { padding: 20px 18px 30px; }
+  .panel .actions { padding-inline: 18px; }
 }

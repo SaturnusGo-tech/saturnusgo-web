@@ -14,6 +14,7 @@
 .toolbar button:focus-visible, .edit:focus-visible { outline: 2px solid var(--falcon-action); outline-offset: 1px; }
 .toolbar .done { margin-left: auto; color: var(--falcon-action); }
 .preview { position: relative; min-height: 26px; padding: 3px 28px 3px 6px; cursor: text; }
+.preview[role="button"]:focus-visible { outline: 1px solid var(--falcon-focus); outline-offset: 2px; border-radius: 8px; }
 .edit { position: absolute; right: 2px; top: 2px; opacity: 0; transition: opacity 160ms ease; }
 .input:hover .edit, .input:focus-within .edit { opacity: 1; }
 .rendered { min-width: 0; color: var(--falcon-text-secondary); overflow-wrap: anywhere; }

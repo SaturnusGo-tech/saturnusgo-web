@@ -3,13 +3,12 @@ import { useScenarioLayout } from "../../../common/scenario/useScenarioLayout";
 import { CaseCustomFields } from "../fields/CaseCustomFields";
 import { FolderPathPicker } from "../placement/FolderPathPicker";
 import type { TestCaseRevision } from "../../../../../../core/tms/contracts/legacy-contract";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import type { TmsLocale } from "../../../../localization/model/locale";
 import { CaseMetadataControls } from "../../detail/metadata/CaseMetadataControls";
 import { InspectorDetails } from "../details/InspectorDetails";
-import { MarkdownField } from "../markdown/MarkdownField";
-import type { CaseInspectorEditor, InspectorSection } from "../model";
-import { InspectorSectionView } from "../section/InspectorSectionView";
+import type { CaseInspectorEditor } from "../model";
+import { CreationNarrativeSection } from "./CreationNarrativeSection";
 import { InspectorSteps } from "../steps/InspectorSteps";
 import css from "../caseInspector.module.css";
 import rail from "../propertyRail.module.css";
@@ -64,27 +63,6 @@ export function CaseCreationSections({
         disabled={editor.submitting} ru={ru} onPatch={patch} documentation={documentation} /></section>
     </aside>
   </div>;
-}
-
-function CreationNarrativeSection({ section, title, value, ru, onChange }: {
-  section: Extract<InspectorSection, "description" | "preconditions">;
-  title: string;
-  value: string;
-  ru: boolean;
-  onChange: (value: string) => void;
-}) {
-  const [editing, setEditing] = useState(false);
-  const snapshot = useRef(value);
-  const emptyLabel = section === "description"
-    ? (ru ? "Описание не указано" : "No description")
-    : (ru ? "Предусловия не указаны" : "No preconditions specified");
-  return <InspectorSectionView title={title} section={section} editing={editing} ru={ru}
-    onEdit={() => { snapshot.current = value; setEditing(true); }}
-    onCancel={() => { onChange(snapshot.current); setEditing(false); }}
-    onSave={() => setEditing(false)}>
-    <MarkdownField appearance="plain" onRequestEdit={() => { snapshot.current = value; setEditing(true); }} attachmentKey={section} value={value} label={title}
-      autoFocus={editing} onChange={editing ? onChange : undefined} emptyLabel={emptyLabel} />
-  </InspectorSectionView>;
 }
 
 function CreationSection({ title, children, headingActions }: { title: string; children: React.ReactNode; headingActions?: React.ReactNode }) {

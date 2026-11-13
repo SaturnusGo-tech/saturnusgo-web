@@ -13,6 +13,7 @@ const layoutStyles = readFileSync(new URL("../../cases.module.css", import.meta.
 const listingStyles = readFileSync(new URL("../../listing/caseListing.module.css", import.meta.url), "utf8");
 const content = readFileSync(new URL("../CaseInspectorContent.tsx", import.meta.url), "utf8");
 const creation = readFileSync(new URL("../creation/CaseCreationSections.tsx", import.meta.url), "utf8");
+const creationNarrative = readFileSync(new URL("../creation/CreationNarrativeSection.tsx", import.meta.url), "utf8");
 const detailPanel = readFileSync(new URL("../../detail/CaseDetailPanel.tsx", import.meta.url), "utf8");
 const details = readFileSync(new URL("../details/InspectorDetails.tsx", import.meta.url), "utf8");
 const section = readFileSync(new URL("../section/InspectorSectionView.tsx", import.meta.url), "utf8");
@@ -171,7 +172,7 @@ test("create mode shares the same calm two-column hierarchy and stable action ba
   assert.match(creation, /<aside className=\{[^\n]*rail\.sideRail[\s\S]*Расположение[\s\S]*Свойства[\s\S]*<InspectorDetails/);
   assert.doesNotMatch(creation, /number=|creationTone_|<details/);
   assert.match(creation, /CreationNarrativeSection[\s\S]*section="description"/);
-  assert.match(creation, /onChange=\{editing \? onChange : undefined\}/);
+  assert.match(creationNarrative, /onChange=\{editing && !disabled \? onChange : undefined\}/);
   assert.match(creation, /<InspectorSteps revision=\{revision\} editing/);
   assert.ok(detailPanel.lastIndexOf("</form>") < detailPanel.lastIndexOf("{creating && editorActions}"));
   assert.match(detailPanel, /!creating && editorActions/);

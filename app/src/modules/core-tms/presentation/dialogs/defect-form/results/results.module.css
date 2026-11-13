@@ -1,0 +1,2 @@
+.error { display: block; margin-block: 6px; color: var(--falcon-danger); font-size: 12px; line-height: 1.5; }
+.results .expected { margin-top: 24px; }
