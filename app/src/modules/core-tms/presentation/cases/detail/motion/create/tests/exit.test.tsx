@@ -13,7 +13,7 @@ function fixture() {
     let finish!: () => void; const finished = new Promise<void>(resolve => { finish = resolve; });
     const call = { frames, finish, cancelled: false, cancel() { call.cancelled = true; finish(); } }; calls.push(call); return { ...call, finished };
   } };
-  let exit!: (close: () => void) => void;
+  let exit!: (close: () => void) => void | Promise<void>;
   function Probe({ creating = true }: { creating?: boolean }) { exit = useCasePanelExit({ current: element as unknown as HTMLElement }, creating); return null; }
   return { Probe, element, calls, listeners, preference, exit: (cb: () => void) => exit(cb), restore() {
     for (const [key, descriptor] of [["window", originalWindow], ["getComputedStyle", originalStyle]] as const) {
@@ -37,7 +37,7 @@ test("dismissal replaces the draft before releasing the final hidden frame", asy
   const f = fixture(); let renderer!: ReactTestRenderer, cancelledAtCommit = true;
   try {
     act(() => { renderer = create(<f.Probe/>); });
-    act(() => f.exit(() => { cancelledAtCommit = f.calls[0].cancelled; }));
+    act(() => { f.exit(() => { cancelledAtCommit = f.calls[0].cancelled; }); });
     await act(async () => { f.calls[0].finish(); });
     assert.equal(cancelledAtCommit, false, "the filled exit must still hide the live draft while React commits its replacement");
     assert.equal(f.calls[0].cancelled, true); act(() => renderer.unmount());
@@ -46,7 +46,7 @@ test("dismissal replaces the draft before releasing the final hidden frame", asy
 test("unmount cancels exit without closing a different screen", async () => {
   const f = fixture(); let renderer!: ReactTestRenderer, closed = 0;
   try {
-    act(() => { renderer = create(<f.Probe/>); }); act(() => f.exit(() => closed++));
+    act(() => { renderer = create(<f.Probe/>); }); act(() => { f.exit(() => closed++); });
     await act(async () => { renderer.unmount(); });
     assert.equal(closed, 0); assert.equal(f.calls[0].cancelled, true); assert.equal(f.element.inert, false);
   } finally { f.restore(); }
@@ -55,11 +55,26 @@ test("reduced motion or disabled animation closes immediately; preference change
   const f = fixture(); let renderer!: ReactTestRenderer, closed = 0;
   try {
     f.preference.matches = true; act(() => { renderer = create(<f.Probe/>); });
-    act(() => f.exit(() => closed++)); assert.equal(closed, 1); assert.equal(f.calls.length, 0);
+    act(() => { f.exit(() => closed++); }); assert.equal(closed, 1); assert.equal(f.calls.length, 0);
     f.preference.matches = false; act(() => renderer.update(<f.Probe creating={false}/>));
-    act(() => f.exit(() => closed++)); assert.equal(closed, 2); assert.equal(f.calls.length, 0);
-    act(() => renderer.update(<f.Probe/>)); act(() => f.exit(() => closed++));
+    act(() => { f.exit(() => closed++); }); assert.equal(closed, 2); assert.equal(f.calls.length, 0);
+    act(() => renderer.update(<f.Probe/>)); act(() => { f.exit(() => closed++); });
     await act(async () => { f.preference.matches = true; f.listeners.forEach(cb => cb()); });
     assert.equal(closed, 3); assert.equal(f.element.inert, false); act(() => renderer.unmount());
   } finally { f.restore(); }
+});
+
+
+test("exit completion settles after animation or cancellation so navigation cannot remain locked", async () => {
+  for (const unmount of [false, true]) {
+    const f = fixture(); let renderer!: ReactTestRenderer, settled = false, closed = 0;
+    try {
+      act(() => { renderer = create(<f.Probe/>); });
+      const completion = Promise.resolve(f.exit(() => { closed++; })).then(() => { settled = true; });
+      await Promise.resolve(); assert.equal(settled, false);
+      await act(async () => { if (unmount) renderer.unmount(); else f.calls[0].finish(); });
+      await completion; assert.equal(settled, true); assert.equal(closed, unmount ? 0 : 1);
+      if (!unmount) act(() => renderer.unmount());
+    } finally { f.restore(); }
+  }
 });

@@ -1,3 +1,5 @@
+import { requestAuthoringLeave } from "../../../authoring/leave/application/authoring-leave";
+import { leaveCaseInspector } from "./leaveCaseInspector";
 import { fieldFilterCount } from "../model/fields/case-field-filters";
 import { useWorkspacePeople } from "../../../workspace/members/context/WorkspacePeopleContext";
 import { useMemberDirectory } from "../../../workspace/members/state/directory/useMemberDirectory";
@@ -131,10 +133,13 @@ export function useCasesViewController(
       : { key, direction: key === "priority" ? "desc" : "asc" });
   }
   function selectRow(row: CaseListRow) {
-    if (props.editor) return;
-    if (row.folderPath !== props.selectedFolder || (row.testCase.folderId ?? "") !== (props.selectedFolderId ?? "")) props.onSelectFolder(row.folderPath, row.testCase.folderId ?? undefined);
-    props.onSelectCase(row.testCase.id);
-    setDetailOpen(true);
+    if (props.editor?.submitting) return;
+    void requestAuthoringLeave(() => {
+      props.editor?.onCancel();
+      if (row.folderPath !== props.selectedFolder || (row.testCase.folderId ?? "") !== (props.selectedFolderId ?? "")) props.onSelectFolder(row.folderPath, row.testCase.folderId ?? undefined);
+      props.onSelectCase(row.testCase.id);
+      setDetailOpen(true);
+    });
   }
   function createCase(folderPath?: string) {
     const path = folderPath ?? props.selectedFolder;
@@ -149,12 +154,9 @@ export function useCasesViewController(
     setDetailFullscreen(false);
     props.onNew(path || "/");
   }
-  function closeInspector() {
-    const restorePrevious = props.editor?.mode === "create" && Boolean(props.selectedCaseId);
-    props.editor?.onCancel();
-    if (!restorePrevious) props.onSelectCase("");
-    setDetailFullscreen(false);
-    setDetailOpen(restorePrevious);
+  function closeInspector(animate?: (leave: () => void) => void) {
+    void leaveCaseInspector({ editor: props.editor, selectedCaseId: props.selectedCaseId,
+      onSelectCase: props.onSelectCase, setDetailFullscreen, setDetailOpen, animate });
   }
   function toggleSelectionMode() {
     setSelectionMode((current) => {

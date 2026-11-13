@@ -53,7 +53,11 @@ export function browserHarness(transition = (update: () => void) => update()) {
     onNew: () => calls.push("new"), onNewFolder() {},
   } as unknown as CasesViewProps;
   const bulk = h.load<{ useCaseBulkSelection: typeof useCaseBulkSelection }>(new URL("../../bulk/selection-hook/useCaseBulkSelection.ts", import.meta.url), () => selection);
+  const requestAuthoringLeave = async (action: (commit: (update: () => void) => void) => unknown) => { await action(update => update()); return true; };
+  const inspector = h.load<{ leaveCaseInspector: typeof import("../../view/leaveCaseInspector").leaveCaseInspector }>(new URL("../../view/leaveCaseInspector.ts", import.meta.url), () => ({ requestAuthoringLeave }));
   const controller = h.load<{ useCasesViewController: typeof useCasesViewController }>(new URL("../../view/useCasesViewController.ts", import.meta.url), (name) => {
+    if (name.endsWith("authoring-leave")) return { requestAuthoringLeave };
+    if (name.endsWith("leaveCaseInspector")) return inspector;
     if (name.endsWith("content-transition")) return { transitionContent: transition };
     if (name.endsWith("WorkspacePeopleContext")) return { useWorkspacePeople: () => ({ workspaceId: "w", offline: true }) };
     if (name.endsWith("useMemberDirectory")) return { useMemberDirectory: () => ({ members: new Map(), items: [], loading: false, error: false }) };

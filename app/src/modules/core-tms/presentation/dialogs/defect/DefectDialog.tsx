@@ -1,3 +1,4 @@
+import { useFormLeave } from "../../../authoring/leave/state/value/useFormLeave";
 import { DefectForm } from "../defect-form/DefectForm";
 import { useEffect, useState, type FormEvent } from "react";
 import type { Defect, RunItem, TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
@@ -64,6 +65,7 @@ export function DefectDialog({ workspaceId, projectId, run, item, sourceCase, co
   const [reproducibility, setReproducibility] = useState("Always");
   const [component, setComponent] = useState(componentOptions[0] ?? fallbackComponent);
   const [integrationChoice, setIntegrationChoice] = useState<DefectIntegrationChoice>("");
+  const [editedRoute, setEditedRoute] = useState<{ initial: string; value: string } | null>(null);
   const { configurationVersion, enabled, options: youTrackOptions, status: youTrackStatus } = youTrack;
   useEffect(() => {
     if (configurationVersion !== 1 || !enabled || integrationChoice) return;
@@ -85,6 +87,15 @@ export function DefectDialog({ workspaceId, projectId, run, item, sourceCase, co
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [operationKey] = useState(() => crypto.randomUUID());
+  const value = { title, description, preconditions, testData, actualResult: actual, expectedResult: expected,
+    component, severity, priority, reproducibility, assigneeIdentityId, link };
+  const leave = useFormLeave(value, { busy: submitting,
+    revision: [editedRoute?.value, files.map(file => [file.name, file.size, file.type, file.lastModified])],
+    extraDirty: files.length > 0 || Boolean(editedRoute && editedRoute.initial !== editedRoute.value) });
+  const changeRoute = (next: DefectIntegrationChoice) => {
+    setEditedRoute(current => ({ initial: current?.initial ?? integrationChoice, value: next }));
+    setIntegrationChoice(next);
+  };
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (submitting) return;
@@ -115,6 +126,7 @@ export function DefectDialog({ workspaceId, projectId, run, item, sourceCase, co
     };
     try {
       const created = await createDefect({ http, attachments, projectId, payload, files, operationKey, link, offline, locale });
+      leave.release();
       dismiss(() => onCreated(created));
     } catch (caught) {
       setError(describeDefectCreateError(caught, copy.error, locale));
@@ -123,8 +135,7 @@ export function DefectDialog({ workspaceId, projectId, run, item, sourceCase, co
   }
   return <DefectForm workspaceId={workspaceId} offline={offline}
     context={item ? `${item.caseKey} · ${run?.name} · ${run?.environment.name}` : sourceCase ? `${sourceCase.testCase.key} · ${sourceCase.revision.title}` : undefined}
-    value={{ title, description, preconditions, testData, actualResult: actual, expectedResult: expected, component, severity, priority,
-      reproducibility, assigneeIdentityId, link }}
+    value={value}
     onChange={patch => {
       if (patch.title !== undefined) setTitle(patch.title);
       if (patch.description !== undefined) setDescription(patch.description);
@@ -140,9 +151,9 @@ export function DefectDialog({ workspaceId, projectId, run, item, sourceCase, co
       if (patch.link !== undefined) setLink(patch.link);
     }}
     components={localizedComponentOptions}
-    routing={{ value: integrationChoice, onChange: setIntegrationChoice, options: routeOptions,
+    routing={{ value: integrationChoice, onChange: changeRoute, options: routeOptions,
       disabled: offline || youTrackStatus !== "ready", resolved: routing.resolved, message: routingMessage }}
     files={files} onFilesChange={setFiles} submitting={submitting} error={error}
     closing={closing} panelRef={panelRef} onSubmit={submit}
-    onClose={() => { if (!submitting) dismiss(onClose); }} />;
+    onClose={() => { if (!submitting) void leave.close(() => dismiss(onClose)); }} />;
 }

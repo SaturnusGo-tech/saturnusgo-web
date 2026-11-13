@@ -6,16 +6,19 @@ export function useDrawerDismiss() {
   const animations = useRef<Animation[]>([]);
   const [closing, setClosing] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const pending = useRef(false);
+  const pending = useRef<Promise<void> | null>(null);
+  const settle = useRef<(() => void) | undefined>(undefined);
   useEffect(() => () => {
-    clearTimeout(timer.current);
+    clearTimeout(timer.current); settle.current?.();
     animations.current.forEach(animation => animation.cancel());
   }, []);
   function dismiss(done: () => void) {
-    if (pending.current) return;
-    pending.current = true;
+    if (pending.current) return pending.current;
+    const promise = new Promise<void>(resolve => { settle.current = resolve; });
+    pending.current = promise;
+    const finish = () => { try { done(); } finally { settle.current?.(); } };
     const panel = panelRef.current;
-    if (!panel || window.matchMedia("(prefers-reduced-motion: reduce)").matches) { done(); return; }
+    if (!panel || window.matchMedia("(prefers-reduced-motion: reduce)").matches) { finish(); return promise; }
     const transform = getComputedStyle(panel).transform;
     const backdrop = panel.parentElement;
     panel.inert = true;
@@ -29,7 +32,8 @@ export function useDrawerDismiss() {
         { duration: 240, easing: "ease-in", fill: "forwards" }));
     }
     setClosing(true);
-    timer.current = setTimeout(done, 240);
+    timer.current = setTimeout(finish, 240);
+    return promise;
   }
   return { closing, dismiss, panelRef };
 }

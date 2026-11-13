@@ -1,3 +1,4 @@
+import { useFormLeave } from "../../../../authoring/leave/state/value/useFormLeave";
 import { ErrorToast } from "../../../common/error/ErrorToast";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { Environment } from "../../../../../../core/tms/contracts/legacy-contract";
@@ -17,12 +18,15 @@ export function EnvironmentEditor({ projectId, environment, offline, onClose, on
   const [loading, setLoading] = useState(Boolean(environment && !offline));
   const [pending, setPending] = useState(false); const [error, setError] = useState(false);
   const [operationKey] = useState(() => crypto.randomUUID());
+  const leave = useFormLeave(draft, { busy: pending });
+  const close = () => { if (!pending) void leave.close(onClose); };
   useEffect(() => {
     if (!environment || offline) return;
     let current = true;
     void readEnvironmentForEdit(http, environment.id).then(result => {
       if (!current) return;
-      setResource(result); setDraft({ name: result.data.name, key: result.data.key, baseUrl: result.data.baseUrl, description: result.data.description ?? "" });
+      const fresh = { name: result.data.name, key: result.data.key, baseUrl: result.data.baseUrl, description: result.data.description ?? "" };
+      leave.reset(fresh); setResource(result); setDraft(fresh);
     }).catch(() => { if (current) setError(true); }).finally(() => { if (current) setLoading(false); });
     return () => { current = false; };
   }, [environment?.id, http, offline]);
@@ -34,7 +38,7 @@ export function EnvironmentEditor({ projectId, environment, offline, onClose, on
       const result = environment && resource
         ? (await updateEnvironment({ http, environment: resource.data, etag: resource.etag, ...draft, offline, operationKey })).data
         : await createEnvironment({ http, projectId, ...draft, offline, operationKey });
-      onSaved(result);
+      leave.release(); onSaved(result);
     } catch { setError(true); }
     finally { setPending(false); onBusy(false); }
   }
@@ -48,7 +52,7 @@ export function EnvironmentEditor({ projectId, environment, offline, onClose, on
     <div className={css.editorFields}>{field("name", copy.name, copy.namePlaceholder)}{field("key", copy.key, "STAGING")}{field("baseUrl", copy.baseUrl, "https://staging.example.com", "url")}</div>
     <div className={css.editorBottom}><label><span>{copy.description}</span><input value={draft.description} disabled={loading || pending}
       placeholder={copy.descriptionPlaceholder} onChange={event => setDraft(current => ({ ...current, description: event.target.value }))} /></label>
-      <div className={css.actions}><button type="button" onClick={onClose} disabled={pending}>{copy.cancel}</button>
+      <div className={css.actions}><button type="button" onClick={close} disabled={pending}>{copy.cancel}</button>
         <button className={css.save} disabled={loading || pending || Boolean(environment && !resource) || !draft.name.trim() || !draft.key.trim() || !draft.baseUrl.trim()}>
           {pending ? copy.creating : locale === "ru" ? "Сохранить" : "Save"}</button></div></div>
     <ErrorToast message={error ? copy.error : null} />

@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import type { useWorkspaceState } from "../../state/workspace/useWorkspaceState";
 import { navigateWorkspace } from "../../state/navigation/browser/workspace-history";
 import type { FolderResource } from "../model/folder";
+import { requestAuthoringLeave } from "../../authoring/leave/application/authoring-leave";
 
 export function useFolderNavigation(state: ReturnType<typeof useWorkspaceState>, resource: FolderResource) {
   useEffect(() => {
@@ -27,8 +28,9 @@ export function useFolderNavigation(state: ReturnType<typeof useWorkspaceState>,
     restore(); window.addEventListener("popstate", restore);
     return () => window.removeEventListener("popstate", restore);
   }, [state.projectId, state.view, resource.items, resource.loading]);
-  return (path: string, knownFolderId?: string) => {
-    if (state.dialog === "case") return;
+  return (path: string, knownFolderId?: string) => { void requestAuthoringLeave(() => {
+    if (state.isCaseSubmitting()) return;
+    if (state.dialog === "case") state.resetCaseEditor();
     const url = new URL(window.location.href);
     if (!isProjectCaseContext(url.href, state.projectId)) url.searchParams.set("view", "cases");
     url.searchParams.delete("caseId");
@@ -39,5 +41,5 @@ export function useFolderNavigation(state: ReturnType<typeof useWorkspaceState>,
     navigateWorkspace(url.href);
     state.setSelectedFolderId(knownFolderId ?? folder?.id ?? (path === "/" ? "root" : ""));
     state.setSelectedFolder(path); state.setSelectedCaseId("");
-  };
+  }); };
 }

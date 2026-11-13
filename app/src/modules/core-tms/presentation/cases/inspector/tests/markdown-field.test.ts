@@ -163,7 +163,7 @@ test("scenario editing keeps one compact field per action and preserves Markdown
 
 test("a handled select Escape cannot close its containing modal", () => {
   assert.equal(select.match(/event\.stopPropagation\(\)/g)?.length, 2);
-  assert.match(modal, /if \(event\.defaultPrevented\) return/);
+  assert.match(modal, /if \(event\.defaultPrevented \|\| authoringLeave\.isPending\(\)\) return/);
 });
 
 test("create mode shares the same calm two-column hierarchy and stable action bar", () => {

@@ -1,3 +1,4 @@
+import { useFormLeave } from "../../../authoring/leave/state/value/useFormLeave";
 import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { Button, Drawer, DrawerContent, DrawerHeader, Input, Textarea } from "@heroui/react";
@@ -21,6 +22,9 @@ export function RunEditDialog({ run, workspaceId, onClose, onSaved }: {
   const ru = locale === "ru";
   const { closing, dismiss, panelRef } = useDrawerDismiss();
   const state = useRunEditor(run.id, run.projectId, ru);
+  const leave = useFormLeave(null, { extraDirty: state.draftDirty || state.uncertain, busy: state.busy || state.platformBuilds.uploading,
+    revision: [state.draft, Object.entries(state.platformBuilds.drafts ?? {}).map(([id, draft]) => [id, draft.androidVersion, draft.iosReference,
+      draft.artifact?.id, draft.file && [draft.file.name, draft.file.size, draft.file.type, draft.file.lastModified]])] });
   const [confirm, setConfirm] = useState<"close" | "reload" | null>(null);
   const [chosenOwner, setChosenOwner] = useState<{ identityId: string; displayName: string } | null>(null);
   const ownerId = state.draft.ownerIdentityId;
@@ -32,9 +36,9 @@ export function RunEditDialog({ run, workspaceId, onClose, onSaved }: {
   } : null;
   const close = () => dismiss(onClose);
   const ask = (action: "close" | "reload") => {
-    if (state.busy || closing) return;
+    if (state.busy || state.platformBuilds.uploading || closing) return;
+    if (action === "close") { void leave.close(close); return; }
     if (state.draftDirty || state.uncertain) setConfirm(action);
-    else if (action === "close") close();
     else void state.reload();
   };
   const canSave = state.phase === "ready" && state.editable && !state.busy && !state.conflict
@@ -58,7 +62,7 @@ export function RunEditDialog({ run, workspaceId, onClose, onSaved }: {
         event.preventDefault();
         if (!canSave) return;
         const updated = await state.save();
-        if (updated) dismiss(() => onSaved(updated));
+        if (updated) { leave.release(); dismiss(() => onSaved(updated)); }
       }}>
         <div className={css.content} aria-busy={state.phase === "loading" || state.busy}>
           {state.phase === "loading" && <div className={css.loading} role="status"><LoadingOrb />{ru ? "Загружаем настройки…" : "Loading settings…"}</div>}

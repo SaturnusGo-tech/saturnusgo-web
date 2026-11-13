@@ -51,8 +51,9 @@ void test("reader Slack catalog enables mention notifications while core-only co
     const { componentHarness, nodes } = await import("../../../portfolios/tests/support/component-harness");
     const h = componentHarness();
     const { CommentComposer } = h.load<{ CommentComposer: (props: never) => unknown }>(new URL("../../../presentation/cases/collaboration/composer/CommentComposer.tsx", import.meta.url), name => {
+      if (name.endsWith("useFormLeave")) return { useFormLeave: () => ({ release() {}, close: (action: () => void) => action() }) };
       if (name.endsWith("WorkspaceConnectorContext")) return { useWorkspaceConnectors: () => current };
-      if (name.endsWith("useCommentAttachments")) return { useCommentAttachments: () => ({ references: [], blocked: false }) };
+      if (name.endsWith("useCommentAttachments")) return { useCommentAttachments: () => ({ references: [], entries: [], blocked: false }) };
       if (name.endsWith("comment-attachments")) return { readCommentAttachments: () => ({ text: "Hello", attachments: [] }), writeCommentAttachments: (body: string) => body };
     });
     let submitted: { notifyChannels?: string[] } | undefined;

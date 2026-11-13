@@ -30,6 +30,8 @@ import { transitionContent } from "./motion/transition/content-transition";
 import { usePageAppearance } from "./motion/usePageAppearance";
 import appearance from "./appearance/glass.module.css";
 import { WorkspaceUiProvider } from "./ui/WorkspaceUiProvider";
+import { AuthoringLeaveHost } from "../../authoring/leave/presentation/AuthoringLeaveHost";
+import { requestAuthoringLeave } from "../../authoring/leave/application/authoring-leave";
 
 const glassEnabled = process.env.NEXT_PUBLIC_FALCON_GLASS_EXPERIMENT !== "false";
 
@@ -59,7 +61,7 @@ export function LocalizedWorkspace() {
 
   function toggleSidebar() { changeSidebar(!sidebarCollapsed); }
 
-  function changeView(next: typeof model.view) { transitionContent(() => selectView(next)); }
+  function changeView(next: typeof model.view) { void requestAuthoringLeave(commit => transitionContent(() => commit(() => selectView(next)))); }
 
   function selectView(next: typeof model.view) {
     if (next === "cases" && model.dialog !== "case") model.setSelectedCaseId("");
@@ -76,6 +78,7 @@ export function LocalizedWorkspace() {
 
   return (
     <WorkspaceUiProvider locale={languageTag} notice={model.notice}>
+    <AuthoringLeaveHost />
     <FolderAppearanceProvider resource={model.folders} workspaceId={model.data.workspace.id} projectId={model.project?.id}><WorkspacePeopleProvider workspaceId={model.data.workspace.id} offline={model.connection !== "connected"}>
     <WorkspaceConnectorProvider workspaceId={model.data.workspace.id} projectId={model.project?.id ?? ""} active={model.connection === "connected" && !!model.project && model.data.meta.authorization.capabilities.includes("integration:read")}>
     <div

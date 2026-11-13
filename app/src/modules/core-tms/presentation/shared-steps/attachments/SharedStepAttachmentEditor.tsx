@@ -1,6 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
+import { useId, useMemo, useRef } from "react";
+import { useAuthoringSession } from "../../../authoring/leave/state/useAuthoringSession";
+import { requestAuthoringLeave } from "../../../authoring/leave/application/authoring-leave";
 import type { SharedStep, SharedStepDraft } from "../../../shared-steps/model/shared-step";
 import type { useSharedSteps } from "../../../shared-steps/state/useSharedSteps";
 import { useSharedStepAssetSave } from "../../../shared-steps/state/attachments/useSharedStepAssetSave";
@@ -17,12 +19,18 @@ export function SharedStepAttachmentEditor({ draft, current, resource, ru, folde
   onClose: () => void;
 }) {
   const assets = useSharedStepAssetSave(resource, ru);
+  const id = useId();
+  const baseline = useRef(JSON.stringify(draft));
+  const authoring = useAuthoringSession({ id: `shared-step-editor:${id}`,
+    dirty: JSON.stringify(draft) !== baseline.current || assets.entries.length > 0 || assets.locked, busy: assets.saving,
+    revision: JSON.stringify([draft, assets.entries.map(file => file.id), assets.locked]) });
+  const close = () => { if (!assets.saving) void requestAuthoringLeave(onClose); };
   const validStepIds = useMemo(() => new Set(draft.items.map(({ id }) => id)), [draft.items]);
   return <CaseAttachmentDraftProvider locale={ru ? "ru" : "en"}
     enabled={resource.attachmentsEnabled && !assets.saving && !assets.locked}
     entries={assets.entries} validStepIds={validStepIds} onEntries={assets.setEntries}>
-    <SharedStepEditor draft={draft} folders={folders} currentPath={current?.folderPath} ru={ru} onChange={onChange} onCancel={onClose}
+    <SharedStepEditor draft={draft} folders={folders} currentPath={current?.folderPath} ru={ru} onChange={onChange} onCancel={close}
       saving={assets.saving} locked={assets.locked} error={assets.error}
-      onSave={() => void assets.save(draft, current).then((saved) => { if (saved) onClose(); })} />
+      onSave={() => assets.save(draft, current).then((saved) => { if (saved) { authoring.release(); onClose(); } })} />
   </CaseAttachmentDraftProvider>;
 }

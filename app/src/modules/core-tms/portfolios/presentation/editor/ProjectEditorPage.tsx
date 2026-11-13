@@ -1,3 +1,4 @@
+import { requestAuthoringLeave } from "../../../authoring/leave/application/authoring-leave";
 import { PortfolioIcon } from "../icon/PortfolioIcon";
 import { OrganizationExtras } from "../../management/presentation/extras/OrganizationExtras";
 import { WorkflowSelect } from "../../management/presentation/WorkflowSelect";
@@ -47,7 +48,7 @@ export function ProjectEditorPage({ actionsTargetId, workspaceId, canReadAttachm
       <div className={css.titleField}><label className={styles.srOnly} htmlFor="project-title">{copy.projectName}</label>
         <input id="project-title" autoFocus required data-field="name" aria-invalid={attempted && Boolean(errors.name)} aria-describedby={attempted && errors.name ? `${formId}-name-error` : undefined} maxLength={120} disabled={form.pending} value={form.name}
           onChange={(event) => form.updateName(event.target.value)} placeholder={copy.projectName} data-testid="project-name" />{attempted && errors.name && <span id={`${formId}-name-error`} className={css.limit} role="alert">{errors.name}</span>}</div>
-      <EditorActions targetId={actionsTargetId} formId={formId} pending={form.pending} saveLabel={current ? copy.save : copy.newProject} cancelLabel={copy.cancel} onCancel={onCancel} />
+      <EditorActions targetId={actionsTargetId} formId={formId} pending={form.pending} saveLabel={current ? copy.save : copy.newProject} cancelLabel={copy.cancel} onCancel={() => { if (!form.pending) void requestAuthoringLeave(onCancel); }} />
     </header>
     <div className={styles.tabs}><span className={css.activeTab}>{copy.overview}</span></div>
     <div className={css.editorBody}><main className={css.mainFields}>

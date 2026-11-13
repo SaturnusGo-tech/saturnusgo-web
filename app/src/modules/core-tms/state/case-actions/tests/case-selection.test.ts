@@ -1,3 +1,5 @@
+import { commitCaseToWorkspace } from "../reconciliation/commit-case";
+import { requestAuthoringLeave } from "../../../authoring/leave/application/authoring-leave";
 import assert from "node:assert/strict";
 import test from "node:test";
 import { TmsApiError } from "../../../../../core/tms/transport/http";
@@ -45,12 +47,14 @@ function setup(saveError?: TmsApiError, link?: (path: string, method: string, bo
     if (name.endsWith("case-requirements-events")) return {notifyCaseRequirementsChanged};
   });
   const actions = h.load<{ useCaseActions: typeof useCaseActions }>(new URL("../useCaseActions.ts", import.meta.url), name => {
+    if (name.endsWith("authoring-leave")) return { requestAuthoringLeave };
     if (name.endsWith("TmsHttpClientContext")) return { useTmsHttpClient: () => ({ mutate: link, getResource: read }) };
     if (name.endsWith("AttachmentClientProvider")) return { useAttachmentClient: () => ({}) };
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en", t: (key: string) => key }) };
     if (name.endsWith("caseRevision")) return { createEmptyRevision, normalizeRevisionTags };
     if (name.endsWith("mutation-failure")) return mutationFailure;
     if (name.endsWith("pending-operation")) return { resolvePendingOperation };
+    if (name.endsWith("commit-case")) return { commitCaseToWorkspace };
     if (name.endsWith("case-maintenance")) return { reconcileMaintenance };
     if (name.endsWith("pendingCaseAttachment")) return pendingCaseAttachment;
     if (name.endsWith("saveCaseWithAttachments")) return { saveCaseWithAttachments };
@@ -92,13 +96,16 @@ test("a lost document link response resumes against the existing case and also a
   f.render().state.setCaseDraft({ ...createEmptyRevision(), title: "Coverage",
     description: "[Rule](https://tms.example/work/?workspaceId=workspace&projectId=project&view=product-docs&docId=pasted)" });
   f.render().actions.setCaseDocumentation([first, {docId: "doc-two", sectionId: "policy", title: "Payments", sectionTitle: "Policy"}]);
-  const submit = () => f.render().actions.saveCase({preventDefault() {}} as never);
+  let released = 0;
+  const submit = () => f.render().actions.saveCase({preventDefault() {}} as never, [], undefined, () => { released++; });
   await submit();
   assert.equal(f.selection().dialog, "case");
   assert.equal(f.render().actions.caseDocumentationRetry, true);
+  assert.equal(released, 0, "an incomplete save retains unsaved protection");
   f.render().actions.setCaseDocumentation([first]);
   await submit();
   assert.equal(f.writes(), 1);
+  assert.equal(released, 1, "only a fully saved case releases its authoring session");
   assert.equal(f.selection().dialog, null);
   const path = "/workspaces/workspace/projects/project/product-docs/cases/case-created/requirements";
   assert.deepEqual(requests, [

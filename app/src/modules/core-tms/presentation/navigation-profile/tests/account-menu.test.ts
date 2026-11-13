@@ -4,6 +4,7 @@ import type { NavigationProfile } from "../NavigationProfile";
 import type { TmsSessionIdentity } from "../../../auth/presentation/session/TmsSessionContext";
 import { memberRoleLabel } from "../../../company-administration/presentation/permissions/member-role-label";
 import { componentHarness, invoke, nodes } from "../../../portfolios/tests/support/component-harness";
+import * as leave from "../../../authoring/leave/application/authoring-leave";
 
 function setup(session: Partial<TmsSessionIdentity> | null = {}, downloadsAvailable = true, locale: "en" | "ru" = "en") {
   let dismissed = 0, closed = 0, settings = 0, help = 0;
@@ -14,6 +15,7 @@ function setup(session: Partial<TmsSessionIdentity> | null = {}, downloadsAvaila
     close() { closed++; }, dismiss() { dismissed++; }, triggerKeyDown() {}, panelKeyDown() {} };
   const { NavigationProfile: render } = h.load<{ NavigationProfile: typeof NavigationProfile }>(new URL("../NavigationProfile.tsx", import.meta.url), name => {
     if (name === "react-dom") return { createPortal: (value: unknown) => value };
+    if (name.endsWith("authoring-leave")) return leave;
     if (name.endsWith("TmsSessionContext")) return { useOptionalTmsSession: () => identity };
     if (name.endsWith("useRailPopup")) return { useRailPopup: () => popup };
     if (name.endsWith("useDesktopDownloadsAvailable")) return { useDesktopDownloadsAvailable: () => downloadsAvailable };

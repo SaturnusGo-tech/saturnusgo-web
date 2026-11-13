@@ -53,3 +53,12 @@ test("application update errors are reported, not disguised as an animation canc
   transitionContent(() => { throw failure; }); await Promise.resolve(); await Promise.resolve();
   assert.deepEqual(errors, [failure]);
 });
+
+test("navigation can await the delayed update commit rather than only scheduling a snapshot", async () => {
+  const update = pending(); const visual = pending(); let frame!: () => void; let commits = 0; let completed = false;
+  install(callback => { frame = callback; return { skipTransition() {}, finished: visual.done, updateCallbackDone: update.done }; });
+  const completion = Promise.resolve(transitionContent(() => { commits++; })).then(() => { completed = true; });
+  await Promise.resolve(); assert.equal(completed, false, "a pending commit must retain its leave authorization");
+  frame(); update.finish(); await completion;
+  assert.equal(commits, 1); assert.equal(completed, true); visual.finish();
+});

@@ -1,6 +1,7 @@
 import { transitionContent } from "../../../presentation/workspace/motion/transition/content-transition";
 import { createNavigationHistory, navigationEntry } from "../history/history";
 import { createNavigationContextStore } from "../context/navigation-context-store";
+import { requestAuthoringLeave } from "../../../authoring/leave/application/authoring-leave";
 export const HISTORY_CHANGE = "falcon:navigation";
 const ends = new Map<string, number>();
 const contexts = createNavigationContextStore({
@@ -48,7 +49,7 @@ export const readNavigationContext = <T,>(key: string, fallback: T): T => typeof
   : (navigationEntry(historyState())?.context[key] as T | undefined) ?? fallback;
 export const saveNavigationContext = (key: string, value: unknown) => history().context(key, value);
 
-export const visitWorkspace = (href: string) => transitionContent(() => {
+export const visitWorkspace = (href: string) => requestAuthoringLeave(commit => transitionContent(() => commit(() => {
   navigateWorkspace(href);
   window.dispatchEvent(new PopStateEvent("popstate", { state: window.history.state }));
-});
+})));

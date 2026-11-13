@@ -1,5 +1,6 @@
 import type { useWorkspaceState } from "../workspace/useWorkspaceState";
 import { defaultWorkingRun } from "../../runs/model/history/run-history";
+import { requestAuthoringLeave } from "../../authoring/leave/application/authoring-leave";
 
 export function useWorkspaceActions(
   state: ReturnType<typeof useWorkspaceState>,
@@ -7,12 +8,17 @@ export function useWorkspaceActions(
   const notify = (message: string) => state.setNotice(message);
 
   async function chooseProject(nextProjectId: string): Promise<boolean> {
+    if (nextProjectId === state.projectId) return true;
     if (state.isCaseSubmitting()) return false;
     const remote = state.connection === "demo"
       ? null
       : await state.loadProject(nextProjectId);
     if (state.isCaseSubmitting()) return false;
     if (state.connection !== "demo" && !remote) return false;
+    return requestAuthoringLeave(() => applyProject(nextProjectId, remote));
+  }
+
+  function applyProject(nextProjectId: string, remote: Awaited<ReturnType<typeof state.loadProject>>) {
     window.localStorage.setItem("tms.project.v1", nextProjectId);
     state.setProjectId(nextProjectId);
     const testCases = remote?.testCases ?? state.data.testCases;

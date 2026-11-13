@@ -29,6 +29,7 @@ function loadDraft() {
   }).outputText;
   runInNewContext(source, { module, exports: module.exports, crypto: globalThis.crypto, require(name: string) {
     if (name === "react") return React;
+    if (name.endsWith("authoring-leave")) return { requestAuthoringLeave: async (action: () => unknown) => { await action(); return true; } };
     if (name === "react/jsx-runtime") return jsx;
     if (name === "react-dom") return { createPortal: (children: React.ReactNode) => children };
     for (const [component, stub] of Object.entries(ui)) if (name.endsWith(`/${component}`)) return { [component]: stub };
@@ -132,4 +133,23 @@ test("saving text keeps related-case context on the new draft version and curren
   assert.equal(after.props.document.id, "doc");
   assert.equal(after.props.document.draftVersion, 3);
   assert.equal(after.props.document.publishedVersion, 1);
+});
+
+test("closing a changed document saves its draft before leaving and a failed save keeps editing", async t => {
+  const { ProductDocDraft } = loadDraft();
+  let saves = 0, closed = 0, failing = true;
+  const api = { async save() { saves++; if (failing) throw new Error("Offline"); return { draftVersion: 3 }; } } as unknown as ProductDocsApi;
+  let renderer!: ReactTestRenderer;
+  t.after(() => act(() => renderer.unmount()));
+  await act(async () => { renderer = create(<ProductDocDraft api={api} scope={scope} document={document}
+    copy={productDocsCopy("en")} locale="en" projectName="Project" drafts={new Map()} onSaved={() => {}}
+    onClose={() => { closed++; }} onPublished={() => {}} />); });
+  act(() => renderer.root.findByType(ui.ProductDocDraftSurface as Host).props.onTitle("Latest workflow"));
+  await act(async () => renderer.root.findByType(ui.DraftActions as Host).props.onClose());
+  assert.equal(saves, 1, "close must attempt saving, never silently discard or only offer discard");
+  assert.equal(closed, 0);
+  assert.equal(renderer.root.findByType(ui.ProductDocDraftSurface as Host).props.title, "Latest workflow");
+  failing = false;
+  await act(async () => renderer.root.findByType(ui.DraftActions as Host).props.onClose());
+  assert.equal(closed, 1);
 });

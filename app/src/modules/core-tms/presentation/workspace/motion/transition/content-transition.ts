@@ -27,6 +27,7 @@ export function transitionContent(update: () => void) {
   // A skipped visual transition is normal on a fast second navigation. Update errors are not.
   void active.updateCallbackDone.catch((error: unknown) => { globalThis.reportError(error); });
   void active.finished.then(cleanup, cleanup);
+  return active.updateCallbackDone;
   function cleanup() {
     if (current !== generation) return;
     active = undefined;

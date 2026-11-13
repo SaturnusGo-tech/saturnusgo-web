@@ -6,6 +6,7 @@ import * as caseLinks from "../../../../../test-cases/navigation/case-deep-link"
 import * as workspaceLinks from "../../../workspace-deep-link";
 import { WorkspaceNavigationRestoration } from "../../../restoration/workspace-navigation-restoration";
 import type { useWorkspaceHistory } from "../../useWorkspaceHistory";
+import * as leave from "../../../../../authoring/leave/application/authoring-leave";
 
 const href = "https://tms.example/work/?workspaceId=w&projectId=p&view=portfolios&catalogProjectId=p&folderId=f";
 function setup() {
@@ -16,6 +17,7 @@ function setup() {
     setCase: (id) => { state.caseId = id; events.push(`case:${id}`); },
     setRun: (id) => { state.runId = id; }, setItem() {}, closeDialog: () => events.push("close"), reload: () => events.push("reload") };
   const hook = h.load<{ useWorkspaceHistory: typeof useWorkspaceHistory }>(new URL("../../useWorkspaceHistory.ts", import.meta.url), (name) => {
+    if (name.endsWith("authoring-leave")) return leave;
     if (name.endsWith("project-case-context")) return { isProjectCaseContext };
     if (name.endsWith("case-deep-link")) return caseLinks;
     if (name.endsWith("workspace-deep-link")) return workspaceLinks;

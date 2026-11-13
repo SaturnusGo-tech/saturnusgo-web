@@ -1,3 +1,4 @@
+import * as leave from "../../../../authoring/leave/application/authoring-leave";
 import { hookHarness } from "../../../navigation/browser/tests/project/hook-harness";
 import { createWorkspaceShell } from "../../../../../../core/tms/fallback/bootstrap";
 import type { TestCaseSummary, TestRunSummary } from "../../../../../../core/tms/contracts/legacy-contract";
@@ -22,6 +23,7 @@ export function workspaceHarness(href = `${projectHref}&caseId=c`) {
     ] as TestCaseSummary[], runs: [] as TestRunSummary[], suites: [] };
   const bootstrap = { data, generation: 1, connection: "connected", setData() {}, retryBootstrap() {} };
   function resolve(name: string): unknown {
+    if (name.endsWith("authoring-leave")) return leave;
     if (name.endsWith("run-history")) return { defaultWorkingRun };
     if (name.endsWith("project-case-context")) return { isProjectCaseContext };
     if (name.endsWith("case-deep-link")) return caseLinks;

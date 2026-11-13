@@ -1,4 +1,5 @@
 import { ErrorToast } from "../common/error/ErrorToast";
+import { requestAuthoringLeave } from "../../authoring/leave/application/authoring-leave";
 import { AvatarProfile, BuildingWorkspace, ChatTripleDots, Lifesaver, Logout, Settings } from "@openai/apps-sdk-ui/components/Icon";
 import { useId, useState } from "react";
 import { createPortal } from "react-dom";
@@ -84,8 +85,9 @@ export function NavigationProfile({ collapsed, workspaceId, onOpenSettings, onOp
       {session && <><div className={css.separator} role="separator"/>
         <button role="menuitem" type="button" className={css.action} disabled={pending} aria-busy={pending} data-testid="account-logout"
           onClick={() => {
-            if (pending) return; setFailed(false); setPending(true);
-            void session.signOut().catch(() => setFailed(true)).finally(() => setPending(false));
+            if (pending) return;
+            void requestAuthoringLeave(async () => { setFailed(false); setPending(true);
+              await session.signOut().catch(() => setFailed(true)).finally(() => setPending(false)); });
           }}><Logout width={20} height={20} aria-hidden="true"/><span>{t("auth.signOut")}</span></button>
       </>}
       <ErrorToast message={failed ? t("auth.logoutError") : null} />

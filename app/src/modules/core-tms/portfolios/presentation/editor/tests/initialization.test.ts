@@ -14,6 +14,7 @@ for (const [editing, omitsChecklist] of [[false, false], [true, false], [false, 
   const h = componentHarness(); const commands: Record<string, unknown>[] = []; const events: string[] = [];
   const legacy: Project = { id: "project", key: "PAY", name: "Payments", description: "", portfolioId: "portfolio-existing" };
   const form = h.load<{ useProjectForm: typeof useProjectForm }>(new URL("../../../../projects/state/dialog/useProjectForm.ts", import.meta.url), (name) => {
+    if (name.endsWith("useFormLeave")) return { useFormLeave: () => ({ reset() {} }) };
     if (name.endsWith("TmsHttpClientContext")) return { useTmsHttpClient: () => ({}) };
     if (name.endsWith("pending-operation")) return { resolvePendingOperation };
     if (name.endsWith("createProject")) return {

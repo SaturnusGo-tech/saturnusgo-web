@@ -1,5 +1,6 @@
 "use client";
 
+import { requestAuthoringLeave } from "../../../authoring/leave/application/authoring-leave";
 import type { MDXEditorMethods } from "@mdxeditor/editor";
 import { useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -39,15 +40,17 @@ export function ProductDocDraft({ api, scope, document, copy, locale, drafts, ed
   const [editorSeed, setEditorSeed] = useState(() => ({ markdown: sectionsToEditorMarkdown(sections), epoch: 0 }));
   const [taxonomy, setTaxonomy] = useState(initial?.taxonomy ?? document.taxonomy ?? emptyProductDocTaxonomy);
   const [properties, setProperties] = useState(initial?.properties ?? document.properties ?? emptyProductDocProperties);
+  const [validMarkup, setValidMarkup] = useState(true);
+  const [mediaBusy, setMediaBusy] = useState(false);
+  const withinLimits = sections.length <= 100 && sections.every((section) => section.title.length <= 200 && section.markdown.length <= 32_768)
+    && sections.reduce((length, section) => length + section.markdown.length, 0) <= 262_144;
   const { baseline, setBaseline, dirty, titleFormattingChanged, taxonomyChanged, draftTaxonomy,
     propertiesChanged, draftProperties } = useBufferedProductDocDraft(
     drafts, bufferKey, initial?.baseline ?? { title: startingTitle, titleHighlights: document.titleHighlights,
       sections: document.sections, taxonomy: document.taxonomy, properties: document.properties, version: document.draftVersion },
-    { title, titleHighlights, sections, taxonomy, properties },
+    { title, titleHighlights, sections, taxonomy, properties }, !validMarkup || mediaBusy || !withinLimits,
   );
-  const [validMarkup, setValidMarkup] = useState(true);
   const [busy, setBusy] = useState(false);
-  const [mediaBusy, setMediaBusy] = useState(false);
   const [error, setError] = useState("");
   const [discardOpen, setDiscardOpen] = useState(false);
   const [nextPage, setNextPage] = useState<{ create: () => void }>();
@@ -56,8 +59,6 @@ export function ProductDocDraft({ api, scope, document, copy, locale, drafts, ed
   const [actionsHost, setActionsHost] = useState<HTMLDivElement | null>(null);
   const [introId] = useState(() => crypto.randomUUID());
   const editorRef = useRef<MDXEditorMethods>(null), savingRef = useRef(false);
-  const withinLimits = sections.length <= 100 && sections.every((section) => section.title.length <= 200 && section.markdown.length <= 32_768)
-    && sections.reduce((length, section) => length + section.markdown.length, 0) <= 262_144;
   const valid = Boolean(title.trim() && withinLimits && validMarkup);
   const canPublish = document.canPublish && valid && sections.some((section) => section.title.trim() || section.markdown.trim());
   const mounted = useRef(false);
@@ -84,7 +85,11 @@ export function ProductDocDraft({ api, scope, document, copy, locale, drafts, ed
     setSaved(false);
     try {
       let expectedDraftVersion = baseline.version;
-      if (dirty) {
+      if (dirty && drafts.flush) {
+        if (!await drafts.flush()) return false;
+        expectedDraftVersion = drafts.acknowledged?.(bufferKey)?.version ?? baseline.version;
+        if (mounted.current) { onSaved(); setSaved(true); if (folder) onClose(); }
+      } else if (dirty) {
         const cleanTitle = titleToSave;
         const cleanTitleHighlights = trimTitleHighlights(title, titleHighlights);
         const cleanSections = sections.map((section) => ({ ...section, title: section.title.trim() }));
@@ -125,7 +130,8 @@ export function ProductDocDraft({ api, scope, document, copy, locale, drafts, ed
   }
   useImperativeHandle(requestNewPageRef, () => (create) => {
     if (savingRef.current || mediaBusy || readingFile.current || nextPage || previewVersion !== undefined) return;
-    if (dirty) {
+    if (drafts.flush) void requestAuthoringLeave(create);
+    else if (dirty) {
       setError("");
       setNextPage({ create });
     } else create();
@@ -144,12 +150,16 @@ export function ProductDocDraft({ api, scope, document, copy, locale, drafts, ed
     canPublish={!folder && document.canPublish} publishLabel={publishLabel}
     canSave={!busy && !mediaBusy && dirty && valid} canSubmit={!busy && !mediaBusy && canPublish}
     onSave={(publish) => { void save(publish); }}
-    onClose={() => { if (dirty) setDiscardOpen(true); else discardDraft(); }} />;
+    onClose={() => {
+      if (drafts.flush) void requestAuthoringLeave(onClose);
+      else if (dirty) void save(false, undefined, !folder).then(ok => { if (ok && !folder) onClose(); });
+      else onClose();
+    }} />;
   return <div className={styles.draft} data-local-actions={!actionsHost || undefined}
     onKeyDown={(event) => {
       if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== "s") return;
       event.preventDefault();
-      if (!nextPage && !discardOpen && previewVersion === undefined) void save(false);
+      if (!nextPage && previewVersion === undefined) void save(false);
     }}>
     {actionsHost ? createPortal(actions, actionsHost) : <header className={styles.actionHeader}>{actions}</header>}
     <ProductDocDraftNavigation copy={copy} ru={ru} busy={busy} error={error} discardOpen={discardOpen}

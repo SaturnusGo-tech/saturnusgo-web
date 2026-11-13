@@ -10,6 +10,7 @@ const tick = () => new Promise(resolve => setImmediate(resolve));
 function setup(read: () => Promise<unknown>, write: (input: Record<string, unknown>) => Promise<unknown>) {
   const h = componentHarness(); let saved: Environment | null = null;
   const module = h.load<{ EnvironmentEditor: typeof EnvironmentEditor }>(new URL("../../editor/EnvironmentEditor.tsx", import.meta.url), name => {
+    if (name.endsWith("useFormLeave")) return { useFormLeave: () => ({ reset() {}, release() {}, close: (action: () => void) => action() }) };
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en" }) };
     if (name.endsWith("copy")) return { getEnvironmentDialogCopy };
     if (name.endsWith("TmsHttpClientContext")) return { useTmsHttpClient: () => http };

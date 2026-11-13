@@ -33,7 +33,7 @@ export function CasesView(props: CasesViewProps) {
   const listPaneRef = useRef<HTMLElement>(null);
   const animateDetailExit = useCasePanelExit(detailPanelRef, view.inspectorOpen && props.editor?.mode !== "create", props.selectedCaseId);
   const closeDetail = () => {
-    if (!props.editor?.submitting) animateDetailExit(view.closeInspector);
+    if (!props.editor?.submitting) view.closeInspector(animateDetailExit);
   };
   const moveWasOpen = useRef(false);
   const returnFocusRef = useRef<HTMLElement | null>(null);
@@ -131,7 +131,7 @@ export function CasesView(props: CasesViewProps) {
           : <div role="status" data-testid="case-detail-loading"><span className={shell.srOnly}>{t("common.loading")}</span></div>
         : <CaseDetailPanel
             tagSuggestions={tagSuggestions}
-            key={props.editor?.mode === "create" ? "create" : props.testCase?.id}
+            key={props.editor?.mode === "create" ? props.editor.sessionId ?? "create" : props.testCase?.id}
             locale={locale}
             languageTag={languageTag}
             testCase={props.testCase}

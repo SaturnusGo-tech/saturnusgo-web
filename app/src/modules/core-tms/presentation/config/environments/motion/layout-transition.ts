@@ -14,9 +14,9 @@ export function transitionEnvironmentLayout(update: () => void) {
   try {
     const transition = document.startViewTransition(() => { if (current !== generation) return; committed = true; flushSync(update); });
     active = transition;
-    void transition.updateCallbackDone.catch(error => globalThis.reportError(error));
     const cleanup = () => { if (active === transition) { delete document.documentElement.dataset.environmentTransition; active = undefined; } };
-    void transition.finished.then(cleanup, cleanup);
+    const finished = transition.finished.then(cleanup, cleanup);
+    return transition.updateCallbackDone.then(() => finished);
   } catch (error) {
     delete document.documentElement.dataset.environmentTransition;
     if (committed) throw error;

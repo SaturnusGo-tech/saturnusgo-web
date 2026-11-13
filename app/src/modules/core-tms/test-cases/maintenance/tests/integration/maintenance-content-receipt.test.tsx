@@ -1,3 +1,4 @@
+import { commitCaseToWorkspace } from "../../../../state/case-actions/reconciliation/commit-case";
 import assert from "node:assert/strict";
 import test from "node:test";
 import type { TestCase } from "../../../../../../core/tms/contracts/legacy-contract";
@@ -25,6 +26,7 @@ test("a delayed content-save receipt accepts the saved revision without revertin
     if (name.endsWith("pending-operation")) return { resolvePendingOperation };
     if (name.endsWith("pendingCaseAttachment")) return pendingCaseAttachment;
     if (name.endsWith("saveCaseWithAttachments")) return { saveCaseWithAttachments: () => receipt };
+    if (name.endsWith("commit-case")) return { commitCaseToWorkspace };
     if (name.endsWith("case-maintenance")) return { reconcileMaintenance };
     if (name.endsWith("useCaseDocumentation")) return { useCaseDocumentation: () => ({fields: {}, save: async () => true, reset() {}}) };
   });

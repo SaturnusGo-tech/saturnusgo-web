@@ -1,3 +1,4 @@
+import { requestAuthoringLeave } from "../../../authoring/leave/application/authoring-leave";
 import { useCatalogActions } from "../../lifecycle/state/useCatalogActions";
 import { useEffect, useState, type ReactNode } from "react";
 import type { Project } from "../../../../../core/tms/contracts/legacy-contract";
@@ -53,16 +54,18 @@ export function usePortfoliosView(props: PortfoliosViewProps) {
 
   useEffect(() => { if (route.kind === "portfolio" && portfolio.data) setStatus(portfolio.data.data.status); }, [route.kind, portfolio.data]);
   function navigate(next: PortfolioRoute) {
-    setDialog(null); setSearch(""); setNotice(null); setStatus("active");
-    if (props.onNavigate) props.onNavigate(next); else setLocalRoute(next);
+    void requestAuthoringLeave(() => {
+      setDialog(null); setSearch(""); setNotice(null); setStatus("active");
+      if (props.onNavigate) props.onNavigate(next); else setLocalRoute(next);
+    });
   }
   function refresh() { portfolioList.reload(); projects.reload(); project.reload(); portfolio.reload(); }
   const catalogActions = useCatalogActions(scope, enabled && props.canManage !== false, refresh, props.onProjectUpdated, props.onCatalogChanged);
-  async function save(draft: PortfolioDraft) {
+  async function save(draft: PortfolioDraft, onSaved?: () => void) {
     if (props.offline || props.canManage === false) return;
     const current = null;
     const result = await command.run(JSON.stringify({ current, draft }), (key, signal) => savePortfolio(http, props.workspaceId, draft, current, key, signal));
-    if (result) { setDialog(null); refresh(); navigate({ kind: "portfolio", id: result.data.id }); setNotice("portfolio"); }
+    if (result) { onSaved?.(); setDialog(null); refresh(); navigate({ kind: "portfolio", id: result.data.id }); setNotice("portfolio"); }
   }
   async function transition() {
     if (props.offline || props.canManage === false || !portfolio.data?.etag) return;

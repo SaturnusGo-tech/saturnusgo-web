@@ -58,7 +58,7 @@ export function useWorkspaceState() {
   const history = useWorkspaceHistory({ workspaceId: data.workspace.id, projectId, view,
     runId: selectedRunId, caseId: selectedCaseId, ready: connection === "connected" || connection === "demo",
     setView, setCase: setSelectedCaseId, setRun: setSelectedRunId, setItem: setSelectedRunItemId,
-    closeDialog: () => setDialog(null), reload: bootstrap.retryBootstrap });
+    closeDialog: () => { if (dialog === "case") caseEditor.resetCaseEditor(); else setDialog(null); }, reload: bootstrap.retryBootstrap });
   const canWriteNavigation = history.canWrite;
 
   useEffect(() => {

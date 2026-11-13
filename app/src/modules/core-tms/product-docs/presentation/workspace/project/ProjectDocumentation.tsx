@@ -1,5 +1,6 @@
 "use client";
 
+import { requestAuthoringLeave } from "../../../../authoring/leave/application/authoring-leave";
 import { AnimatePresence } from "framer-motion";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { useOptionalTmsSession } from "../../../../auth/presentation/session/TmsSessionContext";
@@ -66,14 +67,18 @@ export function ProjectDocumentation({ api, scope, locale, projectName, drafts, 
   }, [page?.id]);
 
   function choose(next: ProductDocSelection | undefined) {
-    setStructureOpen(false);
-    onSelect(next);
-    setTreeOpen(false);
+    return requestAuthoringLeave(() => {
+      setStructureOpen(false);
+      setTreeOpen(false);
+      return onSelect(next);
+    });
   }
   function browse(next: ProductDocsShelf = "overview") {
-    clearSearch();
-    setShelf(next);
-    choose(undefined);
+    return requestAuthoringLeave(() => {
+      clearSearch();
+      setShelf(next);
+      return choose(undefined);
+    });
   }
   function onCreated(id: string, kind: ProductDocNode["kind"]) {
     clearSearch();
@@ -109,8 +114,8 @@ export function ProjectDocumentation({ api, scope, locale, projectName, drafts, 
     ownerId: session?.subject ?? undefined, onSelect: choose, onChanged: refreshDocs });
   function closeDraft(published = false) {
     setEditor({ key: routeKey, open: false, folder: false });
-    if (!published && page?.kind === "page" && page.publishedVersion === null) onSelect(page.parentId ? { docId: page.parentId } : undefined);
     refreshDocs();
+    if (!published && page?.kind === "page" && page.publishedVersion === null) return onSelect(page.parentId ? { docId: page.parentId } : undefined);
   }
   const subdocs = page?.kind === "page" && selection?.version === undefined && !page.archivedAt
     ? <ProductDocSubdocs key={page.id} api={api} scope={scope} copy={copy} locale={locale}
@@ -158,7 +163,7 @@ export function ProjectDocumentation({ api, scope, locale, projectName, drafts, 
               activity?.focus({ preventScroll: true });
               activity?.scrollIntoView({ block: "start" });
             }}
-            onEdit={() => setEditor({ key: routeKey, open: true, folder: page.kind === "folder" })}
+            onEdit={() => { void requestAuthoringLeave(() => setEditor({ key: routeKey, open: true, folder: page.kind === "folder" })); }}
             starred={library.starred.includes(page.id)} onStar={() => toggleStar(page.id)}
             onVersion={(version) => choose({ docId: page.id, version })}
             onChanged={refreshDocs} />} />

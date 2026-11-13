@@ -1,3 +1,4 @@
+import { requestAuthoringLeave } from "../../../authoring/leave/application/authoring-leave";
 import { useRunFolderAppearance } from "../../../folders/state/appearance-catalog/useRunFolderAppearance";
 import type { RunRepositoryModel } from "./state/useRunRepository";
 import { isWorkingRun } from "../../../runs/model/history/run-history";
@@ -32,7 +33,9 @@ export function RunRepositoryBrowser({ model, repository, onSelectItem, onEditRu
   const controlsLocked = navigationLocked || !browser.ready || browser.loading || Boolean(browser.error);
   const choose = (runId: string, projectId: string) => {
     if (navigationLocked) return;
-    model.setProjectId(projectId); model.setSelectedRunId(runId); model.setSelectedRunItemId(null);
+    void requestAuthoringLeave(() => {
+      model.setProjectId(projectId); model.setSelectedRunId(runId); model.setSelectedRunItemId(null);
+    });
   };
   const canManage = model.connection === "connected" && model.data.meta.authorization.capabilities.includes("run:manage");
   const canAssign = canManage && Boolean(run && !run.archivedAt && ["draft","active","paused"].includes(run.status));

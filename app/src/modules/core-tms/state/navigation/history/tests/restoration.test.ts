@@ -8,6 +8,7 @@ import { readWorkspaceDeepLink, buildWorkspaceDeepLink } from "../../workspace-d
 import { isProjectCaseContext } from "../../../../test-cases/navigation/project/project-case-context";
 import { readCaseDeepLink } from "../../../../test-cases/navigation/case-deep-link";
 import { buildDefectDeepLink, readDefectDeepLink } from "../../../../defects/navigation/defect-deep-link";
+import * as leave from "../../../../authoring/leave/application/authoring-leave";
 import type { useWorkspaceHistory } from "../../browser/useWorkspaceHistory";
 function harness() {
   let href = "https://tms.example/work/?workspaceId=w&projectId=p&view=suites&suiteId=suite-1";
@@ -20,6 +21,7 @@ function harness() {
   runInNewContext(compiled, { module, exports: module.exports, URL,
     window: { location: { get href() { return href; } }, addEventListener: (event: string, callback: () => void) => listeners.set(event, callback), removeEventListener: () => {} },
     require(name: string) {
+      if (name.endsWith("authoring-leave")) return leave;
       if (name === "react") return { useRef: (current: unknown) => ({ current }), useCallback: (callback: unknown) => callback, useEffect: (callback: () => void) => effects.push(callback) };
       if (name.endsWith("workspace-deep-link")) return { readWorkspaceDeepLink };
       if (name.endsWith("project-case-context")) return { isProjectCaseContext };

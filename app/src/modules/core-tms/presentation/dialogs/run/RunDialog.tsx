@@ -1,3 +1,4 @@
+import { useFormLeave } from "../../../authoring/leave/state/value/useFormLeave";
 import { RunCasesSkeleton } from "../../runs/loading/RunCasesSkeleton";
 import { Plus, X } from "lucide-react";
 import type { Bootstrap, Project, Suite, TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
@@ -25,7 +26,14 @@ export function RunDialog(props: Props) {
   const state = useBatchComposer(props.data, props.project, props.presetCaseIds, props.offline, ru, props.selectedSuiteId);
   const filters = useSelectionFilters(state.visibleCases);
   const selected = new Set(state.caseIds);
-  const close = () => { if (!state.busy) dismiss(props.onClose); };
+  const builds = Object.entries(state.platformBuilds.drafts).map(([id, build]) => ({ id,
+    androidVersion: build.androidVersion, iosReference: build.iosReference, artifactId: build.artifact?.id,
+    file: build.file ? [build.file.name, build.file.size, build.file.lastModified] : null,
+  })).filter(build => build.androidVersion || build.iosReference || build.artifactId || build.file);
+  const leave = useFormLeave({ suiteId: state.suiteId, projectIds: state.projectIds, caseIds: state.caseIds,
+    iterationId: state.iterationId, name: state.name, description: state.description, tags: state.tags,
+    ownerIdentityId: state.ownerIdentityId, build: state.build, builds }, { busy: state.busy || state.platformBuilds.uploading });
+  const close = () => { if (!state.busy) void leave.close(() => dismiss(props.onClose)); };
   const toggle = (id: string) => state.setCaseIds((ids) => ids.includes(id) ? ids.filter((value) => value !== id) : [...ids, id]);
   const scope = (ids: readonly string[]) => state.setCaseIds((current) => ids.every((id) => current.includes(id))
     ? current.filter((id) => !ids.includes(id)) : [...new Set([...current, ...ids])]);
@@ -35,7 +43,7 @@ export function RunDialog(props: Props) {
     panelClassName={`${styles.runPanel} ${closing ? styles.closing : ""}`}>
     <form className={styles.form} onSubmit={async (event) => {
       event.preventDefault(); const batch = await state.submit();
-      if (batch) dismiss(() => props.onCreated(batch.runs[0], batch.runs));
+      if (batch) { leave.release(); dismiss(() => props.onCreated(batch.runs[0], batch.runs)); }
     }} ref={(element) => { panelRef.current = element?.parentElement ?? null; if (element) element.inert = closing; }}>
       <div className={styles.body} aria-busy={state.loading || state.busy}
         ref={(element) => { if (element) element.inert = state.busy; }}>

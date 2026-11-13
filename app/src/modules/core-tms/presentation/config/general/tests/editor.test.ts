@@ -34,12 +34,14 @@ function setup(t: TestContext, overrides: { etag?: string | null; offline?: bool
       const result = await respond(); return { data: result.data as T, etag: result.etag };
     } };
   const form = h.load<{ useProjectForm: typeof useProjectForm }>(new URL("../../../../projects/state/dialog/useProjectForm.ts", import.meta.url), name => {
+    if (name.endsWith("useFormLeave")) return { useFormLeave: () => ({ reset() {} }) };
     if (name.endsWith("TmsHttpClientContext")) return { useTmsHttpClient: () => http };
     if (name.endsWith("pending-operation")) return { resolvePendingOperation };
     if (name.endsWith("mutation-failure")) return { formatTmsMutationFailure, toTmsMutationFailure };
     if (name.endsWith("createProject")) return { createProject, updateProject };
   });
   const { ProjectInlineEditor: Editor } = h.load<{ ProjectInlineEditor: typeof ProjectInlineEditor }>(new URL("../ProjectInlineEditor.tsx", import.meta.url), name => {
+    if (name.endsWith("authoring-leave")) return { requestAuthoringLeave: async (action: () => void) => { action(); return true; } };
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en" }) };
     if (name.endsWith("portfolios/model/copy")) return { portfolioCopy };
     if (name.endsWith("settings-sections")) return { settingsCopy };

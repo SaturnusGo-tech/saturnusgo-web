@@ -3,6 +3,7 @@ import { buildDefectDeepLink, readDefectDeepLink } from "../../defects/navigatio
 import { readWorkspaceDeepLink } from "../navigation/workspace-deep-link";
 import { navigateWorkspace } from "../navigation/browser/workspace-history";
 import type { View } from "../types/workspace";
+import { requestAuthoringLeave } from "../../authoring/leave/application/authoring-leave";
 
 export function useDefectNavigation(projectId: string, setView: (view: View) => void, canWriteNavigation: () => boolean) {
   const [selection, setSelection] = useState<{ defectId: string; includeArchived: boolean } | null>(null);
@@ -18,13 +19,15 @@ export function useDefectNavigation(projectId: string, setView: (view: View) => 
     restore(); window.addEventListener("popstate", restore);
     return () => window.removeEventListener("popstate", restore);
   }, [projectId]);
-  function selectDefect(defectId: string | null, includeArchived = false) {
+  function applySelection(defectId: string | null, includeArchived = false) {
     navigateWorkspace(buildDefectDeepLink(window.location.href, { projectId, defectId, includeArchived }));
     setSelection(defectId ? { defectId, includeArchived } : null);
   }
+  function selectDefect(defectId: string | null, includeArchived = false) {
+    void requestAuthoringLeave(() => applySelection(defectId, includeArchived));
+  }
   function openDefect(defectId: string, includeArchived = false) {
-    selectDefect(defectId, includeArchived);
-    setView("reports");
+    void requestAuthoringLeave(() => { applySelection(defectId, includeArchived); setView("reports"); });
   }
   const canonicalizeSelectedDefect = useCallback(() => {
     if (!projectId || !selectedDefectId || !canWriteNavigation()) return;

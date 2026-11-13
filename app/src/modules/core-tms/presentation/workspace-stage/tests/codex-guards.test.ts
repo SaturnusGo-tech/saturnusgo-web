@@ -52,6 +52,9 @@ test("workspace permits shared connector catalog for readers only with a project
     const model = { view: "cases", project, repositoryScope: { key: "workspace" }, connection: "connected", canManageIntegrations: false, activeProjectRuns: [],
       data: { workspace: { id: "w" }, meta: { authorization: { capabilities: caps } } } };
     const { LocalizedWorkspace } = h.load<{ LocalizedWorkspace: () => unknown }>(new URL("../../workspace/LocalizedWorkspace.tsx", import.meta.url), name => {
+      if (name.endsWith("WorkspaceStartup")) return { useWorkspaceStartupPending() {} };
+      if (name.endsWith("TmsHttpClientContext")) return { useOptionalTmsHttpClient: () => null };
+      if (name.endsWith("useMemberPresence")) return { useMemberPresence() {} };
       if (name.endsWith("useWorkspaceModel")) return { useWorkspaceModel: () => model };
       if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ t: (key: string) => key }) };
       if (name.endsWith("usePageAppearance")) return { usePageAppearance: () => ({ current: null }) };

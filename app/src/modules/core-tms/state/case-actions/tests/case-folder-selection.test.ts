@@ -1,3 +1,5 @@
+import { commitCaseToWorkspace } from "../reconciliation/commit-case";
+import { requestAuthoringLeave } from "../../../authoring/leave/application/authoring-leave";
 import { saveCaseWithAttachments } from "../../../application/evidence/case/save/saveCaseWithAttachments";
 import * as pendingCaseAttachment from "../../../application/evidence/case/pendingCaseAttachment";
 import assert from "node:assert/strict";
@@ -34,8 +36,10 @@ function harness(folderPath: string, folderId: string | null | undefined, archiv
   runInNewContext(ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2021 } }).outputText, {
     module, exports: module.exports, crypto,
     require(name: string) {
+      if (name.endsWith("authoring-leave")) return { requestAuthoringLeave };
       if (name === "react") return { useRef: (current: unknown) => ({ current }), useState: (value: unknown) => [value, () => {}] };
       if (name.endsWith("pending-operation")) return { resolvePendingOperation };
+      if (name.endsWith("commit-case")) return { commitCaseToWorkspace };
       if (name.endsWith("case-maintenance")) return { reconcileMaintenance };
       if (name.endsWith("useCaseDocumentation")) return { useCaseDocumentation: () => ({fields: {}, save: async () => true, reset() {}}) };
       if (name.endsWith("mutation-failure")) return { isRequiredCustomFieldFailure: () => false, toTmsMutationFailure: (value: unknown) => value, formatTmsMutationFailure: () => "Unexpected failure" };

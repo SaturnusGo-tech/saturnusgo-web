@@ -1,3 +1,4 @@
+import { requestAuthoringLeave } from "../../authoring/leave/application/authoring-leave";
 import { portfolioRouteUrl } from "../../portfolios/navigation/portfolio-route";
 import { navigateWorkspace } from "../navigation/browser/workspace-history";
 import { useState } from "react";
@@ -53,25 +54,32 @@ export function useWorkspaceResourceActions(
   }
 
   function openNewProject() {
-    closeResourceEditors();
-    state.setDialog(null);
-    navigateWorkspace(portfolioRouteUrl(window.location.href, { kind: "project-create" }));
-    state.setView("portfolios");
+    return requestAuthoringLeave(() => {
+      closeResourceEditors();
+      state.setDialog(null);
+      navigateWorkspace(portfolioRouteUrl(window.location.href, { kind: "project-create" }));
+      state.setView("portfolios");
+    });
   }
 
   function openNewEnvironment() {
-    closeResourceEditors();
-    state.setDialog("environment");
+    return requestAuthoringLeave(() => {
+      closeResourceEditors();
+      state.setDialog("environment");
+    });
   }
 
   async function openEditProject() {
-    if (!derived.project) return;
+    const project = derived.project;
+    if (!project) return;
     try {
       const resource = offline
-        ? { data: derived.project, etag: null }
-        : await getProject(http, derived.project.id);
-      setProjectEditor(resource);
-      state.setDialog("project");
+        ? { data: project, etag: null }
+        : await getProject(http, project.id);
+      return requestAuthoringLeave(() => {
+        setProjectEditor(resource);
+        state.setDialog("project");
+      });
     } catch {
       notify(t("actions.projectUpdateError"));
     }
@@ -84,8 +92,10 @@ export function useWorkspaceResourceActions(
       const resource = offline
         ? { data: current, etag: null }
         : await getEnvironment(http, environmentId);
-      setEnvironmentEditor(resource);
-      state.setDialog("environment");
+      return requestAuthoringLeave(() => {
+        setEnvironmentEditor(resource);
+        state.setDialog("environment");
+      });
     } catch {
       notify(t("actions.environmentUpdateError"));
     }

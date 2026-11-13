@@ -10,6 +10,7 @@ import { mergeProjectCollections, type ProjectCollections } from "../../workspac
 import { createWorkspaceRequests } from "../../workspace/requests/workspace-requests";
 import { resolveSelectedCase } from "../../../test-cases/navigation/selection/selected-case";
 import { defaultWorkingRun } from "../../../runs/model/history/run-history";
+import * as leave from "../../../authoring/leave/application/authoring-leave";
 import { casePriority } from "../../../helpers/cases/caseRevision";
 
 type Pending<T> = { id: string; signal: AbortSignal; resolve: (value: T) => void; reject: (error: Error) => void };
@@ -24,6 +25,7 @@ function harness() {
   const memory = new Map<string, string>();
   const window = { localStorage: { setItem: (key: string, value: string) => memory.set(key, value) } };
   function require(name: string): unknown {
+    if (name.endsWith("authoring-leave")) return leave;
     if (name === "react") return {
       useRef: (current: unknown) => ({ current }), useCallback: (fn: unknown) => fn,
       useMemo: (fn: () => unknown) => fn(), useEffect: () => undefined,

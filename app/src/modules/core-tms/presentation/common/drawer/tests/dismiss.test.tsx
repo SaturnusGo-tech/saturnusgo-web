@@ -4,7 +4,7 @@ import { createElement } from "react";
 import { act, create } from "react-test-renderer";
 import { useDrawerDismiss } from "../useDrawerDismiss";
 
-test("drawer exit preserves an interrupted entrance, dismisses once and cancels on unmount", context => {
+test("drawer exit preserves an interrupted entrance, dismisses once and cancels on unmount", async context => {
   context.mock.timers.enable({ apis: ["setTimeout"] });
   const originalWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
   const originalStyle = Object.getOwnPropertyDescriptor(globalThis, "getComputedStyle");
@@ -20,19 +20,22 @@ test("drawer exit preserves an interrupted entrance, dismisses once and cancels 
   let completed = 0;
   try {
     act(() => { renderer = create(createElement(Harness) as unknown as Parameters<typeof create>[0]); });
-    act(() => { current.dismiss(() => completed++); current.dismiss(() => completed++); });
+    let exit: unknown, repeated: unknown, resolved = false;
+    act(() => { exit = current.dismiss(() => completed++); repeated = current.dismiss(() => completed++); });
+    assert.ok(exit instanceof Promise, "the whole exit is awaitable"); assert.equal(exit, repeated);
+    void (exit as Promise<void>).then(() => { resolved = true; });
     assert.equal(completed, 0); assert.equal(panel.inert, true); assert.equal(current.closing, true);
     assert.equal(calls.length, 2);
     assert.equal(calls[0].frames[0].transform, "matrix(1,0,0,1,350,0)");
     assert.equal(calls[0].frames[1].transform, "translateX(100%)");
-    act(() => context.mock.timers.tick(239)); assert.equal(completed, 0);
-    act(() => context.mock.timers.tick(1)); assert.equal(completed, 1);
+    act(() => context.mock.timers.tick(239)); await Promise.resolve(); assert.equal(completed, 0); assert.equal(resolved, false);
+    act(() => context.mock.timers.tick(1)); await exit; assert.equal(completed, 1); assert.equal(resolved, true);
     act(() => renderer.unmount()); assert.ok(calls.every(call => call.cancelled));
-    act(() => { renderer = create(createElement(Harness) as unknown as Parameters<typeof create>[0]); current.dismiss(() => completed++); });
-    act(() => renderer.unmount()); act(() => context.mock.timers.tick(300)); assert.equal(completed, 1);
+    act(() => { renderer = create(createElement(Harness) as unknown as Parameters<typeof create>[0]); exit = current.dismiss(() => completed++); });
+    act(() => renderer.unmount()); await exit; act(() => context.mock.timers.tick(300)); assert.equal(completed, 1);
     reduced = true;
     act(() => { renderer = create(createElement(Harness) as unknown as Parameters<typeof create>[0]); });
-    act(() => current.dismiss(() => completed++)); assert.equal(completed, 2);
+    act(() => { current.dismiss(() => completed++); }); assert.equal(completed, 2);
     act(() => renderer.unmount());
   } finally {
     if (originalWindow) Object.defineProperty(globalThis, "window", originalWindow); else Reflect.deleteProperty(globalThis, "window");

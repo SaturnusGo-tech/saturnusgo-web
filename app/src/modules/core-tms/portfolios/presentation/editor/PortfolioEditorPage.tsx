@@ -1,3 +1,4 @@
+import { useFormLeave } from "../../../authoring/leave/state/value/useFormLeave";
 import { PortfolioIcon } from "../icon/PortfolioIcon";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { OrganizationExtras } from "../../management/presentation/extras/OrganizationExtras";
@@ -18,7 +19,7 @@ import css from "../styles/editor.module.css";
 
 export function PortfolioEditorPage({ actionsTargetId, workspaceId, canReadAttachments = false, canManageAttachments = false, current, copy, pending, error, onSave, onCancel }: {
   actionsTargetId?: string; workspaceId: string; canReadAttachments?: boolean; canManageAttachments?: boolean; current?: Portfolio; copy: PortfolioCopy; pending: boolean; error: TmsMutationFailure | null;
-  onSave: (draft: PortfolioDraft) => Promise<void>; onCancel: () => void;
+  onSave: (draft: PortfolioDraft, onSaved?: () => void) => Promise<void>; onCancel: () => void;
 }) {
   const { locale } = useTmsLocale();
   const formId = useId();
@@ -30,14 +31,16 @@ export function PortfolioEditorPage({ actionsTargetId, workspaceId, canReadAttac
   const [name, setName] = useState(current?.name ?? "");
   const [description, setDescription] = useState(current?.description ?? "");
   const [responsibleIdentityId, setResponsibleIdentityId] = useState(current?.responsibleIdentityId ?? null);
+  const value = { name, description, responsibleIdentityId, workflowPhase, checklist };
+  const leave = useFormLeave(value, { busy: pending });
   const errors = organizationErrors({ name, description, checklist }, locale === "ru");
-  return <form id={formId} noValidate className={css.editor} onSubmit={(event) => { event.preventDefault(); setAttempted(true); if (pending) return; if (Object.keys(errors).length) { focusOrganizationError(event.currentTarget, errors); return; } void onSave({ name, description, responsibleIdentityId, workflowPhase, checklist }); }} aria-busy={pending || undefined}>
+  return <form id={formId} noValidate className={css.editor} onSubmit={(event) => { event.preventDefault(); setAttempted(true); if (pending) return; if (Object.keys(errors).length) { focusOrganizationError(event.currentTarget, errors); return; } void onSave(value, leave.release); }} aria-busy={pending || undefined}>
     <header className={styles.heading}>
       <PortfolioIcon size={24} />
       <div className={css.titleField}><label className={styles.srOnly} htmlFor="portfolio-title">{copy.portfolioTitle}</label>
         <input id="portfolio-title" autoFocus required data-field="name" aria-invalid={attempted && Boolean(errors.name)} aria-describedby={attempted && errors.name ? `${formId}-name-error` : undefined} maxLength={120} disabled={pending} value={name} onChange={(event) => setName(event.target.value)} placeholder={copy.portfolioTitle} />
       {attempted && errors.name && <span id={`${formId}-name-error`} className={css.limit} role="alert">{errors.name}</span>}</div>
-      <EditorActions targetId={actionsTargetId} formId={formId} pending={pending} saveLabel={current ? copy.save : copy.createPortfolio} cancelLabel={copy.cancel} onCancel={onCancel} />
+      <EditorActions targetId={actionsTargetId} formId={formId} pending={pending} saveLabel={current ? copy.save : copy.createPortfolio} cancelLabel={copy.cancel} onCancel={() => { if (!pending) void leave.close(onCancel); }} />
     </header>
     <div className={styles.tabs}><span className={css.activeTab}>{copy.aboutPortfolio}</span></div>
     <div className={css.editorBody}><main className={css.mainFields}>

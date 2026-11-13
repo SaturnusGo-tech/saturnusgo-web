@@ -50,10 +50,10 @@ export function PortfoliosView(props: PortfoliosViewProps) {
       {state.command.error && !state.dialog && <FormError message={formatTmsMutationFailure(state.command.error, copy.saveError)} />}
     </>}
     {canManage && creatingPortfolio && <PortfolioEditorPage actionsTargetId={actionsTargetId} {...attachmentPermissions}
-      key="new" workspaceId={props.workspaceId} copy={copy} pending={state.command.pending} error={state.command.error}
+      key={`new:${props.workspaceId}`} workspaceId={props.workspaceId} copy={copy} pending={state.command.pending} error={state.command.error}
       onCancel={state.cancelEditor} onSave={state.save} />}
     {canManage && creatingProject && <ProjectEditorPage actionsTargetId={actionsTargetId} {...attachmentPermissions}
-      key={`new:${creationPortfolioId ?? ""}`} workspaceId={props.workspaceId} copy={copy}
+      key={`new:${props.workspaceId}:${creationPortfolioId ?? ""}`} workspaceId={props.workspaceId} copy={copy}
       portfolioId={creationPortfolioId ?? currentPortfolio?.id} portfolioName={currentPortfolio?.name} onCancel={state.cancelEditor} onCreated={state.created} onUpdated={state.updated} />}
     {canManage && state.dialog === "attach" && <AttachProjectDialog workspaceId={props.workspaceId} copy={copy} pending={state.command.pending}
       error={state.command.error} onClose={close} onAttach={state.attach} />}

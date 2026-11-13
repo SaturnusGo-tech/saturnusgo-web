@@ -1,3 +1,4 @@
+import { requestAuthoringLeave } from "../../authoring/leave/application/authoring-leave";
 import { useWorkspaceCapabilities } from "../../auth/spaces/capabilities/composition/useWorkspaceCapabilities";
 import type { ReactNode } from "react";
 import { WorkspaceMaintenanceProvider } from "../../test-cases/maintenance/composition/WorkspaceMaintenanceProvider";
@@ -169,7 +170,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
       onSelectDefect={model.setSelectedDefectId}
       selectedDefectStatus={model.selectedDefectResource.status}
       onRetrySelectedDefect={model.selectedDefectResource.retry}
-      onNew={() => model.setDialog("defect")}
+      onNew={() => void requestAuthoringLeave(() => model.setDialog("defect"))}
       onOpenRun={model.openRun} defectRetest={model.defectRetest}
     />
   );

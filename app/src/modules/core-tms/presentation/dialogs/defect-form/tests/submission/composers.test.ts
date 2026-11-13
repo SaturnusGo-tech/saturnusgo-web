@@ -14,6 +14,7 @@ test("both entry points save edited Markdown, fields and attachments, preserve c
     const h = componentHarness(); const calls: Parameters<typeof createDefect>[0][] = [];
     let fail = true, created = 0, drawerDismissed = 0;
     const resolve = (name: string) => {
+      if (name.endsWith("useFormLeave")) return { useFormLeave: () => ({ release() {}, close: (action: () => void) => action() }) };
       if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "ru", t: (key: string) => key }) };
       if (name.endsWith("copy")) return { getDefectDialogCopy };
       if (name.endsWith("useDrawerDismiss")) return { useDrawerDismiss: () => ({ closing: false, panelRef: {}, dismiss: (done: () => void) => { drawerDismissed++; done(); } }) };

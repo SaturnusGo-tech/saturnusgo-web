@@ -1,3 +1,4 @@
+import { requestAuthoringLeave } from "../../../authoring/leave/application/authoring-leave";
 import { ErrorToast } from "../../common/error/ErrorToast";
 import { Plus, Search } from "lucide-react";
 import { useState } from "react";
@@ -17,7 +18,9 @@ export function EnvironmentSettings({ environments, projectId, projectName, offl
   const [copied, setCopied] = useState(""); const [error, setError] = useState("");
   const [query, setQuery] = useState(""); const [editing, setEditing] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const select = (id: string | null) => { if (!busy) transitionEnvironmentLayout(() => setEditing(id)); };
+  const select = (id: string | null, after?: () => void) => {
+    if (!busy) return requestAuthoringLeave(commit => transitionEnvironmentLayout(() => commit(() => { setEditing(id); after?.(); })));
+  };
   async function copy(environment: Environment) {
     try { await navigator.clipboard.writeText(environment.baseUrl); setCopied(environment.id); setError(""); }
     catch { setError(ru ? "Не удалось скопировать адрес. Выделите его и скопируйте вручную." : "Could not copy the URL. Select and copy it manually."); }
@@ -36,7 +39,7 @@ export function EnvironmentSettings({ environments, projectId, projectName, offl
     <div style={{ viewTransitionName: "environment-create" }}><EnvironmentExpansion>{editing === "new" && editor()}</EnvironmentExpansion></div>
     <ul className={css.list}>{matching.map(environment => <EnvironmentRow key={environment.id} environment={environment}
       editor={editing === environment.id ? editor(environment) : undefined} disabled={busy}
-      copied={copied === environment.id} onCopy={() => void copy(environment)} onEdit={() => select(editing === environment.id ? null : environment.id)} onToggle={() => { select(null); onToggle(environment.id); }} />)}</ul>
+      copied={copied === environment.id} onCopy={() => void copy(environment)} onEdit={() => select(editing === environment.id ? null : environment.id)} onToggle={() => select(null, () => onToggle(environment.id))} />)}</ul>
     {!matching.length && editing !== "new" && <div className={css.empty}>
       {!environments.length && <img src="/falcon/ui/environment-server.webp" width="72" height="48" alt="" />}
       <p>{environments.length ? (ru ? "Окружения не найдены" : "No environments found") : t("config.emptyEnvironments")}</p></div>}

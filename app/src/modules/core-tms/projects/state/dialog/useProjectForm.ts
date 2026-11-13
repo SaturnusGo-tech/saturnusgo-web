@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useFormLeave } from "../../../authoring/leave/state/value/useFormLeave";
 import type { Project } from "../../../../../core/tms/contracts/legacy-contract";
 import { formatTmsMutationFailure, toTmsMutationFailure } from "../../../../../core/tms/errors/mutation-failure";
 import { resolvePendingOperation, type PendingOperation } from "../../../../../core/tms/idempotency/pending-operation";
@@ -21,6 +22,19 @@ export function useProjectForm(input: { workspaceId: string; project?: Project; 
   const operation = useRef<PendingOperation | null>(null);
   useEffect(() => () => active.current?.abort(), []);
   const fields = { name, key, description, testingPlan, portfolioId, responsibleIdentityId, workflowPhase: workflowPhase ?? "new", checklist: checklist ?? [] };
+  const leave = useFormLeave(fields, { busy: pending });
+  const scope = `${input.workspaceId}:${input.project?.id ?? `new:${input.portfolioId ?? ""}`}`;
+  const loadedScope = useRef(scope);
+  useEffect(() => {
+    if (loadedScope.current === scope) return;
+    loadedScope.current = scope; active.current?.abort(); operation.current = null;
+    const next = { name: input.project?.name ?? "", key: input.project?.key ?? "", description: input.project?.description ?? "",
+      testingPlan: input.project?.testingPlan ?? "", portfolioId: input.project?.portfolioId ?? input.portfolioId ?? null,
+      responsibleIdentityId: input.project?.responsibleIdentityId ?? null, workflowPhase: input.project?.workflowPhase ?? "new", checklist: input.project?.checklist ?? [] };
+    setName(next.name); setKey(next.key); setDescription(next.description); setTestingPlan(next.testingPlan);
+    setPortfolioId(next.portfolioId); setResponsibleIdentityId(next.responsibleIdentityId);
+    setWorkflowPhase(next.workflowPhase); setChecklist(next.checklist); setPending(false); setError(""); leave.reset(next);
+  }, [scope]);
   function updateName(next: string) {
     setName(next);
     if (!input.project && (!key || key === name.replace(/[^a-z0-9]/gi, "").slice(0, 6).toUpperCase())) {
@@ -40,6 +54,7 @@ export function useProjectForm(input: { workspaceId: string; project?: Project; 
         : await createProject(options);
       if (controller.signal.aborted) return null;
       if ("ok" in result && !result.ok) { setError(formatTmsMutationFailure(result.failure, input.errorText)); return null; }
+      leave.reset(fields);
       return "ok" in result ? { data: result.project, etag: result.etag } : result;
     } catch (caught) {
       if (!controller.signal.aborted) setError(formatTmsMutationFailure(toTmsMutationFailure(caught), input.errorText));

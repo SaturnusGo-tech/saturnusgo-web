@@ -6,6 +6,7 @@ import { runInNewContext } from "node:vm";
 import ts from "typescript";
 import { createNavigationHistory, navigationEntry } from "../../history/history";
 import { createNavigationContextStore } from "../../context/navigation-context-store";
+import * as leave from "../../../../authoring/leave/application/authoring-leave";
 
 const require = createRequire(import.meta.url);
 const routerSource = ts.createSourceFile("app-router.js", readFileSync(require.resolve("next/dist/client/components/app-router"), "utf8"), ts.ScriptTarget.ES2021, true);
@@ -49,6 +50,7 @@ function harness(limit = Infinity) {
   runInNewContext(ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2021 } }).outputText, {
     module, exports: module.exports, window, crypto: { randomUUID: () => "session" }, Event,
     require(name: string) {
+      if (name.endsWith("authoring-leave")) return leave;
       if (name.endsWith("content-transition")) return { transitionContent: (update: () => void) => update() };
       if (name.endsWith("navigation-context-store")) return { createNavigationContextStore };
       assert.equal(name, "../history/history"); return { createNavigationHistory, navigationEntry };

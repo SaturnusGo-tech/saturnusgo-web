@@ -26,6 +26,8 @@ function render(path: string, exported: string, props: unknown, confirmation?: "
       };
       if (name.endsWith("inspector/model") || name === "./model") return model;
       if (name.endsWith("caseMarkdownImages")) return markdownImages;
+      if (name.endsWith("useCaseAuthoringSession")) return { useCaseAuthoringSession: () => ({ release() {} }) };
+      if (name.endsWith("authoring-leave")) return { requestAuthoringLeave: async (action: (commit: (update: () => void) => void) => unknown) => { await action(update => update()); return true; } };
       if (name.endsWith("useCaseActivityNavigation")) return { useCaseActivityNavigation: () => {} };
       if (name.endsWith("useCasePanelExit")) return { useCasePanelExit: () => (close: () => void) => close() };
       if (name.endsWith("useCreateCaseEntrance")) return { useCreateCaseEntrance: () => {} };

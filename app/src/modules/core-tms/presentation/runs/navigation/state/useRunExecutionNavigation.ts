@@ -1,3 +1,4 @@
+import { requestAuthoringLeave } from "../../../../authoring/leave/application/authoring-leave";
 import { useEffect, useRef, useState } from "react";
 import type { ExecutionStatus } from "../../../../../../core/tms/contracts/legacy-contract";
 import type { WorkspaceModel } from "../../../../state/model/useWorkspaceModel";
@@ -45,7 +46,7 @@ export function useRunExecutionNavigation(model: WorkspaceModel, repository: Run
   function select(id: string) {
     if (!ready || dirty || locked.current) return;
     const row = entries.find(entry => entry.item.id === id);
-    if (row) { choose(row); setRequestedItem(id); }
+    if (row) void requestAuthoringLeave(() => { choose(row); setRequestedItem(id); });
   }
   function retryItem() {
     setRequestedItem(model.selectedRunItemId);

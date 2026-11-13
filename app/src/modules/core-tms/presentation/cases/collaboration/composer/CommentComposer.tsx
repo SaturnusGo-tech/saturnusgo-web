@@ -1,3 +1,4 @@
+import { useFormLeave } from "../../../../authoring/leave/state/value/useFormLeave";
 import { ErrorToast } from "../../../common/error/ErrorToast";
 import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -28,13 +29,17 @@ export function CommentComposer({ ru, projectId, initial, reply, pending, failur
   const cannotSubmit = pending || files.blocked || !serialized.trim() || serialized.length > 10_000;
   const [mentions, setMentions] = useState<string[]>(initial?.mentions ?? []);
   const [slack, setSlack] = useState(false);
+  const leave = useFormLeave({ body, mentions, slack, attachments: files.references }, { busy: pending || files.uploading,
+    extraDirty: files.entries.some(entry => Boolean(entry.file) && !entry.id),
+    revision: files.entries.map(entry => [entry.key, entry.id, entry.file && [entry.file.name, entry.file.size, entry.file.type, entry.file.lastModified]]) });
   const catalog = useWorkspaceConnectors();
   const slackConnected = catalog.connections.some((c) => c.projectId === projectId && c.provider === "slack" && c.enabled);
   async function submit() {
     if (cannotSubmit || submitting.current) return;
     submitting.current = true;
-    try { await onSubmit({ body: serialized, parentId: reply?.id ?? null, mentions,
+    try { const saved = await onSubmit({ body: serialized, parentId: reply?.id ?? null, mentions,
       notifyChannels: mentions.length && slack && slackConnected ? ["slack"] : [] });
+      if (saved) leave.release();
     } finally { submitting.current = false; }
   }
   return <div className={css.composer} aria-busy={pending || files.uploading || undefined} onKeyDown={(event) => {
@@ -61,7 +66,7 @@ export function CommentComposer({ ru, projectId, initial, reply, pending, failur
     <ErrorToast message={failure} />
     <CommentAttachmentList state={files} pending={pending} ru={ru} />
     <footer><div className={css.mentions} ref={(element) => { if (element) element.inert = pending; }}><span ref={setEmojiHost} /><CommentAttachmentButton state={files} pending={pending} ru={ru} /><CommentMentions value={mentions} onChange={setMentions} ru={ru} /></div>
-      <div className={css.submitActions}>{!persistent && <button type="button" disabled={pending} onClick={onCancel}>{ru ? "Отмена" : "Cancel"}</button>}
+      <div className={css.submitActions}>{!persistent && <button type="button" disabled={pending} onClick={() => void leave.close(onCancel)}>{ru ? "Отмена" : "Cancel"}</button>}
       <button type="button" className={css.send} disabled={cannotSubmit} onClick={() => void submit()}><Send size={14} />
         {pending ? (ru ? "Сохранение…" : "Saving…") : initial ? (ru ? "Сохранить" : "Save") : (ru ? "Отправить" : "Post")}</button></div></footer>
 

@@ -134,9 +134,10 @@ test("compact autofocus reaches the lazy Markdown editor without changing persis
     ru: boolean; pending: boolean; failure: string; persistent: boolean; autoFocus?: boolean;
     onSubmit: () => Promise<boolean>; onCancel: () => void;
   }) => unknown }>(new URL("../../../cases/collaboration/composer/CommentComposer.tsx", import.meta.url), name => {
+    if (name.endsWith("useFormLeave")) return { useFormLeave: () => ({ release() {}, close: (action: () => void) => action() }) };
     if (name.endsWith("comment-attachments")) return { readCommentAttachments: () => ({ text: "", attachments: [] }),
       writeCommentAttachments: (body: string) => body };
-    if (name.endsWith("useCommentAttachments")) return { useCommentAttachments: () => ({ references: [] }) };
+    if (name.endsWith("useCommentAttachments")) return { useCommentAttachments: () => ({ references: [], entries: [] }) };
     if (name.endsWith("WorkspaceConnectorContext")) return { useWorkspaceConnectors: () => ({ connections: [] }) };
     return undefined;
   });

@@ -33,6 +33,7 @@ function setup(overrides: Partial<Props> = {}) {
       if (name === "react/jsx-runtime") return jsxRuntime;
       if (name.endsWith(".css")) return { default: new Proxy({}, { get: (_object, key) => String(key) }) };
       if (name.endsWith("/Icon")) return { ArrowLeft: "svg" };
+      if (name.endsWith("useFormLeave")) return { useFormLeave: () => ({ release() {}, close: (action: () => void) => action() }) };
       if (name.endsWith("copy")) return { getSuiteDialogCopy };
       if (name.endsWith("suite-selection")) return selection;
       if (name.endsWith("pending-operation")) return { resolvePendingOperation };
@@ -117,8 +118,8 @@ test("dynamic preview errors block persistence and expose retry without discardi
   try {
     h.change("onName", "Keep this name"); h.setPreview(false, true);
     assert.equal(Boolean(h.submitDisabled()), true); await h.submit(); assert.equal(h.calls.length, 0);
-    const retry = h.root().findAll(node => node.type === "button" && node.children.includes("Retry"))[0];
-    act(() => retry.props.onClick()); assert.equal(h.retries(), 1);
+    const retry = h.root().find(node => String(node.type) === "ErrorToast" && node.props.retryLabel === "Retry");
+    act(() => retry.props.onRetry()); assert.equal(h.retries(), 1);
     h.setPreview(false, false); assert.equal(h.fields().props.name, "Keep this name"); assert.equal(Boolean(h.submitDisabled()), false);
   } finally { h.dispose(); }
 });

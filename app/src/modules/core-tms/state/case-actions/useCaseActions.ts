@@ -1,6 +1,7 @@
+import { requestAuthoringLeave } from "../../authoring/leave/application/authoring-leave";
 import { useRef, useState } from "react";
 import type { FormEvent } from "react";
-import type { TestCase, TestCaseSummary } from "../../../../core/tms/contracts/legacy-contract";
+import type { TestCase } from "../../../../core/tms/contracts/legacy-contract";
 import {
   formatTmsMutationFailure,
   isRequiredCustomFieldFailure,
@@ -22,10 +23,9 @@ import {
 } from "../../test-cases/data/test-case-api";
 import type { useWorkspaceDerived } from "../workspace-derived/useWorkspaceDerived";
 import type { useWorkspaceState } from "../workspace/useWorkspaceState";
-import { reconcileMaintenance } from "../../test-cases/maintenance/model/case-maintenance";
+import { commitCaseToWorkspace } from "./reconciliation/commit-case";
 import type { DraftProductDocRequirement } from "../../product-docs/domain/product-docs";
 import { useCaseDocumentation } from "./documentation/useCaseDocumentation";
-
 export function useCaseActions(
   state: ReturnType<typeof useWorkspaceState>,
   derived: ReturnType<typeof useWorkspaceDerived>,
@@ -37,51 +37,44 @@ export function useCaseActions(
   const caseOperation = useRef<PendingOperation | null>(null);
   const archiveOperation = useRef<PendingOperation | null>(null);
   const archivePending = useRef(false);
+  const caseAuthoringSession = useRef("");
   const saveCheckpoint = useRef<CaseSaveCheckpoint | null>(null);
   const [caseAttachmentRecovery, setCaseAttachmentRecovery] = useState(false);
   const [caseRequiredFields, setCaseRequiredFields] = useState(false);
   const documentation = useCaseDocumentation(http, locale, notify);
-  function commit(testCase: TestCase, etag: string | null, append = false) {
-    const { current: _current, linkIds: _linkIds, ...fields } = testCase;
-    const summary: TestCaseSummary = { ...fields, etag: state.connection === "demo" ? "" : etag ?? "" };
-    state.setData((current) => ({
-      ...current,
-      testCases: append && !current.testCases.some(item => item.id === summary.id)
-        ? [...current.testCases, summary]
-        : current.testCases.map((item) => item.id === summary.id ? reconcileMaintenance(summary, item) : item),
-    }));
-    state.setSelectedCaseId(testCase.id);
-    state.setSelectedFolder(testCase.folderPath);
-    state.setSelectedFolderId(testCase.folderId ?? (testCase.folderPath === "/" ? "root" : ""));
-    state.setSelectedCaseDetail(current => reconcileMaintenance(testCase, current));
-    state.setSelectedCaseEtag(etag);
-  }
+  const commit = (testCase: TestCase, etag: string | null, append = false) => commitCaseToWorkspace(state, testCase, etag, append);
   function openNewCase(folderPath = state.selectedFolder || "/Unsorted", requirement?: DraftProductDocRequirement) {
     if (state.isCaseSubmitting()) return;
-    caseOperation.current = null;
-    saveCheckpoint.current = null;
-    setCaseAttachmentRecovery(false);
-    setCaseRequiredFields(false);
-    documentation.reset(requirement ? [requirement] : []);
-    state.setCaseDraft(createEmptyRevision(locale));
-    state.setCaseFolderPath(folderPath);
-    state.setEditing(false);
-    state.setDialog("case");
+    void requestAuthoringLeave(() => {
+      caseAuthoringSession.current = crypto.randomUUID();
+      caseOperation.current = null;
+      saveCheckpoint.current = null;
+      setCaseAttachmentRecovery(false);
+      setCaseRequiredFields(false);
+      documentation.reset(requirement ? [requirement] : []);
+      state.setCaseDraft(createEmptyRevision(locale));
+      state.setCaseFolderPath(folderPath);
+      state.setEditing(false);
+      state.setDialog("case");
+    });
   }
   function openEditCase() {
-    if (state.isCaseSubmitting() || !derived.selectedRevision || derived.selectedCase?.archivedAt) return;
-    caseOperation.current = null;
-    saveCheckpoint.current = null;
-    setCaseAttachmentRecovery(false);
-    setCaseRequiredFields(false);
-    documentation.reset();
-    state.setCaseDraft(structuredClone(derived.selectedRevision));
-    state.setCaseFolderPath(derived.selectedCase?.folderPath ?? "/Unsorted");
-    state.setEditing(true);
-    state.setDialog("case");
+    const revision = derived.selectedRevision;
+    if (state.isCaseSubmitting() || !revision || derived.selectedCase?.archivedAt) return;
+    void requestAuthoringLeave(() => {
+      caseAuthoringSession.current = crypto.randomUUID();
+      caseOperation.current = null;
+      saveCheckpoint.current = null;
+      setCaseAttachmentRecovery(false);
+      setCaseRequiredFields(false);
+      documentation.reset();
+      state.setCaseDraft(structuredClone(revision));
+      state.setCaseFolderPath(derived.selectedCase?.folderPath ?? "/Unsorted");
+      state.setEditing(true);
+      state.setDialog("case");
+    });
   }
-
-  async function saveCase(event: FormEvent, files: PendingCaseAttachment[] = [], onProgress?: CaseAttachmentProgress) {
+  async function saveCase(event: FormEvent, files: PendingCaseAttachment[] = [], onProgress?: CaseAttachmentProgress, onSaved?: () => void) {
     event.preventDefault();
     if (state.editing && derived.selectedCase?.archivedAt) return;
     if (!derived.project || !state.caseDraft.title.trim() || !state.beginCaseSubmission()) return;
@@ -93,7 +86,6 @@ export function useCaseActions(
     };
     const validStepIds = new Set(input.revision.steps.map(({ id }) => id));
     const validFiles = filterPendingCaseAttachments(files, validStepIds, new Set(input.revision.checklist.map(({ id }) => id)));
-
     try {
       if (state.connection === "demo") {
         const now = new Date().toISOString();
@@ -157,6 +149,7 @@ export function useCaseActions(
     saveCheckpoint.current = null;
     setCaseAttachmentRecovery(false);
     documentation.reset();
+    onSaved?.();
     state.setDialog(null);
     notify(state.editing ? t("actions.caseRevisionSaved") : t("actions.caseCreated"));
   }
@@ -195,6 +188,5 @@ export function useCaseActions(
     notify(restoring ? t("actions.caseRestored") : t("actions.caseArchived"));
     return true;
   }
-
-  return { caseAttachmentRecovery, caseRequiredFields, ...documentation.fields, openNewCase, openEditCase, saveCase, cloneCase, toggleArchiveCase };
+  return { caseAuthoringSessionId: caseAuthoringSession.current, caseAttachmentRecovery, caseRequiredFields, ...documentation.fields, openNewCase, openEditCase, saveCase, cloneCase, toggleArchiveCase };
 }

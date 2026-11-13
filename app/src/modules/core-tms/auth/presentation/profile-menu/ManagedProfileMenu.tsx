@@ -1,5 +1,6 @@
 "use client";
 import { ProfileLink } from "../../../profile/presentation/ProfileLink";
+import { requestAuthoringLeave } from "../../../authoring/leave/application/authoring-leave";
 import { BillingLink } from "../../../billing/presentation/link/BillingLink";
 import { BillingPlanLink } from "../../../billing/composition/menu/BillingPlanLink";
 import { memberRoleLabel } from "../../../company-administration/presentation/permissions/member-role-label";
@@ -73,8 +74,8 @@ export function ManagedProfileMenu({ session }: { readonly session: TmsSessionId
       {session.administrationPath && <a role="menuitem" href={session.administrationPath}><Building2 size={17} />{ru ? "Управление компанией" : "Company administration"}</a>}
       {!session.administrationPath && <CompanyAdministrationLink role="menuitem" workspaceId={session.workspaceId ?? undefined} onClick={() => setAnchor(null)}><Building2 size={17} />{ru ? "Управление компанией" : "Company administration"}</CompanyAdministrationLink>}
       <button role="menuitem" type="button" disabled={pending} onClick={() => {
-        setFailed(false); setPending(true);
-        void session.signOut().catch(() => setFailed(true)).finally(() => setPending(false));
+        void requestAuthoringLeave(async () => { setFailed(false); setPending(true);
+          await session.signOut().catch(() => setFailed(true)).finally(() => setPending(false)); });
       }}><LogOut size={17} />{t("auth.signOut")}</button>
       {failed && <p className={styles.error} role="alert">{t("auth.logoutError")}</p>}
     </div>, document.body)}

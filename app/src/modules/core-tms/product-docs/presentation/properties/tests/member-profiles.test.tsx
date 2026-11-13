@@ -50,6 +50,7 @@ function fixture() {
         if(name.endsWith("MemberProfileLink"))return {MemberProfileLink:({children,...props}:React.PropsWithChildren)=>React.createElement("a",props,children)};
         if (name.endsWith("member-role-label")) return { memberRoleLabel };
         if (name.endsWith("FalconTooltip")) return { FalconTooltip: ({ children }: React.PropsWithChildren) => children };
+        if (name.endsWith("useFormLeave")) return { useFormLeave: () => ({ reset() {} }) };
         if (name.endsWith("useProductDocResource")) return { useProductDocResource };
         if (name.includes("notifications/inbox/model/presentation")) return { notificationTime: () => "now" };
         if (name.endsWith("ErrorToast")) return { ErrorToast: () => null };

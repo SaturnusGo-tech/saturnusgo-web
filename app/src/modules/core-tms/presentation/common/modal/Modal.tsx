@@ -1,4 +1,5 @@
 import { X } from "lucide-react";
+import { authoringLeave } from "../../../authoring/leave/application/authoring-leave";
 import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import { useEffect, useId, useRef, useState } from "react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -114,7 +115,7 @@ export function Modal({
       target?.focus({ preventScroll: true });
     });
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.defaultPrevented) return;
+      if (event.defaultPrevented || authoringLeave.isPending()) return;
       if (event.key === "Escape") {
         event.preventDefault();
         closeRef.current();

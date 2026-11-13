@@ -1,3 +1,4 @@
+import { useFormLeave } from "../../../authoring/leave/state/value/useFormLeave";
 import { DefectForm } from "../../dialogs/defect-form/DefectForm";
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
@@ -49,6 +50,7 @@ export function InlineDefectComposer({ workspaceId, projectId, run, item, step, 
   const [priority, setPriority] = useState<Defect["priority"]>("high");
   const [component, setComponent] = useState(componentOptions[0]);
   const [integrationChoice, setIntegrationChoice] = useState<DefectIntegrationChoice>("");
+  const [editedRoute, setEditedRoute] = useState<{ initial: string; value: string } | null>(null);
   const { configurationVersion, enabled, options: youTrackOptions, status: youTrackStatus } = youTrack;
   useEffect(() => {
     if (configurationVersion !== 1 || !enabled || integrationChoice) return;
@@ -74,6 +76,15 @@ export function InlineDefectComposer({ workspaceId, projectId, run, item, step, 
   const [error, setError] = useState("");
   const [operationKey] = useState(() => crypto.randomUUID());
 
+  const value = { title, description, preconditions, testData, actualResult: actual, expectedResult: expected,
+    reproduction: repro, component, severity, priority, reproducibility, assigneeIdentityId, link };
+  const leave = useFormLeave(value, { busy: submitting,
+    revision: [editedRoute?.value, files.map(file => [file.name, file.size, file.type, file.lastModified])],
+    extraDirty: files.length > 0 || Boolean(editedRoute && editedRoute.initial !== editedRoute.value) });
+  const changeRoute = (next: DefectIntegrationChoice) => {
+    setEditedRoute(current => ({ initial: current?.initial ?? integrationChoice, value: next }));
+    setIntegrationChoice(next);
+  };
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (submitting) return;
@@ -90,6 +101,7 @@ export function InlineDefectComposer({ workspaceId, projectId, run, item, step, 
     };
     try {
       const next = await createDefect({ http, attachments, projectId, payload, files, operationKey, link, offline, locale });
+      leave.release();
       dismiss(() => { onCreated(next); onClose(); });
     } catch (caught) {
       setError(describeDefectCreateError(caught, t("inlineDefect.saveError"), locale));
@@ -100,8 +112,7 @@ export function InlineDefectComposer({ workspaceId, projectId, run, item, step, 
   const componentChoices = componentOptions.map((value) => ({ value, label: localizedComponentLabel(locale, value) }));
   return <DefectForm workspaceId={workspaceId} offline={offline}
     context={`${item.caseKey} · ${t("inlineDefect.linkStep")} ${step.order} · ${run.environment.name}`}
-    value={{ title, description, preconditions, testData, actualResult: actual, expectedResult: expected, reproduction: repro,
-      component, severity, priority, reproducibility, assigneeIdentityId, link }}
+    value={value}
     onChange={patch => {
       if (patch.title !== undefined) setTitle(patch.title);
       if (patch.description !== undefined) setDescription(patch.description);
@@ -118,9 +129,9 @@ export function InlineDefectComposer({ workspaceId, projectId, run, item, step, 
       if (patch.link !== undefined) setLink(patch.link);
     }}
     components={componentChoices}
-    routing={{ value: integrationChoice, onChange: setIntegrationChoice, options: routeOptions,
+    routing={{ value: integrationChoice, onChange: changeRoute, options: routeOptions,
       disabled: offline || youTrackStatus !== "ready", resolved: routing.resolved, message: routingMessage }}
     files={files} onFilesChange={setFiles} submitting={submitting} error={error}
     closing={closing} panelRef={panelRef} onSubmit={submit}
-    onClose={() => { if (!submitting) dismiss(onClose); }} />;
+    onClose={() => { if (!submitting) void leave.close(() => dismiss(onClose)); }} />;
 }

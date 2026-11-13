@@ -1,3 +1,4 @@
+import { useFormLeave } from "../../../authoring/leave/state/value/useFormLeave";
 import { ErrorToast } from "../../common/error/ErrorToast";
 import { ArrowLeft } from "@openai/apps-sdk-ui/components/Icon";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
@@ -36,6 +37,8 @@ export function SuiteDialog(props: Props) {
   const [tags, setTags] = useState((props.suite ? props.suite.filter.tags ?? [] : ["smoke"]).join(", "));
   const [submitting, setSubmitting] = useState(false); const [error, setError] = useState("");
   const operation = useRef<PendingOperation | null>(null);
+  const leave = useFormLeave({ name, description, type, caseIds, tags }, { busy: submitting });
+  const close = () => { if (!submitting) void leave.close(props.onClose); };
   const normalizedTags = tags.split(",").map(tag => tag.trim()).filter(Boolean);
   const membership = { projectId: props.projectId, type, caseIds, filter: { ...(props.suite?.type === "dynamic" ? props.suite.filter : {}), tags: normalizedTags } };
   const preview = useSuitePreview(activeCases, membership, props.folders);
@@ -52,17 +55,17 @@ export function SuiteDialog(props: Props) {
     try {
       const saved = await saveSuite({ http, suite: props.suite, suiteEtag: props.suiteEtag, projectId: props.projectId, name, description, type, caseIds,
         tags: normalizedTags, offline: props.offline, operationKey: operation.current.key });
-      props.onSaved(saved.data, saved.etag);
+      leave.release(); props.onSaved(saved.data, saved.etag);
     } catch (caught) {
       setError(formatTmsMutationFailure(toTmsMutationFailure(caught), copy.error)); setSubmitting(false);
     }
   }
   return <section className={shared.workspace} aria-label={props.suite ? copy.configureTitle : copy.createTitle}>
     <form onSubmit={submit} className={css.page} aria-busy={submitting}>
-      <button type="button" className={css.back} disabled={submitting} onClick={props.onClose}><ArrowLeft width={16} height={16} />{ru ? "Тест-сьюты" : "Test suites"}</button>
+      <button type="button" className={css.back} disabled={submitting} onClick={close}><ArrowLeft width={16} height={16} />{ru ? "Тест-сьюты" : "Test suites"}</button>
       <header className={css.header}>
         <div><h1 ref={title} tabIndex={-1}>{props.suite ? copy.configureTitle : copy.createTitle}</h1><p>{copy.subtitle}</p></div>
-        <div className={css.actions}><button type="button" className={css.cancel} disabled={submitting} onClick={props.onClose}>{copy.cancel}</button>
+        <div className={css.actions}><button type="button" className={css.cancel} disabled={submitting} onClick={close}>{copy.cancel}</button>
           <button type="submit" className={shared.primary} disabled={disabled}>{submitting ? copy.saving : props.suite ? copy.save : copy.create}</button></div>
       </header>
       <div ref={element => { if (element) element.inert = submitting; }}>

@@ -1,3 +1,4 @@
+import { useFormLeave } from "../../../authoring/leave/state/value/useFormLeave";
 import { Check, Globe2, Plus } from "lucide-react";
 import { useState } from "react";
 import type { FormEvent } from "react";
@@ -37,6 +38,8 @@ export function EnvironmentDialog({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(false);
   const [operationKey] = useState(() => crypto.randomUUID());
+  const leave = useFormLeave({ name, key, baseUrl, description }, { busy: submitting });
+  const close = () => { if (!submitting) void leave.close(onClose); };
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (submitting) return;
@@ -47,17 +50,16 @@ export function EnvironmentDialog({
           http, environment, etag: environmentEtag ?? null, name, key,
           baseUrl, description, offline, operationKey,
         });
-        onUpdated(result.data, result.etag);
+        leave.release(); onUpdated(result.data, result.etag);
       } else {
-        onCreated(await createEnvironment({
-          http, projectId, name, key, baseUrl, description, offline, operationKey,
-        }));
+        const created = await createEnvironment({ http, projectId, name, key, baseUrl, description, offline, operationKey });
+        leave.release(); onCreated(created);
       }
     }
     catch { setError(true); setSubmitting(false); }
   }
   return <Modal title={environment ? copy.editTitle : copy.title} subtitle={copy.subtitle}
-    panelClassName={css.dialog} onClose={onClose}>
+    panelClassName={css.dialog} onClose={close}>
     <form className={css.form} onSubmit={submit} aria-busy={submitting}>
       <div className={css.body}>
         <div className={css.identity}>
@@ -91,7 +93,7 @@ export function EnvironmentDialog({
         {error && <FormError message={copy.error} />}
       </div>
       <footer className={css.footer}>
-        <button type="button" className={css.cancel} onClick={onClose}>{copy.cancel}</button>
+        <button type="button" className={css.cancel} onClick={close}>{copy.cancel}</button>
         <button type="submit" className={styles.primaryButton}
           disabled={submitting || !name.trim() || !key.trim() || !baseUrl.trim()}>
           {environment ? <Check size={16} aria-hidden="true" /> : <Plus size={16} aria-hidden="true" />}

@@ -1,3 +1,4 @@
+import { useFormLeave } from "../../../authoring/leave/state/value/useFormLeave";
 import { ErrorToast } from "../../common/error/ErrorToast";
 import { useEffect, useRef, useState } from "react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -16,6 +17,7 @@ export function StepActualEditor({ value, order, onChange, onSave, onDirtyChange
   const inFlight = useRef(false);
   const mounted = useRef(true);
   const dirty = saved !== draft;
+  useFormLeave(null, { extraDirty: dirty, busy: pending, revision: draft });
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
   useEffect(() => { if (!dirty && !pending) { setSaved(value); setDraft(value); } }, [value, dirty, pending]);
   async function save() {

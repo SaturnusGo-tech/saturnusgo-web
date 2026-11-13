@@ -1,3 +1,4 @@
+import { requestAuthoringLeave } from "../../../authoring/leave/application/authoring-leave";
 import { ErrorToast } from "../../common/error/ErrorToast";
 import { useEffect, useRef } from "react";
 import type { Project } from "../../../../../core/tms/contracts/legacy-contract";
@@ -24,8 +25,9 @@ export function ProjectInlineEditor({ project, etag, workspaceId, offline, onBus
   const options = [{ value: "", label: catalog.noPortfolio }, ...portfolios.items.map(item => ({ value: item.id, label: item.name }))];
   if (form.portfolioId && !portfolios.items.some(item => item.id === form.portfolioId)) options.push({ value: form.portfolioId, label: catalog.unknownPortfolio });
   const disabled = offline || form.pending || !etag;
+  const close = () => { if (!form.pending) void requestAuthoringLeave(onCancel); };
   return <form className={css.form} aria-label={copy.editTitle} aria-busy={form.pending || undefined}
-    onKeyDown={event => { if (event.key === "Escape" && !form.pending) { event.preventDefault(); event.stopPropagation(); onCancel(); } }}
+    onKeyDown={event => { if (event.key === "Escape" && !form.pending) { event.preventDefault(); event.stopPropagation(); close(); } }}
     onSubmit={async event => {
       event.preventDefault();
       if (disabled || !form.modified || !form.name.trim()) return;
@@ -50,7 +52,7 @@ export function ProjectInlineEditor({ project, etag, workspaceId, offline, onBus
     <ErrorToast message={form.error} />
     {!etag && <p className={`${css.error} ${css.full}`} role="alert">{ru ? "Не удалось получить версию проекта. Закройте форму и повторите попытку." : "Could not load the project version. Close the form and try again."}</p>}
     <footer className={`${css.actions} ${css.full}`}>
-      <button type="button" className={css.cancel} disabled={form.pending} onClick={onCancel}>{copy.cancel}</button>
+      <button type="button" className={css.cancel} disabled={form.pending} onClick={close}>{copy.cancel}</button>
       <button className={css.save} disabled={disabled || !form.modified || !form.name.trim()}>{form.pending ? copy.saving : copy.save}</button>
     </footer>
   </form>;

@@ -1,5 +1,6 @@
 "use client";
 
+import { useFormLeave } from "../../../authoring/leave/state/value/useFormLeave";
 import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { Button, Textarea } from "@heroui/react";
@@ -40,6 +41,7 @@ export function ProductDocActivity({ api, scope, document, locale, copy }: {
   const [postError, setPostError] = useState(false);
   const [moreError, setMoreError] = useState(false);
   const intent = useRef<{ body: string; key: string } | undefined>(undefined);
+  const leave = useFormLeave({ body }, { busy: posting });
 
   async function post() {
     const message = body.trim();
@@ -50,6 +52,7 @@ export function ProductDocActivity({ api, scope, document, locale, copy }: {
     try {
       const comment = await api.postComment(scope, docId, message, { idempotencyKey: intent.current.key });
       setPosted((items) => [comment, ...items]);
+      leave.reset({ body: "" });
       setBody("");
       intent.current = undefined;
     } catch {

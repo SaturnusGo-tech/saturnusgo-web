@@ -1,3 +1,4 @@
+import { useFormLeave } from "../../../authoring/leave/state/value/useFormLeave";
 import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
 import { PortfolioIcon } from "../../../portfolios/presentation/icon/PortfolioIcon";
 import { PiInfo, PiLockKey, PiPlus } from "react-icons/pi";
@@ -24,16 +25,19 @@ export function ProjectDialog({ workspaceId, project, projectEtag, portfolioId, 
   const copy = getProjectDialogCopy(locale);
   const catalogCopy = portfolioCopy(locale);
   const form = useProjectForm({ workspaceId, project, projectEtag, offline, portfolioId, errorText: copy.projectError });
+  const leave = useFormLeave({ name: form.name, key: form.key, description: form.description,
+    portfolioId: form.portfolioId, responsibleIdentityId: form.responsibleIdentityId }, { busy: form.pending });
+  const close = () => { if (!form.pending) void leave.close(onClose); };
   const portfolios = useProjectPortfolioOptions(workspaceId, !offline);
   const options = [{ value: "", label: catalogCopy.noPortfolio }, ...portfolios.items.map((item) => ({ value: item.id, label: item.name }))];
   if (form.portfolioId && !portfolios.items.some((item) => item.id === form.portfolioId)) {
     options.push({ value: form.portfolioId, label: portfolioName || catalogCopy.unknownPortfolio });
   }
-  return <Modal title={project ? copy.editTitle : copy.title} onClose={onClose} panelClassName={styles.panel}>
+  return <Modal title={project ? copy.editTitle : copy.title} onClose={close} panelClassName={styles.panel}>
     <form className={styles.form} onSubmit={async (event) => {
       event.preventDefault();
       const result = await form.save();
-      if (result) { if (project) onUpdated(result.data, result.etag); else onCreated(result.data); }
+      if (result) { leave.release(); if (project) onUpdated(result.data, result.etag); else onCreated(result.data); }
     }} aria-busy={form.pending || undefined}>
       <div className={styles.body}>
         <p className={styles.intro}>{project ? copy.editHint : copy.createHint}</p>
@@ -65,7 +69,7 @@ export function ProjectDialog({ workspaceId, project, projectEtag, portfolioId, 
         {form.error && <FormError message={form.error} />}
       </div>
       <footer className={styles.actions}>
-        <button type="button" onClick={onClose}>{copy.cancel}</button>
+        <button type="button" onClick={close}>{copy.cancel}</button>
         <button className={styles.primary} disabled={offline || form.pending || !form.name.trim() || form.key.trim().length < 2 || (!form.modified && !form.error)}>
           {form.pending ? <LoadingOrb /> : !project ? <PiPlus size={17} aria-hidden="true" /> : null}
           {form.pending ? project ? copy.saving : copy.creating : project ? copy.save : copy.create}

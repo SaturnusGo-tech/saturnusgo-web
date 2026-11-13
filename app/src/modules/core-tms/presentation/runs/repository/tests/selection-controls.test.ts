@@ -7,10 +7,12 @@ import { isWorkingRun } from "../../../../runs/model/history/run-history";
 import type { SelectionControls } from "../../../cases/selection/controls/SelectionControls";
 import type { RepositoryQueryControls } from "../../../cases/browser/controls/RepositoryQueryControls";
 import { componentHarness, invoke, nodes } from "../../../../portfolios/tests/support/component-harness";
+import * as authoringLeave from "../../../../authoring/leave/application/authoring-leave";
 
 function browser() {
   const h = componentHarness(); const selected: string[][] = [];
   const { RunRepositoryBrowser: render } = h.load<{ RunRepositoryBrowser: typeof RunRepositoryBrowser }>(new URL("../RunRepositoryBrowser.tsx", import.meta.url), name => {
+    if (name.endsWith("authoring-leave")) return authoringLeave;
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en" }) };
     if (name.endsWith("useRunFolderAppearance")) return { useRunFolderAppearance: () => [] };
     if (name.endsWith("run-repository")) return { runRepositoryFolders: () => [] };

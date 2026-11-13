@@ -10,6 +10,8 @@ import { validChecklist } from "../../../management/model/organization";
 import { organizationErrors, focusOrganizationError } from "../validation/validate";
 const copy = portfolioCopy("ru");
 function shared(name: string) {
+  if (name.endsWith("useFormLeave")) return { useFormLeave: () => ({ release() {}, close: async (action: () => void) => { action(); return true; } }) };
+  if (name.endsWith("authoring-leave")) return { requestAuthoringLeave: async (action: () => void) => { action(); return true; } };
   if (name.endsWith("validation/validate")) return { organizationErrors, focusOrganizationError };
   if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "ru" }) };
   if (name.endsWith("management/model/copy")) return { organizationCopy };

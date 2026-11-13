@@ -2,6 +2,7 @@ import { navigateWorkspace } from "../navigation/browser/workspace-history";
 import { useCallback } from "react";
 import type { View } from "../types/workspace";
 import { openRunNavigation } from "./open-run-navigation";
+import { requestAuthoringLeave } from "../../authoring/leave/application/authoring-leave";
 
 export function useRunNavigation(input: {
   workspaceId: string; projectId: string;
@@ -11,14 +12,14 @@ export function useRunNavigation(input: {
   clearDefectSelection: () => void;
 }) {
   return useCallback((runId: string, runItemId: string | null = null) => {
-    openRunNavigation({ workspaceId: input.workspaceId, projectId: input.projectId, runId, runItemId }, {
+    void requestAuthoringLeave(() => openRunNavigation({ workspaceId: input.workspaceId, projectId: input.projectId, runId, runItemId }, {
       href: window.location.href,
       replace: (href) => navigateWorkspace(href),
       clearDefect: input.clearDefectSelection,
       selectRun: input.setSelectedRunId,
       selectItem: input.setSelectedRunItemId,
       showRuns: () => input.setView("runs"),
-    });
+    }));
   }, [input.workspaceId, input.projectId, input.setSelectedRunId, input.setSelectedRunItemId,
     input.setView, input.clearDefectSelection]);
 }

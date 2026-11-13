@@ -1,3 +1,5 @@
+import { requestAuthoringLeave } from "../../../authoring/leave/application/authoring-leave";
+import { useCaseAuthoringSession } from "./authoring/useCaseAuthoringSession";
 import { CaseMaintenanceFeature } from "../../../test-cases/maintenance/composition/CaseMaintenanceFeature";
 import { useCaseActivityNavigation } from "../../../test-cases/navigation/activity/useCaseActivityNavigation";
 import { ListChecks, Pencil } from "lucide-react";
@@ -29,6 +31,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
   const [attempted, setAttempted] = useState(false);
   const [tab, setTab] = useState<DetailTab>("overview");
   const [files, setFiles] = useState<PendingCaseAttachment[]>([]);
+  const authoring = useCaseAuthoringSession(props.editor, files);
   const [headerEditing, setHeaderEditing] = useState<"title" | null>(null);
   const formId = useId();
   const tabsId = useId();
@@ -88,7 +91,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
   const runCase = () => { if (!archived) props.onRunCase(); };
   function cancelEditor() {
     if (props.editor?.submitting) return;
-    closeWithMotion(() => { setHeaderEditing(null); props.editor?.onCancel(); });
+    void requestAuthoringLeave(commit => closeWithMotion(() => commit(() => { setHeaderEditing(null); props.editor?.onCancel(); })));
   }
   if (!props.testCase && !creating) return <div ref={panelRef} tabIndex={-1} className={styles.detailPanelInner}><div className={styles.detailEmpty}><ListChecks size={28} /><strong>{ru ? "Выберите тест-кейс" : "Select a test case"}</strong><span>{ru ? "Здесь появятся свойства, шаги и история." : "Properties, steps, and history will appear here."}</span><button className={styles.primaryButton} onClick={() => props.onNew(props.selectedFolder)}>{ru ? "Создать кейс" : "Create case"}</button></div></div>;
   if (!revision) return null;
@@ -124,7 +127,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
     onClone={props.onClone}
     onCreateDefect={props.onCreateDefect}
     onArchive={props.onArchive}
-    onClose={props.onClose ? () => { if (!props.editor?.submitting) closeWithMotion(() => props.onClose?.()); } : undefined}
+    onClose={props.onClose ? () => { if (!props.editor?.submitting) props.onClose?.(); } : undefined}
   >{!creating && editorActions}</CaseDetailHeaderActions>;
   const location = props.location && <div className={inspector.caseLocation}>{props.location}</div>;
   const retest = readyDefects > 0 && <div className={inspector.metaRow}>
@@ -178,7 +181,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
       if (problem === "title") panelRef.current?.querySelector<HTMLElement>("[data-case-title-input]")?.focus();
       if (archived || !props.editor || problem || props.editor.submitting) { event.preventDefault(); return; }
       setFiles((current) => current.map((entry) => entry.phase === "ready" ? entry : { ...entry, phase: "preparing" }));
-      props.editor.onSubmit(event, files, uploadProgress);
+      props.editor.onSubmit(event, files, uploadProgress, authoring.release);
     }}>
       <fieldset disabled={uploadLocked} className={inspector.uploadFieldset}>
       <div className={`${styles.detailScroll} ${inspector.scroll}`} id={`${tabsId}-panel`} role={creating ? undefined : "tabpanel"} aria-labelledby={creating ? undefined : `${tabsId}-${activeTab}`} tabIndex={0}>

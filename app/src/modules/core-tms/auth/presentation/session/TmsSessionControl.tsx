@@ -1,6 +1,7 @@
 "use client";
 
 import { ManagedProfileMenu } from "../profile-menu/ManagedProfileMenu";
+import { requestAuthoringLeave } from "../../../authoring/leave/application/authoring-leave";
 import { LogOut } from "lucide-react";
 import { useState } from "react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -19,8 +20,7 @@ export function TmsSessionControl() {
   const [failed, setFailed] = useState(false);
   const label = session.label || t("auth.account");
   const signOut = () => {
-    setFailed(false);
-    void session.signOut().catch(() => setFailed(true));
+    void requestAuthoringLeave(async () => { setFailed(false); await session.signOut().catch(() => setFailed(true)); });
   };
   if (session.kind === "managed") return <ManagedProfileMenu session={session} />;
   return (

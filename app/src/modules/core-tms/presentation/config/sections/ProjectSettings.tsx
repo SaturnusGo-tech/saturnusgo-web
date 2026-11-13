@@ -1,3 +1,4 @@
+import { requestAuthoringLeave } from "../../../authoring/leave/application/authoring-leave";
 import { ErrorToast } from "../../common/error/ErrorToast";
 import { Archive, ArrowRotateCcw, EditPencil, ChevronUp } from "@openai/apps-sdk-ui/components/Icon";
 import { useEffect, useId, useRef, useState } from "react";
@@ -39,9 +40,11 @@ export function ProjectSettings({ project, workspaceId, offline, canManage, onUp
   useEffect(() => { if (!canManage || offline) { setRequested(false); setPending(false); } }, [canManage, offline]);
   function cancel() {
     if (pending) return;
-    restoreFocus.current = true;
-    setRequested(false);
-    if (!expansion.present) editor.close();
+    void requestAuthoringLeave(() => {
+      restoreFocus.current = true;
+      setRequested(false);
+      if (!expansion.present) editor.close();
+    });
   }
   function edit() {
     if (!canManage || offline || pending) return;
@@ -70,7 +73,7 @@ export function ProjectSettings({ project, workspaceId, offline, canManage, onUp
     <ErrorToast message={editor.error} retryLabel={ru ? "Повторить" : "Try again"} onRetry={edit} />
     {expansion.present && <div id={`${id}-editor`} data-project-expansion aria-hidden={!open || undefined}
       ref={element => { expansion.ref.current = element; if (element) element.inert = !open; }}>
-      <div className={css.editorSpace}>{editor.resource && <ProjectInlineEditor workspaceId={workspaceId}
+      <div className={css.editorSpace}>{editor.resource && <ProjectInlineEditor key={`${workspaceId}:${editor.resource.data.id}`} workspaceId={workspaceId}
         project={editor.resource.data} etag={editor.resource.etag} offline={offline || !canManage}
         onBusy={setPending} onCancel={cancel} onSaved={(value, etag) => {
           restoreFocus.current = true;

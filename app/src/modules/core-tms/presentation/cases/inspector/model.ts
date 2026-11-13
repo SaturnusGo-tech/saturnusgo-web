@@ -48,6 +48,7 @@ export function caseRevisionAttachmentIds(revision: TestCaseRevision, comments: 
 
 export type CaseInspectorEditor = {
   mode: "edit" | "create";
+  sessionId?: string;
   projectId?: string;
   canCreateFieldValues?: boolean;
   requiredFields?: boolean;
@@ -57,7 +58,7 @@ export type CaseInspectorEditor = {
   components: string[];
   onChange: (next: TestCaseRevision) => void;
   onFolderPath: (next: string) => void;
-  onSubmit: (event: FormEvent, files: PendingCaseAttachment[], onProgress?: CaseAttachmentProgress) => void;
+  onSubmit: (event: FormEvent, files: PendingCaseAttachment[], onProgress?: CaseAttachmentProgress, onSaved?: () => void) => void;
   onCancel: () => void;
   submitting?: boolean;
   attachmentsPending?: boolean;

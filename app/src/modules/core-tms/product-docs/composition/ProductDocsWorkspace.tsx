@@ -2,7 +2,7 @@ import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
 import { ProductDocRunInspector } from "../presentation/run/inspector/ProductDocRunInspector";
 import type { ProductDocRunSelection } from "../state/run/inspector/useProductDocRunModel";
 import type { Activity } from "../../../../core/tms/contracts/legacy-contract";
-import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode, type RefObject } from "react";
+import { useState, useSyncExternalStore, type ReactNode, type RefObject } from "react";
 import type { DraftProductDocRequirement, ProductDocsApi, ProductDocScope, ProductDocSelection } from "../domain/product-docs";
 import { ProductDocsView } from "../presentation/ProductDocsView";
 import { ProductDocsPanel } from "../presentation/panel/ProductDocsPanel";
@@ -12,7 +12,9 @@ import { buildWorkspaceDeepLink } from "../../state/navigation/workspace-deep-li
 import { ProductDocCasePanel } from "../presentation/panel/case/ProductDocCasePanel";
 import { ProductDocsContext } from "./context/ProductDocsContext";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
-import type { ProductDocDraftBuffer } from "../state/draft/draft-buffer";
+import { useProductDocDraftSession } from "../state/draft/session/useProductDocDraftSession";
+import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
+import { requestAuthoringLeave } from "../../authoring/leave/application/authoring-leave";
 import type { ProductDocRepositoryTarget } from "../navigation/product-doc-smart-link";
 import { ProductDocRepositoryPanel } from "../presentation/panel/repository/ProductDocRepositoryPanel";
 import { CaseReferenceProvider } from "../../case-references/presentation/CaseReferenceProvider";
@@ -41,17 +43,8 @@ export function ProductDocsWorkspace({api, scope, children, visible, enabled, pr
   contentRef: RefObject<HTMLDivElement | null>;
 }) {
   const {locale} = useTmsLocale();
-  const drafts = useRef<ProductDocDraftBuffer>(new Map());
-  useEffect(() => {
-    if (!enabled && !drafts.current.size) return;
-    function warn(event: BeforeUnloadEvent) {
-      if (!drafts.current.size) return;
-      event.preventDefault();
-      event.returnValue = true;
-    }
-    window.addEventListener("beforeunload", warn);
-    return () => window.removeEventListener("beforeunload", warn);
-  }, [enabled]);
+  const session = useOptionalTmsSession();
+  const drafts = useProductDocDraftSession({ api, scope, enabled, locale, ownerId: session?.subject ?? null, notify: workspace.notify });
   const href = useSyncExternalStore(subscribe, () => window.location.href, () => "");
   const [panel, setPanel] = useState<{scope: ProductDocScope; href: string; selection: ProductDocSelection; trigger: HTMLElement}>();
   const [casePanel, setCasePanel] = useState<{href: string; id: string; scope: ProductDocScope; trigger?: HTMLElement}>();
@@ -66,8 +59,7 @@ export function ProductDocsWorkspace({api, scope, children, visible, enabled, pr
   }
   function select(selection?: ProductDocSelection) {
     const next = documentHref(selection);
-    if (visible) navigateWorkspace(next);
-    else visitWorkspace(next);
+    return requestAuthoringLeave(() => visible ? navigateWorkspace(next) : visitWorkspace(next));
   }
   function openCase(caseId: string, trigger?: HTMLElement, selection?: ProductDocSelection, projectId = scope.projectId) {
     setRunPanel(undefined);
@@ -92,12 +84,12 @@ export function ProductDocsWorkspace({api, scope, children, visible, enabled, pr
   const referenceProjects = workspace.data.projects.map(project => project.id);
   return <ProductDocsContext.Provider value={context}>
     <CaseReferenceProvider scope={scope} records={workspace.data.testCases} projectIds={referenceProjects}>
-    {visible ? (context ? <ProductDocsView api={context.api} scope={scope} locale={locale} projectName={projectName} drafts={drafts.current}
+    {visible ? (context ? <ProductDocsView api={context.api} scope={scope} locale={locale} projectName={projectName} drafts={drafts}
       selection={href ? readProductDocSelection(href) : undefined} onSelect={select} onCreateCase={onCreateCase}
       onOpenCase={({caseId}, selection) => openCase(caseId, document.activeElement instanceof HTMLElement ? document.activeElement : undefined, selection)} /> : fallback) : children}
     {context && <ProductDocsPanel api={context.api} scope={scope} locale={locale} projectName={projectName} selection={currentPanel?.selection} trigger={currentPanel?.trigger}
       contentRef={contentRef} onClose={() => setPanel(undefined)}
-      onOpenFull={(selection: ProductDocSelection) => { setPanel(undefined); select(selection); }} />}
+      onOpenFull={(selection: ProductDocSelection) => select(selection)} />}
     {context && <ProductDocRepositoryPanel target={repositoryPanel?.href === href ? repositoryPanel.target : undefined} scope={scope}
       trigger={repositoryPanel?.trigger} onClose={() => setRepositoryPanel(undefined)}
       onCase={(id, trigger, projectId) => openCase(id, trigger, undefined, projectId)} />}

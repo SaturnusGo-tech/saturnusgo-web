@@ -9,9 +9,10 @@ test("new run uses repository filters and single-line priority rows while preser
   const cases = [{ id: "case-a", projectId: "project-a" }, { id: "case-b", projectId: "project-b" }];
   let selected: string[] = [];
   const state = { projectIds: ["project-a", "project-b"], visibleCases: cases, caseIds: [], suiteId: "suite-a", iterations: [],
-    catalog: {}, platformBuilds: {}, loading: false, busy: false, tags: "", build: "", name: "Release",
+    catalog: {}, platformBuilds: { drafts: {} }, loading: false, busy: false, tags: "", build: "", name: "Release",
     setCaseIds: (update: (ids: string[]) => string[]) => { selected = update(selected); } };
   const { RunDialog: View } = h.load<{ RunDialog: typeof RunDialog }>(new URL("../../../dialogs/run/RunDialog.tsx", import.meta.url), name => {
+    if (name.endsWith("useFormLeave")) return { useFormLeave: () => ({ release() {}, close: (action: () => void) => action() }) };
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en" }) };
     if (name.endsWith("useBatchComposer")) return { useBatchComposer: () => state };
     if (name.endsWith("useDrawerDismiss")) return { useDrawerDismiss: () => ({ closing: false, dismiss() {}, panelRef: { current: null } }) };

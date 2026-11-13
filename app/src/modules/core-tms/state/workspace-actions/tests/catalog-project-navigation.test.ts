@@ -4,6 +4,7 @@ import test from "node:test";
 import { runInNewContext } from "node:vm";
 import ts from "typescript";
 import { createWorkspaceShell } from "../../../../../core/tms/fallback/bootstrap";
+import * as leave from "../../../authoring/leave/application/authoring-leave";
 import { defaultWorkingRun } from "../../../runs/model/history/run-history";
 
 function compile(path: URL, overrides: Record<string, unknown> = {}) {
@@ -17,7 +18,7 @@ function harness(loaded: boolean, submitting = false) {
   const events: string[] = [];
   const data = createWorkspaceShell();
   const actions = compile(new URL("../useWorkspaceActions.ts", import.meta.url), {
-    require: () => ({ defaultWorkingRun }),
+    require: (name: string) => name.endsWith("authoring-leave") ? leave : { defaultWorkingRun },
     window: { localStorage: { setItem: () => events.push("remember") } },
   });
   const state = new Proxy({ connection: "connected", data, isCaseSubmitting: () => submitting,
