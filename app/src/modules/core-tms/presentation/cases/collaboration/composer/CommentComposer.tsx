@@ -13,11 +13,11 @@ import { useCommentAttachments } from "../attachments/useCommentAttachments";
 import { CommentAttachmentButton, CommentAttachmentList } from "../attachments/controls/CommentAttachmentControls";
 import { readCommentAttachments, writeCommentAttachments } from "../../../../test-cases/collaboration/model/attachments/comment-attachments";
 import css from "./comment-composer.module.css";
-export function CommentComposer({ ru, projectId, initial, reply, pending, failure, onSubmit, onCancel, onClearReply, persistent = false }: {
+export function CommentComposer({ ru, projectId, initial, reply, pending, failure, onSubmit, onCancel, onClearReply, persistent = false, autoFocus }: {
   ru: boolean; projectId?: string; initial?: TestCaseComment; reply?: TestCaseComment;
   pending: boolean; failure: string; onSubmit: (draft: CommentDraft) => Promise<boolean>; onCancel: () => void;
   onClearReply?: () => void;
-  persistent?: boolean;
+  persistent?: boolean; autoFocus?: boolean;
 }) {
   const [original] = useState(() => readCommentAttachments(initial?.body ?? ""));
   const [body, setBody] = useState(original.text);
@@ -45,7 +45,7 @@ export function CommentComposer({ ru, projectId, initial, reply, pending, failur
     <div className={css.editorFrame} data-reply={Boolean(reply)}>
     <div ref={(element) => { if (element) element.inert = pending; }}>
       <MarkdownField allowAttachments={false} onTransferFiles={files.enabled && !pending && !files.uploading ? files.add : undefined}
-        compact autoFocus={!persistent || Boolean(reply)} value={body}
+        compact autoFocus={autoFocus ?? (!persistent || Boolean(reply))} value={body}
         label={ru ? "Текст комментария" : "Comment text"} onChange={setBody}
         renderFooter={(emoji) => emojiHost ? createPortal(emoji, emojiHost) : null}
         contextContent={reply && <div className={css.replyQuote} role="note" aria-label={ru ? "Исходное сообщение" : "Original message"}>

@@ -7,6 +7,8 @@ const detail = readFileSync(new URL("../detail/DefectReportDetail.tsx", import.m
 const row = readFileSync(new URL("../branches/DefectRow.tsx", import.meta.url), "utf8");
 const browser = readFileSync(new URL("../browser/DefectBrowser.tsx", import.meta.url), "utf8");
 const header = readFileSync(new URL("../detail/header/DefectReportHeader.tsx", import.meta.url), "utf8");
+const content = readFileSync(new URL("../detail/content/DefectReportContent.tsx", import.meta.url), "utf8");
+const attachments = readFileSync(new URL("../detail/attachments/DefectReportAttachments.tsx", import.meta.url), "utf8");
 const properties = readFileSync(new URL("../detail/properties/DefectReportProperties.tsx", import.meta.url), "utf8");
 
 test("report list follows the production split-view and keeps evidence out of rows", () => {
@@ -28,13 +30,15 @@ test("bug report detail shares case inspector styling, tabs, and attachments", (
   assert.match(header, /case-detail-tabs\.module\.css/);
   assert.match(header, /<Tabs aria-label=/);
   assert.match(detail, /role="tabpanel" aria-labelledby=/);
-  assert.match(detail, /inspector\.sectionBody/);
-  assert.match(detail, /<MarkdownField value=\{defect\.actualResult\}/);
-  assert.match(detail, /<MarkdownField value=\{defect\.expectedResult\}/);
-  assert.match(detail, /case-attachments\.module\.css/);
-  assert.match(detail, /presentation="media" variant="gallery"/);
-  assert.doesNotMatch(header, /defect\.status/);
-  assert.match(properties, /<DefectStatusIcon status=\{defect\.status\}/);
+  assert.match(detail, /<DefectExecutionContext/);
+  assert.match(detail, /<DefectReportContent/);
+  assert.ok(detail.indexOf("<DefectExecutionContext") < detail.indexOf("<DefectReportContent"));
+  assert.match(content, /<MarkdownField value=\{defect\.actualResult\}/);
+  assert.match(content, /<MarkdownField value=\{defect\.expectedResult\}/);
+  assert.match(attachments, /case-attachments\.module\.css/);
+  assert.match(attachments, /presentation="media" variant="gallery"/);
+  assert.match(header, /<DefectStatusIcon status=\{defect\.status\}/);
+  assert.doesNotMatch(properties, /<DefectStatusIcon/);
   assert.match(properties, /defect\.externalIssue\.url/);
   assert.match(properties, /defect\.externalIssue\.key/);
 });

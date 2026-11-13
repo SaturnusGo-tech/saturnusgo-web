@@ -5,13 +5,14 @@ import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
 import { useConnectorTargetLinks } from "../../application/links/useConnectorTargetLinks";
 import { connectorLinkDisplay } from "../../model/links/connector-link-display";
 import styles from "./target-links.module.css";
-export function ConnectorTargetLinks({ workspaceId, projectId, targetId }: {
-  workspaceId: string; projectId: string; targetId: string;
+export function ConnectorTargetLinks({ workspaceId, projectId, targetId, hideEmpty = false }: {
+  workspaceId: string; projectId: string; targetId: string; hideEmpty?: boolean;
 }) {
   const { locale } = useTmsLocale(); const ru = locale === "ru";
   const state = useConnectorTargetLinks({ workspaceId, projectId }, targetId);
   if (state.status === "error") return <ErrorToast message={ru ? "Не удалось загрузить связи." : "Could not load links."}
     retryLabel={ru ? "Повторить" : "Retry"} onRetry={state.retry} />;
+  if (hideEmpty && state.status === "ready" && !state.links.length) return null;
   return <section className={styles.section}><h2>{ru ? "Интеграции" : "Integrations"}</h2>
     {state.status === "loading" && <small role="status">{ru ? "Загружаем связи…" : "Loading links…"}</small>}
     {state.status === "ready" && !state.links.length && <small>{ru ? "Связанных записей пока нет." : "No linked records yet."}</small>}

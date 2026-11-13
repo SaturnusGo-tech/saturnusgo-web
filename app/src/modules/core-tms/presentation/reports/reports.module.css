@@ -1,5 +1,5 @@
 .workspace {
-  --report-panel-width: calc(100% - clamp(260px, 29%, 400px));
+  --report-panel-width: calc(100% - clamp(280px, 29%, 440px));
   --cases-bg: var(--falcon-surface);
   --cases-deep: var(--falcon-elevated);
   --cases-raised: var(--falcon-panel);
@@ -28,8 +28,6 @@
 .workspace *, .workspace *::before, .workspace *::after { box-sizing: border-box; }
 .workspace button, .workspace input { font: inherit; }
 
-.workspace:has(> .detailSpace) { --reports-list-min-width: 820px; }
-
 .detailSpace { flex: 0 0 auto; min-width: 0; pointer-events: none; }
 .detailPanel { position: absolute; z-index: 30; inset: 0 0 0 auto; width: var(--report-panel-width); min-width: 0; min-height: 0; overflow: hidden; background: var(--falcon-surface); border-left: 1px solid var(--falcon-border); }
 .detailError { height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 7px; padding: 24px; color: var(--falcon-text-muted); text-align: center; }
@@ -38,6 +36,5 @@
 @container reports-workspace (max-width: 719px) {
   .detailSpace { display: none; }
   .detailPanel { width: 100%; border-inline-start: 0; }
-  .workspace > section { --reports-list-min-width: 0px; }
   .workspace[data-detail-open] > section { visibility: hidden; }
 }

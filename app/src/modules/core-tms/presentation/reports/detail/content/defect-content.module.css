@@ -1,0 +1,20 @@
+.content { display: grid; gap: 24px; min-width: 0; }
+.description { min-width: 0; }
+.description h3 { margin: 0 0 10px; font-size: 18px; font-weight: 650; }
+.results { display: grid; margin: 0; min-width: 0; }
+.result { display: grid; grid-template-columns: minmax(110px, .27fr) minmax(0, 1fr); gap: 16px; padding-block: 17px; border-block-end: 1px solid var(--falcon-border-subtle); }
+.result:first-child { padding-block-start: 10px; }
+.result:last-child { border-block-end: 0; }
+.result dt { display: flex; align-items: baseline; gap: 11px; margin: 0; padding-inline-start: 9px; font-size: 14px; line-height: 1.6; font-weight: 600; }
+.result dt svg { align-self: start; margin-block-start: 4px; flex: none; color: var(--falcon-text-secondary); }
+.result[data-actual] dt { border-inline-start: 2px solid var(--falcon-danger); }
+.result[data-actual] dt svg { fill: currentColor; color: var(--falcon-danger); }
+.result dd { margin: 0; min-width: 0; }
+@container (max-width: 700px) {
+  .result { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .result dd { padding-inline-start: 24px; }
+}
+
+.content :global(.wmde-markdown.wmde-markdown) { font-size: 15px; line-height: 1.65 !important; }
+.content :global(.wmde-markdown) :is(h1, h2, h3, h4) { border: 0; }
+.content :global(.wmde-markdown) :is(h2, h3) { margin-block: 24px 12px !important; font-size: 18px; }

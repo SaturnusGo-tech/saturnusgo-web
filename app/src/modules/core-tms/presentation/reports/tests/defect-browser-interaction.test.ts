@@ -165,7 +165,7 @@ test("an empty scoped search offers all statuses without clearing the query", ()
   assert.equal(f.requests[f.requests.length - 1]?.query, "HOST-BUG-12"); f.h.dispose();
 });
 
-test("a bug row shows actual priority, localized status, and its ID after the title", t => {
+test("a bug row retains selection and accessible status without rendering key or assignee", t => {
   const h = componentHarness(); t.after(() => h.dispose());
   const { DefectRow: Row } = h.load<{ DefectRow: typeof DefectRow }>(new URL("../branches/DefectRow.tsx", import.meta.url), name => {
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en", t: (key: string) => key }) };
@@ -180,11 +180,10 @@ test("a bug row shows actual priority, localized status, and its ID after the ti
   assert.equal(tree.find(node => node.type === "PriorityIcon")?.props.level, "low");
   assert.ok(tree.some(node => node.props["aria-label"] === "Priority low"));
   assert.equal(tree.find(node => node.type === "DefectStatusIcon")?.props.status, "open");
-  assert.ok(tree.some(node => node.props.children === "Status open"));
-  const title = tree.findIndex(node => node.props.children === defect.title);
-  const key = tree.findIndex(node => node.props.children === defect.key);
-  assert.ok(title > -1 && key > title);
-  assert.equal(tree.find(node => node.type === "ResponsibleName")?.props.identityId, "actor-assigned");
+  assert.equal(tree.find(node => node.type === "FalconTooltip")?.props.label, "Status open");
+  assert.ok(tree.some(node => node.props.children === defect.title));
+  assert.ok(!tree.some(node => node.props.children === defect.key || node.props.children === "Status open"));
+  assert.ok(!tree.some(node => node.type === "ResponsibleName"));
   const action = tree.find(node => node.type === "Button")!;
   assert.equal(action.props["aria-current"], "page");
   invoke(action, "onPress");

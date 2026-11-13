@@ -1,18 +1,20 @@
-import { Button, Tab, Tabs, Tooltip } from "@heroui/react";
-import { ArrowLeft, Info, X } from "lucide-react";
-import { useRef, useState } from "react";
+import { Button, Tab, Tabs } from "@heroui/react";
+import { useReducedMotion } from "framer-motion";
+import { ArrowLeft, X } from "lucide-react";
 import type { Defect } from "../../../../../../core/tms/contracts/legacy-contract";
 import { buildDefectDeepLink } from "../../../../defects/navigation/defect-deep-link";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
+import { localizedLabel } from "../../../../localization/format/labels";
 import type { DefectRetest } from "../../../../runs/verification/state/defect/useDefectRetest";
 import { CommentShareItem } from "../../../cases/collaboration/sharing/CommentShareItem";
-import overlays from "../../../cases/detail/header/case-header-overlays.module.css";
 import tabs from "../../../cases/detail/tabs/case-detail-tabs.module.css";
 import inspector from "../../../cases/inspector/caseInspector.module.css";
+import { DefectStatusIcon } from "../../../common/properties/defect/DefectStatusIcon";
 import { transitionContent } from "../../../workspace/motion/transition/content-transition";
 import { DefectRetestAction } from "../retest/DefectRetestAction";
 import { DefectRetestPanel } from "../retest/DefectRetestPanel";
-import detail from "../defect-detail.module.css";
+import { DefectReportDates } from "./dates/DefectReportDates";
+import styles from "./defect-report-header.module.css";
 
 export type DetailTab = "overview" | "attachments";
 
@@ -28,12 +30,20 @@ export function DefectReportHeader({ workspaceId, defect, retest, evidenceCount,
 }) {
   const { locale, t } = useTmsLocale();
   const ru = locale === "ru";
+  const reducedMotion = useReducedMotion();
   const back = t("reports.backToList");
-  return <header className={detail.header}>
-    <div className={`${inspector.utilityRow} ${detail.utility}`}>
-      <div className={inspector.headerActions}>
+  const status = localizedLabel(locale, defect.status);
+  return <header className={styles.header}>
+    <div className={styles.utility}>
+      <div className={styles.identity}>
+        <span className={styles.key}>{defect.key}</span>
+        <span className={styles.status} data-status={defect.status} aria-label={`${t("reports.status")}: ${status}`}>
+          <DefectStatusIcon status={defect.status} /><span>{status}</span>
+        </span>
+      </div>
+      <div className={`${inspector.headerActions} ${styles.actions}`}>
         {retest && <DefectRetestAction retest={retest} />}
-        <div className={detail.share}>
+        <div className={styles.share}>
           <CommentShareItem key={defect.id} compact resource="defect" ru={ru} link={() => {
             const url = new URL(window.location.href);
             if (workspaceId) url.searchParams.set("workspaceId", workspaceId);
@@ -41,19 +51,17 @@ export function DefectReportHeader({ workspaceId, defect, retest, evidenceCount,
           }} />
         </div>
         <Button type="button" isIconOnly variant="light" disableRipple aria-label={back} title={back}
-          className={`${inspector.iconButton} ${detail.back}`} onPress={onBack}>
+          className={`${inspector.iconButton} ${styles.back}`} onPress={onBack}>
           <X size={17} aria-hidden="true" /><ArrowLeft size={17} aria-hidden="true" />
         </Button>
       </div>
     </div>
-    <div className={inspector.titleRow}>
-      <h2>{defect.title}<span className={inspector.titleKey}>#{defect.key}</span></h2>
-    </div>
+    <div className={styles.titleRow}><h2>{defect.title}</h2></div>
     {retest && <DefectRetestPanel key={defect.id} retest={retest} />}
-    <div className={`${tabs.row} ${detail.tabRow}`}>
-      <Tabs aria-label={ru ? "Разделы баг-репорта" : "Bug report sections"} selectedKey={tab}
+    <div className={`${tabs.row} ${styles.tabRow}`}>
+      <Tabs aria-label={ru ? "Разделы баг-репорта" : "Bug report sections"} selectedKey={tab} disableAnimation={Boolean(reducedMotion)}
         classNames={{ base: tabs.base, tabList: tabs.tabs, tab: tabs.tab, tabContent: tabs.content, cursor: tabs.cursor }}
-        motionProps={{ transition: { type: "spring", duration: .3, bounce: 0 } }}
+        motionProps={{ transition: { type: "spring", duration: reducedMotion ? 0 : .3, bounce: 0 } }}
         onSelectionChange={key => {
           if (key === "overview" || key === "attachments") transitionContent(() => onTabChange(key));
         }}>
@@ -65,26 +73,4 @@ export function DefectReportHeader({ workspaceId, defect, retest, evidenceCount,
       <div className={tabs.actions}><DefectReportDates key={defect.id} createdAt={defect.createdAt} archivedAt={defect.archivedAt} /></div>
     </div>
   </header>;
-}
-
-function DefectReportDates({ createdAt, archivedAt }: { createdAt: string; archivedAt?: string | null }) {
-  const { locale, languageTag, t } = useTmsLocale();
-  const [open, setOpen] = useState(false);
-  const wasOpenBeforeTouch = useRef(false);
-  const ru = locale === "ru";
-  const format = new Intl.DateTimeFormat(languageTag, { dateStyle: "medium", timeStyle: "short" });
-  return <Tooltip isOpen={open} onOpenChange={setOpen} placement="bottom-end" offset={5} delay={350} closeDelay={60}
-    disableAnimation classNames={{ base: overlays.positioner, content: overlays.dates }}
-    content={<dl>
-      <div><dt>{t("reports.created")}</dt><dd><time dateTime={createdAt}>{format.format(new Date(createdAt))}</time></dd></div>
-      {archivedAt && <div><dt>{ru ? "В архиве с" : "Archived on"}</dt>
-        <dd><time dateTime={archivedAt}>{format.format(new Date(archivedAt))}</time></dd></div>}
-    </dl>}>
-    <Button type="button" isIconOnly variant="light" disableRipple className={overlays.dateTrigger}
-      aria-label={ru ? "Даты баг-репорта" : "Bug report dates"}
-      onPointerDownCapture={event => { if (event.pointerType === "touch") wasOpenBeforeTouch.current = open; }}
-      onPress={event => { if (event.pointerType === "touch") setOpen(!wasOpenBeforeTouch.current); }}>
-      <Info size={15} aria-hidden="true" />
-    </Button>
-  </Tooltip>;
 }

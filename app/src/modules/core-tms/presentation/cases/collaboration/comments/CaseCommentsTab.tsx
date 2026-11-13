@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { TmsLocale } from "../../../../localization/model/locale";
 import type { TestCaseComment } from "../../../../test-cases/collaboration/model/test-case-collaboration";
 import { CommentComposer } from "../composer/CommentComposer";
+import { CompactCommentPrompt } from "./compact/CompactCommentPrompt";
 import { CommentThread } from "../threads/CommentThread";
 import { commentTree } from "../threads/comment-tree";
 import { useCommentAncestors } from "../ancestry/useCommentAncestors";
@@ -12,30 +13,37 @@ import { useCommentNavigation } from "../navigation/useCommentNavigation";
 import type { CaseCollaborationViewModel } from "../model";
 import { commentFailureLabel } from "../model";
 import css from "../caseCollaboration.module.css";
-type Props = { caseId: string; locale: TmsLocale; languageTag: string; model: CaseCollaborationViewModel; showRefresh?: boolean; hideHeading?: boolean };
-export function CaseCommentsSection({ caseId, locale, languageTag, model, showRefresh = true, hideHeading = false }: Props) {
+type Props = {
+  caseId: string; locale: TmsLocale; languageTag: string; model: CaseCollaborationViewModel;
+  showRefresh?: boolean; hideHeading?: boolean; compactComposer?: boolean;
+};
+export function CaseCommentsSection({ caseId, locale, languageTag, model, showRefresh = true, hideHeading = false, compactComposer = false }: Props) {
   const ru = locale === "ru";
   const headingId = `case-comments-${caseId}`;
   const heading = ru ? "Комментарии" : "Comments";
   useCommentAncestors(caseId, model);
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
-  const [composer, setComposer] = useState<{ reply?: TestCaseComment }>({});
+  const [composer, setComposer] = useState<{ reply?: TestCaseComment; expanded?: boolean }>({});
   const [composerVersion, setComposerVersion] = useState(0);
   const { failedId, reveal } = useCommentNavigation(caseId, model, () => setCollapsed(new Set()));
   const composerRef = useRef<HTMLDivElement>(null);
-  const currentCase = useRef(caseId); currentCase.current = caseId;
+  const currentCase = useRef({ id: caseId, epoch: 0 });
+  if (currentCase.current.id !== caseId) currentCase.current = { id: caseId, epoch: currentCase.current.epoch + 1 };
+  const caseEpoch = currentCase.current.epoch;
   const motion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" as const : "smooth" as const;
   useEffect(() => { setComposer({}); setCollapsed(new Set()); }, [caseId]);
   useEffect(() => {
-    if (!composer.reply) return;
+    if (!composer.reply && !(compactComposer && composer.expanded)) return;
     composerRef.current?.scrollIntoView({ block: "nearest", behavior: motion() });
     composerRef.current?.querySelector<HTMLElement>('[role="textbox"], textarea')?.focus({ preventScroll: true });
-  }, [composer]);
+  }, [composer, compactComposer]);
   const editor = <CommentComposer key={`${caseId}:${composerVersion}`} ru={ru} projectId={model.commentProjectId} persistent
+    autoFocus={compactComposer ? true : undefined}
     reply={composer.reply} pending={model.commentSubmitting || Boolean(model.changingCommentId)} failure={model.commentFailure ? commentFailureLabel(locale, model.commentFailure) : ""}
-    onClearReply={() => setComposer({})} onCancel={() => setComposer({})} onSubmit={async draft => {
+    onClearReply={() => setComposer(current => ({ ...current, reply: undefined }))}
+    onCancel={() => setComposer(current => ({ ...current, reply: undefined }))} onSubmit={async draft => {
       const ok = await model.addComment(draft.body, draft);
-      if (ok && currentCase.current === caseId) { setComposer({}); setComposerVersion(value => value + 1); } return ok;
+      if (ok && currentCase.current.id === caseId && currentCase.current.epoch === caseEpoch) { setComposer({}); setComposerVersion(value => value + 1); } return ok;
     }} />;
   const refresh = showRefresh && <button type="button" className={css.refreshComments}
     disabled={model.comments.refreshing || model.commentSubmitting || Boolean(model.changingCommentId)}
@@ -48,12 +56,17 @@ export function CaseCommentsSection({ caseId, locale, languageTag, model, showRe
     <ErrorToast message={model.comments.status === "error" ? (ru ? "Не удалось загрузить комментарии" : "Could not load comments") : null}
       retryLabel={ru ? "Повторить" : "Retry"} onRetry={model.retryComments} />
     {model.comments.status === "ready" && <>
-      {model.canComment && <div ref={composerRef}><ExpandingComment>{editor}</ExpandingComment></div>}
+      {model.canComment && <div ref={composerRef}>
+        {compactComposer && !composer.expanded && !composer.reply
+          ? <CompactCommentPrompt ru={ru} disabled={model.commentSubmitting || Boolean(model.changingCommentId)}
+            onOpen={() => { if (!model.commentSubmitting && !model.changingCommentId) setComposer({ expanded: true }); }} />
+          : <ExpandingComment>{editor}</ExpandingComment>}
+      </div>}
       <ErrorToast message={failedId ? (ru ? "Комментарий недоступен или не удалось его загрузить." : "The comment is unavailable or could not be loaded.") : null}
         retryLabel={ru ? "Повторить" : "Retry"} onRetry={failedId ? () => void reveal(failedId) : undefined} />
       {commentTree(model.comments.items).map(node => <CommentThread key={node.comment.id} node={node} ru={ru} languageTag={languageTag}
         model={model} collapsed={collapsed} toggle={id => setCollapsed(old => { const next = new Set(old); if (next.has(id)) next.delete(id); else next.add(id); return next; })}
-        onReply={reply => { setComposer({ reply }); setCollapsed(old => { const next = new Set(old); next.delete(reply.id); return next; }); }}
+        onReply={reply => { setComposer({ reply, expanded: true }); setCollapsed(old => { const next = new Set(old); next.delete(reply.id); return next; }); }}
         onParent={id => void reveal(id)} />)}
       {(model.comments.hasMore || model.comments.loadMoreFailed) && <div className={css.pagination}>
         <ErrorToast message={model.comments.loadMoreFailed ? (ru ? "Не удалось загрузить предыдущие комментарии" : "Could not load older comments") : null} />

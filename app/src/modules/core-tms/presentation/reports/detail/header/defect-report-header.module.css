@@ -1,0 +1,55 @@
+.header { flex: 0 0 auto; min-inline-size: 0; }
+.utility { display: flex; align-items: center; gap: 16px; padding: 24px 20px 8px 30px; }
+.identity { display: flex; flex: 1; min-inline-size: 0; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.key { color: var(--falcon-text-secondary); font-size: 14px; line-height: 22px; overflow-wrap: anywhere; }
+.status {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  max-inline-size: 100%;
+  min-block-size: 30px;
+  padding: 4px 10px;
+  border-radius: 7px;
+  background: var(--falcon-control);
+  color: var(--falcon-text-secondary);
+  font-size: 14px;
+  line-height: 20px;
+}
+.status > span:last-child { min-inline-size: 0; overflow-wrap: anywhere; }
+.status:is([data-status="verified"], [data-status="closed"]) { background: var(--falcon-success-bg); }
+.utility .actions { flex-wrap: nowrap; gap: 4px; }
+.share { display: flex; }
+.share > span > span { inset-inline-start: auto; inset-inline-end: 0; }
+.utility .back { min-inline-size: 0; }
+.back > svg:last-child { display: none; }
+.titleRow { min-inline-size: 0; padding: 8px 30px 22px; }
+.titleRow h2 {
+  margin: 0;
+  max-inline-size: 680px;
+  color: var(--falcon-text);
+  font-size: clamp(24px, 3.1cqi, 34px);
+  font-weight: 650;
+  line-height: 1.25;
+  letter-spacing: -.025em;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.tabRow { justify-content: space-between; flex-wrap: nowrap; padding-inline-start: 8px; }
+.tabRow > :first-child { min-inline-size: 0; overflow: hidden; }
+.tabRow [role="tab"] { inline-size: auto; }
+@container (max-width: 620px) {
+  .utility { padding-inline: 18px 10px; }
+  .titleRow { padding-inline: 18px; }
+  .tabRow { padding-inline-start: 4px; }
+}
+@container (max-width: 430px) {
+  .utility { flex-wrap: wrap; gap: 10px; padding-block-start: 10px; }
+  .identity { flex-basis: 100%; }
+  .utility .actions { flex: 1 0 100%; order: -1; margin: 0; justify-content: flex-end; }
+  .utility .back { order: -1; margin-inline-end: auto; }
+}
+@media (max-width: 760px) {
+  .back > svg:first-child { display: none; }
+  .back > svg:last-child { display: block; }
+}

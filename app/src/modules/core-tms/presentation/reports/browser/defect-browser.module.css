@@ -1,6 +1,6 @@
 .pane { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; container-type: inline-size; }
 .header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; padding: 14px 24px; }
-.header h1 { margin: 0; color: var(--falcon-text); font-size: 16px; line-height: 1.4; font-weight: 600; }
+.header h1 { margin: 0; color: var(--falcon-text); font-size: 20px; line-height: 1.4; font-weight: 600; }
 .scopes { display: flex; align-items: center; gap: 2px; padding: 2px; border-radius: 9px; background: color-mix(in srgb, var(--falcon-text) 5%, var(--falcon-surface)); }
 .scopes .scopeTab { position: relative; display: inline-flex; align-items: center; min-height: 29px; height: 29px; padding: 0 9px; border: 0; border-radius: 7px; background: transparent; font-size: 12px; }
 .scopes .scopeTab[data-focus-visible="true"] { outline: 1px solid var(--falcon-focus); outline-offset: -1px; }
@@ -11,7 +11,7 @@
 .search[data-input-shell] {
   --tms-focus-border: transparent;
   --tms-focus-ring: transparent;
-  flex: 0 1 264px;
+  flex: 1 1 264px;
   min-width: 0;
   border-radius: 999px;
 }
@@ -47,10 +47,10 @@
 .scopeHint { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 0 24px 12px; color: var(--falcon-text-muted); font-size: 12px; line-height: 1.5; }
 .scopeHint button, .empty button { border: 0; border-radius: 8px; padding: 5px 7px; background: transparent; color: var(--falcon-action); font-size: 12px; cursor: pointer; }
 .scopeHint button:hover, .empty button:hover { background: var(--falcon-hover); }
-.viewport { min-height: 0; flex: 1; overflow: auto; padding: 0 18px 24px; scrollbar-gutter: stable; scrollbar-color: var(--falcon-border-strong) transparent; }
+.viewport { min-height: 0; flex: 1; overflow-y: auto; overflow-x: hidden; padding: 0 18px 24px; scrollbar-gutter: stable; scrollbar-color: var(--falcon-border-strong) transparent; }
 .groups {
   list-style: none; margin: 0; padding: 0;
-  min-inline-size: var(--reports-list-min-width, 0px);
+  min-inline-size: 0;
   container-type: inline-size;
 }
 .message { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 18px; color: var(--falcon-text-muted); font-size: 12px; }

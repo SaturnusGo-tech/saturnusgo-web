@@ -1,7 +1,8 @@
 .metadata { display:inline-flex; align-items:center; flex-wrap:wrap; gap:8px 12px; min-width:0; }
 .metadata > span, .metadata button { display:inline-flex; align-items:center; gap:5px; min-width:0; overflow-wrap:anywhere; }
 .metadata svg { flex:none; }
-.metadata button { padding:0; border:0; background:none; color:var(--falcon-action); font:inherit; text-align:left; cursor:pointer; }
+.metadata { font-size:14px; color:var(--falcon-text-secondary); }
+.metadata button { padding:0; border:0; background:none; color:var(--falcon-text); font:inherit; text-align:left; cursor:pointer; text-decoration:underline; text-decoration-color:var(--falcon-border-strong); text-underline-offset:3px; }
 .metadata button:hover { text-decoration:underline; }
 .metadata button:focus-visible { outline:2px solid var(--falcon-action); outline-offset:3px; border-radius:3px; }
 .unavailable { color:var(--falcon-text-muted); }

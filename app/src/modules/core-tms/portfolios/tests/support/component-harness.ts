@@ -3,7 +3,7 @@ import { runInNewContext } from "node:vm";
 import ts from "typescript";
 
 type Slot = { value?: unknown; deps?: readonly unknown[]; cleanup?: () => void };
-export type Node = { type: string; props: Record<string, unknown> };
+export type Node = { type: string; key?: string | null; props: Record<string, unknown> };
 export function componentHarness(initialHref = "https://tms.example/work/", globals: Record<string, unknown> = {}) {
   let cursor = 0;
   let effects: (() => void)[] = [];
@@ -37,7 +37,7 @@ export function componentHarness(initialHref = "https://tms.example/work/", glob
   const proxy = new Proxy({}, { get: (_target, key) => String(key) });
   function load<T>(url: URL, resolve: (name: string) => unknown = () => undefined): T {
     const module = { exports: {} };
-    const jsx = (type: string, props: Record<string, unknown>) => ({ type, props });
+    const jsx = (type: string, props: Record<string, unknown>, key?: string) => ({ type, props, key });
     runInNewContext(ts.transpileModule(readFileSync(url, "utf8"), {
       compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2021, jsx: ts.JsxEmit.ReactJSX },
     }).outputText, { ...globals, module, exports: module.exports, AbortController, JSON, URL, window, crypto: globalThis.crypto,

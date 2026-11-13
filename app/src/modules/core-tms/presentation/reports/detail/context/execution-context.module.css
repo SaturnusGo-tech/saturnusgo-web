@@ -1,0 +1,23 @@
+.context { min-width: 0; padding-block-end: 22px; border-block-end: 1px solid var(--falcon-border); }
+.heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-block-end: 20px; }
+.heading h3 { margin: 0; font-size: 18px; font-weight: 650; line-height: 1.4; }
+.environment { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px; margin: 0; color: var(--falcon-text-muted); font-size: 13px; }
+.trace { display: grid; gap: 18px; margin-block-end: 22px; }
+.row { position: relative; display: grid; grid-template-columns: 15px minmax(150px, .43fr) minmax(0, 1fr); align-items: baseline; gap: 10px; font-size: 14px; line-height: 1.5; }
+.row:first-child::after { content: ""; position: absolute; inset-inline-start: 7px; inset-block-start: 14px; block-size: calc(100% + 10px); inline-size: 1px; background: var(--falcon-border-strong); }
+.dot { align-self: start; justify-self: center; margin-block-start: 6px; fill: currentColor; color: var(--falcon-text-muted); }
+.label { color: var(--falcon-text-secondary); }
+.failed { align-self: start; margin-block-start: 2px; color: var(--falcon-danger); }
+.step { min-width: 0; overflow-wrap: anywhere; font-weight: 600; }
+.link { min-width: 0; padding: 0; border: 0; background: none; color: var(--falcon-text); font: inherit; text-align: start; text-decoration: underline; text-decoration-color: var(--falcon-border-strong); text-underline-offset: 3px; cursor: pointer; overflow-wrap: anywhere; }
+.link:hover { text-decoration-color: currentColor; }
+.link:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 4px; border-radius: 3px; }
+.muted { color: var(--falcon-text-muted); font-size: 12px; margin: 0; line-height: 1.5; }
+.context > p[role="status"] { margin-block-end: 12px; }
+@container (max-width: 700px) {
+  .heading { flex-wrap: wrap; gap: 6px; }
+  .environment { justify-content: flex-start; }
+  .row { grid-template-columns: 15px minmax(0, 1fr); gap: 4px 9px; }
+  .row > :last-child { grid-column: 2; }
+  .row:first-child::after { block-size: calc(100% + 10px); }
+}
