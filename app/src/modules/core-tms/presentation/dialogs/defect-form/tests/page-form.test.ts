@@ -26,6 +26,7 @@ test("bug creation uses the shared drawer, a property rail and a pinned submit f
   assert.equal(all.find(node => node.props["data-testid"] === "defect-title")?.props["aria-required"], "true");
   const narratives = all.filter(node => node.type === "NarrativeField"); assert.equal(narratives.length, 3);
   assert.equal(narratives.every(node => node.props.framed === true), true);
+  assert.equal(narratives.every(node => node.props.hideEditButton === true), true);
   invoke(narratives[0], "onChange", "## Updated Markdown"); assert.deepEqual(JSON.parse(JSON.stringify(patches[0])), { description: "## Updated Markdown" });
   invoke(all.find(node => node.type === "form")!, "onSubmit", { preventDefault() {} }); assert.equal(submitted, 1);
   invoke(all[0], "onClose"); assert.equal(closed, 1);

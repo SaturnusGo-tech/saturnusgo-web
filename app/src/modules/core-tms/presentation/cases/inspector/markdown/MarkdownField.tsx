@@ -34,6 +34,7 @@ type Props = {
   contextContent?: ReactNode;
   appearance?: "plain";
   onRequestEdit?: () => void;
+  editOnKeyboard?: boolean;
   renderFooter?: (emoji: ReactNode) => ReactNode;
 };
 
@@ -116,6 +117,14 @@ function MarkdownFieldContent(props: Props) {
     ? attachments?.entries.filter((entry) => entry.fieldKey === props.attachmentKey) ?? []
     : [];
   if (!props.onChange) return <div className={props.onRequestEdit ? plain.readable : undefined}
+    role={props.editOnKeyboard && props.onRequestEdit ? "button" : undefined}
+    tabIndex={props.editOnKeyboard && props.onRequestEdit ? 0 : undefined}
+    aria-label={props.editOnKeyboard && props.onRequestEdit ? `${locale === "ru" ? "Изменить" : "Edit"}: ${props.label}` : undefined}
+    onKeyDown={props.editOnKeyboard && props.onRequestEdit ? (event) => {
+      if (event.defaultPrevented || event.target !== event.currentTarget || !["Enter", " "].includes(event.key)) return;
+      event.preventDefault();
+      props.onRequestEdit?.();
+    } : undefined}
     onClick={props.onRequestEdit ? (event) => {
       if ((event.target as Element).closest("a, button, input") || window.getSelection()?.toString()) return;
       props.onRequestEdit?.();

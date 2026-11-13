@@ -32,11 +32,11 @@
 .layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; align-items: start; gap: 28px; min-width: 0; }
 .content { display: flex; flex-direction: column; min-width: 0; gap: 28px; }
 .content > section { min-height: 84px; }
-.content > section > div[data-editing] {
+.content > section > div[data-editing="true"] {
   min-height: 104px; padding: 12px; border: 1px solid var(--falcon-border-strong);
   border-radius: 12px; background: var(--falcon-control);
 }
-.content > section > div[data-editing]:focus-within { border-color: var(--falcon-text-muted); }
+.content > section > div[data-editing="true"]:focus-within { border-color: var(--falcon-text-muted); }
 .content > section > div[data-invalid="true"] { border-color: var(--falcon-danger-border); }
 .content [contenteditable="true"]:is(:focus, :focus-visible) { outline: 0; box-shadow: none; }
 .validation { display: block; margin-top: 6px; color: var(--falcon-danger); font-size: 12px; }
