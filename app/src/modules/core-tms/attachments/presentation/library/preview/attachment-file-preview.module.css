@@ -237,7 +237,7 @@
 .document { padding: 28px clamp(18px, 5vw, 72px); }
 .document p { max-width: 74ch; margin: 0 auto 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
 
-/* The source viewer follows GitHub's file pane in both themes. */
+/* GitHub's file-pane layout; dark surfaces use Falcon's semantic palette. */
 .archive, .sourcePreview {
   --file-bg: #ffffff;
   --file-toolbar: #f6f8fa;
@@ -261,14 +261,14 @@
 }
 
 :global(.dark) :is(.archive, .sourcePreview) {
-  --file-bg: #0d1117;
-  --file-toolbar: #151b23;
-  --file-control: #212830;
-  --file-border: #3d444d;
-  --file-text: #f0f6fc;
-  --file-muted: #9198a1;
-  --file-link: #4493f8;
-  --file-active: #656c7633;
+  --file-bg: var(--falcon-code);
+  --file-toolbar: var(--falcon-elevated);
+  --file-control: var(--falcon-control);
+  --file-border: var(--falcon-border);
+  --file-text: var(--falcon-text);
+  --file-muted: var(--falcon-text-secondary);
+  --file-link: var(--falcon-text);
+  --file-active: var(--falcon-selected);
   --syntax-key: #7ee787;
   --syntax-string: #a5d6ff;
   --syntax-literal: #79c0ff;
@@ -276,6 +276,11 @@
   --syntax-name: #d2a8ff;
   --syntax-type: #ffa657;
   color-scheme: dark;
+}
+
+:global(.dark) .archiveSidebar {
+  --file-bg: var(--falcon-sidebar);
+  background: var(--file-bg);
 }
 
 .archive {

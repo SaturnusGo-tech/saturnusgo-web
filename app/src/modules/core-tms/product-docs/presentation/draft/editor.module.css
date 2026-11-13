@@ -35,7 +35,15 @@
   white-space: nowrap;
 }
 .saveStatus:empty { margin-inline-end: -8px; }
-.actions .publish { min-height: 30px; padding-inline: 13px; border-radius: 999px; font-weight: 550; }
+.actions .publish {
+  height: 32px;
+  min-height: 32px;
+  min-width: 0;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 550;
+}
 .actions :is(.saveDraft, .closeEditor) {
   display: inline-flex;
   align-items: center;
