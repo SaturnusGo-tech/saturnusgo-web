@@ -1,6 +1,7 @@
 "use client";
 
 import { useSharedStepInsertion } from "./insertion/useSharedStepInsertion";
+import { useCaseAttachmentDraft } from "../attachments/CaseAttachmentDraftContext";
 import { FalconCheckbox } from "../../../common/checkbox/FalconCheckbox";
 import { Plus, Trash2 } from "lucide-react";
 import type {
@@ -37,7 +38,9 @@ type Props = {
 export function InspectorSteps({
   layout = "list", revision, editing, autoFocus = true, ru, sharedSteps, onResolveSharedStep, onPatch,
 }: Props) {
-  const sharedInsertion = useSharedStepInsertion(revision, onResolveSharedStep, onPatch, editing);
+  const attachmentDraft = useCaseAttachmentDraft();
+  const pendingStepIds = new Set(attachmentDraft?.entries.flatMap(entry => entry.stepId ? [entry.stepId] : []) ?? []);
+  const sharedInsertion = useSharedStepInsertion(revision, onResolveSharedStep, onPatch, editing, pendingStepIds);
   function updateStep(id: string, next: Partial<TestStep>) {
     onPatch({
       steps: revision.steps.map((step) => step.id === id ? { ...step, ...next } : step),

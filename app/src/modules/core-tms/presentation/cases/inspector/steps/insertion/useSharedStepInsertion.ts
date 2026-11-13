@@ -4,10 +4,10 @@ import type { SharedStep } from "../../../../../shared-steps/model/shared-step";
 import { insertSharedStepAfter } from "./insert-shared-step";
 
 export function useSharedStepInsertion(revision: TestCaseRevision, resolve: (id: string) => Promise<SharedStep | null>,
-  patch: (next: Partial<TestCaseRevision>) => void, editing = true) {
+  patch: (next: Partial<TestCaseRevision>) => void, editing = true, pendingStepIds: ReadonlySet<string> = new Set()) {
   const allowed = editing && revision.type !== "checklist";
-  const latest = useRef({ revision, patch, allowed });
-  latest.current = { revision, patch, allowed };
+  const latest = useRef({ revision, patch, allowed, pendingStepIds });
+  latest.current = { revision, patch, allowed, pendingStepIds };
   const sequence = useRef(0);
   const [error, setError] = useState(false);
   const [pending, setPending] = useState(false);
@@ -27,7 +27,7 @@ export function useSharedStepInsertion(revision: TestCaseRevision, resolve: (id:
       if (index >= 0 && target < 0) { setError(true); return; }
       const snapshot = { id: value.id, title: value.current.title, revision: value.currentRevision,
         items: value.current.items.map(item => ({ ...item, attachmentIds: [...item.attachmentIds] })) };
-      latest.current.patch({ steps: insertSharedStepAfter(steps, target, snapshot) });
+      latest.current.patch({ steps: insertSharedStepAfter(steps, target, snapshot, latest.current.pendingStepIds) });
     } catch { if (token === sequence.current) setError(true); }
     finally { if (token === sequence.current) setPending(false); }
   }

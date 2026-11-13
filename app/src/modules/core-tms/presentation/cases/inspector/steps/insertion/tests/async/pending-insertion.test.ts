@@ -5,6 +5,7 @@ import { createEmptyRevision } from "../../../../../../../helpers/cases/caseRevi
 import { emptySharedStepDraft, type SharedStep } from "../../../../../../../shared-steps/model/shared-step";
 import { insertSharedStepAfter } from "../../insert-shared-step";
 import type { useSharedStepInsertion } from "../../useSharedStepInsertion";
+import { filterPendingCaseAttachments } from "../../../../../../../application/evidence/case/pendingCaseAttachment";
 
 const shared = (): SharedStep => ({ id: "shared", projectId: "p", folderId: null, folderPath: "/", currentRevision: 1,
   current: { ...emptySharedStepDraft(), title: "Sign in", revision: 1, createdBy: "qa", createdAt: "now" },
@@ -16,13 +17,26 @@ function setup(t: TestContext) {
     name => name.endsWith("insert-shared-step") ? { insertSharedStepAfter } : undefined);
   let revision = createEmptyRevision();
   let editing = true;
+  let pendingStepIds = new Set<string>();
   const render = () => {
     const captured = revision;
     return h.render(() => loaded.useSharedStepInsertion(revision,
-      () => new Promise(resolve => pending.push(resolve)), next => { revision = { ...captured, ...next }; }, editing));
+      () => new Promise(resolve => pending.push(resolve)), next => { revision = { ...captured, ...next }; }, editing, pendingStepIds));
   };
-  return { h, pending, render, stopEditing: () => { editing = false; }, get revision() { return revision; }, edit: (next: typeof revision) => { revision = next; } };
+  return { h, pending, render, stopEditing: () => { editing = false; }, get revision() { return revision; },
+    attach: (stepId: string) => { pendingStepIds = new Set([stepId]); }, edit: (next: typeof revision) => { revision = next; } };
 }
+test("files attached while loading keep the blank first row and remain queued after insertion", async t => {
+  const h = setup(t), firstId = h.revision.steps[0].id;
+  const task = h.render().insert(-1, "shared");
+  const entries = [{ id: "pending", fieldKey: `step:${firstId}:action`, stepId: firstId,
+    file: new File(["evidence"], "evidence.txt", { type: "text/plain" }) }];
+  h.attach(firstId); h.render(); h.pending[0](shared()); await task;
+  assert.equal(h.revision.steps.length, 2);
+  assert.equal(h.revision.steps[0].sharedStepId, "shared");
+  assert.equal(h.revision.steps[1].id, firstId);
+  assert.deepEqual(filterPendingCaseAttachments(entries, new Set(h.revision.steps.map(step => step.id))), entries);
+});
 test("a pending insertion uses current text rather than overwriting edits made during loading", async t => {
   const h = setup(t), task = h.render().insert(-1, "shared");
   assert.equal(h.render().pending, true);
