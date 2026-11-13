@@ -1,10 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { AnchoredDropdown } from "../../../../../../../shared/components/anchored-popup/dropdown/AnchoredDropdown";
 import { componentHarness, invoke, nodes, type Node } from "../../../../../portfolios/tests/support/component-harness";
 import type { ProductDocItemMenu } from "../../menu/ProductDocItemMenu";
 import type { ProductDocLifecycleContext } from "../../../../state/lifecycle/product-doc-lifecycle-context";
 import { productDocsCopy } from "../../../../localization/copy";
+
+const AnchoredDropdown = Symbol("AnchoredDropdown");
 
 function fixture(instant = false) {
   const frames: (() => void)[] = [];
@@ -115,4 +116,17 @@ test("a new dialog waits for the menu DOM unmount commit rather than motion comp
   assert.equal(f.count(), 0, "ref churn on a connected menu is not an unmount");
   invoke(menu, "ref", connected); invoke(menu, "ref", null); connected.isConnected = false;
   f.flushMicrotasks(); f.flushFrames(); assert.equal(f.count(), 1);
+});
+
+
+test("archived items expose restore in the menu only with the server publish capability", t => {
+  const f = fixture(); t.after(f.h.dispose);
+  const node = { ...f.props().node, archivedAt: "2026-11-13" };
+  for (const canPublish of [false, true]) {
+    const view = f.render({ node, permissions: { canPublish, canDelete: true } });
+    const labels = view.filter(node => node.type === "DropdownItem").map(node => node.props.textValue);
+    assert.equal(labels.includes("Restore"), canPublish);
+    assert.equal(labels.includes("Archive item"), false);
+    assert.equal(labels.includes("Delete item"), true);
+  }
 });

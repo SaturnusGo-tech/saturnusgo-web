@@ -1,10 +1,10 @@
-.positioner { max-width: none; outline: none; }
+.positioner { display: flex; min-height: 0; max-width: none; max-height: inherit; outline: none; }
 .positioner .surface {
   display: flex;
   align-items: stretch;
   flex-direction: column;
   width: min(218px, calc((100vw - 34px) / 2));
-  max-height: min(480px, calc(100dvh - 40px));
+  max-height: inherit;
   padding: 0;
   overflow: hidden;
   border: 1px solid var(--falcon-border-strong);
@@ -15,7 +15,7 @@
   font-size: 13px;
   line-height: 1.4;
 }
-.values { display: flex; flex-direction: column; min-height: 0; width: 100%; }
+.values { display: flex; flex-direction: column; min-height: 0; max-height: inherit; width: 100%; }
 .positioner .search {
   flex: none;
   width: 100%;

@@ -8,9 +8,10 @@ test("run history belongs to the header byline and never the case content", () =
   const { RunsView: View } = h.load<{ RunsView: typeof RunsView }>(new URL("../../RunsView.tsx", import.meta.url), name => {
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en", t: (key: string) => key }) };
     if (name.endsWith("useScenarioLayout")) return { useScenarioLayout: () => ["list", () => {}] };
+    if (name.endsWith("useLoadingFeedback")) return { useLoadingFeedback: () => false };
     if (name.endsWith("useRunFocus")) return { useRunFocus: () => ({ focused: false, ready: true }) };
     if (name.endsWith("useRunKeyboardShortcuts")) return { useRunKeyboardShortcuts() {} };
-    if (name.endsWith("caseRevision")) return { executableSteps: () => [] };
+    if (name.endsWith("caseRevision")) return { executableSteps: () => [], casePriority: () => "none" };
     if (name.endsWith("labels")) return { localizedLabel: () => "Passed" };
     if (name.endsWith("executionStatus")) return { statusIcon: {} };
     if (name.endsWith("attempt-editing")) return { canEditRunAttempt: () => false };

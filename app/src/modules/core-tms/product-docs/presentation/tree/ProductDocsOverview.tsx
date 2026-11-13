@@ -107,7 +107,7 @@ export function ProductDocsOverview({
     <PageRows {...rowProps} nodes={saved.nodes} showLocation />
   </section> : undefined;
 
-  return <section className={styles.shelf} aria-labelledby={titleId}>
+  return <section className={styles.shelf} data-empty={!hasContent && !feedback || undefined} aria-labelledby={titleId}>
     <div className={styles.body}>
       <header className={styles.intro}>
         <h1 id={titleId}>{title}</h1>

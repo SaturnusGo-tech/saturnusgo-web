@@ -1,3 +1,5 @@
+import { QlSearchHint } from "../../common/query-search/QlSearchHint";
+import { isQlSearchShortcut } from "../../common/query-search/ql-search-shortcut";
 import { FolderVisual } from "../../../folders/presentation/appearance/visual/FolderVisual";
 import { QlDisclosure } from "../../common/disclosure/QlDisclosure";
 import { fieldFilterCount } from "../model/fields/case-field-filters";
@@ -36,7 +38,7 @@ export function CasesToolbar(props: Props) {
   const [qlExpanded, setQlExpanded] = useState(Boolean(props.qlQuery?.trim()));
   const rootRef = useRef<HTMLDivElement>(null);
   const filterButtonRef = useRef<HTMLButtonElement>(null);
-  const qlButtonRef = useRef<HTMLButtonElement>(null);
+  const searchInput = useRef<HTMLInputElement>(null);
   const qlPanelRef = useRef<HTMLDivElement>(null);
   const qlPanelId = useId();
   const qlQuery = props.qlQuery ?? localQl;
@@ -66,11 +68,12 @@ export function CasesToolbar(props: Props) {
   useEffect(() => { if (props.interactionLocked) setActionOpen(false); }, [props.interactionLocked]);
 
   function updateQl(value: string) { props.onQlQuery ? props.onQlQuery(value) : setLocalQl(value); }
-  function toggleQl() {
-    setQlExpanded(!qlExpanded);
-    if (!qlExpanded) requestAnimationFrame(() => qlPanelRef.current?.querySelector<HTMLInputElement>("input")?.focus({ preventScroll: true }));
+  function openQl() {
+    if (props.interactionLocked) return;
+    setQlExpanded(true);
+    requestAnimationFrame(() => qlPanelRef.current?.querySelector<HTMLInputElement>("input")?.focus({ preventScroll: true }));
   }
-  function closeQl() { setQlExpanded(false); qlButtonRef.current?.focus(); }
+  function closeQl() { setQlExpanded(false); searchInput.current?.focus({ preventScroll: true }); }
   function chooseViewMode(value: CaseListViewMode) {
     if (value === "dynamic") props.onGroupBy?.(dynamicGroupBy(groupBy));
     props.onViewMode?.(value);
@@ -95,7 +98,11 @@ export function CasesToolbar(props: Props) {
         <span className={repositoryStyles.meta}>{props.countLabel}<i />{props.estimateLabel ?? (ru ? "Оценка не указана" : "Estimate not specified")}</span>
       </div>}
       <div className={`${styles.searchLine} ${props.repositoryMode ? repositoryStyles.searchLine : ""}`}>
-        <label className={styles.inputShell} data-input-shell><Search size={14} /><input value={props.query} onChange={(event) => props.onQuery(event.target.value)} placeholder={ru ? "Поиск по названию" : "Search by title"} aria-label={ru ? "Поиск по ID, названию, папке, компоненту или тегу" : "Search by ID, title, folder, component, or tag"} />{props.query && <button type="button" className={styles.clearButton} onClick={() => props.onQuery("")} aria-label={ru ? "Очистить" : "Clear"}><X size={12} /></button>}</label>
+        <label className={styles.inputShell} data-input-shell><Search size={14} /><input ref={searchInput} value={props.query} onChange={(event) => props.onQuery(event.target.value)} placeholder={ru ? "Найти кейсы или выполнить QL" : "Find cases or run a QL query"}
+          aria-keyshortcuts="Meta+L Control+L" aria-expanded={qlExpanded} aria-controls={qlPanelId} onKeyDown={event => {
+            if (!isQlSearchShortcut(event) || props.interactionLocked) return;
+            event.preventDefault(); event.stopPropagation(); openQl();
+          }} aria-label={ru ? "Поиск по ID, названию, папке, компоненту или тегу" : "Search by ID, title, folder, component, or tag"} />{props.query && <button type="button" className={styles.clearButton} onClick={() => props.onQuery("")} aria-label={ru ? "Очистить" : "Clear"}><X size={12} /></button>}<QlSearchHint active={Boolean(qlQuery.trim())} ru={ru} disabled={props.interactionLocked} open={qlExpanded} controls={qlPanelId} onOpen={openQl} /></label>
         <button type="button" aria-pressed={props.selectionMode}
           className={`${styles.secondaryButton} ${styles.selectionModeButton} ${props.selectionMode ? styles.selectionModeActive : ""}`}
           aria-label={ru ? "Выбрать тест-кейсы" : "Select test cases"}
@@ -107,12 +114,6 @@ export function CasesToolbar(props: Props) {
           <button type="button" aria-pressed={viewMode === "list"} className={`${styles.segmentButton} ${viewMode === "list" ? styles.segmentActive : ""}`} onClick={() => chooseViewMode("list")}><List size={13} /><span>{text.list}</span></button>
           <button type="button" aria-pressed={viewMode === "dynamic"} className={`${styles.segmentButton} ${viewMode === "dynamic" ? styles.segmentActive : ""}`} onClick={() => chooseViewMode("dynamic")}><ListTree size={13} /><span>{text.dynamic}</span></button>
         </div>}
-        {props.repositoryMode && <button ref={qlButtonRef} type="button" className={repositoryStyles.qlToggle}
-          onClick={toggleQl} aria-expanded={qlExpanded} aria-controls={qlPanelId}
-          aria-label={qlQuery.trim() ? (ru ? "QL-запрос, активен" : "QL query, active") : (ru ? "QL-запрос" : "QL query")}
-          title={qlQuery.trim() || (ru ? "Расширенный поиск QL" : "Advanced QL search")}>
-          QL{qlQuery.trim() && <span className={repositoryStyles.activeQuery} aria-hidden="true" />}
-        </button>}
         <div className={styles.filterAnchor} data-case-popover-root>
           <button ref={filterButtonRef} type="button" className={`${styles.iconButton} ${activeFilterCount ? styles.filterActive : ""}`} onClick={() => { setActionOpen(false); setGroupOpen(false); props.onFilterOpen(); }} aria-haspopup="dialog" aria-expanded={props.filterOpen} aria-controls="case-filter-panel" data-testid="case-filter-toggle" aria-label={activeFilterCount > 0 ? (ru ? `Фильтры, активно: ${activeFilterCount}` : `Filters, active: ${activeFilterCount}`) : (ru ? "Фильтры" : "Filters")}><Filter size={14} />{activeFilterCount > 0 && <b aria-hidden="true">{activeFilterCount}</b>}</button>
           {props.filterOpen && <CaseFilterMenu locale={props.locale} filters={props.filters} facets={facets} options={facetOptions} onFilters={props.onFilters} onFacets={(value) => props.onFacetFilters?.(value)} onClose={closeFilters} />}

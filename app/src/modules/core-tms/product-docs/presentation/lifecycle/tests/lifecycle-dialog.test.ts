@@ -109,3 +109,27 @@ test("a retained Cancel cannot begin the modal exit after a mutation starts", as
   assert.equal(f.modalDismisses(), 0);
   f.operations[0].resolve(); await flush();
 });
+
+
+test("restoration requires confirmation and fresh privileged metadata before restoring the archived node", async t => {
+  const archived = { ...root, archivedAt: "2026-11-13", canPublish: true };
+  const f = dialogFixture(archived, "restore"); t.after(f.h.dispose);
+  f.render(); assert.equal(f.operations.length, 0);
+  assert.equal(f.reads[0][2]?.archived, true);
+  await flush(); assert.equal(Boolean(f.confirm().props.isDisabled), false);
+  const confirm = f.confirm(); invoke(confirm, "onPress"); invoke(confirm, "onPress");
+  assert.equal(f.operations.length, 1); assert.equal(f.operations[0].mode, "restore");
+  assert.equal(f.operations[0].input.expectedDraftVersion, 9);
+  for (const changed of [{ canPublish: false }, { archivedAt: undefined }]) {
+    const denied = dialogFixture({ ...archived, ...changed }, "restore"); t.after(denied.h.dispose);
+    denied.render(); await flush(); assert.equal(Boolean(denied.confirm().props.isDisabled), true);
+  }
+});
+
+
+test("restore cancellation never changes data or discards local edits", async t => {
+  const f = dialogFixture({ ...root, archivedAt: "2026-11-13", canPublish: true }, "restore"); t.after(f.h.dispose);
+  f.render(); await flush();
+  invoke(f.render().find(node => node.type === "Button" && node.props.children === "Cancel")!, "onPress");
+  assert.equal(f.modalDismisses(), 1); assert.equal(f.operations.length, 0); assert.equal(f.completed.length, 0);
+});

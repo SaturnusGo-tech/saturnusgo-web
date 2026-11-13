@@ -5,7 +5,10 @@
 .action { position: absolute; inset: 0; width: 100%; color: var(--install-on-action); background: var(--install-action); opacity: 1; transform: translateY(0);
   transition: opacity 200ms ease, transform 200ms cubic-bezier(.2,.8,.2,1), visibility 0s; }
 .secondary { background: var(--install-panel); color: var(--install-text); border-color: var(--install-line); transition: opacity 200ms ease, visibility 0s; }
-.secondarySlot { flex: none; }
+.secondarySlot { display: grid; flex: none; min-width: 0; max-inline-size: 160px; overflow: hidden; transition: max-inline-size 200ms cubic-bezier(.2,.8,.2,1); }
+.secondarySlot[data-hidden="true"] { max-inline-size: 0; }
+.secondarySlot > button { min-width: 0; overflow: hidden; }
+.secondarySlot[data-hidden="true"] > button { padding-inline: 0; border-inline-width: 0; }
 .root .slot .action[data-hidden="true"] { opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(4px); transition: opacity 200ms ease, transform 200ms cubic-bezier(.2,.8,.2,1), visibility 0s 200ms; }
 .root .secondary[data-hidden="true"] { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 200ms ease, visibility 0s 200ms; }
 .action:hover, .secondary:hover { filter: brightness(.93); }
@@ -13,4 +16,4 @@
 .root :is(.action, .secondary):disabled { cursor: default; }
 .root :is(.action, .secondary):focus-visible { outline: 2px solid var(--install-text); outline-offset: 3px; }
 .srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-@media(prefers-reduced-motion: reduce) { .root .action, .root .secondary { transition: none !important; transform: none !important; } }
+@media(prefers-reduced-motion: reduce) { .root .action, .root .secondary, .root .secondarySlot { transition: none !important; transform: none !important; } }

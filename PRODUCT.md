@@ -49,3 +49,7 @@ For the current authentication surface, the supplied Linear login/signup screens
 3. Keep company authority and personal access explicit; never grant membership by inference.
 4. Keep server state authoritative and expose honest loading, error and unavailable states.
 5. Explain significant behavior changes before implementation; the owner handles manual UI acceptance for this authentication iteration.
+
+## Overlay interaction contract
+
+The owner repeatedly rejected jumping menus, changing modal sizes and square inner input focus. Anchored overlay positioning owns geometry; visibility motion must never restart during measurement or parent rerenders. Confirmation copy is present from its first frame, with async metadata controlling eligibility only. Keep keyboard focus visible on the rounded outer control and use one focus/portal owner. Verify opening frames, not only the settled screenshot.

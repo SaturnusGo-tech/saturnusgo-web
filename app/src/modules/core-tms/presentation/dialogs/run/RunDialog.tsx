@@ -45,10 +45,10 @@ export function RunDialog(props: Props) {
             <div className={styles.projects}><h3>{ru ? "Тест-кейсы" : "Test cases"}</h3></div>
             {suite && <div className={styles.suite}><span>{suite.name}</span><small>{ru ? "Состав набора определит сервер" : "Suite membership is resolved by the server"}</small>
               <button type="button" aria-label={ru ? "Убрать набор" : "Remove suite"} onClick={() => state.setSuiteId("")}><X size={14} /></button></div>}
-            <SelectionControls state={filters} ru={ru} onSelectAll={() => scope(filters.visible.filter((item) => !state.suiteId || item.projectId !== props.project.id).map((item) => item.id))} />
+            <SelectionControls repository state={filters} ru={ru} onSelectAll={() => scope(filters.visible.filter((item) => !state.suiteId || item.projectId !== props.project.id).map((item) => item.id))} />
             {state.loading && <RunCasesSkeleton />}
             {!state.loading && state.projectIds.map((id) => <SelectionTree key={id} cases={filters.visible.filter((c) => c.projectId === id)}
-              folders={state.catalog[id]?.folders ?? []} selected={selected} ru={ru} selectable
+              folders={state.catalog[id]?.folders ?? []} selected={selected} ru={ru} selectable titleMode="inline"
               disabled={state.loading || (Boolean(suite) && id === props.project.id)} onToggle={toggle} onScope={scope}
               heading={<><strong>{props.data.projects.find((p) => p.id === id)?.name}</strong>
                 <span>{filters.visible.filter((c) => c.projectId === id).length}</span></>} />)}

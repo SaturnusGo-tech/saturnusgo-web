@@ -71,7 +71,7 @@ test("archiving a published page confirms against the current draft version", as
   loadDraft(draft);
   await flush();
   const ready = render();
-  assert.ok(ready.some((item) => item.props.subtitle === draft.title));
+  assert.ok(ready.some((item) => item.props.subtitle === published.title), "the confirmation title stays stable across metadata loading");
   const confirm = findConfirm(ready);
   assert.ok(confirm);
   assert.ok(!confirm.props.isDisabled);
@@ -90,43 +90,21 @@ test("archiving a published page confirms against the current draft version", as
   assert.equal(archived, 1);
 });
 
-test("the archive shelf restores a scoped archived node and refreshes the tree", async (context) => {
-  const h = componentHarness();
-  context.after(h.dispose);
+test("the archive shelf exposes lifecycle actions through one menu without a direct restore button", async context => {
+  const h = componentHarness(); context.after(h.dispose);
   const list = h.load<{ useProductDocList: typeof useProductDocList }>(
-    new URL("../../../state/tree/useProductDocList.ts", import.meta.url),
-  );
-  const toasts: { title: string; severity: string }[] = [];
+    new URL("../../../state/tree/useProductDocList.ts", import.meta.url));
   const { ProductDocsArchive: View } = h.load<{ ProductDocsArchive: typeof ProductDocsArchive }>(
     new URL("../ProductDocsArchive.tsx", import.meta.url),
-    (name) => name === "@heroui/react" ? { addToast: ({ title, severity }: (typeof toasts)[number]) => toasts.push({ title, severity }) }
-      : name.endsWith("product-doc-response") ? { productDocErrorCode }
-      : name.endsWith("useProductDocList") ? list : undefined,
-  );
-  const calls: Parameters<ProductDocsApi["setArchived"]>[] = [];
-  const listing: Parameters<ProductDocsApi["list"]>[] = [];
-  let changed = false;
-  const api = {
-    list: async (...args: Parameters<ProductDocsApi["list"]>) => {
-      listing.push(args);
-      return { nodes: [{ ...node, archivedAt: "2026-11-08T00:00:00Z" }], canEdit: true, canPublish: true, nextCursor: null };
-    },
-    setArchived: async (...args: Parameters<ProductDocsApi["setArchived"]>) => {
-      calls.push(args);
-      return { draftVersion: 4, archivedAt: null, affectedCount: 1 };
-    },
-  } as ProductDocsApi;
-  const render = () => nodes(h.render(() => View({ api, scope, copy, refresh: 0, onChanged: () => { changed = true; } })));
-  assert.equal(render().find((item) => item.props["aria-label"] === `Restore ${node.title}`), undefined);
-  await Promise.resolve();
-  assert.equal(listing[0][1]?.archived, true);
-  const restore = render().find((item) => item.props["aria-label"] === `Restore ${node.title}`);
-  assert.ok(restore);
-  invoke(restore, "onClick");
-  await flush();
-  assert.equal(calls.length, 1);
-  assert.deepEqual(calls[0].slice(0, 3), [scope, node.id, false]);
-  assert.equal(calls[0][3].expectedDraftVersion, 3);
-  assert.equal(changed, true);
-  assert.deepEqual(toasts, [{ title: copy.restored, severity: "success" }]);
+    name => name.endsWith("useProductDocList") ? list : undefined);
+  const api = { list: async () => ({ nodes: [{ ...node, archivedAt: "2026-11-08" }],
+    canPublish: true, canDelete: true, nextCursor: null }) } as unknown as ProductDocsApi;
+  const lifecycle = { api, scope, copy, locale: "en" as const, drafts: new Map(), onCompleted() {}, onChanged() {} };
+  const render = () => nodes(h.render(() => View({ api, scope, copy, refresh: 0, onChanged() {}, lifecycle })));
+  render(); await flush(); const view = render();
+  assert.equal(view.some(item => item.props["aria-label"] === `Restore ${node.title}`), false);
+  const menu = view.find(item => item.type === "ProductDocItemMenu"); assert.ok(menu);
+  const permissions = menu.props.permissions as { canPublish?: boolean; canDelete?: boolean };
+  assert.equal(permissions.canPublish, true);
+  assert.equal(permissions.canDelete, true);
 });

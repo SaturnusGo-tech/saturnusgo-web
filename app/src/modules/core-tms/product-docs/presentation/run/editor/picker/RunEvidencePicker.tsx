@@ -1,5 +1,7 @@
 "use client";
 
+import { QlSearchHint } from "../../../../../presentation/common/query-search/QlSearchHint";
+import { isQlSearchShortcut } from "../../../../../presentation/common/query-search/ql-search-shortcut";
 import { ErrorToast } from "../../../../../presentation/common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../../../shared/components/loading/LoadingOrb";
 import { Button, DrawerBody, DrawerFooter, Input, Listbox, ListboxItem, ListboxSection, Skeleton } from "@heroui/react";
@@ -44,7 +46,7 @@ export function RunEvidencePicker({ scope, load, capture, onChoose }: Props) {
   const captureRequest = useRef<AbortController | null>(null);
   const command = useRef<CaptureProductDocRunInput>(null);
   const list = useRef<HTMLElement>(null);
-  const search = useRef<HTMLInputElement>(null);
+  const search = useRef<HTMLInputElement>(null!);
   const shortDate = new Intl.DateTimeFormat(languageTag, { day: "numeric", month: "short" });
   const fullDate = new Intl.DateTimeFormat(languageTag, { dateStyle: "medium" });
   const invalidQl = Boolean(parseCaseQuery(ql).error);
@@ -76,16 +78,13 @@ export function RunEvidencePicker({ scope, load, capture, onChoose }: Props) {
     return () => window.clearTimeout(timeout);
   }, [invalidQl, ql]);
   useEffect(() => () => captureRequest.current?.abort(), []);
-
   function toggleOverlay(tool: "ql" | "filters", open: boolean) {
     setOverlay((current) => open ? tool : current === tool ? null : current);
   }
-
   function clearSelection() {
     setChoice("");
     setCaptureFailed(false);
   }
-
   function changeFilters(next: RunFilterState) {
     clearSelection();
     const group = next.groups[0];
@@ -114,7 +113,6 @@ export function RunEvidencePicker({ scope, load, capture, onChoose }: Props) {
       if (!controller.signal.aborted) setCapturePending(false);
     }
   }
-
   const loadingLabel = ru ? "Загружаем прогоны…" : "Loading runs…";
   return <>
     <div className={styles.body}>
@@ -124,14 +122,18 @@ export function RunEvidencePicker({ scope, load, capture, onChoose }: Props) {
         <Input ref={search} autoFocus type="search" size="sm" aria-label={ru ? "Найти прогон по названию или ID" : "Find a run by name or ID"}
           classNames={{ base: styles.input, inputWrapper: styles.inputWrapper, innerWrapper: styles.inputInner }}
           startContent={<Search size={16} aria-hidden="true" />}
-          placeholder={ru ? "Название или ID…" : "Name or ID…"} value={page.search} isDisabled={capturePending}
+          endContent={<QlSearchHint active={Boolean(ql)} ru={ru} disabled={capturePending} open={qlOpen} onOpen={() => toggleOverlay("ql", true)} />} aria-keyshortcuts="Meta+L Control+L" aria-haspopup="dialog" aria-expanded={qlOpen}
+          placeholder={ru ? "Найти прогоны или выполнить QL" : "Find runs or run a QL query"} value={page.search} isDisabled={capturePending}
           onValueChange={(value) => { page.setSearch(value); clearSelection(); }}
           onKeyDown={(event) => {
+            if (isQlSearchShortcut(event) && !capturePending) {
+              event.preventDefault(); event.stopPropagation(); toggleOverlay("ql", true); return;
+            }
             if (event.key !== "ArrowDown" || replacingRuns) return;
             const first = list.current?.querySelector<HTMLElement>('[role="option"]:not([aria-disabled="true"])');
             if (first) { event.preventDefault(); first.focus(); }
           }} />
-        <RunEvidenceQueryControl locale={locale} query={ql} open={qlOpen} instantClose={filtersOpen} disabled={capturePending}
+        <RunEvidenceQueryControl trigger={search} locale={locale} query={ql} open={qlOpen} instantClose={filtersOpen} disabled={capturePending}
           onOpenChange={(open) => toggleOverlay("ql", open)} onQuery={(value) => { setQl(value); clearSelection(); }}
           folders={folderCatalog.status === "ready" ? folderCatalog.data.map(({ value }) => value) : []}
           components={components} members={members.items} tags={tags} />

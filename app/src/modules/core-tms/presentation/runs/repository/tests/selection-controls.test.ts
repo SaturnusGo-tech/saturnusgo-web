@@ -1,3 +1,4 @@
+import { isQlSearchShortcut } from "../../../common/query-search/ql-search-shortcut";
 import assert from "node:assert/strict";
 import test from "node:test";
 import type { RunRepositoryBrowser } from "../RunRepositoryBrowser";
@@ -66,6 +67,7 @@ test("the shared repository search closes QL while showing the HeroUI filters, a
   const { RepositoryQueryControls: render } = h.load<{ RepositoryQueryControls: typeof RepositoryQueryControls }>(
     new URL("../../../cases/browser/controls/RepositoryQueryControls.tsx", import.meta.url), name => {
       if (name.endsWith("case-field-filters")) return { fieldFilterCount: () => 0 };
+      if (name.endsWith("ql-search-shortcut")) return { isQlSearchShortcut };
       return undefined;
     });
   const props = { locale: "en", query: "", qlQuery: "key:HOST-1", tags: [], directory: { items: [] },
@@ -77,7 +79,9 @@ test("the shared repository search closes QL while showing the HeroUI filters, a
   invoke(view().find(node => node.type === "Popover")!, "onOpenChange", true);
   assert.ok(view().some(node => node.type === "CaseFilterMenu"));
   assert.ok(!view().some(node => node.type === "CaseQlAutocomplete"));
-  invoke(view().find(node => node.props["aria-label"] === "QL query")!, "onPress");
+  const search = view().find(node => node.type === "Input")!;
+  assert.equal(view().some(node => node.type === "Button" && node.props.children === "QL"), false);
+  invoke(search, "onKeyDown", { key: "l", metaKey: true, preventDefault() {}, stopPropagation() {} });
   assert.ok(!view().some(node => node.type === "CaseFilterMenu"));
   assert.equal(view().find(node => node.type === "QlDisclosure")?.props.open, true);
   assert.equal(props.qlQuery, "key:HOST-1");
@@ -90,11 +94,14 @@ test("repository control placement preserves run-creation and suite selection ac
       name.endsWith("case-field-filters") ? { fieldFilterCount: () => 0 } : undefined);
     const props = { repository, ru: false, onSelectAll: () => selected++, state: { query: "", qlQuery: "", options: { folders: [], components: [], tags: [] }, directory: { items: [] }, facets: { folders: [], components: [] }, filters: { type: "all", priority: "all", lifecycle: "all" } } } as unknown as Parameters<typeof SelectionControls>[0];
     const all = nodes(h.render(() => render(props)));
-    const search = all.find(node => node.props["data-input-shell"] === true)!;
-    assert.equal(nodes(search).some(node => node.props["aria-label"] === "QL query"), repository);
-    assert.equal(nodes(search).some(node => node.props["aria-label"] === "Filters"), repository);
+    const controls = all.find(node => node.type === "RepositoryQueryControls");
+    if (controls) all.push(...nodes(controls.props.actions));
+    const search = all.find(node => node.props["data-input-shell"] === true);
+    assert.equal(all.some(node => node.type === "button" && node.props.children === "QL"), false);
+    assert.equal(repository ? all.some(node => node.type === "RepositoryQueryControls") : nodes(search).some(node => node.type === "QlSearchHint"), true);
+    if (!repository) assert.equal(nodes(search).some(node => node.props["aria-label"] === "Filters"), false);
     const selectAll = all.find(node => node.type === "button" && node.props.children === "Select all");
-    assert.equal(Boolean(selectAll), !repository);
+    assert.equal(Boolean(selectAll), true);
     if (selectAll) { invoke(selectAll, "onClick"); assert.equal(selected, 1); }
   }
 });

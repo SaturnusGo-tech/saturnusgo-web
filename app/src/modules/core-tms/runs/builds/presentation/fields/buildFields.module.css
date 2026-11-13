@@ -5,8 +5,8 @@
 .field .label { position: static; padding: 0; transform: none; color: var(--falcon-text-muted); font-size: 12px; font-weight: 500; }
 .field .control, .field .control:hover { display: flex; align-items: center; min-height: 34px; padding: 7px 10px; border: 1px solid var(--falcon-border); border-radius: 9px; background: var(--falcon-control); box-shadow: none; }
 .field .inner { width: 100%; min-width: 0; }
-.field .control:focus-within { border-color: var(--falcon-icon-muted); }
-.field .input, .field .input:focus { box-sizing: border-box; width: 100%; min-width: 0; padding: 0; border: 0; outline: 0; box-shadow: none; background: transparent; color: inherit; font: inherit; }
+.field .control:focus-within { border-color: var(--falcon-icon-muted); outline: 0; box-shadow: none; }
+.fields .field .control .input, .fields .field .control .input:is(:hover, :focus, :focus-visible, :active) { box-sizing: border-box; width: 100%; min-width: 0; padding: 0; border: 0 !important; outline: 0 !important; box-shadow: none !important; background: transparent !important; color: inherit; font: inherit; }
 .projectOptions { border: 1px solid var(--falcon-border); border-radius: 10px; background: var(--falcon-elevated); color: var(--falcon-text); box-shadow: var(--falcon-shadow-popover); }
 .upload { min-width: 0; display: grid; justify-items: start; gap: 8px; }
 .fileInput { display: none; }

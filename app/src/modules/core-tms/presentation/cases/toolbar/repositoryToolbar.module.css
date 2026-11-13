@@ -12,10 +12,7 @@
 .searchLine > label { padding-inline: 10px; }
 .searchLine > label input { font-size: 12px; }
 .searchLine > button { gap: 6px; }
-.qlToggle { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-width: 34px; padding: 0 8px; border: 1px solid var(--falcon-border-strong); border-radius: 7px; background: var(--falcon-control); color: var(--falcon-text-secondary); font: inherit; font-size: 11px; cursor: pointer; }
-.qlToggle:hover, .qlToggle[aria-expanded=true] { color: var(--falcon-text); background: var(--falcon-selected); }
-.qlToggle:focus-visible, .searchLine button:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 2px; }
-.activeQuery { width: 5px; height: 5px; border-radius: 50%; background: var(--falcon-action); }
+.searchLine button:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 2px; }
 .qlLine { display: flex; align-items: center; gap: 8px; }
 .qlLine > div { flex: 1; min-width: 0; }
 .qlLine > button { flex-shrink: 0; border-radius: 7px; }

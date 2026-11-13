@@ -2,7 +2,7 @@
 import { Button, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
 import { useProviderContext } from "@heroui/system";
 import { useReducedMotion } from "framer-motion";
-import { Archive, EllipsisVertical, Trash2 } from "lucide-react";
+import { Archive, EllipsisVertical, RotateCcw, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { AnchoredDropdown } from "../../../../../../shared/components/anchored-popup/dropdown/AnchoredDropdown";
 import type { ProductDocNode } from "../../../domain/product-docs";
@@ -30,6 +30,8 @@ export function ProductDocItemMenu({ context, node, permissions, items = [], dis
   const actions = [...items,
     ...(permissions.canArchive === true && !node.archivedAt ? [{ key: "archive", label: copy.archiveItem,
       icon: <Archive size={15} aria-hidden="true" />, run: () => setDialog({ owner, mode: "archive" }) }] : []),
+    ...(permissions.canPublish === true && node.archivedAt ? [{ key: "restore", label: copy.restore,
+      icon: <RotateCcw size={15} aria-hidden="true" />, run: () => setDialog({ owner, mode: "restore" }) }] : []),
     ...(permissions.canDelete === true ? [{ key: "delete", label: copy.deleteItem,
       icon: <Trash2 size={15} aria-hidden="true" />, run: () => setDialog({ owner, mode: "delete" }) }] : []),
   ];

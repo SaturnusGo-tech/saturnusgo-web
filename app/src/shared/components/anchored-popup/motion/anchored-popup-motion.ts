@@ -1,4 +1,5 @@
 import type { PopoverProps } from "@heroui/react";
+import styles from "./anchored-popup.module.css";
 
 type PopupMotion = NonNullable<PopoverProps["motionProps"]>;
 
@@ -12,7 +13,9 @@ const phases = {
 export function anchoredPopupMotion(existing?: PopupMotion): PopupMotion {
   return {
     ...existing,
-    initial: "initial",
+    initial: false,
+    className: `${styles.entrance} ${existing?.className ?? ""}`,
+    style: { ...existing?.style, maxHeight: "inherit" },
     animate: "enter",
     exit: "exit",
     variants: phases,

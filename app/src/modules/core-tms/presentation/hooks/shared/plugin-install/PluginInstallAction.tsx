@@ -23,7 +23,7 @@ export function PluginInstallAction({ installed, installing, disabled, ru, onIns
   }, [installing]);
   const manageLabel = ru ? "Управлять" : "Manage";
   return <div className={css.root} ref={root}>
-    {canManage && <div className={css.secondarySlot}><button type="button" className={css.secondary} data-hidden={installed}
+    {canManage && <div className={css.secondarySlot} data-hidden={installed}><button type="button" className={css.secondary} data-hidden={installed}
       aria-hidden={installed} tabIndex={installed ? -1 : 0} disabled={disabled || installed}
       onClick={() => { if (!disabled && !installed) onManage(); }}><Settings width={18} height={18} />{manageLabel}</button></div>}
     <div className={css.slot}>

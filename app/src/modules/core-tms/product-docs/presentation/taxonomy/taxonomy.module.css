@@ -42,12 +42,15 @@
   content: "";
 }
 .filterTrigger[data-filtered]::after { position: absolute; inset: 3px 3px auto auto; }
-.popover { z-index: 75; inline-size: min(288px, calc(100vw - 24px)); }
+.popover { z-index: 75; inline-size: min(288px, calc(100vw - 24px)); max-block-size: inherit; }
 .searchPopover { z-index: 160; }
 .panel {
   box-sizing: border-box;
+  display: block;
+  align-items: stretch;
+  padding: 0;
   inline-size: 100%;
-  max-block-size: min(340px, 75dvh);
+  max-block-size: inherit;
   border: 1px solid var(--falcon-border);
   border-radius: 14px;
   background: var(--falcon-elevated);
@@ -55,7 +58,7 @@
   box-shadow: var(--falcon-shadow-popover);
   overflow: auto;
 }
-.selector { padding: 10px; font-size: 13px; }
+.selector { box-sizing: border-box; inline-size: 100%; min-inline-size: 0; padding: 10px; font-size: 13px; }
 .selector[data-filter] {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);

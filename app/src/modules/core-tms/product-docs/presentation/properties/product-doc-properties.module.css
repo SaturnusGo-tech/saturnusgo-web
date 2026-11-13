@@ -16,3 +16,25 @@
 }
 .value[data-status="draft"] > svg { stroke-dasharray: 2.3 2.5; }
 .value[data-status="published"] > svg { color: var(--falcon-success); }
+
+/* Keep the pointer target while drawing a tighter hover surface around its label. */
+.panel section :global(button[aria-haspopup]) {
+  position: relative;
+  isolation: isolate;
+  background: transparent;
+}
+.panel section :global(button[aria-haspopup])::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 5px 1px;
+  border-radius: 6px;
+  pointer-events: none;
+  transition: background-color 120ms ease-out;
+}
+.panel section :global(button[aria-haspopup]):is(:hover, [data-hover="true"], [aria-expanded="true"])::before {
+  background: var(--falcon-hover);
+}
+@media (prefers-reduced-motion: reduce) {
+  .panel section :global(button[aria-haspopup])::before { transition: none; }
+}

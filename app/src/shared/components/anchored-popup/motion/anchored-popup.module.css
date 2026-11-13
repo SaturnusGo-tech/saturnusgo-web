@@ -1,0 +1,6 @@
+/* The measured positioner never moves. CSS owns entry even when Motion's
+   asynchronous features initialise or the controlled parent rerenders. */
+@media (prefers-reduced-motion: no-preference) {
+  .entrance { animation: appear 120ms ease-out; }
+}
+@keyframes appear { from { opacity: 0; } to { opacity: 1; } }

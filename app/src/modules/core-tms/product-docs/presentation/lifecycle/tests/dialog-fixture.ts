@@ -13,7 +13,7 @@ export const root: ProductDocDetail = { id: "root", parentId: null, kind: "page"
   canEdit: false, canPublish: false, canArchive: true, canDelete: true };
 export const flush = () => new Promise<void>(resolve => setImmediate(resolve));
 
-export function dialogFixture(current: ProductDocDetail = root, mode: "archive" | "delete" = "archive", canEdit = false) {
+export function dialogFixture(current: ProductDocDetail = root, mode: "archive" | "delete" | "restore" = "archive", canEdit = false) {
   const h = componentHarness();
   const resource = h.load<{ useProductDocResource: typeof useProductDocResource }>(new URL("../../../state/useProductDocResource.ts", import.meta.url));
   const { ProductDocLifecycleDialog: View } = h.load<{ ProductDocLifecycleDialog: typeof ProductDocLifecycleDialog }>(
@@ -30,9 +30,9 @@ export function dialogFixture(current: ProductDocDetail = root, mode: "archive" 
   const drafts: ProductDocDraftBuffer = new Map();
   let closed = 0, modalDismisses = 0;
   const api = { get: async (...args: Parameters<ProductDocsApi["get"]>) => { reads.push(args); return current; },
-    setArchived: (target: typeof scope, id: string, _archived: boolean, input: { expectedDraftVersion: number }) =>
-      new Promise(resolve => operations.push({ mode: "archive", scope: target, id, input,
-        resolve: () => resolve({ draftVersion: 10, archivedAt: "2026-11-13", affectedCount: 3 }), reject: () => {} })),
+    setArchived: (target: typeof scope, id: string, archived: boolean, input: { expectedDraftVersion: number }) =>
+      new Promise(resolve => operations.push({ mode: archived ? "archive" : "restore", scope: target, id, input,
+        resolve: () => resolve({ draftVersion: 10, archivedAt: archived ? "2026-11-13" : null, affectedCount: 3 }), reject: () => {} })),
     delete: (target: typeof scope, id: string, input: { expectedDraftVersion: number }, options: { idempotencyKey: string }) =>
       new Promise((resolve, reject) => operations.push({ mode: "delete", scope: target, id, input, key: options.idempotencyKey,
         resolve: () => resolve({ draftVersion: 10, deletedAt: "2026-11-13", affectedCount: 3 }), reject })),
@@ -47,7 +47,7 @@ export function dialogFixture(current: ProductDocDetail = root, mode: "archive" 
     return typeof modal.props.children === "function"
       ? [...rendered, ...nodes(modal.props.children(() => { modalDismisses++; }))] : rendered;
   };
-  const confirm = () => render().find(node => node.type === "Button" && node.props.children === (mode === "archive" ? "Archive item" : "Delete item"))!;
+  const confirm = () => render().find(node => node.type === "Button" && node.props.children === (mode === "archive" ? "Archive item" : mode === "restore" ? "Restore" : "Delete item"))!;
   return { h, render, confirm, reads, operations, completed, drafts, props: () => props,
     closed: () => closed, modalDismisses: () => modalDismisses };
 }

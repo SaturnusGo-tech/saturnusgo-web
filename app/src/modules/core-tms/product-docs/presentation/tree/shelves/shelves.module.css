@@ -247,3 +247,7 @@
 @media (prefers-reduced-motion: reduce) {
   .sectionTile, .pageRow { transition: none; }
 }
+
+/* Empty content belongs to the full pane, not the capped reading column. */
+.shelf[data-empty] { inline-size: 100%; }
+.shelf[data-empty] .body { inline-size: 100%; padding-block-end: 32px; }

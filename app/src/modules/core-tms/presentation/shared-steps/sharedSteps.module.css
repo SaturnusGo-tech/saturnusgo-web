@@ -57,7 +57,7 @@
 .state strong { color: var(--falcon-text); font-size: 15px; font-weight: 500; }
 .view .primaryButton, .editor .primaryButton { flex: none; white-space: nowrap; border-radius: 999px; padding: 7px 15px; min-height: 36px; font-size: 13px; font-weight: 500; }
 .editor { display: grid; grid-template-rows: auto minmax(0, 1fr); }
-.editorHeader { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: center; gap: 12px; width: min(100%, 1110px); margin-inline: auto; min-height: 88px; padding: 22px 30px; }
+.editorHeader { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: center; gap: 12px; width: 100%; margin: 0; min-height: 88px; padding: 22px 30px; }
 .editor .editorHeader .iconButton { width: 36px; padding: 0; color: var(--falcon-text-muted); background: transparent; border-color: transparent; box-shadow: none; }
 .editor .editorHeader .iconButton:hover { color: var(--falcon-text); }
 .editor .editorHeader .iconButton:focus-visible { outline: 1px solid var(--falcon-action); outline-offset: 2px; }
@@ -68,8 +68,8 @@
 .editor .editorHeader .titleField input:focus-visible { background: transparent; outline: 0; box-shadow: none; }
 .editorActions { display: flex; align-items: center; gap: 8px; }
 .editorScroll { min-height: 0; overflow: auto; padding: 8px 30px 56px; background: var(--falcon-surface); scrollbar-color: var(--falcon-border-subtle) transparent; }
-.editorScroll > * { width: min(100%, 1050px); margin-inline: auto; }
-.paper { width: min(920px, 100%); margin: 0; padding: 0; background: transparent; border: 0; border-radius: 0; box-shadow: none; }
+.editorScroll > * { width: 100%; margin-inline: 0; }
+.paper { width: 100%; margin: 0; padding: 0; background: transparent; border: 0; border-radius: 0; box-shadow: none; }
 .scenarioHeading { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 .scenarioHeading h2 { margin: 0; font-size: 14px; font-weight: 500; }
 .scenarioHeading span { min-width: 20px; padding: 2px 6px; color: var(--falcon-text-muted); background: var(--falcon-hover); border-radius: 999px; font-size: 10px; text-align: center; }
