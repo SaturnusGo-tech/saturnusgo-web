@@ -1,29 +1,43 @@
 export function codexProfileCopy(ru:boolean) {
  return ru?{
   introduction:'Агент QA в Falcon',
-  bio:`Codex — AI-агент OpenAI. В Falcon он помогает команде QA разобраться в продукте, развивать покрытие и готовить проверки на основе уже накопленных знаний.
+  bio:`Привет, я **Codex** — твой AI-напарник по QA в Falcon. Помогаю разобраться в продукте, найти пробелы в покрытии и довести проверки до понятного результата. Опиши задачу обычными словами — я начну с того, что уже есть у команды.
 
-С ним можно:
+### Сначала — контекст
 
-- Изучать требования, существующие кейсы и прошлые результаты, привлекая доступные вложения и код для исследования поведения продукта.
-- Создавать и уточнять тест-кейсы, упорядочивать папки и писать документацию с диаграммами и ссылками на источники.
-- Готовить прогоны, а при разрешённом выполнении — проводить поддерживаемые проверки, сохранять доказательства, регистрировать дефекты и разбирать фактические результаты.
+- **Исследую продукт.** Читаю требования, существующие кейсы, прошлые результаты, доступные вложения и код. Сопоставляю источники и отмечаю вопросы, на которые пока нет ответа.
+- **Нахожу, что проверить.** Ищу связанные сценарии, граничные условия и недостающее покрытие, чтобы сохранять полезные проверки и дополнять их по делу.
 
-Codex также помогает переносить покрытие: проверять данные импорта и экспортировать выбранные кейсы.
+### От задачи — к проверке
 
-Работа ограничена пространством, проектами и правами подключения. Подготовка прогона собирает нужные проверки; выполнение фиксирует их фактические результаты. Активность и достижения ниже отражают записанные действия.`,
+- **Работаю с тест-кейсами.** Создаю и уточняю кейсы, упорядочиваю папки, проверяю данные импорта и экспортирую выбранное покрытие.
+- **Готовлю прогоны.** Подбираю проверки под задачу. Когда выполнение разрешено, провожу поддерживаемые проверки и сохраняю фактические результаты с доказательствами.
+
+### Знания остаются в Falcon
+
+- **Пишу документацию.** Связываю объяснения, диаграммы и источники, чтобы следующему человеку было проще продолжить работу.
+- **Разбираю результат.** Помогаю зарегистрировать дефекты, связать доказательства и понять, что требует внимания перед следующим прогоном.
+
+*Работаю в пределах проектов и прав моего подключения. Подготовка прогона ещё не означает, что проверки выполнены. Моя активность и достижения отражают записанные действия.*`,
  }:{
   introduction:'QA agent in Falcon',
-  bio:`Codex is OpenAI’s AI agent. In Falcon, it helps QA teams understand the product, develop coverage and prepare checks using the knowledge already in their workspace.
+  bio:`Hi, I’m **Codex** — your AI teammate for QA in Falcon. I help you understand the product, find gaps in coverage and turn checks into results your team can use. Describe the task in your own words — I’ll start with what your team already knows.
 
-You can work with it to:
+### First, the context
 
-- Investigate requirements, existing cases and previous results, using available attachments and code to understand product behaviour.
-- Create and refine test cases, organize folders, and write documentation with diagrams and links to its sources.
-- Prepare test runs and, when execution is authorized, carry out supported checks, retain evidence, file defects and review observed results.
+- **Investigate the product.** I read requirements, existing cases, previous results, available attachments and code. I compare sources and flag questions that still need an answer.
+- **Find what to check.** I look for related scenarios, boundary conditions and missing coverage, keeping useful checks and adding what the task needs.
 
-Codex also helps teams move coverage by validating imports and exporting selected cases.
+### From a task to a check
 
-Work stays within the workspace, projects and permissions granted to its connection. Preparing a run gathers the checks to perform; execution records their actual outcomes. The activity and achievements below reflect recorded actions.`,
+- **Work with test cases.** I create and refine cases, organize folders, validate imports and export selected coverage.
+- **Prepare test runs.** I select checks for the task. When execution is authorized, I carry out supported checks and retain their actual results and evidence.
+
+### Keep the knowledge in Falcon
+
+- **Write documentation.** I connect explanations, diagrams and sources so the next person can pick up the work.
+- **Review the outcome.** I help file defects, link evidence and identify what needs attention before the next run.
+
+*I work within the projects and permissions granted to my connection. Preparing a run does not mean its checks have been executed. My activity and achievements reflect recorded actions.*`,
  };
 }
