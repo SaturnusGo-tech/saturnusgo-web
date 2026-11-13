@@ -15,8 +15,11 @@
   color: var(--falcon-text);
   font-size: inherit;
 }
-.trigger { cursor: pointer; transition: background-color 150ms ease; }
-.trigger:is([data-hover="true"], [aria-expanded="true"]) { background: var(--falcon-hover); }
+.trigger { position: relative; isolation: isolate; cursor: pointer; }
+.trigger::before { position: absolute; z-index: -1; inset: var(--property-hover-block-inset, 0px) 0; border-radius: inherit; background: transparent; content: ""; pointer-events: none; transition: background-color 150ms ease; }
+.trigger:is([data-hover="true"], [aria-expanded="true"])::before { background: var(--falcon-hover); }
+.trigger:not([data-compact]):is([data-hover="true"], [aria-expanded="true"]) { background: transparent; }
+.trigger[data-compact]::before { display: none; }
 .trigger:focus-visible { outline: 1px solid var(--falcon-focus); outline-offset: -1px; }
 .trigger > span:not(.member), .value > span:not(.member) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 :is(.trigger, .value, .option) > svg { flex: none; color: var(--falcon-icon); }
@@ -103,7 +106,7 @@
   .popover { animation: property-popover-enter 110ms ease-out both; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .trigger { transition: none; }
+  .trigger::before { transition: none; }
 }
 @keyframes property-popover-enter {
   from { opacity: 0; }

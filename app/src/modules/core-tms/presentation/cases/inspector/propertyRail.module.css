@@ -43,3 +43,5 @@
 .documentation [data-documentation-field] > dt { padding-block-start: 0; }
 .documentation [data-documentation-field] > dd { font-size: 13px; min-inline-size: 0; }
 .documentation [data-documentation-field] > dd > button { color: var(--falcon-text-muted); }
+
+.sideRail { --property-hover-block-inset: 5px; --falcon-focus: var(--falcon-text-secondary); }

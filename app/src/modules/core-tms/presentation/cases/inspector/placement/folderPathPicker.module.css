@@ -1,11 +1,15 @@
-.root { display: grid; gap: 6px; min-inline-size: 0; }
+.root { display: grid; gap: 6px; min-inline-size: 0; --falcon-focus: var(--falcon-text-secondary); }
 .label { font-size: 12px; color: var(--falcon-text-muted); }
-.selection { min-inline-size: 0; max-inline-size: 100%; font-size: 13px; line-height: 18px; }
-.selection > span { max-inline-size: 100%; }
-.menu.menu { inline-size: min(320px, calc(100vw - 24px)); }
-.create { display: grid; gap: 2px; min-inline-size: 0; }
-.path { color: var(--falcon-text-muted); font-size: 12px; overflow-wrap: anywhere; }
+.selection { flex: 1; min-inline-size: 0; max-inline-size: 100%; font-size: 13px; line-height: 18px; }
+.menu.menu { inline-size: min(480px, calc(100vw - 24px)); --falcon-focus: var(--falcon-text-secondary); --tms-focus-ring: transparent; --tms-focus-border: transparent; }
+.menu.menu [data-slot="base"]:has(> [data-slot="main-wrapper"]) { padding: 10px 10px 4px; }
+.menu.menu [data-slot="input-wrapper"] { min-block-size: 38px; padding-inline: 12px; border-radius: 12px; border: 1px solid var(--falcon-border); background: var(--falcon-selected); box-shadow: none; }
+.menu.menu [data-slot="input-wrapper"]:is(:focus-within, [data-focus="true"]) { border-color: var(--falcon-text-muted); box-shadow: none; outline: 0; }
+.menu.menu [data-slot="inner-wrapper"], .menu.menu input { border: 0 !important; border-radius: inherit; outline: 0 !important; box-shadow: none !important; background: transparent; }
+.menu.menu .option { flex-wrap: nowrap; min-inline-size: 0; min-block-size: 36px; }
+.menu.menu .option > [data-slot="title"] { white-space: nowrap; }
+.create { display: flex; align-items: center; gap: 10px; min-inline-size: 0; }
+.create > :first-child { flex: none; font-size: 12px; color: var(--falcon-text-secondary); }
 .hint { margin: 0; padding: 8px 14px 12px; font-size: 11px; line-height: 1.45; color: var(--falcon-text-muted); }
-@media (prefers-reduced-motion: reduce) {
-  .selection > span[data-overflow], .selection > span[data-overflow] > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; overflow-wrap: normal; }
-}
+.menu.menu [data-slot="input-wrapper"]::before, .menu.menu [data-slot="input-wrapper"]::after { display: none; }
+.menu.menu [role="listbox"] { scrollbar-width: thin; scrollbar-color: var(--falcon-border-strong) transparent; }

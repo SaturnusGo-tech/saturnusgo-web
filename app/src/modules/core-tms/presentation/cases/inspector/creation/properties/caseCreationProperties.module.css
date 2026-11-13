@@ -1,4 +1,4 @@
-.properties { inline-size: 100%; }
+.properties { inline-size: 100%; --property-hover-block-inset: 5px; --falcon-focus: var(--falcon-text-secondary); }
 .layout { grid-template-columns: minmax(0, 1fr) 280px; }
 @container (max-width: 680px) {
   .layout { grid-template-columns: minmax(0, 1fr); }

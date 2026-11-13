@@ -1,0 +1,15 @@
+.viewport { display: block; min-inline-size: 0; max-inline-size: 100%; overflow: hidden; white-space: nowrap; text-align: start; }
+.accessible { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.content { display: inline-block; inline-size: max-content; max-inline-size: none; vertical-align: middle; }
+.breadcrumbs, .list { inline-size: max-content; max-inline-size: none; }
+.list { display: flex; align-items: center; flex-wrap: nowrap; gap: 0; margin: 0; padding: 0; list-style: none; }
+.crumb { display: inline-flex; align-items: center; flex: none; min-inline-size: max-content; }
+.item { display: inline-flex; align-items: center; color: var(--falcon-text-secondary); font: inherit; white-space: nowrap; opacity: 1; pointer-events: none; }
+.crumb:last-child .item { display: inline-flex; align-items: center; color: var(--falcon-text); }
+.separator { flex: none; margin-inline: 5px; color: var(--falcon-text-muted); }
+.viewport[data-overflow="true"] { mask-image: linear-gradient(to right, #000 calc(100% - 14px), transparent); }
+:is(button:hover, button:focus-visible, [role="option"]:hover, [role="option"]:focus-visible) .viewport[data-overflow="true"] .content {
+  animation: path-reveal var(--path-duration) ease-in-out infinite alternate;
+}
+@keyframes path-reveal { 0%, 12% { transform: translateX(0); } 88%, 100% { transform: translateX(var(--path-distance)); } }
+@media (prefers-reduced-motion: reduce) { .viewport .content { animation: none !important; } }

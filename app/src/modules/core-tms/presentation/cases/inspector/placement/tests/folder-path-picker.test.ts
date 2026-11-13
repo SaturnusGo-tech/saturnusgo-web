@@ -11,7 +11,7 @@ function picker() {
   const controls = shared.load<{ PropertyPopover: typeof PropertyPopover; PropertySearch: typeof PropertySearch }>(
     new URL("../../../../common/properties/select/PropertySelect.tsx", import.meta.url));
   const changes: string[] = []; let focused = 0;
-  const props = { value: "/Mobile", folders: ["/Mobile", "/Mobile/Android", "/Web"], ru: false, disabled: false,
+  const props = { value: "/Mobile", folders: ["/Mobile", "/Mobile/Android", "/Web"], ru: false, disabled: false, allowCreate: true,
     onChange: (value: string) => { changes.push(value); props.value = value; } };
   const render = () => nodes(h.render(() => renderPicker(props)));
   const popover = () => {
@@ -91,7 +91,24 @@ test("submitting closes and disables the picker, including option callbacks", ()
 test("long selected paths retain the complete accessible value while the visible label stays compact", () => {
   const h = picker(); const path = "/Web/My home/Tasks and assignees/Guest arrival preparation"; h.props.value = path;
   assert.equal(h.trigger().props["aria-label"], `Folder, ${path}`);
-  assert.equal(h.overlay().find(node => node.type === "OverflowLabel")?.props.text, path);
+  assert.equal(h.overlay().find(node => node.type === "FolderPathBreadcrumb")?.props.path, path);
   h.open(); const selected = h.render().find(node => node.props["data-folder-path"] === path); assert.ok(selected);
   invoke(selected, "onPress"); assert.deepEqual(h.changes, [path]);
+});
+
+test("an existing-folder-only picker never creates an unknown folder from Enter or a menu action", () => {
+  const h = picker(); h.props.allowCreate = false; h.open(); h.type("/Does not exist");
+  assert.equal(h.render().some(node => node.props["data-folder-create"]), false);
+  h.menuKey("Enter"); assert.deepEqual(h.changes, []);
+  h.type("/Web"); h.menuKey("Enter"); assert.deepEqual(h.changes, ["/Web"]);
+});
+
+test("root destinations have a readable localized name without changing their stored path", () => {
+  const h = picker(); h.props.value = "/";
+  assert.equal(h.trigger().props["aria-label"], "Folder, Project root");
+  const root = h.render().find(node => node.props["data-folder-path"] === "/")!;
+  assert.equal(root.props.textValue, "Project root");
+  assert.equal(root.props["aria-label"], "Project root");
+  h.props.ru = true; assert.equal(h.trigger().props["aria-label"], "Папка, Корень проекта");
+  invoke(root, "onPress"); assert.deepEqual(h.changes, ["/"]);
 });
