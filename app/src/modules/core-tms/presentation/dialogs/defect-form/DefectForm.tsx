@@ -56,14 +56,14 @@ export function DefectForm(props: Props) {
         </div>
         <div className={css.layout} data-defect-create-layout>
           <main className={css.content}>
-            <NarrativeField label={copy.description} value={value.description} error={errors.description}
+            <NarrativeField framed label={copy.description} value={value.description} error={errors.description}
               onChange={description => onChange({ description })} disabled={submitting} />
-            {value.reproduction !== undefined && <NarrativeField label={ru ? "Шаги воспроизведения" : "Steps to reproduce"}
+            {value.reproduction !== undefined && <NarrativeField framed label={ru ? "Шаги воспроизведения" : "Steps to reproduce"}
               value={value.reproduction} error={errors.reproduction}
               onChange={reproduction => onChange({ reproduction })} disabled={submitting} />}
-            <NarrativeField label={copy.actual} value={value.actualResult} error={errors.actualResult}
+            <NarrativeField framed label={copy.actual} value={value.actualResult} error={errors.actualResult}
               onChange={actualResult => onChange({ actualResult })} disabled={submitting} />
-            <NarrativeField label={copy.expected} value={value.expectedResult}
+            <NarrativeField framed label={copy.expected} value={value.expectedResult}
               onChange={expectedResult => onChange({ expectedResult })} disabled={submitting} />
             <DefectEvidence files={props.files} onChange={props.onFilesChange} disabled={submitting} />
           </main>

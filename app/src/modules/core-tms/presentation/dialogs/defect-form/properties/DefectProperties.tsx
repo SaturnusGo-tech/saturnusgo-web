@@ -1,15 +1,11 @@
-import { Input } from "@heroui/react";
 import { Box, CircleDot, Flame, Minus, OctagonAlert, Plug, Repeat2 } from "lucide-react";
-import { useId } from "react";
 import { PropertyIdentityField } from "../../../common/properties/metadata/identity/PropertyIdentityField";
 import { PriorityIcon, priorityLevels } from "../../../common/properties/PriorityIcon";
 import { PropertySelect } from "../../../common/properties/select/PropertySelect";
-import { useInputShellRef } from "../../../common/integration-controls/refs/useInputShellRef";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import { getDefectDialogCopy } from "../../defect/copy";
 import type { DefectDraft, DefectRouting } from "../model";
 import { DefectRoutingHelp } from "../help/DefectRoutingHelp";
-import form from "../form.module.css";
 import css from "./properties.module.css";
 
 type Props = {
@@ -20,8 +16,6 @@ type Props = {
 const severityIcons = { critical: OctagonAlert, high: Flame, medium: CircleDot, low: Minus };
 
 export function DefectProperties({ workspaceId, offline, disabled, value, onChange, components, routing, showRoutingError }: Props) {
-  const linkId = useId();
-  const linkShellRef = useInputShellRef();
   const { locale } = useTmsLocale();
   const ru = locale === "ru";
   const copy = getDefectDialogCopy(locale);
@@ -58,12 +52,6 @@ export function DefectProperties({ workspaceId, offline, disabled, value, onChan
         <DefectRoutingHelp />
       </div>
       {showRoutingError && !routing.resolved && <small className={css.error} role="alert">{routing.message}</small>}
-    </div>
-    <div className={css.linkField}><label htmlFor={linkId}>{copy.deepLink}</label>
-      <Input id={linkId} type="text" aria-label={copy.deepLink} size="sm" value={value.link}
-        wrapperRef={linkShellRef}
-        classNames={{ inputWrapper: form.fieldShell, input: form.fieldInput }}
-        placeholder={copy.linkPlaceholder} isDisabled={disabled} onValueChange={link => onChange({ link })} />
     </div>
   </aside>;
 }

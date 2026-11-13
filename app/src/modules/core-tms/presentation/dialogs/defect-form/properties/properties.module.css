@@ -4,8 +4,6 @@
 .rows > * { min-width: 0; max-width: 100%; }
 .routing { display: flex; align-items: center; gap: 2px; }
 .routing > :first-child { min-width: 0; max-width: calc(100% - 28px); }
-.linkField { display: grid; grid-template-columns: minmax(0, 1fr); gap: 7px; margin-top: 15px; }
-.linkField > label { color: var(--falcon-text-muted); font-size: 13px; line-height: 19px; }
 .error { padding: 3px 7px; font-size: 12px; line-height: 1.5; color: var(--falcon-danger); }
 .severityIcon { display: inline-grid; flex: none; place-items: center; color: var(--falcon-icon); }
 .severityIcon[data-level="high"] { color: var(--falcon-warning); }

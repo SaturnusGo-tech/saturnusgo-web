@@ -32,11 +32,13 @@
 .layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; align-items: start; gap: 28px; min-width: 0; }
 .content { display: flex; flex-direction: column; min-width: 0; gap: 28px; }
 .content > section { min-height: 84px; }
-.panel .fieldShell { min-height: 34px; padding: 0 10px; border: 1px solid var(--falcon-border-strong); border-radius: 12px; background: var(--falcon-control); box-shadow: none; }
-.panel .fieldShell:is([data-hover="true"], [data-focus="true"], [data-focus-within="true"]) { background: var(--falcon-control); }
-.panel .fieldShell input.fieldInput,
-.panel .fieldShell input.fieldInput:is(:hover, :focus, :focus-visible) { padding: 0; border: 0; border-radius: inherit; outline: 0; background: transparent; box-shadow: none; color: var(--falcon-text); font: inherit; }
-.fieldInput::placeholder { color: var(--falcon-text-muted); opacity: 1; }
+.content > section > div[data-editing] {
+  min-height: 104px; padding: 12px; border: 1px solid var(--falcon-border-strong);
+  border-radius: 12px; background: var(--falcon-control);
+}
+.content > section > div[data-editing]:focus-within { border-color: var(--falcon-text-muted); }
+.content > section > div[data-invalid="true"] { border-color: var(--falcon-danger-border); }
+.content [contenteditable="true"]:is(:focus, :focus-visible) { outline: 0; box-shadow: none; }
 .validation { display: block; margin-top: 6px; color: var(--falcon-danger); font-size: 12px; }
 .actions { display: flex; flex: none; align-items: center; justify-content: flex-end; gap: 8px; padding: 14px 28px; border-top: 1px solid var(--falcon-border-subtle); background: var(--falcon-surface); }
 .actions button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 32px; padding: 6px 12px; border: 0; border-radius: 12px; font: inherit; font-weight: 500; cursor: pointer; white-space: nowrap; }
