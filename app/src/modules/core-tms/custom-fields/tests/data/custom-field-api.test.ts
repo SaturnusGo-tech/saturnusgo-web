@@ -8,11 +8,12 @@ test("registry requests remain scoped and bounded; updates carry row-version and
   const calls: { path: string; method?: string; body?: unknown; options?: unknown }[] = [];
   const http = { get: async (path: string) => { calls.push({ path }); return { data: [value], meta: { nextCursor: "next-page" } }; },
     mutateResource: async (path: string, method: string, body: unknown, options: unknown) => { calls.push({ path, method, body, options }); return { data: value, etag: "tag" }; } } as unknown as TmsHttpClient;
-  const page = await listCustomFieldValues(http, scope, field.id, { search: "a & b", parentValueId: "group-1", cursor: "cursor/2" });
+  const page = await listCustomFieldValues(http, scope, field.id, { search: "a & b", parentValueId: "group-1", cursor: "cursor/2", includeUnclassified: true });
   assert.equal(page.nextCursor, "next-page");
   const url = new URL(calls[0].path, "https://example.test");
   assert.equal(url.searchParams.get("workspaceId"), scope.workspaceId); assert.equal(url.searchParams.get("limit"), "50");
   assert.equal(url.searchParams.get("search"), "a & b"); assert.equal(url.searchParams.get("parentValueId"), "group-1");
+  assert.equal(url.searchParams.get("includeUnclassified"), "true");
   await saveCustomField(http, scope, { name: field.name, identifier: field.identifier, type: field.type, multiple: false, required: true }, field, "field-op");
   assert.equal(calls[1].method, "PATCH"); assert.deepEqual(calls[1].options, { ifMatch: '"custom-field:field-a:v3"', idempotencyKey: "field-op", signal: undefined });
   await saveCustomFieldValue(http, scope, field.id, { value: "Acme 2", confirmedSimilarValueIds: [value.id] }, null, "value-op");

@@ -22,7 +22,7 @@ type Props = {
 
 export function ProductDocTaxonomyFields(props: Props) {
   const http = useOptionalTmsHttpClient();
-  return http ? <TaxonomyFields {...props} key={`${props.scope.workspaceId}:${props.scope.projectId}`} /> : null;
+  return http ? <TaxonomyFields key={`${props.scope.workspaceId}:${props.scope.projectId}`} {...props} /> : null;
 }
 
 function TaxonomyFields({ scope, value, onChange, filter = false, disabled = false }: Props) {
@@ -42,10 +42,10 @@ function TaxonomyFields({ scope, value, onChange, filter = false, disabled = fal
   };
   const selected = [value.productGroup?.label, value.product?.label].filter(Boolean).join(", ");
 
-  function select(dimension: TaxonomyDimension, next: ProductDocTaxonomy[TaxonomyDimension]) {
+  function select(dimension: TaxonomyDimension, next: ProductDocTaxonomy[TaxonomyDimension], unclassified = false) {
     if (dimension === "productGroup") {
       if ((next?.id ?? null) !== (value.productGroup?.id ?? null)) onChange({ productGroup: next, product: null });
-    } else onChange({ ...value, product: next });
+    } else onChange({ ...value, ...(unclassified ? { productGroup: null } : {}), product: next });
     if (!filter) setOpen(undefined);
   }
 

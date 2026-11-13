@@ -1,3 +1,4 @@
 .hint, .error { margin: 6px 14px; color: var(--falcon-text-secondary); font-size: 12px; line-height: 1.45; }
 .error { color: var(--falcon-danger); }
 .creation { display: grid; border-block-start: 1px solid var(--falcon-border-subtle); }
+.sectionTitle { display: block; padding: 8px 10px 4px; color: var(--falcon-text-secondary); font-size: 11px; font-weight: 500; }

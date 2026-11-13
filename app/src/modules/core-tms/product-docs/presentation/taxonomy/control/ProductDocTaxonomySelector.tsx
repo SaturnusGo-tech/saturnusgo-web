@@ -1,7 +1,7 @@
 "use client";
 
 import { ErrorToast } from "../../../../presentation/common/error/ErrorToast";
-import { Button, Input, Listbox, ListboxItem, Skeleton, Tab, Tabs } from "@heroui/react";
+import { Button, Input, Listbox, ListboxItem, ListboxSection, Skeleton, Tab, Tabs } from "@heroui/react";
 import { useReducedMotion } from "framer-motion";
 import { Search, X } from "lucide-react";
 import { useEffect, useRef } from "react";
@@ -24,7 +24,7 @@ type Props = {
   value: ProductDocTaxonomy;
   labels: Record<TaxonomyDimension, string>;
   onDimension(dimension: TaxonomyDimension): void;
-  onSelect(dimension: TaxonomyDimension, value: ProductDocTaxonomy[TaxonomyDimension]): void;
+  onSelect(dimension: TaxonomyDimension, value: ProductDocTaxonomy[TaxonomyDimension], unclassified?: boolean): void;
 };
 
 export function ProductDocTaxonomySelector(props: Props) {
@@ -66,7 +66,8 @@ function TaxonomyValues({ scope, dimension, filter, value, labels, onSelect, cat
   const ru = locale === "ru";
   const searchRef = useRef<HTMLInputElement>(null);
   const optionsRef = useRef<HTMLElement>(null);
-  const page = useCustomFieldValues({ ...scope, fieldId, parentValueId: groupId });
+  const page = useCustomFieldValues({ ...scope, fieldId, parentValueId: groupId,
+    includeUnclassified: dimension === "product" && Boolean(groupId) || undefined });
   const needsGroup = dimension === "product" && !filter && !groupId;
   const items = needsGroup ? page.items.filter((entry) => !entry.parentValueId) : page.items;
   const waiting = catalog.loading || page.loading;
@@ -74,6 +75,13 @@ function TaxonomyValues({ scope, dimension, filter, value, labels, onSelect, cat
   const { setSearch } = page;
   useEffect(() => { if (autoFocus) searchRef.current?.focus({ preventScroll: true }); }, [autoFocus]);
   const empty = ru ? "Сбросить выбор" : "Clear selection";
+  const unclassified = groupId ? items.filter(entry => entry.isLegacy && !entry.parentValueId) : [];
+  const sections = unclassified.length ? [
+    { id: "group", title: ru ? "В выбранной группе" : "In selected group", items: items.filter(entry => entry.parentValueId === groupId) },
+    { id: "unclassified", title: ru ? "Без группы" : "Unclassified", items: unclassified },
+  ].filter(section => section.items.length) : null;
+  const option = (entry: { id: string; label: string }) => <ListboxItem key={entry.id} textValue={entry.label}
+    endContent={entry.id === clearKey ? <X size={14} aria-hidden="true" /> : undefined}>{entry.label}</ListboxItem>;
 
   return <div className={styles.values} data-dimension={dimension}>
     <div className={styles.valueSearch} data-input-shell>
@@ -95,14 +103,14 @@ function TaxonomyValues({ scope, dimension, filter, value, labels, onSelect, cat
         const [key] = keys;
         if (key === clearKey) return onSelect(dimension, null);
         const entry = items.find((option) => option.id === key);
-        if (entry) onSelect(dimension, { id: entry.id, label: entry.label });
+        if (entry) onSelect(dimension, { id: entry.id, label: entry.label }, dimension === "product" && entry.parentValueId === null);
       }}>
-      {[...(value[dimension] ? [{ id: clearKey, label: empty }] : []), ...items].map((entry) =>
-        <ListboxItem key={entry.id} textValue={entry.label} endContent={entry.id === clearKey ? <X size={14} aria-hidden="true" /> : undefined}>
-          {entry.label}
-        </ListboxItem>
-      )}
+      {[...(sections ? sections.map(section => <ListboxSection key={section.id} title={section.title}>
+        {section.items.map(option)}</ListboxSection>) : items.map(option)),
+        ...(value[dimension] ? [option({ id: clearKey, label: empty })] : [])]}
     </Listbox>
+    {unclassified.length > 0 && <p className={styles.hint}>{ru
+      ? "Выбор продукта без группы снимет текущую группу." : "Choosing an unclassified product clears the current group."}</p>}
     {waiting && !items.length && <div className={styles.pending} role="status" aria-label={ru ? "Загрузка…" : "Loading…"}>
       <Skeleton className={styles.skeleton} disableAnimation />
       <Skeleton className={styles.skeleton} disableAnimation />

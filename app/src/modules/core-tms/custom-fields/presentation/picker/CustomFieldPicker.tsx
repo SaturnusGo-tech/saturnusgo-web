@@ -1,5 +1,5 @@
 import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
-import { Button, Listbox, ListboxItem } from "@heroui/react";
+import { Button, Listbox, ListboxItem, ListboxSection } from "@heroui/react";
 import { Check, Layers, Package, Plus, RotateCcw, SlidersHorizontal, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -21,7 +21,9 @@ export function CustomFieldPicker({ field, selected, onChange, parentValueId, al
   const { locale } = useTmsLocale();
   const ru = locale === "ru";
   const [open, setOpen] = useState(false);
-  const page = useCustomFieldValues({ workspaceId, projectId, fieldId: field.id, parentValueId, enabled: open && !disabled });
+  const includeUnclassified = field.systemKey === "product" && Boolean(parentValueId);
+  const page = useCustomFieldValues({ workspaceId, projectId, fieldId: field.id, parentValueId,
+    includeUnclassified: includeUnclassified || undefined, enabled: open && !disabled });
   const write = useFieldValueWrite({ workspaceId, projectId }, field.id, ru);
   const context = useRef("");
   context.current = `${workspaceId}:${projectId}:${field.id}:${parentValueId ?? ""}`;
@@ -32,6 +34,15 @@ export function CustomFieldPicker({ field, selected, onChange, parentValueId, al
   const exact = page.items.find(value => normalizedFieldLabel(value.label) === normalizedFieldLabel(page.search));
   const parentNeeded = field.systemKey === "product" && !parentValueId && !allowProductsWithoutGroup;
   const selectedKeys = new Set(selected.map(value => value.id));
+  const unclassified = includeUnclassified ? page.items.filter(value => value.isLegacy && !value.parentValueId) : [];
+  const sections = unclassified.length ? [
+    { id: "group", title: ru ? "В выбранной группе" : "In selected group", items: page.items.filter(value => value.parentValueId === parentValueId) },
+    { id: "unclassified", title: ru ? "Без группы" : "Unclassified", items: unclassified },
+  ].filter(section => section.items.length) : null;
+  const option = (value: CustomFieldSelection) => <ListboxItem key={value.id} textValue={customValueLabel(value, ru)} onPress={() => choose(value)}
+    endContent={selectedKeys.has(value.id) ? <Check size={14} className={properties.selectedIcon} aria-hidden="true" /> : undefined}>
+    {customValueLabel(value, ru)}
+  </ListboxItem>;
   const trigger = <><CustomFieldIcon systemKey={field.systemKey} fallback={displayValue !== undefined} />
     <span>{displayValue ?? (selected.length ? selected.map(value => customValueLabel(value, ru)).join(", ") : placeholder ?? (ru ? "Выберите значение" : "Select a value"))}</span></>;
 
@@ -43,6 +54,7 @@ export function CustomFieldPicker({ field, selected, onChange, parentValueId, al
 
   function choose(value: CustomFieldSelection) {
     if (parentNeeded && value.parentValueId) return;
+    if (includeUnclassified && value.parentValueId && value.parentValueId !== parentValueId) return;
     const next = field.multiple ? (selectedKeys.has(value.id)
       ? selected.filter(item => item.id !== value.id) : [...selected, value]) : [value];
     onChange(next);
@@ -64,12 +76,11 @@ export function CustomFieldPicker({ field, selected, onChange, parentValueId, al
       hideSelectedIcon selectedKeys={selectedKeys} disabledKeys={page.items.filter(value => parentNeeded && value.parentValueId).map(value => value.id)}
       classNames={{ base: properties.list, list: properties.options }} itemClasses={{ base: properties.option, title: properties.optionTitle }}
       emptyContent={page.loading || page.failure ? null : ru ? "Значения не найдены" : "No values found"}>
-      {page.items.map(value => <ListboxItem key={value.id} textValue={customValueLabel(value, ru)} onPress={() => choose(value)}
-        endContent={selectedKeys.has(value.id) ? <Check size={14} className={properties.selectedIcon} aria-hidden="true" /> : undefined}>
-        {customValueLabel(value, ru)}
-      </ListboxItem>)}
+      {sections ? sections.map(section => <ListboxSection key={section.id} title={section.title}
+        classNames={{ heading: css.sectionTitle }}>{section.items.map(option)}</ListboxSection>) : page.items.map(option)}
     </Listbox>
-    {parentNeeded && <p className={css.hint}>{ru ? "Выберите группу для выбора её продуктов. Прежние значения без группы доступны ниже." : "Choose a group to select its products. Existing unclassified values remain available."}</p>}
+    {unclassified.length > 0 && <p className={css.hint}>{ru ? "Выбор продукта без группы снимет текущую группу." : "Choosing an unclassified product clears the current group."}</p>}
+    {parentNeeded && <p className={css.hint}>{ru ? "Для остальных продуктов выберите группу." : "Choose a group for other products."}</p>}
     {page.loading && <LoadingOrb label={ru ? "Загрузка…" : "Loading…"} />}
     {!!page.failure && <div role="alert" className={css.hint}>{customFieldError(page.failure, ru)}
       <Button type="button" size="sm" variant="light" onPress={page.refresh}>{ru ? "Повторить" : "Retry"}</Button>

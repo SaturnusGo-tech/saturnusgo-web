@@ -10,6 +10,9 @@ export function updateCaseField(revision: TestCaseRevision, field: CustomFieldDe
     const parent = values[0]?.id ?? null;
     fields = fields.map(item => item.systemKey === "product" && item.values.some(value => value.parentValueId !== parent) ? { ...item, values: [] } : item);
   }
+  if (field.systemKey === "product" && values[0]?.parentValueId === null) {
+    fields = fields.map(item => item.systemKey === "product_group" ? { ...item, values: [] } : item);
+  }
   const product = fields.find(item => item.systemKey === "product");
   const group = fields.find(item => item.systemKey === "product_group");
   const regression = fields.find(item => item.systemKey === "regression");

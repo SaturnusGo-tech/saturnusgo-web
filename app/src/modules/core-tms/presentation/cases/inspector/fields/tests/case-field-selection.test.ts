@@ -21,6 +21,17 @@ test("explicit regression false remains an ID selection, not a missing boolean",
   const next=updateCaseField(createEmptyRevision(),regression,[{id:"no",value:false,label:"false",parentValueId:null}]);
   assert.equal(next.regression,false);assert.equal(next.customFields?.[0].values[0].id,"no");
 });
+test("selecting an explicitly unclassified product clears its incompatible group without changing the product parent", () => {
+  const base = createEmptyRevision();
+  const grouped = { ...base, ...updateCaseField(base, group, [value("whole-product")]) };
+  const next = updateCaseField(grouped, product, [value("Deep Links")]);
+  assert.equal(next.productGroupId, null);
+  assert.equal(next.productId, "Deep Links");
+  assert.equal(next.component, "Deep Links");
+  assert.deepEqual(next.customFields?.find(item => item.systemKey === "product_group")?.values, []);
+  assert.equal(next.customFields?.find(item => item.systemKey === "product")?.values[0].parentValueId, null);
+  assert.equal(grouped.productGroupId, "whole-product");
+});
 test("changing a saved value preserves its position in the snapshot", () => {
   const platform = field("platform", null);
   const channel = field("channel", null);

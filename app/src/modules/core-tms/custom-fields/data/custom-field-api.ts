@@ -1,10 +1,10 @@
 import type { TmsHttpClient } from "../../../../core/tms/transport/http";
 import { fieldEtag, valueEtag, type CustomFieldScope, type CustomFieldDefinition, type CustomFieldDraft,
   type CustomFieldValue, type CustomFieldValueDraft, type CustomFieldPage, type CustomFieldStatus } from "../model/custom-field";
-type Query = { search?: string; cursor?: string | null; status?: CustomFieldStatus; parentValueId?: string | null; limit?: string };
+type Query = { search?: string; cursor?: string | null; status?: CustomFieldStatus; parentValueId?: string | null; includeUnclassified?: boolean; limit?: string };
 function path(scope: CustomFieldScope, suffix = "", query: Query = {}) {
   const params = new URLSearchParams({ workspaceId: scope.workspaceId });
-  for (const [key, value] of Object.entries(query)) if (value != null && value !== "") params.set(key, value);
+  for (const [key, value] of Object.entries(query)) if (value != null && value !== "") params.set(key, String(value));
   return `/projects/${encodeURIComponent(scope.projectId)}/custom-fields${suffix}?${params}`;
 }
 async function list<T>(http: TmsHttpClient, route: string, signal?: AbortSignal): Promise<CustomFieldPage<T>> {
