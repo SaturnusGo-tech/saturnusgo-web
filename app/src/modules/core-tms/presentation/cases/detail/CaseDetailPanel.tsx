@@ -147,7 +147,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
   >
     <header className={`${inspector.caseHeader} ${creating ? inspector.creationHeader : ""}`}
       data-compact={props.compactHeader ? "true" : undefined}>
-      {!props.compactHeader && <>{headerActions}{location}{retest}</>}
+      {!props.compactHeader && <>{location && !creating ? <div className={inspector.caseTopRow}>{location}{headerActions}</div> : <>{headerActions}{location}</>}{retest}</>}
       <div className={inspector.titleRow}>
         {creating ? <input disabled={uploadLocked} autoFocus data-case-title-input aria-invalid={attempted && problem === "title"}
           aria-label={titleLabel} className={inspector.titleInput} value={revision.title}

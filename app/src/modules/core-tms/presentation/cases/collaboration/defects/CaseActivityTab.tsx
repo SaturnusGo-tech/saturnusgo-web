@@ -104,7 +104,9 @@ export function CaseActivityTab(props: Props) {
         <b>{caseActivity.length}</b>
       </header>
       {caseActivity.map((entry) => <div className={styles.activityRecord} key={entry.id}>
-        {entry.actorIdentityId?<MemberProfilePreview workspaceId={people.workspaceId} identityId={entry.actorIdentityId} name={activityActorLabel(entry.actor)} locale={props.locale} offline={people.offline}><MemberAvatar workspaceId={people.workspaceId} identityId={entry.actorIdentityId} name={activityActorLabel(entry.actor)} /></MemberProfilePreview>:<MemberAvatar identityId={null} name={activityActorLabel(entry.actor)} />}
+        <span className={css.historyActor}>
+          {entry.actorIdentityId?<MemberProfilePreview workspaceId={people.workspaceId} identityId={entry.actorIdentityId} name={activityActorLabel(entry.actor)} locale={props.locale} offline={people.offline}><MemberAvatar workspaceId={people.workspaceId} identityId={entry.actorIdentityId} name={activityActorLabel(entry.actor)} /></MemberProfilePreview>:<MemberAvatar identityId={null} name={activityActorLabel(entry.actor)} />}
+        </span>
         <div>
           <strong>{activityLabel(props.locale, entry.action)}</strong>
           <small>{entry.actorIdentityId?<MemberProfileLink workspaceId={people.workspaceId} identityId={entry.actorIdentityId}>{activityActorLabel(entry.actor)}</MemberProfileLink>:activityActorLabel(entry.actor)} · {formatTime(entry.createdAt, props.languageTag)}</small>

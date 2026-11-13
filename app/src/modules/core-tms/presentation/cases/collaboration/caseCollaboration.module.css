@@ -224,3 +224,6 @@
 
 .commentIdentity > a { color:inherit; text-decoration:none; }
 .commentIdentity > a:hover { text-decoration:underline; text-underline-offset:3px; }
+.historyActor { inline-size: 26px; block-size: 26px; flex: none; aspect-ratio: 1; }
+.historyActor > span { inline-size: 100%; block-size: 100%; }
+.historyActor > span > button[aria-expanded] { inline-size: 26px; block-size: 26px; min-block-size: 26px; padding: 0; margin-inline-start: 0; justify-content: center; border-radius: 50%; }
