@@ -1,4 +1,4 @@
-.evidence { min-width: 0; margin-top: 24px; border-radius: 18px; outline: 1px solid transparent; outline-offset: 8px; }
+.evidence { min-width: 0; margin-top: 24px; border-radius: 18px; outline: 1px solid transparent; outline-offset: 8px; container: evidence-grid / inline-size; }
 .evidence[data-dragging="true"] { outline-color: var(--falcon-border-strong); background: var(--falcon-hover); }
 .evidence:focus-visible { outline-color: var(--falcon-text-muted); }
 .prompt { display: flex; flex-direction: column; align-items: center; padding: 26px 12px 24px; text-align: center; }
@@ -9,12 +9,9 @@
 .evidence button.add:hover:not(:disabled) { opacity: .86; }
 .evidence button.add:disabled { opacity: .45; cursor: default; }
 .evidence button.add:focus-visible { outline: 2px solid var(--falcon-text-muted); outline-offset: 3px; }
-.files { list-style: none; display: flex; flex-direction: column; padding: 0; margin: 0; }
-.files li { display: flex; align-items: center; gap: 9px; min-width: 0; padding: 7px 4px; color: var(--falcon-text-secondary); font-size: 12px; line-height: 18px; }
-.files li > svg { flex: none; color: var(--falcon-text-muted); }
-.files li > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.files button { flex: none; display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--falcon-text-muted); cursor: pointer; }
-.files button:hover:not(:disabled) { background: var(--falcon-hover); color: var(--falcon-text); }
-.files button:disabled { opacity: .45; cursor: default; }
-.files button:focus-visible { outline: 1px solid var(--falcon-text-muted); outline-offset: 2px; }
+.count { color: var(--falcon-text-muted); margin-left: 4px; font-weight: 400; }
+.files { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; gap: 22px 18px; padding: 0; margin: 4px 0 0; }
+@container evidence-grid (max-width: 460px) {
+  .files { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 12px; }
+}
 .error { text-align: center; color: var(--falcon-danger); font-size: 12px; line-height: 18px; margin: 0 0 12px; }

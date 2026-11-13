@@ -1,6 +1,7 @@
 import { Button } from "@heroui/react";
-import { Upload, Paperclip, X } from "lucide-react";
+import { Upload } from "lucide-react";
 import { useRef } from "react";
+import { StagedAttachmentTile } from "../../../../attachments/presentation/staged/StagedAttachmentTile";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import { MAX_EVIDENCE_FILES } from "../../../../application/evidence/batch/evidenceBatchLimit";
 import css from "./evidence.module.css";
@@ -16,7 +17,7 @@ export function DefectEvidence({ files, onChange, onAdd, disabled, dragging, lim
     tabIndex={disabled ? -1 : 0} aria-disabled={disabled}>
     <div className={css.prompt}>
       <Upload className={css.upload} size={36} strokeWidth={1.25} aria-hidden="true" />
-      <h3>{ru ? "Вложения" : "Attached files"}</h3>
+      <h3>{ru ? "Вложения" : "Attached files"}{files.length > 0 && <span className={css.count}> {files.length}</span>}</h3>
       <p>{dragging ? (ru ? "Отпустите файлы, чтобы добавить" : "Drop files to attach")
         : (ru ? "Перетащите файлы сюда или вставьте из буфера" : "Drop files here or paste from your clipboard")}</p>
       <Button type="button" radius="full" size="sm" disableRipple isDisabled={disabled} className={css.add}
@@ -27,10 +28,8 @@ export function DefectEvidence({ files, onChange, onAdd, disabled, dragging, lim
     {limitExceeded && <p className={css.error} role="alert">{ru
       ? `Можно добавить до ${MAX_EVIDENCE_FILES} файлов. Уменьшите количество и повторите.`
       : `You can attach up to ${MAX_EVIDENCE_FILES} files. Choose fewer files and try again.`}</p>}
-    {files.length > 0 && <ul className={css.files}>{files.map(file => <li key={`${file.name}:${file.size}:${file.lastModified}`}>
-      <Paperclip size={13} /><span title={file.name}>{file.name}</span>
-      <button type="button" disabled={disabled} aria-label={`${ru ? "Удалить файл" : "Remove file"} ${file.name}`}
-        onClick={() => onChange(files.filter(item => item !== file))}><X size={14} /></button>
-    </li>)}</ul>}
+    {files.length > 0 && <ul className={css.files}>{files.map(file => <StagedAttachmentTile
+      key={`${file.name}:${file.size}:${file.lastModified}`} file={file} locale={ru ? "ru" : "en"} disabled={disabled}
+      onRemove={() => onChange(files.filter(item => item !== file))} />)}</ul>}
   </section>;
 }

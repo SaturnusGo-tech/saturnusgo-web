@@ -8,7 +8,7 @@
 
 **Tech stack:** React, existing HeroUI controls, Lucide upload icon, PostgreSQL, checked OpenAPI/generated TypeScript.
 
-**Spec:** User's 2026-11-13 direction: Description, Preconditions and Test Data look identical; Actual/Expected retain the testcase result pair. Evidence sits centered below: upload vector icon, Attachments heading, rounded Add evidence action. No format inventory, text input, thumbnail cards or permanent drop-zone panel.
+**Spec:** User's 2026-11-13 direction: Description, Preconditions and Test Data look identical; Actual/Expected retain the testcase result pair. Evidence sits centered below: upload vector icon, Attachments heading, rounded Add evidence action. Latest approved reference adds clean landscape thumbnail tiles below, with filename and size/type beneath and a remove action in the preview corner. No format inventory, text input or permanent drop-zone panel.
 
 ## Constraints and review focus
 
@@ -22,8 +22,8 @@
 
 ## Tasks
 
-- [ ] Backend owner: first prove failing create/update/read and PostgreSQL roundtrip for both narrative fields; implement additive migration, domain, SQL, presenter and OpenAPI; regenerate transport types. Run backend gates and document recovery.
-- [ ] Client narratives owner: use generated transport fields at the adapter boundary; extend controlled drafts, submit/reset/retry and read/edit detail. Render both fields using `CreationNarrativeSection`; test payload and roundtrip behavior.
-- [ ] Root: first prove binary/text paste/drop, duplicate handling, disabled state, pending-event accumulation and batch overflow. Reuse existing file-transfer parser. Implement centered evidence affordance and compact filename rows; no decorative containers.
-- [ ] Root: render actual form with isolated nonpersistent fixtures, inspect empty/filled/focused states, RU dark/EN light and narrow viewport together; fix observed issues in one batch and confirm once.
+- [x] Backend owner: first prove failing create/update/read and PostgreSQL roundtrip for both narrative fields; implement additive migration, domain, SQL, presenter and OpenAPI; regenerate transport types. Run backend gates and document recovery.
+- [x] Client narratives owner: use generated transport fields at the adapter boundary; extend controlled drafts, submit/reset/retry and read/edit detail. Render both fields using `CreationNarrativeSection`; test payload and roundtrip behavior.
+- [x] Root: prove binary/text paste/drop, duplicate handling, disabled state, pending-event accumulation and batch overflow. Reuse existing file-transfer parser. Implement centered evidence affordance and clean thumbnail tiles without outer card containers.
+- [x] Root: render actual form with isolated nonpersistent fixtures, inspect empty/filled/focused states, RU dark/EN light and narrow viewport together; fix observed issues in one batch and confirm once.
 - [ ] Root/reviewer: inspect combined changes, run relevant frontend suites, typecheck/architecture/contract/build plus full backend gate. Publish only coherent contract/client/backend changes, verify actual production release bytes and report browser limitations.
