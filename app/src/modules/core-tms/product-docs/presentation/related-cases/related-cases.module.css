@@ -18,22 +18,22 @@
 .wrapper, .backdrop { position: fixed; inset: max(var(--falcon-native-toolbar, 0px), var(--falcon-desktop-caption, 0px)) 0 0; }
 .wrapper { z-index: 172; }
 .backdrop { z-index: 171; background: var(--falcon-scrim); }
-.drawer { inline-size: min(480px, calc(100vw - 12px)); max-inline-size: calc(100vw - 12px); background: var(--falcon-surface); color: var(--falcon-text); border-inline-start: 1px solid var(--falcon-border); border-radius: 0; box-shadow: -12px 0 35px rgb(0 0 0 / 12%); }
+.drawer { display: flex; flex-direction: column; block-size: calc(100dvh - max(var(--falcon-native-toolbar, 0px), var(--falcon-desktop-caption, 0px))); max-block-size: 100%; min-block-size: 0; overflow: hidden; inline-size: min(480px, calc(100vw - 12px)); max-inline-size: calc(100vw - 12px); background: var(--falcon-surface); color: var(--falcon-text); border-inline-start: 1px solid var(--falcon-border); border-radius: 0; box-shadow: -12px 0 35px rgb(0 0 0 / 12%); }
 .pickerDrawer { inline-size: min(960px, calc(100vw - 12px)); max-inline-size: min(960px, calc(100vw - 12px)); }
 .header { display: flex; flex: none; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; border-block-end: 1px solid var(--falcon-border); }
 .header h2 { display: flex; align-items: center; gap: 9px; margin: 0; padding: 0; font-size: 17px; font-weight: 600; }
 .total { color: var(--falcon-text-secondary); font-size: 12px; font-weight: 400; }
-.body { display: flex; flex-direction: column; gap: 12px; padding: 18px 20px; }
+.body { display: flex; flex: 1 1 0; flex-direction: column; min-block-size: 0; overflow: auto; gap: 12px; padding: 18px 20px; }
 .list { display: grid; gap: 5px; margin: 0; padding: 0; list-style: none; }
 .list > li { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; min-inline-size: 0; padding-block: 5px; border-block-end: 1px solid var(--falcon-border); }
 .list .caseLink { flex: 1; }
-.pickerBody { display: flex; flex-direction: column; gap: 12px; padding: 14px 18px; }
-.pickerBody > p { margin: 0; }
-.pickerFieldset { min-inline-size: 0; margin: 0; padding: 0; border: 0; }
-.catalogState { display: flex; flex-direction: column; min-inline-size: 0; min-block-size: clamp(220px, 40dvh, 360px); }
+.pickerBody { display: flex; flex: 1 1 0; flex-direction: column; min-block-size: 0; overflow: hidden; gap: 12px; padding: 14px 18px; }
+.pickerBody > p { flex: none; margin: 0; }
+.pickerFieldset { display: flex; flex: 1 1 0; flex-direction: column; min-inline-size: 0; min-block-size: 0; margin: 0; padding: 0; border: 0; }
+.catalogState { display: flex; flex: 1 1 0; flex-direction: column; min-inline-size: 0; min-block-size: 0; overflow: hidden; }
 .catalogError { display: grid; place-items: center; flex: 1; text-align: center; }
 .catalogError > p { max-inline-size: 36ch; margin: 0; }
-.footer { display: flex; align-items: center; gap: 8px; padding: 12px 18px; border-block-start: 1px solid var(--falcon-border); }
+.footer { display: flex; flex: none; align-items: center; gap: 8px; padding: 12px 18px; border-block-start: 1px solid var(--falcon-border); }
 .footer > span { margin-inline-end: auto; }
 .error { color: var(--falcon-danger); font-size: 13px; }
 .srOnly { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }

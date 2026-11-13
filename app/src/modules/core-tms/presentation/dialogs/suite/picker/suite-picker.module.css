@@ -10,8 +10,14 @@
 .filterTrigger[data-active],.selectedFilter[aria-pressed=true]{background:var(--falcon-hover);border-color:var(--falcon-text-muted)}
 .selectedFilter span{font-variant-numeric:tabular-nums;color:var(--falcon-text-muted)}
 .browser{display:grid;grid-template-columns:minmax(150px,190px) minmax(0,1fr);border-top:1px solid var(--falcon-border-subtle);min-width:0}
-.picker[data-purpose="related-cases"] .browser{grid-template-columns:minmax(280px,.92fr) minmax(0,1fr)}
-.picker[data-purpose="related-cases"] .folders{padding-inline-end:16px}
+.picker[data-purpose="related-cases"]{display:flex;flex:1 1 0;flex-direction:column;min-block-size:0;overflow:hidden}
+.picker[data-purpose="related-cases"] .toolbar,.picker[data-purpose="related-cases"] .mobileFolders,.picker[data-purpose="related-cases"] .scopeBar{flex:none}
+.picker[data-purpose="related-cases"] .browser{flex:1 1 0;min-block-size:0;grid-template-columns:minmax(280px,.92fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr);overflow:hidden}
+.picker[data-purpose="related-cases"] .folders{min-block-size:0;overflow:auto;overscroll-behavior:contain;padding-inline-end:16px}
+.picker[data-purpose="related-cases"] .results{display:flex;flex:1 1 0;flex-direction:column;min-block-size:0;overflow:hidden}
+.picker[data-purpose="related-cases"] .rows{flex:1 1 0;min-block-size:0;overflow:auto;overscroll-behavior:contain}
+.picker[data-purpose="related-cases"] .caseRow{flex:none}
+.picker[data-purpose="related-cases"] .empty{flex:1 1 0;min-block-size:0;overflow:auto}
 .picker[data-purpose="related-cases"] .folderRow{align-items:flex-start}
 .picker[data-purpose="related-cases"] .folderButton{align-items:flex-start;line-height:18px}
 .picker[data-purpose="related-cases"] .folderButton>span:not([data-folder-visual]){overflow:visible;overflow-wrap:anywhere;white-space:normal;text-overflow:clip}
@@ -49,6 +55,7 @@
 .picker button:focus-visible,.picker input:focus-visible,.picker summary:focus-visible,.priorityMenu button:focus-visible{outline:2px solid var(--falcon-text-muted);outline-offset:2px}
 @media(hover:hover){.filterTrigger:hover,.selectedFilter:hover,.allFolders:hover,.folderButton:hover,.caseRow:hover,.search button:hover,.empty button:hover{background:var(--falcon-hover)}.priorityMenu button:hover{background:var(--falcon-hover)}}
 @container suite-picker (max-width:650px){.browser{display:block}.folders{display:none}.results{padding-inline-start:0}.mobileFolders{display:block;border-top:1px solid var(--falcon-border-subtle);padding:7px 0}.mobileFolders summary{display:flex;align-items:center;gap:8px;min-height:32px;font-size:12px;color:var(--falcon-text-muted);cursor:pointer;list-style:none}.mobileFolders summary::-webkit-details-marker{display:none}.mobileFolders summary>span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mobileFolders[open] summary>svg:last-child{transform:rotate(180deg)}.mobileFolders .folderNav{max-height:220px;overflow:auto;background:var(--falcon-panel);padding:8px;border-radius:8px}.mobileFolders .folderHeading{display:none}}
+@container suite-picker (max-width:650px){.picker[data-purpose="related-cases"] .browser{display:flex;flex-direction:column}.picker[data-purpose="related-cases"] .mobileFolders .folderNav{max-block-size:min(220px,30dvh)}}
 .mobileFolders summary>svg:first-child{color:var(--falcon-folder);flex:none}
 @container suite-picker (max-width:400px){.search{flex-basis:100%}.caseRow{padding-inline:4px;gap:7px}.priority{min-width:0}.priority>span{font-size:10px;padding-inline:5px}.caseTitle{font-size:12px}.caseMeta{font-size:10px}.toolbar{padding-bottom:11px}.filterTrigger,.selectedFilter{min-height:32px;padding:5px 10px;font-size:12px}}
 @keyframes picker-menu-in{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:translateY(0)}}
