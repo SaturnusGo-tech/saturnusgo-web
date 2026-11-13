@@ -9,6 +9,7 @@
   --cases-raised: var(--falcon-panel);
   --tms-focus-border: var(--falcon-text-muted);
   --tms-focus-ring: var(--falcon-border-strong);
+  --falcon-focus: var(--falcon-text-muted);
 }
 .panel.panel > header { min-height: 44px; padding: 7px 24px; background: var(--falcon-surface); }
 .panel.panel > header h2 { color: var(--falcon-text-muted); font-size: 13px; font-weight: 500; }

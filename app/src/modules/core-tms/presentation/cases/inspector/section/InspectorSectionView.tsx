@@ -56,7 +56,7 @@ export function InspectorSectionView(props: Props) {
   return <section ref={sectionRef}
     aria-label={props.hideHeading ? props.title : undefined}
     data-rail-details={props.hideHeading || undefined}
-    className={`${css.section} ${props.section === "description" || props.section === "preconditions" ? css.narrativeSection : ""}`}
+    className={`${css.section} ${["description", "preconditions", "testData"].includes(props.section) ? css.narrativeSection : ""}`}
     data-field-editing={props.actionsInHeader && active ? "" : undefined}
     onKeyDown={(event) => {
       if (!active || props.persistentEditing || event.key !== "Escape") return;

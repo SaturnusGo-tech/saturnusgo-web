@@ -42334,7 +42334,9 @@
           "linkIds",
           "createdByIdentityId",
           "createdAt",
-          "updatedAt"
+          "updatedAt",
+          "preconditions",
+          "testData"
         ],
         "properties": {
           "id": {
@@ -42479,6 +42481,16 @@
               }
             ],
             "description": "Canonical defect in the same project when this defect was closed as a duplicate."
+          },
+          "preconditions": {
+            "type": "string",
+            "maxLength": 20000,
+            "description": "Markdown-formatted preconditions for reproducing the defect."
+          },
+          "testData": {
+            "type": "string",
+            "maxLength": 20000,
+            "description": "Markdown-formatted test data used to reproduce the defect."
           }
         }
       },
@@ -42591,6 +42603,16 @@
               }
             ],
             "description": "Direct source test case in the same project, without creating a run. Mutually exclusive with runId, runItemId and stepId; immutable after creation."
+          },
+          "preconditions": {
+            "type": "string",
+            "maxLength": 20000,
+            "description": "Markdown-formatted preconditions for reproducing the defect."
+          },
+          "testData": {
+            "type": "string",
+            "maxLength": 20000,
+            "description": "Markdown-formatted test data used to reproduce the defect."
           }
         },
         "allOf": [
@@ -42677,6 +42699,16 @@
           },
           "actualResult": {
             "$ref": "#/components/schemas/LongText"
+          },
+          "preconditions": {
+            "type": "string",
+            "maxLength": 20000,
+            "description": "Markdown-formatted preconditions for reproducing the defect."
+          },
+          "testData": {
+            "type": "string",
+            "maxLength": 20000,
+            "description": "Markdown-formatted test data used to reproduce the defect."
           }
         }
       },

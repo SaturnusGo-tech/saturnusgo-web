@@ -9210,6 +9210,10 @@ export interface components {
             sourceCaseId?: components["schemas"]["Identifier"] | null;
             /** @description Canonical defect in the same project when this defect was closed as a duplicate. */
             triageDuplicateOfDefectId?: components["schemas"]["Identifier"] | null;
+            /** @description Markdown-formatted preconditions for reproducing the defect. */
+            preconditions: string;
+            /** @description Markdown-formatted test data used to reproduce the defect. */
+            testData: string;
         };
         DefectCreateRequest: {
             projectId: components["schemas"]["Identifier"];
@@ -9230,6 +9234,10 @@ export interface components {
             actualResult?: components["schemas"]["LongText"];
             /** @description Direct source test case in the same project, without creating a run. Mutually exclusive with runId, runItemId and stepId; immutable after creation. */
             sourceCaseId?: components["schemas"]["Identifier"] | null;
+            /** @description Markdown-formatted preconditions for reproducing the defect. */
+            preconditions?: string;
+            /** @description Markdown-formatted test data used to reproduce the defect. */
+            testData?: string;
         } & unknown;
         DefectPatchRequest: {
             title?: string;
@@ -9244,6 +9252,10 @@ export interface components {
             integrationTarget?: components["schemas"]["DefectIntegrationTarget"] | null;
             expectedResult?: components["schemas"]["LongText"];
             actualResult?: components["schemas"]["LongText"];
+            /** @description Markdown-formatted preconditions for reproducing the defect. */
+            preconditions?: string;
+            /** @description Markdown-formatted test data used to reproduce the defect. */
+            testData?: string;
         };
         DefectStatusTransitionRequest: {
             status: components["schemas"]["DefectStatus"];

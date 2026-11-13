@@ -4,6 +4,8 @@ import type { DefectIntegrationChoice } from "../../../defects/model/integration
 export type DefectDraft = {
   title: string;
   description: string;
+  preconditions: string;
+  testData: string;
   actualResult: string;
   expectedResult: string;
   reproduction?: string;

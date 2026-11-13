@@ -5,7 +5,7 @@ import { InspectorSectionView } from "../section/InspectorSectionView";
 import plain from "../markdown/plain/plainMarkdown.module.css";
 
 type Props = {
-  section: Extract<InspectorSection, "description" | "preconditions">;
+  section: Extract<InspectorSection, "description" | "preconditions" | "testData">;
   title: string;
   value: string;
   ru: boolean;
@@ -22,7 +22,8 @@ export function CreationNarrativeSection({ section, title, value, ru, onChange, 
   useEffect(() => { if (error && !disabled) setEditing(true); }, [error, disabled]);
   const emptyLabel = section === "description"
     ? (ru ? "Описание не указано" : "No description")
-    : (ru ? "Предусловия не указаны" : "No preconditions specified");
+    : section === "preconditions" ? (ru ? "Предусловия не указаны" : "No preconditions specified")
+    : (ru ? "Тестовые данные не указаны" : "No test data specified");
   function edit() {
     if (disabled) return;
     snapshot.current = value;

@@ -84,7 +84,7 @@ export type Suite = SuiteSummary & {
   resolvedCaseCount: number;
 };
 
-export type Defect = {
+export type Defect = Pick<components["schemas"]["Defect"], "preconditions" | "testData"> & {
   sourceCaseId?: string | null;
   archivedAt?: string | null;
   id: string;

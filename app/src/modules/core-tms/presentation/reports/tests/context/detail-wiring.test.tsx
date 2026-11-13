@@ -48,9 +48,10 @@ test("report content sends description and actual/expected Markdown through inta
       return undefined;
     });
   const defect = { description: "### User text\n\n1. **Pay**\n2. [Check](https://example.test)",
+    preconditions: "- **Signed in**", testData: "`account-fixture`",
     actualResult: "```json\n{\"status\": 500}\n```", expectedResult: "| State | Result |\n| --- | --- |\n| Paid | Success |" } as Defect;
   const markdown = nodes(h.render(() => loaded.DefectReportContent({ defect }))).filter(node => node.type === "MarkdownField");
-  assert.deepEqual(markdown.map(node => node.props.value), [defect.description, defect.actualResult, defect.expectedResult]);
+  assert.deepEqual(markdown.map(node => node.props.value), [defect.description, defect.preconditions, defect.actualResult, defect.expectedResult, defect.testData]);
   assert.ok(markdown.every(node => node.props.allowAttachments === false && !node.props.onChange));
 });
 

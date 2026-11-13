@@ -52,6 +52,8 @@ export function DefectDialog({ workspaceId, projectId, run, item, sourceCase, co
       : sourceCase?.revision.title ?? "",
   );
   const [description, setDescription] = useState(item?.snapshot.description ?? sourceCase?.revision.description ?? "");
+  const [preconditions, setPreconditions] = useState(item?.snapshot.preconditions ?? sourceCase?.revision.preconditions ?? "");
+  const [testData, setTestData] = useState(item?.snapshot.testData ?? sourceCase?.revision.testData ?? "");
   const [actual, setActual] = useState(
     attempt?.actualResult ?? "",
   );
@@ -95,6 +97,8 @@ export function DefectDialog({ workspaceId, projectId, run, item, sourceCase, co
       ...(sourceCase ? { sourceCaseId: sourceCase.testCase.id } : {}),
       title,
       description,
+      preconditions,
+      testData,
       severity,
       priority,
       status: "open",
@@ -119,11 +123,13 @@ export function DefectDialog({ workspaceId, projectId, run, item, sourceCase, co
   }
   return <DefectForm workspaceId={workspaceId} offline={offline}
     context={item ? `${item.caseKey} · ${run?.name} · ${run?.environment.name}` : sourceCase ? `${sourceCase.testCase.key} · ${sourceCase.revision.title}` : undefined}
-    value={{ title, description, actualResult: actual, expectedResult: expected, component, severity, priority,
+    value={{ title, description, preconditions, testData, actualResult: actual, expectedResult: expected, component, severity, priority,
       reproducibility, assigneeIdentityId, link }}
     onChange={patch => {
       if (patch.title !== undefined) setTitle(patch.title);
       if (patch.description !== undefined) setDescription(patch.description);
+      if (patch.preconditions !== undefined) setPreconditions(patch.preconditions);
+      if (patch.testData !== undefined) setTestData(patch.testData);
       if (patch.actualResult !== undefined) setActual(patch.actualResult);
       if (patch.expectedResult !== undefined) setExpected(patch.expectedResult);
       if (patch.component !== undefined) setComponent(patch.component);

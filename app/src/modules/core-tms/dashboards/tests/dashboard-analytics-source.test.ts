@@ -53,6 +53,7 @@ const data: Bootstrap = {
   defects: [
     {
       id: "defect-a", projectId: "alpha", key: "BUG-1", title: "Payment rejected", description: "",
+      preconditions: "", testData: "",
       severity: "critical", priority: "high", status: "open", reproducibility: "always",
       assigneeIdentityId: null, component: "Checkout", integrationTarget: "backend", externalIssue: null,
       labels: [], runId: "run-a", runItemId: null, stepId: null, expectedResult: "", actualResult: "",

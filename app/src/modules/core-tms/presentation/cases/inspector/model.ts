@@ -8,7 +8,7 @@ import { readCommentAttachments } from "../../../test-cases/collaboration/model/
 import type { TestCaseComment } from "../../../test-cases/collaboration/model/test-case-collaboration";
 
 export type InspectorSection =
-  | "description" | "component" | "properties" | "preconditions" | "details" | "steps";
+  | "description" | "component" | "properties" | "preconditions" | "testData" | "details" | "steps";
 export type InspectorTabId = "overview" | "files" | "activity";
 export type InspectorTabKey = "ArrowLeft" | "ArrowRight" | "Home" | "End";
 export type InspectorRevisionProblem =
@@ -138,6 +138,7 @@ export function restoreInspectorSection(
     checklist: snapshot.checklist.map((item) => ({ ...item })),
   };
   if (section === "preconditions") return { ...current, preconditions: snapshot.preconditions };
+  if (section === "testData") return { ...current, testData: snapshot.testData };
   if (section === "details") return {
     ...current,
     testData: snapshot.testData,

@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import type { CreationNarrativeSection } from "../CreationNarrativeSection";
+import type { TestCaseRevision } from "../../../../../../../core/tms/contracts/legacy-contract";
 import { componentHarness, invoke, nodes } from "../../../../../portfolios/tests/support/component-harness";
+import { restoreInspectorSection } from "../../model";
 
 test("shared creation narratives retain snapshots, save behavior and opt-in keyboard editing", () => {
   const h = componentHarness(); let value = "Original description";
@@ -34,4 +36,21 @@ test("disabled creation narratives cannot enter editing and expose field errors"
   assert.equal(all.find(node => node.type === "MarkdownField")?.props.onChange, undefined);
   assert.equal(all.find(node => node.type === "InspectorSectionView")?.props.disabled, true);
   assert.equal(all.find(node => node.props.role === "alert")?.props.children, "Add a description");
+});
+
+test("cancelling test data restores only that narrative and preserves other edits", () => {
+  const original: TestCaseRevision = {
+    revision: 1, title: "Checkout", description: "Original description", preconditions: "Signed in",
+    type: "manual", lifecycle: "ready", priority: "high", component: "Checkout", ownerIdentityId: null,
+    tags: [], estimatedMinutes: null, testData: "Original `fixture`", checklist: [], attachmentIds: [],
+    steps: [{ id: "step-1", order: 1, action: "Pay", expectedResult: "Approved", required: true }],
+    changeNote: "Created", createdAt: "2026-11-13T00:00:00Z",
+  };
+  const changed = { ...original, testData: "Changed fixture", description: "Keep description",
+    tags: ["keep-tag"], steps: [{ ...original.steps[0], action: "Keep changed action" }] };
+  const restored = restoreInspectorSection(changed, original, "testData");
+  assert.equal(restored.testData, original.testData);
+  assert.equal(restored.description, changed.description);
+  assert.deepEqual(restored.tags, changed.tags);
+  assert.deepEqual(restored.steps, changed.steps);
 });

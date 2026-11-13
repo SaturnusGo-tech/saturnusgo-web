@@ -10,6 +10,8 @@ export function mapDefect(dto: components["schemas"]["Defect"]): Defect {
     key: dto.key,
     title: dto.title,
     description: dto.description,
+    preconditions: dto.preconditions,
+    testData: dto.testData,
     severity: dto.severity,
     priority: dto.priority,
     status: dto.status,

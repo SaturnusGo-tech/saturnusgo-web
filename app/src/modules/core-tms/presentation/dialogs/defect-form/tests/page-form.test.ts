@@ -11,9 +11,10 @@ test("bug creation uses the shared drawer, a property rail and a pinned submit f
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en" }) };
     if (name.endsWith("copy")) return { getDefectDialogCopy };
     if (name.endsWith("validateDefectDraft")) return { validateDefectDraft };
+    if (name.endsWith("useDefectFileTransfer")) return { useDefectFileTransfer: () => ({}) };
   });
   const props: Parameters<typeof DefectForm>[0] = { workspaceId: "w", offline: false, context: "TC-1 · QA", value: {
-    title: "Missing order", description: "**Steps** to reproduce", actualResult: "No order", expectedResult: "Order appears", component: "Orders", severity: "high", priority: "medium", reproducibility: "Always", assigneeIdentityId: null, link: "https://api.test/orders",
+    title: "Missing order", description: "**Steps** to reproduce", preconditions: "**Account** ready", testData: "`fixture`", actualResult: "No order", expectedResult: "Order appears", component: "Orders", severity: "high", priority: "medium", reproducibility: "Always", assigneeIdentityId: null, link: "https://api.test/orders",
   }, onChange: patch => patches.push(patch), components: [], routing: { value: "", onChange() {}, options: [], disabled: false, resolved: true, message: "" }, files: [], onFilesChange() {}, submitting: false, closing: false, error: "", panelRef: { current: null }, onSubmit: () => { submitted++; }, onClose: () => { closed++; } };
   let all = nodes(h.render(() => View(props)));
   assert.equal(all[0].type, "Modal");
@@ -24,7 +25,10 @@ test("bug creation uses the shared drawer, a property rail and a pinned submit f
   const footer = all.find(node => node.type === "footer");
   assert.equal(nodes(footer).some(node => node.props["data-testid"] === "create-defect"), true);
   assert.equal(all.find(node => node.props["data-testid"] === "defect-title")?.props["aria-required"], "true");
-  const description = all.find(node => node.type === "CreationNarrativeSection");
+  const narrative = all.filter(node => node.type === "CreationNarrativeSection");
+  assert.deepEqual(narrative.map(node => node.props.section), ["description", "preconditions", "testData"]);
+  assert.ok(narrative.every(node => node.props.hideEdit && node.props.allowAttachments === false && !node.props.disabled));
+  const description = narrative[0];
   assert.ok(description, "description uses the same editor as testcase creation");
   invoke(description, "onChange", "## Updated Markdown"); assert.deepEqual(JSON.parse(JSON.stringify(patches[0])), { description: "## Updated Markdown" });
   const results = all.find(node => node.type === "DefectResults");
@@ -35,7 +39,11 @@ test("bug creation uses the shared drawer, a property rail and a pinned submit f
   assert.deepEqual(JSON.parse(JSON.stringify(patches.slice(1))), [{ actualResult: "**Observed** result" }, { expectedResult: "Expected result\n- preserved" }]);
   invoke(all.find(node => node.type === "form")!, "onSubmit", { preventDefault() {} }); assert.equal(submitted, 1);
   invoke(all[0], "onClose"); assert.equal(closed, 1);
+  invoke(narrative[1], "onChange", "**Edited** prerequisites");
+  invoke(narrative[2], "onChange", "```json\n{}\n```");
+  assert.deepEqual(JSON.parse(JSON.stringify(patches.slice(-2))), [{ preconditions: "**Edited** prerequisites" }, { testData: "```json\n{}\n```" }]);
   props.submitting = true; all = nodes(h.render(() => View(props)));
+  assert.ok(all.filter(node => node.type === "CreationNarrativeSection").every(node => node.props.disabled));
   assert.equal(all.find(node => node.props["data-testid"] === "create-defect")?.props.disabled, true);
   assert.equal(all.find(node => node.type === "button" && node.props.children === "Cancel")?.props.disabled, true);
   invoke(all.find(node => node.type === "form")!, "onSubmit", { preventDefault() {} }); assert.equal(submitted, 1);

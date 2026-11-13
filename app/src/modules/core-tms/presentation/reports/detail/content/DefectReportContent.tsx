@@ -11,6 +11,14 @@ export function DefectReportContent({ defect }: { defect: Defect }) {
       <h3>{t("reports.descriptionHeading")}</h3>
       <MarkdownField value={defect.description} label={t("reports.descriptionHeading")} emptyLabel={t("reports.noDescription")} allowAttachments={false} />
     </section>
+    {defect.preconditions?.trim() && <section className={css.description}>
+      <h3>{locale === "ru" ? "Предусловия" : "Preconditions"}</h3>
+      <MarkdownField value={defect.preconditions} label={locale === "ru" ? "Предусловия" : "Preconditions"} allowAttachments={false} />
+    </section>}
+    {defect.testData?.trim() && <section className={css.description}>
+      <h3>{locale === "ru" ? "Тестовые данные" : "Test data"}</h3>
+      <MarkdownField value={defect.testData} label={locale === "ru" ? "Тестовые данные" : "Test data"} allowAttachments={false} />
+    </section>}
     <dl className={css.results}>
       <div className={css.result} data-actual>
         <dt><Circle size={8} aria-hidden="true" /><span>{locale === "ru" ? "Фактически" : "Actual"}</span></dt>

@@ -5,7 +5,8 @@ type Api = components["schemas"];
 const time = "2026-09-08T12:00:00Z";
 export const defect: Defect = {
   id: "bug-1", projectId: "project-1", key: "BUG-1", title: "Checkout fails",
-  description: "Observed checkout failure", severity: "high", priority: "high", status: "verified",
+  description: "Observed checkout failure", preconditions: "", testData: "",
+  severity: "high", priority: "high", status: "verified",
   reproducibility: "always", assigneeIdentityId: null, component: "Checkout", integrationTarget: null,
   externalIssue: null, labels: [], runId: "run-1", runItemId: "item-1", stepId: "step-2",
   expectedResult: "Payment succeeds", actualResult: "Payment fails", attachmentIds: [], linkIds: [], createdAt: time,

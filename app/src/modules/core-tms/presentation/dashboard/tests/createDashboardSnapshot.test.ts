@@ -74,6 +74,7 @@ const data: Bootstrap = {
   defects: [
     {
       id: "defect-1", projectId: "project-1", key: "BUG-1", title: "Open", description: "",
+      preconditions: "", testData: "",
       severity: "high", priority: "high", status: "open", reproducibility: "always",
       assigneeIdentityId: null, component: "Core", integrationTarget: null, externalIssue: null,
       labels: [], runId: null, runItemId: null,

@@ -32,12 +32,12 @@ test("both entry points save edited Markdown, fields and attachments, preserve c
     };
     const entry = inline ? "../../../../runs/defect/InlineDefectComposer.tsx" : "../../../defect/DefectDialog.tsx";
     const module = h.load<{ InlineDefectComposer: typeof InlineDefectComposer; DefectDialog: typeof DefectDialog }>(new URL(entry, import.meta.url), resolve);
-    const item = { id: "item", caseKey: "TC-1", activeAttemptNo: 1, snapshot: { title: "Case", component: "Orders", tags: [] },
+    const item = { id: "item", caseKey: "TC-1", activeAttemptNo: 1, snapshot: { title: "Case", component: "Orders", tags: [], preconditions: "**Run account**", testData: "`run-fixture`" },
       attempts: [{ attemptNo: 1, actualResult: "Old actual", stepResults: [{ stepId: "step", status: "failed" }] }] };
     const props = { workspaceId: "w", projectId: "p", run: inline ? { id: "run", environment: { name: "QA", baseUrl: "" } } : null,
       item: inline ? item : null, sourceCase: direct ? { workspaceId: "w",
         testCase: { id: "source-case", key: "TC-2", projectId: "p" },
-        revision: { title: "Source title", description: "**Source description**", component: "Billing", priority: "low", tags: [] } } : undefined, step: { id: "step", order: 1, action: "Open" }, components: ["Orders"], offline: false,
+        revision: { title: "Source title", description: "**Source description**", preconditions: "**Source account**", testData: "`source-fixture`", component: "Billing", priority: "low", tags: [] } } : undefined, step: { id: "step", order: 1, action: "Open" }, components: ["Orders"], offline: false,
       onClose() {}, onCreated: () => { created++; } };
     const View = inline ? module.InlineDefectComposer : module.DefectDialog;
     const render = () => h.render(() => View(props as never)) as unknown as Node;
@@ -46,18 +46,26 @@ test("both entry points save edited Markdown, fields and attachments, preserve c
       assert.equal(value.title, "Source title"); assert.equal(value.description, "**Source description**");
       assert.equal(value.component, "Billing"); assert.equal(value.priority, "low");
     }
+    const initial = render().props.value as Record<string, unknown>;
+    assert.equal(initial.preconditions, direct ? "**Source account**" : inline ? "**Run account**" : "");
+    assert.equal(initial.testData, direct ? "`source-fixture`" : inline ? "`run-fixture`" : "");
+    const preconditions = "## Preconditions\n\n- **Signed in**\n- Workspace ready";
+    const testData = "```json\n{\"amount\":100}\n```";
     const markdown = "## Actual\n\n**Empty** order history.\n\n- No rows\n- No message";
     const file = { name: "evidence.png", size: 100 };
-    invoke(render(), "onChange", { title: "Missing orders", description: "After login", actualResult: markdown,
+    invoke(render(), "onChange", { title: "Missing orders", description: "After login", preconditions, testData, actualResult: markdown,
       expectedResult: "# Expected\n\nOrder list", reproduction: "1. Log in", severity: "critical", priority: "medium",
       reproducibility: "Sometimes", component: "Payments", assigneeIdentityId: "qa-anna", link: "app://orders" });
     invoke(render(), "onFilesChange", [file]);
     await invoke(render(), "onSubmit", { preventDefault() {} });
     assert.equal(render().props.error, "Retry"); assert.equal(created, 0);
     assert.equal((render().props.value as { actualResult: string }).actualResult, markdown);
+    assert.equal((render().props.value as Record<string, unknown>).preconditions, preconditions);
+    assert.equal((render().props.value as Record<string, unknown>).testData, testData);
     fail = false; await invoke(render(), "onSubmit", { preventDefault() {} });
     assert.equal(created, 1); assert.equal(drawerDismissed, 1); assert.equal(calls[0].operationKey, calls[1].operationKey);
     const saved = calls[1]; assert.equal(saved.payload.sourceCaseId, direct ? "source-case" : undefined); assert.equal(saved.payload.actualResult, markdown);
+    assert.equal(saved.payload.preconditions, preconditions); assert.equal(saved.payload.testData, testData);
     assert.equal(saved.payload.expectedResult, "# Expected\n\nOrder list");
     assert.equal(saved.payload.runId, inline ? "run" : null); assert.equal(saved.payload.stepId, inline ? "step" : null);
     assert.equal(saved.payload.runItemId, inline ? "item" : null); assert.equal(saved.payload.priority, "medium");

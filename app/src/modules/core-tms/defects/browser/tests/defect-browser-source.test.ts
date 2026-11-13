@@ -37,7 +37,7 @@ test("HTTP source keeps exact blank component and passes query/sort/cursors with
 test("scope partitions lifecycle states before group counts, search and sorted records", async () => {
   const statuses: Defect["status"][] = ["open", "triaged", "in_progress", "ready_for_retest", "reopened", "verified", "closed"];
   const defects = statuses.map((status, index) => ({ id: `bug-${index}`, projectId: "project", key: `BUG-${index}`,
-    title: "Платёж", description: "", status, component: index < 5 ? "Checkout" : "History",
+    title: "Платёж", description: "", preconditions: "", testData: "", status, component: index < 5 ? "Checkout" : "History",
     severity: index % 2 ? "critical" : "high", priority: "high", reproducibility: "always", assigneeIdentityId: null,
     labels: [], integrationTarget: null, externalIssue: null, runId: null, runItemId: null, stepId: null,
     expectedResult: "", actualResult: "", attachmentIds: [], linkIds: [], createdAt: "2026-09-13T00:00:00Z" } as Defect));

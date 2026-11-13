@@ -65,6 +65,8 @@ export function InlineDefectComposer({ workspaceId, projectId, run, item, step, 
   const routingMessage = youTrackStatus === "error" ? copy.youTrackUnavailable
     : youTrackStatus === "loading" ? copy.youTrackLoading : copy.youTrackRequired;
   const [description, setDescription] = useState(t("inlineDefect.descriptionDefault", { action: step.action }));
+  const [preconditions, setPreconditions] = useState(item.snapshot.preconditions ?? "");
+  const [testData, setTestData] = useState(item.snapshot.testData ?? "");
   const [repro, setRepro] = useState(`${executableSteps(item.snapshot).map((entry, index) => `${index + 1}. ${entry.action}.`).join("\n")}`);
   const [link, setLink] = useState(/^https:\/\//i.test(run.environment.baseUrl) ? run.environment.baseUrl : "");
   const [files, setFiles] = useState<File[]>([]);
@@ -81,7 +83,7 @@ export function InlineDefectComposer({ workspaceId, projectId, run, item, step, 
     setError("");
     const payload: Omit<Defect, "id" | "key" | "createdAt" | "attachmentIds" | "linkIds" | "externalIssue"> = {
       projectId, title, description: `${description}\n\n${t("inlineDefect.reproSection")}:\n${repro}`,
-      severity, priority, status: "open", reproducibility, assigneeIdentityId,
+      preconditions, testData, severity, priority, status: "open", reproducibility, assigneeIdentityId,
       component, integrationTarget: routing.target,
       labels: defectClientLabels(true), runId: run.id, runItemId: item.id,
       stepId: step.id, expectedResult: expected, actualResult: actual,
@@ -98,11 +100,13 @@ export function InlineDefectComposer({ workspaceId, projectId, run, item, step, 
   const componentChoices = componentOptions.map((value) => ({ value, label: localizedComponentLabel(locale, value) }));
   return <DefectForm workspaceId={workspaceId} offline={offline}
     context={`${item.caseKey} · ${t("inlineDefect.linkStep")} ${step.order} · ${run.environment.name}`}
-    value={{ title, description, actualResult: actual, expectedResult: expected, reproduction: repro,
+    value={{ title, description, preconditions, testData, actualResult: actual, expectedResult: expected, reproduction: repro,
       component, severity, priority, reproducibility, assigneeIdentityId, link }}
     onChange={patch => {
       if (patch.title !== undefined) setTitle(patch.title);
       if (patch.description !== undefined) setDescription(patch.description);
+      if (patch.preconditions !== undefined) setPreconditions(patch.preconditions);
+      if (patch.testData !== undefined) setTestData(patch.testData);
       if (patch.actualResult !== undefined) setActual(patch.actualResult);
       if (patch.expectedResult !== undefined) setExpected(patch.expectedResult);
       if (patch.reproduction !== undefined) setRepro(patch.reproduction);

@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { validateDefectDraft } from "../validation/validateDefectDraft";
 import type { DefectDraft } from "../model";
-const draft: DefectDraft = { title: "Empty order screen", description: "", actualResult: "## Actual\n\nThe screen stays empty.",
+const draft: DefectDraft = { title: "Empty order screen", description: "", preconditions: "", testData: "", actualResult: "## Actual\n\nThe screen stays empty.",
   expectedResult: "Order details", component: "Orders", severity: "high", priority: "medium",
   reproducibility: "Sometimes", assigneeIdentityId: null, link: "" };
 

@@ -43,6 +43,8 @@ export async function createDefect(input: {
     ...(input.payload.sourceCaseId ? { sourceCaseId: input.payload.sourceCaseId } : {}),
     title: input.payload.title,
     description: input.payload.description,
+    preconditions: input.payload.preconditions,
+    testData: input.payload.testData,
     severity: input.payload.severity,
     priority: input.payload.priority,
     reproducibility: input.payload.reproducibility,

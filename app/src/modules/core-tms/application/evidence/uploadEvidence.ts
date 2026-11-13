@@ -1,4 +1,5 @@
 import type { PrivateAttachmentClient } from "../../attachments/application/private-attachment-client";
+import { MAX_EVIDENCE_FILES } from "./batch/evidenceBatchLimit";
 import type {
   AttachmentScope, AttachmentKind, AttachmentMetadata, AttachmentMimeType, AttachmentOwner, AttachmentUploadPhase,
 } from "../../attachments/domain/attachment";
@@ -38,7 +39,7 @@ export async function uploadEvidence(input: AttachmentScope & {
   signal?: AbortSignal;
   onProgress?: (file: File, phase: AttachmentUploadPhase) => void;
 }): Promise<AttachmentMetadata[]> {
-  if (input.files.length > 20) throw new Error("A maximum of 20 evidence files can be uploaded together.");
+  if (input.files.length > MAX_EVIDENCE_FILES) throw new Error(`A maximum of ${MAX_EVIDENCE_FILES} evidence files can be uploaded together.`);
   const uploaded: AttachmentMetadata[] = [];
   for (const [index, file] of input.files.entries()) {
     input.signal?.throwIfAborted();
