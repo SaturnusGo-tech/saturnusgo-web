@@ -4,7 +4,7 @@ import type { SelfProfileActivity, SelfProfilePort } from "../../domain/profile-
 import type { ProfileAchievements } from "../../domain/achievements/profile-achievement-model";
 
 type Result<T> = { key: string; value: T | null; loading: boolean; error: unknown };
-export function useProfileInsights(client: SelfProfilePort, workspaceId: string | null, year: number) {
+export function useProfileInsights(client: Pick<SelfProfilePort, "calendar" | "achievements">, workspaceId: string | null, year: number) {
   const key = `${workspaceId ?? ""}:${year}`, achievementKey = workspaceId ?? "", [revision, refresh] = useState(0);
   const [calendar, setCalendar] = useState<Result<SelfProfileActivity>>({ key, value: null, loading: true, error: null });
   const [achievements, setAchievements] = useState<Result<ProfileAchievements>>({ key: achievementKey, value: null, loading: true, error: null });

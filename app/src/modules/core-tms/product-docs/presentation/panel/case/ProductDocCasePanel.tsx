@@ -103,7 +103,7 @@ function DesktopCasePanel({ contentRef, size, ...props }: Props & { size: Return
 
   return <motion.aside ref={panel} tabIndex={-1} role="dialog" aria-label={locale === "ru" ? "Тест-кейс" : "Test case"}
     aria-modal={modal || undefined} aria-hidden={!present || undefined} id={panelId}
-    className={`${styles.panel} ${caseStyles.panel}`} data-exiting={!present || undefined}
+    className={`${styles.panel} ${caseStyles.panel}`} data-exiting={!present || undefined} data-resizing={size.dragging || undefined}
     style={{ "--product-docs-panel-width": expanded ? "100vw" : size.width ? `${size.width}px` : undefined } as CSSProperties}
     initial={{ x: reduced ? 0 : "100%" }} animate={{ x: 0 }} exit={{ x: reduced ? 0 : "100%" }}
     transition={{ duration: reduced ? 0 : .26, ease: [.16, 1, .3, 1] }}

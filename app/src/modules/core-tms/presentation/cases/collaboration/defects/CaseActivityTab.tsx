@@ -1,6 +1,9 @@
 import { ErrorToast } from "../../../common/error/ErrorToast";
 import { LoadingOrb } from "../../../../../../shared/components/loading/LoadingOrb";
 import { useCaseHistory } from "../../../../test-cases/history/state/useCaseHistory";
+import { MemberProfilePreview } from "../../../../workspace/members/presentation/profile/MemberProfilePreview";
+import { MemberProfileLink } from "../../../../profile/presentation/MemberProfileLink";
+import { useWorkspacePeople } from "../../../../workspace/members/context/WorkspacePeopleContext";
 import { MemberAvatar } from "../../../../workspace/members/avatar/MemberAvatar";
 import { Bug, FileClock, RotateCw } from "lucide-react";
 import type { Activity, TestCaseSummary } from "../../../../../../core/tms/contracts/legacy-contract";
@@ -24,7 +27,7 @@ type Props = {
 };
 
 export function CaseActivityTab(props: Props) {
-  const ru = props.locale === "ru";
+  const ru = props.locale === "ru",people=useWorkspacePeople();
   const history = useCaseHistory(props.testCase, caseActivityForKey(props.activity, props.testCase?.key));
   const caseActivity = history.items;
   const empty = !history.loading && !history.error && props.model.defects.status === "ready"
@@ -101,10 +104,10 @@ export function CaseActivityTab(props: Props) {
         <b>{caseActivity.length}</b>
       </header>
       {caseActivity.map((entry) => <div className={styles.activityRecord} key={entry.id}>
-        <MemberAvatar identityId={entry.actorIdentityId ?? null} name={activityActorLabel(entry.actor)} />
+        {entry.actorIdentityId?<MemberProfilePreview workspaceId={people.workspaceId} identityId={entry.actorIdentityId} name={activityActorLabel(entry.actor)} locale={props.locale} offline={people.offline}><MemberAvatar workspaceId={people.workspaceId} identityId={entry.actorIdentityId} name={activityActorLabel(entry.actor)} /></MemberProfilePreview>:<MemberAvatar identityId={null} name={activityActorLabel(entry.actor)} />}
         <div>
           <strong>{activityLabel(props.locale, entry.action)}</strong>
-          <small>{activityActorLabel(entry.actor)} · {formatTime(entry.createdAt, props.languageTag)}</small>
+          <small>{entry.actorIdentityId?<MemberProfileLink workspaceId={people.workspaceId} identityId={entry.actorIdentityId}>{activityActorLabel(entry.actor)}</MemberProfileLink>:activityActorLabel(entry.actor)} · {formatTime(entry.createdAt, props.languageTag)}</small>
         </div>
       </div>)}
       {history.nextCursor && <button type="button" disabled={history.loading} onClick={history.loadMore}>{ru ? "Загрузить ещё" : "Load more"}</button>}

@@ -32,6 +32,7 @@ export function buildWorkspaceDeepLink(href: string, input: {
   const url = new URL(href); const integration = url.searchParams.get("integration");
   const analysisId = url.searchParams.get("analysisId"); const impact = url.searchParams.get("impact");
   const detail = url.searchParams.get("dashboardDetail");
+  const memberId = url.searchParams.get("memberId");
   const portfolioId = url.searchParams.get("portfolioId");
   const catalogProjectId = url.searchParams.get("catalogProjectId");
   const organizationCreate = url.searchParams.get("organizationCreate");
@@ -88,6 +89,7 @@ export function buildWorkspaceDeepLink(href: string, input: {
     }
   }
   if (input.view === "dashboard" && sameScope && detail && detail.length <= 6500) url.searchParams.set("dashboardDetail", detail);
+  if (input.view === "profile" && sameWorkspace && memberId && /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(memberId)) url.searchParams.set("memberId", memberId);
   if (input.view === "profile" && (section === "#security" || section === "#sessions")) url.hash = section;
   if (input.view === "product-docs" && sameScope) writeProductDocSelection(url, readProductDocSelection(href));
   if (input.view === "help") {

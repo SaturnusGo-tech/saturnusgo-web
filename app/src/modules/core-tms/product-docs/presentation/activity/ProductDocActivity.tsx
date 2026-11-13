@@ -7,6 +7,7 @@ import { ArrowUp } from "lucide-react";
 import { useCallback, useId, useRef, useState } from "react";
 import type { TmsLocale } from "../../../localization/model/locale";
 import { notificationTime } from "../../../notifications/inbox/model/presentation";
+import { MemberProfileLink } from "../../../profile/presentation/MemberProfileLink";
 import { MemberProfilePreview } from "../../../workspace/members/presentation/profile/MemberProfilePreview";
 import { MemberAvatar } from "../../../workspace/members/avatar/MemberAvatar";
 import type { ProductDocComment, ProductDocDetail, ProductDocScope, ProductDocsApi } from "../../domain/product-docs";
@@ -105,7 +106,7 @@ export function ProductDocActivity({ api, scope, document, locale, copy }: {
         </span>
         <div className={styles.content}>
           <div className={styles.metadata}>
-            <strong>{row.author.displayName}</strong>
+            <MemberProfileLink workspaceId={workspaceId} identityId={row.author.identityId}><strong>{row.author.displayName}</strong></MemberProfileLink>
             {row.label && <span>{ru && <span aria-hidden="true">· </span>}{row.label}</span>}
             <time dateTime={row.at} title={fullDate.format(new Date(row.at))}>{notificationTime(row.at, locale)}</time>
           </div>

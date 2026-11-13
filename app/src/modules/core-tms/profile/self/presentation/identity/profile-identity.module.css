@@ -24,3 +24,6 @@
 .identity button:disabled { cursor:wait; opacity:.55; }
 @media (hover:none) { .camera,.remove { opacity:1; transform:none; } }
 @media (prefers-reduced-motion:reduce) { .camera,.remove { transition:none; } }
+
+.identity[data-read-only] .photo { cursor:default; display:grid; place-items:center; }
+.photo > .agent { width:62%; height:62%; object-fit:contain; }

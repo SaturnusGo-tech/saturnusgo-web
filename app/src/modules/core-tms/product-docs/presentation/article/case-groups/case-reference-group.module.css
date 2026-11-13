@@ -1,0 +1,13 @@
+.group { min-inline-size: 0; margin-block: .45rem .7rem; color: var(--falcon-text); }
+.label { display: block; margin-block-end: .35rem; color: var(--falcon-text-secondary); font-size: .9em; font-weight: 500; }
+.group .list { display: grid; gap: .4rem; margin: 0; padding-inline-start: 1.15rem; list-style: disc; }
+.group .list > li { min-inline-size: 0; padding-inline-start: .1rem; line-height: 1.5; font-weight: 550; }
+.list > li::marker { color: var(--falcon-text); font-size: 1.05em; font-weight: 800; }
+.group .list a { max-inline-size: 100%; overflow-wrap: anywhere; }
+.group .remainder:not([hidden]) { margin-block-start: .4rem; }
+.group .disclosure { display: inline-flex; align-items: center; gap: .3rem; min-block-size: 28px; margin-block-start: .25rem; padding: 0; border: 0; background: transparent; color: var(--falcon-text-secondary); font: inherit; font-size: .85em; cursor: pointer; }
+.disclosure:hover { color: var(--falcon-text); }
+.disclosure:focus-visible { outline: 1px solid var(--falcon-focus); outline-offset: 3px; border-radius: 3px; }
+.disclosure svg { transition: transform 160ms ease; }
+.disclosure[aria-expanded="true"] svg { transform: rotate(180deg); }
+@media (prefers-reduced-motion: reduce) { .disclosure svg { transition: none; } }

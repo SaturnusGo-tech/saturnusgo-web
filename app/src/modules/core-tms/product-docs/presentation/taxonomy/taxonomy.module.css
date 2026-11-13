@@ -87,9 +87,19 @@
   .selector[data-filter] > .valuePanel { transition: opacity 80ms linear, visibility 0s; }
   .selector[data-filter] > .valuePanel[data-inert="true"] { transform: none; transition-delay: 0s, 80ms; }
 }
-.dimensions { display: flex; align-items: center; gap: 8px; margin-block-end: 8px; }
+.dimensionRoot { display: block; inline-size: 100%; min-inline-size: 0; }
+.dimensions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  inline-size: 100%;
+  min-inline-size: 0;
+  align-items: center;
+  gap: 8px;
+  margin-block-end: 8px;
+  overflow: visible;
+}
 .dimensionTab, .catalogAction { display: inline-flex; align-items: center; border: 0; color: var(--falcon-text-secondary); background: transparent; font: inherit; cursor: pointer; }
-.dimensions .dimensionTab { position: relative; flex: none; min-height: 27px; padding: 4px 7px; border-radius: 5px; font-size: 12px; font-weight: 600; }
+.dimensions .dimensionTab { position: relative; inline-size: auto; min-inline-size: 0; min-height: 27px; padding: 4px 7px; border-radius: 5px; font-size: 12px; font-weight: 600; }
 .dimensionContent { position: relative; display: inline-flex; align-items: center; gap: 5px; color: inherit; white-space: nowrap; }
 .dimensionTab:is(:hover, [data-hover="true"], [data-pressed="true"]) { background: transparent; color: var(--falcon-text); }
 .dimensionTab[data-selected="true"] { color: var(--falcon-text); }

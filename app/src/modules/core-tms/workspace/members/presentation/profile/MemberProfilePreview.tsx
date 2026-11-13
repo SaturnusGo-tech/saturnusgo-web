@@ -6,6 +6,8 @@ import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } f
 import type { TmsLocale } from "../../../../localization/model/locale";
 import type { WorkspaceActor } from "../../model/actors/workspace-actor";
 import { MemberProfileContent } from "./MemberProfileContent";
+import { memberProfileUrl } from "../../../../profile/navigation/member-profile-route";
+import { visitWorkspace } from "../../../../state/navigation/browser/workspace-history";
 import styles from "./member-profile-preview.module.css";
 
 type Props = {
@@ -27,10 +29,9 @@ export function MemberProfilePreview({
   const anchor = useRef<HTMLSpanElement>(null!);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const [preview, setPreview] = useState(false);
-  const [pinned, setPinned] = useState(false);
   const [placement, setPlacement] = useState<"left" | "right" | "bottom">("left");
   const cardId = useId();
-  const isOpen = !disabled && (preview || pinned);
+  const isOpen = !disabled && preview;
   const label = locale === "ru" ? `Профиль: ${name}` : `Profile: ${name}`;
 
   useEffect(() => () => clearTimeout(timer.current), []);
@@ -51,7 +52,6 @@ export function MemberProfilePreview({
         anchor.current?.querySelector<HTMLElement>("button")?.focus({ preventScroll: true });
       clearTimeout(timer.current);
       setPreview(false);
-      setPinned(false);
     }
     position();
     window.addEventListener("resize", position);
@@ -61,11 +61,10 @@ export function MemberProfilePreview({
   function close() {
     clearTimeout(timer.current);
     setPreview(false);
-    setPinned(false);
   }
   function schedulePreview(visible: boolean, delay: number) {
     clearTimeout(timer.current);
-    if (disabled || pinned) return;
+    if (disabled) return;
     timer.current = setTimeout(() => setPreview(visible), delay);
   }
   return <>
@@ -74,20 +73,13 @@ export function MemberProfilePreview({
       onPointerLeave={(event) => { if (event.pointerType !== "touch") schedulePreview(false, 140); }}
       onFocus={(event) => { if (event.target.matches(":focus-visible")) schedulePreview(true, 0); }}
       onBlur={() => schedulePreview(false, 0)}
-      onKeyDown={(event) => {
-        if (!pinned || event.key !== "Tab" || event.shiftKey) return;
-        const target = document.getElementById(cardId)?.querySelector<HTMLElement>("[data-profile-clock]");
-        if (target) { event.preventDefault(); target.focus(); }
-      }}>
+      >
       {hoverOnly ? children : <Button type="button" variant="light" disableRipple
-        className={styles.trigger} isDisabled={disabled} aria-label={triggerLabel ?? label} aria-haspopup="dialog"
+        className={styles.trigger} isDisabled={disabled} onClick={event=>event.stopPropagation()} aria-label={triggerLabel ?? label}
         aria-expanded={isOpen} aria-controls={isOpen ? cardId : undefined}
         onPress={() => {
-          if (pinned) close();
-          else {
-            clearTimeout(timer.current);
-            setPinned(true);
-          }
+          close();
+          visitWorkspace(memberProfileUrl(window.location.href, workspaceId, identityId));
         }}>
         {children}
       </Button>}

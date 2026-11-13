@@ -16,7 +16,7 @@ export function useProductDocCaseCatalog(scope: ProductDocScope) {
     ]);
     signal.throwIfAborted();
     if (cases.items.some(item => item.projectId !== projectId)) throw new Error("Related case project scope mismatch.");
-    return { folders: folders.filter(item => !item.archivedAt), cases: cases.items.filter(item => !item.archivedAt) };
+    return { folders, cases: cases.items };
   }, [http, workspaceId, projectId]);
   return useProductDocResource(request);
 }

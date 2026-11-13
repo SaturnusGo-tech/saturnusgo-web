@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import type { ProfilePeriod, SelfProfileActivity, SelfProfilePort } from "../domain/profile-model";
 
-export function useProfileActivity(client: SelfProfilePort, workspaceId: string | null, days: ProfilePeriod) {
+export function useProfileActivity(client: Pick<SelfProfilePort, "activity">, workspaceId: string | null, days: ProfilePeriod) {
   const key = `${workspaceId ?? ""}:${days}`;
   const [revision, setRevision] = useState(0);
   const [state, setState] = useState<{ key: string; value: SelfProfileActivity | null; error: unknown; loading: boolean }>({ key, value: null, error: null, loading: true });

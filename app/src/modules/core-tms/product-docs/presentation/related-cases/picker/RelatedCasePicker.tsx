@@ -8,7 +8,7 @@ import { useLoadingFeedback } from "../../../../presentation/common/loading/feed
 import { useState } from "react";
 import type { ProductDocCase, ProductDocScope } from "../../../domain/product-docs";
 import { relatedCasesChanged, toggleRelatedCases, type ProductDocRelatedCaseSelection } from "../../../domain/related-cases/product-doc-related-cases";
-import { SuiteCasePicker } from "../../../../presentation/dialogs/suite/picker/SuiteCasePicker";
+import { RelatedCaseBrowser } from "./RelatedCaseBrowser";
 import { useProductDocCaseCatalog } from "../../../state/related-cases/useProductDocCaseCatalog";
 import styles from "../related-cases.module.css";
 
@@ -65,8 +65,8 @@ export function RelatedCasePicker({ scope, baseline, projectName, ru, busy, fail
           </div>}
           {status === "ready" && resource.status === "ready" && <fieldset disabled={busy} className={styles.pickerFieldset}>
             <legend className={styles.srOnly}>{ru ? "Выбор связанных кейсов" : "Choose related cases"}</legend>
-            <SuiteCasePicker cases={resource.data.cases} folders={resource.data.folders} selected={selected}
-              projectName={projectName} ru={ru} purpose="related-cases" onToggle={id => toggle([id])} onScope={toggle} />
+            <RelatedCaseBrowser cases={resource.data.cases} folders={resource.data.folders} selected={selected}
+              projectName={projectName} ru={ru} disabled={busy} onToggle={id => toggle([id])} onScope={toggle} />
           </fieldset>}
         </motion.div>
       </AnimatePresence>
@@ -76,7 +76,7 @@ export function RelatedCasePicker({ scope, baseline, projectName, ru, busy, fail
     <DrawerFooter className={styles.footer}>
       <span className={styles.hint} aria-live="polite">{cases.length} {ru ? "выбрано" : "selected"}</span>
       <Button variant="light" size="sm" isDisabled={busy} onPress={onCancel}>{ru ? "Назад" : "Back"}</Button>
-      <Button variant="solid" color="primary" size="sm" isLoading={busy}
+      <Button variant="solid" color="primary" size="sm" radius="full" className={styles.apply} isLoading={busy}
         isDisabled={busy || !canApply || status !== "ready" || !relatedCasesChanged({ baseline, cases })}
         onPress={() => void onApply({ baseline, cases })}>{ru ? "Применить" : "Apply"}</Button>
     </DrawerFooter>

@@ -46,3 +46,23 @@ test("changing the picker scope and closing it cancel requests and ignore late c
   requests[4].resolve(page); requests[5].resolve(page);
   await flush();
 });
+
+test("the scoped catalog retains archived identities for the repository Include archived filter", async t => {
+  const h = componentHarness(); t.after(h.dispose);
+  const http = {};
+  const folders = [{ id: "old-folder", archivedAt: "2026-01-01" }, { id: "folder", archivedAt: null }];
+  const cases = [{ id: "old-case", projectId: "p", archivedAt: "2026-01-01" }, { id: "case", projectId: "p", archivedAt: null }];
+  const resource = h.load<{ useProductDocResource: typeof useProductDocResource }>(new URL("../../../useProductDocResource.ts", import.meta.url));
+  const { useProductDocCaseCatalog: catalog } = h.load<{ useProductDocCaseCatalog: typeof useProductDocCaseCatalog }>(
+    new URL("../../useProductDocCaseCatalog.ts", import.meta.url), name =>
+      name.endsWith("TmsHttpClientContext") ? { useTmsHttpClient: () => http }
+        : name.endsWith("folder-api") ? { listFolders: async () => folders }
+          : name.endsWith("test-case-api") ? { listTestCases: async () => ({ items: cases }) }
+            : name.endsWith("useProductDocResource") ? resource : undefined);
+  const read = () => h.render(() => catalog({ workspaceId: "w", projectId: "p" }));
+  read(); await flush();
+  const ready = read(); assert.equal(ready.status, "ready");
+  if (ready.status !== "ready") assert.fail("Expected the project catalog");
+  assert.equal(ready.data.cases.length, 2);
+  assert.equal(ready.data.folders.length, 2);
+});

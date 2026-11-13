@@ -42,7 +42,7 @@ export function ProductDocTaxonomySelector(props: Props) {
   }
   if (!filter) return <div className={styles.selector}>{values(dimension)}</div>;
   return <div className={styles.selector} data-filter>
-    <Tabs classNames={{ tabList: styles.dimensions, tab: styles.dimensionTab, panel: styles.valuePanel,
+    <Tabs classNames={{ base: styles.dimensionRoot, tabList: styles.dimensions, tab: styles.dimensionTab, panel: styles.valuePanel,
       cursor: styles.dimensionCursor, tabContent: styles.dimensionContent }} size="sm"
       aria-label={locale === "ru" ? "Фильтры" : "Filters"} selectedKey={dimension}
       destroyInactiveTabPanel={false} disableAnimation={Boolean(reduceMotion)}

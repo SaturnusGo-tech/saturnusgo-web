@@ -17,7 +17,8 @@ const actor = { identityId: "person", kind: "human", name: "Alex", email: "alex@
 function fixture() {
   let nextTimer = 0;
   const timers = new Map<number, () => void>();
-  const win = Object.assign(new EventTarget(), { innerWidth: 1200 });
+  const visits:string[]=[];
+  const win = Object.assign(new EventTarget(), { innerWidth: 1200, location:{href:"https://falcon.test/work/?workspaceId=workspace&projectId=p"} });
   const doc = Object.assign(new EventTarget(), { getElementById: () => null });
   const Button = ({ children, onPress, isDisabled, ...props }: Record<string, unknown>) =>
     React.createElement("button", { ...props, disabled: isDisabled, onClick: onPress }, children as React.ReactNode);
@@ -44,6 +45,9 @@ function fixture() {
           PropertyPopover: ({ trigger, onOpenChange, open }: { trigger: React.ReactNode; open: boolean; onOpenChange(value: boolean): void }) =>
             React.createElement("button", { onClick: () => onOpenChange(!open) }, trigger), PropertySearch: () => null,
         };
+        if(name.endsWith("member-profile-route"))return {memberProfileUrl:(_href:string,workspace:string,id:string)=>`/work/?workspaceId=${workspace}&view=profile&memberId=${id}`};
+        if(name.endsWith("workspace-history"))return {visitWorkspace:(href:string)=>visits.push(href)};
+        if(name.endsWith("MemberProfileLink"))return {MemberProfileLink:({children,...props}:React.PropsWithChildren)=>React.createElement("a",props,children)};
         if (name.endsWith("member-role-label")) return { memberRoleLabel };
         if (name.endsWith("FalconTooltip")) return { FalconTooltip: ({ children }: React.PropsWithChildren) => children };
         if (name.endsWith("useProductDocResource")) return { useProductDocResource };
@@ -63,7 +67,7 @@ function fixture() {
     await act(async () => { renderer = create(node, { createNodeMock: () => ({ getBoundingClientRect: () => ({ left: 400, right: 420 }) }) }); });
     return renderer;
   }
-  return { load, render, tick() { const callbacks = [...timers.values()]; timers.clear(); callbacks.forEach(callback => callback()); } };
+  return { load, render, visits, tick() { const callbacks = [...timers.values()]; timers.clear(); callbacks.forEach(callback => callback()); } };
 }
 
 test("docs assignee previews on hover without nesting a profile button inside the editing trigger", async t => {
@@ -92,7 +96,8 @@ test("the existing profile card displays a real human role with presence and sig
   const f = fixture();
   const { MemberProfilePreview } = f.load(new URL("MemberProfilePreview.tsx", profileDirectory));
   const renderer = await f.render(t, <MemberProfilePreview workspaceId="workspace" identityId="person" name="Alex" locale="en"><span>Alex</span></MemberProfilePreview>);
-  act(() => renderer.root.findByType("button").props.onClick());
+  const anchor=renderer.root.findAllByType("span").find(node=>node.props.onPointerEnter)!;
+  act(()=>{anchor.props.onPointerEnter({pointerType:"mouse"});f.tick();});
   const text = JSON.stringify(renderer.toJSON());
   assert.match(text, /QA manager/);
   assert.match(text, /Online/);
@@ -100,7 +105,7 @@ test("the existing profile card displays a real human role with presence and sig
   assert.match(text, /Falcon team/);
 });
 
-test("a read-only docs assignee has one keyboard profile control for avatar and name", async t => {
+test("a read-only docs assignee opens the complete member profile on click", async t => {
   const f = fixture();
   const { PropertyAssigneeField } = f.load(assigneeFile);
   const renderer = await f.render(t, <PropertyAssigneeField workspaceId="workspace" locale="en" profilePreview
@@ -108,7 +113,7 @@ test("a read-only docs assignee has one keyboard profile control for avatar and 
   const button = renderer.root.findByType("button");
   assert.match(button.findAllByType("span").flatMap(node => node.children.filter(child => typeof child === "string")).join(""), /Alex/);
   act(() => button.props.onClick());
-  assert.equal(renderer.root.findAllByProps({ role: "dialog" }).length, 1);
+  assert.deepEqual(f.visits,["/work/?workspaceId=workspace&view=profile&memberId=person"]);
 });
 
 
@@ -120,9 +125,9 @@ test("activity avatars expose the existing accessible profile without hiding its
     activity: { created: { identityId: "person", displayName: "Alex", at: "2026-11-11T04:00:00.000Z" } } };
   const renderer = await f.render(t, <ProductDocActivity api={{}} scope={{ workspaceId: "workspace", projectId: "project" }}
     document={document} locale="en" copy={{}} />);
-  const button = renderer.root.findAllByType("button").find(node => node.props["aria-haspopup"] === "dialog");
+  const button = renderer.root.findAllByType("button").find(node => node.props["aria-label"] === "Profile: Alex");
   assert.ok(button, "the activity avatar must open the existing member profile");
   assert.equal(button.parent?.parent?.props["aria-hidden"], undefined);
   act(() => button.props.onClick());
-  assert.equal(renderer.root.findAllByProps({ role: "dialog" }).length, 1);
+  assert.deepEqual(f.visits,["/work/?workspaceId=workspace&view=profile&memberId=person"]);
 });

@@ -10,9 +10,9 @@ import styles from "./profile-calendar.module.css";
 
 type Day = ReturnType<typeof profileCalendar>["days"][number];
 type Hover = { day: Day; left: number; top: number; above: boolean };
-export function ProfileCalendar({ value, loading, error, year, ru, onYear, retry }: {
+export function ProfileCalendar({ value, loading, error, year, ru, onYear, retry, readOnly = false }: {
   value: SelfProfileActivity | null; loading: boolean; error: unknown; year: number; ru: boolean;
-  onYear: (year: number) => void; retry: () => void;
+  onYear: (year: number) => void; retry: () => void; readOnly?: boolean;
 }) {
   const today = new Date().toISOString().slice(0, 10), currentYear = Number(today.slice(0, 4));
   const calendar = useMemo(() => profileCalendar(year, value?.series ?? [], today), [year, value, today]);
@@ -32,7 +32,7 @@ export function ProfileCalendar({ value, loading, error, year, ru, onYear, retry
       <div className={styles.years} role="group" aria-label={ru ? "Год активности" : "Activity year"}>{[currentYear, currentYear - 1].map(option => <button key={option} type="button" aria-pressed={year === option} onClick={() => onYear(option)}>{option}</button>)}</div>
     </header>
     {error ? <ErrorToast message={copy.activityError} retryLabel={copy.retry} onRetry={retry} />
-      : !value ? <div className={styles.feedback}><p>{loading ? (ru ? "Собираем ваши результаты" : "Gathering your recorded work") : copy.noWorkspace}</p></div>
+      : !value ? <div className={styles.feedback}><p>{loading ? (readOnly ? (ru ? "Собираем записанные действия" : "Gathering recorded work") : (ru ? "Собираем ваши результаты" : "Gathering your recorded work")) : copy.noWorkspace}</p></div>
       : <><div className={styles.scroll}>
         <div className={styles.matrix} style={{ "--calendar-columns": calendar.columns } as CSSProperties}>
           <div className={styles.months}>{calendar.months.map(month => <span key={month.month} style={{ gridColumn: month.column }}>{new Intl.DateTimeFormat(locale, { month: "short", timeZone: "UTC" }).format(new Date(Date.UTC(year, month.month, 1)))}</span>)}</div>

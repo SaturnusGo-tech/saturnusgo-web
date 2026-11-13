@@ -151,3 +151,7 @@
   outline-offset: 3px;
   border-radius: 3px;
 }
+
+.identity a { color:inherit; text-decoration:none; border-radius:3px; }
+.identity a:hover { text-decoration:underline; text-underline-offset:3px; }
+.heading a:focus-visible { outline:1px solid var(--falcon-focus); outline-offset:3px; }

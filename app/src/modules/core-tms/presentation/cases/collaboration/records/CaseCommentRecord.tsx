@@ -1,6 +1,8 @@
 import { ErrorToast } from "../../../common/error/ErrorToast";
 import { useState } from "react";
 import { Pencil, Reply } from "lucide-react";
+import { MemberProfilePreview } from "../../../../workspace/members/presentation/profile/MemberProfilePreview";
+import { MemberProfileLink } from "../../../../profile/presentation/MemberProfileLink";
 import { MemberAvatar } from "../../../../workspace/members/avatar/MemberAvatar";
 import { ResponsibleName } from "../../../../workspace/members/presentation/ResponsibleName";
 import { useWorkspacePeople } from "../../../../workspace/members/context/WorkspacePeopleContext";
@@ -27,9 +29,9 @@ export function CaseCommentRecord({ comment, ru, languageTag, model, onReply, on
   const shareLink = () => buildCommentLink(window.location.href, { ...comment, targetKind: model.commentTargetKind, workspaceId: people.workspaceId });
   const edit = () => { setEditing(comment); setConfirming(false); };
   return <article className={css.comment} id={`comment-${comment.id}`} tabIndex={-1}>
-    <MemberAvatar identityId={comment.author.identityId} name={activityActorLabel(comment.author.displayName)} />
+    <MemberProfilePreview workspaceId={people.workspaceId} identityId={comment.author.identityId} name={activityActorLabel(comment.author.displayName)} locale={ru?"ru":"en"} offline={people.offline}><MemberAvatar workspaceId={people.workspaceId} identityId={comment.author.identityId} name={activityActorLabel(comment.author.displayName)} /></MemberProfilePreview>
     <div className={css.commentContent}>
-      <header className={css.commentHeader}><div className={css.commentIdentity}><strong>{activityActorLabel(comment.author.displayName)}</strong>
+      <header className={css.commentHeader}><div className={css.commentIdentity}><MemberProfileLink workspaceId={people.workspaceId} identityId={comment.author.identityId}><strong>{activityActorLabel(comment.author.displayName)}</strong></MemberProfileLink>
         {!comment.deletedAt && Boolean(comment.mentions?.length) && <span className={css.mentionedPeople} role="group" aria-label={ru ? "Упомянутые сотрудники" : "Mentioned teammates"}>
           <span className={css.mentionVerb}>{ru ? "упоминает" : "mentioned"}</span>
           {comment.mentions!.map(id => <ResponsibleName key={id} workspaceId={people.workspaceId} identityId={id} offline={people.offline} />)}

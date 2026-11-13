@@ -221,3 +221,6 @@
 .commentSkeleton span:last-child { width: 55%; }
 @keyframes comment-pulse { from { opacity: .5; } to { opacity: 1; } }
 @media(prefers-reduced-motion:reduce) { .commentSkeleton span { animation: none; } }
+
+.commentIdentity > a { color:inherit; text-decoration:none; }
+.commentIdentity > a:hover { text-decoration:underline; text-underline-offset:3px; }

@@ -8,6 +8,7 @@ import type { TmsLocale } from "../../../../localization/model/locale";
 import { MemberAvatar } from "../../avatar/MemberAvatar";
 import type { WorkspaceActor } from "../../model/actors/workspace-actor";
 import { useWorkspaceActor } from "../../state/actors/useWorkspaceActor";
+import { MemberProfileLink } from "../../../../profile/presentation/MemberProfileLink";
 import styles from "./member-profile-preview.module.css";
 
 export type MemberProfileContentProps = {
@@ -58,12 +59,12 @@ export function MemberProfileContent({ workspaceId, identityId, name, locale, of
   const signInLabel = ru ? "Последний вход" : "Last sign-in";
   return <>
     <div className={styles.heading}>
-      <span className={styles.avatar} data-human={agent ? undefined : true}
+      <MemberProfileLink workspaceId={workspaceId} identityId={identityId} aria-label={ru ? `Открыть профиль: ${displayName}` : `Open profile: ${displayName}`} className={styles.avatar} data-human={agent ? undefined : true}
         style={{ "--member-avatar-color": avatarColor(identityId) } as CSSProperties}>
         <MemberAvatar workspaceId={workspaceId} actor={member} identityId={identityId} name={displayName} offline={offline} />
-      </span>
+      </MemberProfileLink>
       <div className={styles.identity}>
-        <strong>{displayName}</strong>
+        <MemberProfileLink workspaceId={workspaceId} identityId={identityId}><strong>{displayName}</strong></MemberProfileLink>
         {human?.email && <span>{human.email}</span>}
       </div>
     </div>

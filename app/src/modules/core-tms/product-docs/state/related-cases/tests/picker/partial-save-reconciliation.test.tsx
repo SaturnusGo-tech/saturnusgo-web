@@ -49,7 +49,7 @@ async function pickerFixture(t: TestContext, partial = true, pauseReconcile = fa
       } })) : [] };
   });
   function toggle(id: string) {
-    const node = read().ui.find(node => node.type === "SuiteCasePicker")!;
+    const node = read().ui.find(node => node.type === "RelatedCaseBrowser")!;
     (node.props.onToggle as (id: string) => void)(id);
   }
   function applyButton(): Node { return read().ui.find(node => node.type === "Button" && node.props.color === "primary")!; }
@@ -65,7 +65,7 @@ async function pickerFixture(t: TestContext, partial = true, pauseReconcile = fa
     toggle("b"); toggle("c");
     assert.equal(await apply(), false);
     assert.deepEqual([...persisted], ["a", "b"]);
-    const selected = read().ui.find(node => node.type === "SuiteCasePicker")!.props.selected as Set<string>;
+    const selected = read().ui.find(node => node.type === "RelatedCaseBrowser")!.props.selected as Set<string>;
     assert.deepEqual([...selected], ["a", "b", "c"], "reconciliation must preserve desired selection");
     assert.equal(read().state.saveFailed, true);
   }

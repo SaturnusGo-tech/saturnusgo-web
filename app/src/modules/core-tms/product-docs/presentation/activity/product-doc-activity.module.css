@@ -99,3 +99,6 @@
 .empty, .error { margin: 0; font-size: 12px; line-height: 1.45; }
 .empty { color: var(--falcon-text-secondary); }
 .error { color: var(--falcon-danger); }
+
+.metadata > a { color:inherit; text-decoration:none; border-radius:3px; }
+.metadata > a:hover { text-decoration:underline; text-underline-offset:3px; }

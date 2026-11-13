@@ -21,6 +21,9 @@ import { markProductDocRun, readRunEmbedPlacement, runDirectiveName } from "../.
 import { ProductDocAttachment } from "../../attachments/ProductDocAttachment";
 import { markProductDocAttachment, productDocAttachmentName, readProductDocAttachment } from "../../../domain/attachments/productDocAttachment";
 import { CaseReferenceLink } from "../../../../case-references/presentation/CaseReferenceLink";
+import { ProductDocCaseReferenceGroup } from "../case-groups/ProductDocCaseReferenceGroup";
+import { remarkProductDocCaseGroups } from "../case-groups/remarkProductDocCaseGroups";
+import { useProductDocsWorkspace } from "../../../composition/context/ProductDocsContext";
 import { remarkCaseReferences } from "../../../../case-references/markdown/remarkCaseReferences";
 import { ProductDocRepositoryPath } from "../links/repository/ProductDocRepositoryPath";
 import tableStyles from "./article-table.module.css";
@@ -104,7 +107,7 @@ function MarkdownDashboard({ snapshot }: { snapshot?: string }) {
 function MarkdownRun({ snapshot, width, align }: { snapshot?: string; width?: string | number; align?: string }) {
   return <ProductDocRunEvidence snapshotId={snapshot ?? ""} placement={readRunEmbedPlacement({ width, align })} />;
 }
-const embedRenderers = { [dashboardDirectiveName]: MarkdownDashboard, [runDirectiveName]: MarkdownRun,
+const embedRenderers = { "falcon-case-group": ProductDocCaseReferenceGroup, [dashboardDirectiveName]: MarkdownDashboard, [runDirectiveName]: MarkdownRun,
   [productDocAttachmentName]: (props: { attachment?: string; width?: string | number }) =>
     <ProductDocAttachment {...readProductDocAttachment(props)} />,
   [productDocCollapseName]: ({ heading, children }: { heading?: string; children?: ReactNode }) =>
@@ -157,9 +160,11 @@ function MarkdownTask({ type, checked }: { type?: string; checked?: boolean }) {
 }
 
 export const ProductDocMarkdown = memo(function ProductDocMarkdown({ markdown, copy }: { markdown: string; copy: ProductDocsCopy }) {
+  const workspace = useProductDocsWorkspace();
+  const current = typeof window === "undefined" ? undefined : window.location.href;
   return <MarkdownCopy.Provider value={copy}>
     <div className={`${layoutStyles.articleLayouts} ${markerStyles.surface} ${calloutStyles.prose}`}><ReactMarkdown skipHtml
-      remarkPlugins={[remarkGfm, remarkDirective, [remarkHighlights, { preserveOtherDirectives: true }], remarkCaseReferences, renderDocumentBlocks]}
+      remarkPlugins={[remarkGfm, remarkDirective, [remarkHighlights, { preserveOtherDirectives: true }], remarkCaseReferences, [remarkProductDocCaseGroups, { current, scope: workspace?.scope }], renderDocumentBlocks]}
       components={markdownComponents}>{markdown}</ReactMarkdown></div>
   </MarkdownCopy.Provider>;
 });

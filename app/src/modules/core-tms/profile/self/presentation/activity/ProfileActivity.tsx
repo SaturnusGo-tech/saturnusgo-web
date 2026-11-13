@@ -6,13 +6,13 @@ import { profileCopy } from "../copy/profile-copy";
 import { ProfileActivityChart } from "./chart/ProfileActivityChart";
 import styles from "./profile-activity.module.css";
 
-export function ProfileActivity({ value, loading, error, workspaceId, days, ru, onPeriod, retry }: {
+export function ProfileActivity({ value, loading, error, workspaceId, days, ru, onPeriod, retry, readOnly = false }: {
   value: SelfProfileActivity | null; loading: boolean; error: unknown; workspaceId: string | null; days: ProfilePeriod; ru: boolean;
-  onPeriod: (value: ProfilePeriod) => void; retry: () => void;
+  onPeriod: (value: ProfilePeriod) => void; retry: () => void; readOnly?: boolean;
 }) {
-  const copy = profileCopy(ru), numbers = new Intl.NumberFormat(ru ? "ru-RU" : "en-US");
-  return <section className={styles.activity} aria-label={copy.activity} aria-busy={loading}>
-    <header className={styles.heading}><div><h2>{copy.activity}</h2><p>{copy.scope}</p></div>
+  const copy = profileCopy(ru), activityLabel=readOnly?(ru?"Активность":"Activity"):copy.activity, scope=readOnly?(ru?"Записанные действия в текущем пространстве · UTC":"Recorded work in this workspace · UTC"):copy.scope, numbers = new Intl.NumberFormat(ru ? "ru-RU" : "en-US");
+  return <section className={styles.activity} aria-label={activityLabel} aria-busy={loading}>
+    <header className={styles.heading}><div><h2>{activityLabel}</h2><p>{scope}</p></div>
       <div className={styles.period} role="group" aria-label={copy.period}>{([30, 90, 365] as const).map(period =>
         <button key={period} type="button" aria-pressed={days === period} onClick={() => onPeriod(period)}>{ru ? `${period} дн.` : `${period}d`}</button>)}</div>
     </header>
