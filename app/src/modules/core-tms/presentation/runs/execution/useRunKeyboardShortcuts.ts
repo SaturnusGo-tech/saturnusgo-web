@@ -25,7 +25,7 @@ export function useRunKeyboardShortcuts(options: RunKeyboardShortcutOptions) {
       if (embeddedScope) {
         const panel = embeddedScope.current;
         if (!panel?.contains(target) || dialog !== panel.closest("[role=dialog]")) return;
-      } else if (dialog || document.querySelector("[data-defect-page]")) return;
+      } else if (dialog || document.querySelector("[data-defect-drawer]")) return;
       if (target?.closest("input, textarea, select, [contenteditable='true']")) return;
       const index = items.findIndex((entry) => entry.id === item.id);
       const activeAttempt = item.attempts.find((entry) => entry.attemptNo === item.activeAttemptNo)

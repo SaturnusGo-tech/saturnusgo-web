@@ -1,7 +1,6 @@
 import { LoadingOrb } from "../../../../../shared/components/loading/LoadingOrb";
-import { Input } from "@heroui/react";
 import { useEffect, useId, useRef, useState, type FormEvent, type MutableRefObject } from "react";
-import { DefectPageHost } from "./page/DefectPageHost";
+import { Modal } from "../../common/modal/Modal";
 import { FormError } from "../../common/error/FormError";
 import { NarrativeField } from "../../cases/inspector/markdown/plain/NarrativeField";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -38,46 +37,46 @@ export function DefectForm(props: Props) {
     if (Object.keys(next).length) { if (next.title) titleRef.current?.focus(); return; }
     props.onSubmit(event);
   };
-  return <DefectPageHost onNavigate={props.onClose} pending={submitting}>
-    <section className={`${css.panel} ${closing ? css.closing : ""}`} data-defect-page aria-labelledby={`${id}-heading`}
-      onKeyDown={event => { if (event.key === "Escape" && !event.defaultPrevented && !submitting && !closing) { event.preventDefault(); props.onClose(); } }}
-      ref={element => { props.panelRef.current = element; }}>
-      <header><div><h1 id={`${id}-heading`}>{copy.title}</h1>{props.context && <p>{props.context}</p>}</div>
-        <div className={css.actions}><button type="button" className={css.cancel} disabled={submitting || closing} onClick={props.onClose}>{copy.cancel}</button>
-          <button className={css.save} type="submit" form={id} disabled={submitting || closing}
-            data-testid="create-defect">{submitting && <LoadingOrb />} {submitting ? copy.creating : copy.create}</button></div>
-      </header>
+  return <Modal title={copy.title} subtitle={props.context} drawer wide onClose={props.onClose}
+    panelClassName={`${css.panel} ${closing ? css.closing : ""}`}>
     <form id={id} className={css.form} onSubmit={submit} noValidate aria-busy={submitting}
+      data-defect-drawer
       data-testid={value.reproduction !== undefined ? "inline-defect-composer" : "defect-composer"}
-      ref={element => { if (element) element.inert = closing || submitting; }}>
+      ref={element => { props.panelRef.current = element?.parentElement ?? null; if (element) element.inert = closing; }}>
       <div className={css.body}>
         <div className={css.titleField}>
-          <Input id={`${id}-title`} ref={titleRef} data-autofocus data-testid="defect-title" autoFocus
-            aria-label={copy.summary} value={value.title} onValueChange={title => onChange({ title })}
-            classNames={{ inputWrapper: `${css.fieldShell} ${css.titleShell}`, input: `${css.fieldInput} ${css.titleInput}` }}
+          <div className={css.titleShell} data-input-shell data-invalid={Boolean(errors.title)}>
+          <input id={`${id}-title`} ref={titleRef} data-autofocus data-testid="defect-title" autoFocus
+            aria-label={copy.summary} value={value.title} onChange={event => onChange({ title: event.target.value })}
+            className={css.titleInput} disabled={submitting}
             placeholder={ru ? "Название дефекта" : "Defect title"} aria-required="true"
-            isInvalid={Boolean(errors.title)} aria-describedby={errors.title ? `${id}-title-error` : undefined} />
+            aria-invalid={Boolean(errors.title)} aria-describedby={errors.title ? `${id}-title-error` : undefined} />
+          </div>
           {errors.title && <small id={`${id}-title-error`} className={css.validation} role="alert">{errors.title}</small>}
         </div>
-        <div className={css.layout}>
-          <div className={css.content}>
-            <NarrativeField label={copy.description} value={value.description} framed error={errors.description}
+        <div className={css.layout} data-defect-create-layout>
+          <main className={css.content}>
+            <NarrativeField label={copy.description} value={value.description} error={errors.description}
               onChange={description => onChange({ description })} disabled={submitting} />
             {value.reproduction !== undefined && <NarrativeField label={ru ? "Шаги воспроизведения" : "Steps to reproduce"}
-              value={value.reproduction} framed error={errors.reproduction}
+              value={value.reproduction} error={errors.reproduction}
               onChange={reproduction => onChange({ reproduction })} disabled={submitting} />}
-            <NarrativeField label={copy.actual} value={value.actualResult} framed error={errors.actualResult}
+            <NarrativeField label={copy.actual} value={value.actualResult} error={errors.actualResult}
               onChange={actualResult => onChange({ actualResult })} disabled={submitting} />
-            <NarrativeField label={copy.expected} value={value.expectedResult} framed
+            <NarrativeField label={copy.expected} value={value.expectedResult}
               onChange={expectedResult => onChange({ expectedResult })} disabled={submitting} />
             <DefectEvidence files={props.files} onChange={props.onFilesChange} disabled={submitting} />
-            <DefectProperties workspaceId={props.workspaceId} offline={props.offline} disabled={submitting}
+          </main>
+          <DefectProperties workspaceId={props.workspaceId} offline={props.offline} disabled={submitting}
               value={value} onChange={onChange} components={props.components} routing={routing} showRoutingError={attempted} />
-          </div>
         </div>
         {props.error && <FormError message={props.error} />}
       </div>
+      <footer className={css.actions}>
+        <button type="button" className={css.cancel} disabled={submitting || closing} onClick={props.onClose}>{copy.cancel}</button>
+        <button className={css.save} type="submit" disabled={submitting || closing}
+          data-testid="create-defect">{submitting && <LoadingOrb />} {submitting ? copy.creating : copy.create}</button>
+      </footer>
     </form>
-    </section>
-  </DefectPageHost>;
+  </Modal>;
 }

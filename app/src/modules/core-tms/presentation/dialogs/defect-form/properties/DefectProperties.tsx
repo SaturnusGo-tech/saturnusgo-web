@@ -1,9 +1,10 @@
 import { Input } from "@heroui/react";
-import { CircleDot, Flame, Minus, OctagonAlert } from "lucide-react";
+import { Box, CircleDot, Flame, Minus, OctagonAlert, Plug, Repeat2 } from "lucide-react";
 import { useId } from "react";
 import { PropertyIdentityField } from "../../../common/properties/metadata/identity/PropertyIdentityField";
 import { PriorityIcon, priorityLevels } from "../../../common/properties/PriorityIcon";
 import { PropertySelect } from "../../../common/properties/select/PropertySelect";
+import { useInputShellRef } from "../../../common/integration-controls/refs/useInputShellRef";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import { getDefectDialogCopy } from "../../defect/copy";
 import type { DefectDraft, DefectRouting } from "../model";
@@ -20,16 +21,17 @@ const severityIcons = { critical: OctagonAlert, high: Flame, medium: CircleDot, 
 
 export function DefectProperties({ workspaceId, offline, disabled, value, onChange, components, routing, showRoutingError }: Props) {
   const linkId = useId();
+  const linkShellRef = useInputShellRef();
   const { locale } = useTmsLocale();
   const ru = locale === "ru";
   const copy = getDefectDialogCopy(locale);
   const severityLevels = ["critical", "high", "medium", "low"] as const;
   return <aside className={css.properties} aria-label={ru ? "Свойства дефекта" : "Defect properties"}>
-    <div className={css.row}><span>{copy.component}</span>
+    <h3>{ru ? "Свойства" : "Properties"}</h3>
+    <div className={css.rows}>
       <PropertySelect locale={locale} label={copy.component} searchLabel={ru ? "Найти компонент…" : "Find a component…"}
-        value={value.component} options={components} onChange={component => onChange({ component })} disabled={disabled} />
-    </div>
-    <div className={css.row}><span>{copy.severity}</span>
+        value={value.component} options={components.map(component => ({ ...component, icon: <Box size={15} aria-hidden="true" /> }))}
+        onChange={component => onChange({ component })} disabled={disabled} />
       <PropertySelect locale={locale} label={copy.severity} searchLabel={ru ? "Изменить серьёзность…" : "Change severity…"}
         value={value.severity} onChange={severity => onChange({ severity })} disabled={disabled}
         options={severityLevels.map((level, index) => {
@@ -37,32 +39,29 @@ export function DefectProperties({ workspaceId, offline, disabled, value, onChan
           return { value: level, label: copy[level], shortcut: String(index + 1),
             icon: <span className={css.severityIcon} data-level={level}><Icon size={15} aria-hidden="true" /></span> };
         })} />
-    </div>
-    <div className={css.row}><span>{ru ? "Приоритет" : "Priority"}</span>
       <PropertySelect locale={locale} label={ru ? "Приоритет" : "Priority"}
         searchLabel={ru ? "Изменить приоритет…" : "Change priority…"} value={value.priority}
         onChange={priority => onChange({ priority })} disabled={disabled}
         options={priorityLevels.filter(level => level.key !== "none").map((level, index) => ({
           value: level.key, label: level[locale], shortcut: String(index + 1), icon: <PriorityIcon level={level.key} />,
         }))} />
-    </div>
-    <div className={css.row}><span>{copy.reproducibility}</span>
       <PropertySelect locale={locale} label={copy.reproducibility} searchLabel={ru ? "Найти частоту…" : "Find a frequency…"}
         value={value.reproducibility} onChange={reproducibility => onChange({ reproducibility })} disabled={disabled}
-        options={[{ value: "Always", label: copy.always }, { value: "Sometimes", label: copy.sometimes }, { value: "Once", label: copy.once }]} />
-    </div>
-    <div className={css.row}><span>{ru ? "Ответственный" : "Assignee"}</span>
+        options={[{ value: "Always", label: copy.always }, { value: "Sometimes", label: copy.sometimes }, { value: "Once", label: copy.once }]
+          .map(option => ({ ...option, icon: <Repeat2 size={15} aria-hidden="true" /> }))} />
       <PropertyIdentityField workspaceId={workspaceId} locale={locale} value={value.assigneeIdentityId} offline={offline}
         disabled={disabled} onChange={assigneeIdentityId => onChange({ assigneeIdentityId })} />
-    </div>
-    <div className={css.row}><span className={css.label}>{copy.routingLabel}<DefectRoutingHelp /></span>
-      <PropertySelect locale={locale} label={copy.routingLabel} searchLabel={ru ? "Найти интеграцию…" : "Find an integration…"}
-        value={routing.value} options={routing.options} onChange={next => routing.onChange(next as DefectRouting["value"])}
-        disabled={disabled || routing.disabled} />
+      <div className={css.routing}>
+        <PropertySelect locale={locale} label={copy.routingLabel} searchLabel={ru ? "Найти интеграцию…" : "Find an integration…"}
+          value={routing.value} options={routing.options.map(option => ({ ...option, icon: <Plug size={15} aria-hidden="true" /> }))}
+          onChange={next => routing.onChange(next as DefectRouting["value"])} disabled={disabled || routing.disabled} />
+        <DefectRoutingHelp />
+      </div>
       {showRoutingError && !routing.resolved && <small className={css.error} role="alert">{routing.message}</small>}
     </div>
-    <div className={css.row}><label htmlFor={linkId}>{copy.deepLink}</label>
+    <div className={css.linkField}><label htmlFor={linkId}>{copy.deepLink}</label>
       <Input id={linkId} type="text" aria-label={copy.deepLink} size="sm" value={value.link}
+        wrapperRef={linkShellRef}
         classNames={{ inputWrapper: form.fieldShell, input: form.fieldInput }}
         placeholder={copy.linkPlaceholder} isDisabled={disabled} onValueChange={link => onChange({ link })} />
     </div>

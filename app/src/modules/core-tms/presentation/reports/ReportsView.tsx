@@ -14,9 +14,9 @@ import type { DefectRetest } from "../../runs/verification/state/defect/useDefec
 import surface from "./reports.module.css";
 
 export function ReportsView({ workspaceId, projectId, projectName = "", defects, runs, links, selectedDefectId, onSelectDefect,
-  selectedDefectStatus, onRetrySelectedDefect, onNew, onOpenRun, defectRetest, connected = false, canComment = false }: {
+  selectedDefectStatus, onRetrySelectedDefect, onNew, onOpenRun, defectRetest, connected = false, canComment = false, creating = false }: {
   defectRetest?: DefectRetest;
-  connected?: boolean; canComment?: boolean;
+  connected?: boolean; canComment?: boolean; creating?: boolean;
   workspaceId?: string; projectId?: string; projectName?: string;
   defects: Defect[];
   runs: TestRunSummary[];
@@ -42,13 +42,18 @@ export function ReportsView({ workspaceId, projectId, projectName = "", defects,
     onSelectDefect(defectId);
   }
 
-  return <div className={surface.workspace} data-testid="reports-view" data-detail-open={Boolean(selectedDefectId) || undefined}>
+  function createDefect() {
+    if (selectedDefectId) selectDefect(null);
+    onNew();
+  }
+
+  return <div className={surface.workspace} data-testid="reports-view" data-detail-open={!creating && Boolean(selectedDefectId) || undefined}>
     <DefectBrowser workspaceId={workspaceId} projectId={projectId} projectName={projectName}
       connected={connected} defects={browseDefects} query={query} onQueryChange={setQuery}
       severitySort={severitySort} onSeveritySortChange={setSeveritySort}
-      selectedDefectId={selectedDefectId} onSelectDefect={selectDefect} onNew={onNew} />
+      selectedDefectId={selectedDefectId} onSelectDefect={selectDefect} onNew={createDefect} />
 
-    <AnimatePresence>
+    {!creating && <AnimatePresence>
     {selectedDefectId && <motion.div key="detail-space" className={surface.detailSpace} aria-hidden="true"
       initial={{ width: 0 }} animate={{ width: "var(--report-panel-width)" }} exit={{ width: 0 }}
       transition={{ duration: reducedMotion ? 0 : .26, ease: [.2,.75,.25,1] }} />}
@@ -69,6 +74,6 @@ export function ReportsView({ workspaceId, projectId, projectName = "", defects,
           ? <ErrorToast message={locale === "ru" ? "Не удалось открыть баг-репорт" : "Could not open the bug report"}
             retryLabel={locale === "ru" ? "Повторить" : "Retry"} onRetry={onRetrySelectedDefect} />
           : <TessiqLoader pane label={locale === "ru" ? "Загрузка баг-репорта" : "Loading bug report"} testId="defect-detail-loading" />}
-    </motion.aside>}</AnimatePresence>
+    </motion.aside>}</AnimatePresence>}
   </div>;
 }

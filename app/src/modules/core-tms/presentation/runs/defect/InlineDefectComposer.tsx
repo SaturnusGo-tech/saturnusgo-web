@@ -13,7 +13,7 @@ import { executableSteps } from "../../../helpers/cases/caseRevision";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedComponentLabel } from "../../../localization/format/labels";
 import { getDefectDialogCopy } from "../../dialogs/defect/copy";
-import { useDefectPageDismiss } from "../../dialogs/defect-form/page/useDefectPageDismiss";
+import { useDrawerDismiss } from "../../common/drawer/useDrawerDismiss";
 
 type Props = {
   workspaceId: string;
@@ -32,7 +32,7 @@ export function InlineDefectComposer({ workspaceId, projectId, run, item, step, 
   const attachments = useAttachmentClient();
   const { locale, t } = useTmsLocale();
   const copy = getDefectDialogCopy(locale);
-  const { closing, dismiss, panelRef } = useDefectPageDismiss();
+  const { closing, dismiss, panelRef } = useDrawerDismiss();
   const youTrack = useYouTrackRouteOptions(workspaceId, locale);
   const attempt = item.attempts.find((entry) => entry.attemptNo === item.activeAttemptNo) ?? item.attempts[0];
   const localizedStep = executableSteps(item.snapshot, locale).find((entry) => entry.id === step.id) ?? step;

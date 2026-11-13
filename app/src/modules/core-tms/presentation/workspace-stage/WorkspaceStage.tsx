@@ -163,6 +163,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
   if (model.view === "runs") return maintenance(<WorkspaceRunsStage model={model} />);
   return (
     <ReportsView connected={model.connection === "connected"} canComment={model.data.meta.authorization.capabilities.includes("defect:manage")} workspaceId={model.data.workspace.id} projectId={model.projectId} projectName={model.project.name}
+      creating={model.dialog === "defect"}
       defects={model.reportDefects}
       runs={model.projectRuns}
       links={model.projectLinks}

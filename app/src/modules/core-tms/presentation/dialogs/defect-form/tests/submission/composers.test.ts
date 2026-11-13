@@ -12,11 +12,11 @@ test("both entry points save edited Markdown, fields and attachments, preserve c
   for (const mode of ["standalone", "run", "case"]) {
     const inline = mode === "run", direct = mode === "case";
     const h = componentHarness(); const calls: Parameters<typeof createDefect>[0][] = [];
-    let fail = true, created = 0;
+    let fail = true, created = 0, drawerDismissed = 0;
     const resolve = (name: string) => {
       if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "ru", t: (key: string) => key }) };
       if (name.endsWith("copy")) return { getDefectDialogCopy };
-      if (name.endsWith("useDefectPageDismiss")) return { useDefectPageDismiss: () => ({ closing: false, panelRef: {}, dismiss: (done: () => void) => done() }) };
+      if (name.endsWith("useDrawerDismiss")) return { useDrawerDismiss: () => ({ closing: false, panelRef: {}, dismiss: (done: () => void) => { drawerDismissed++; done(); } }) };
       if (name.endsWith("use-youtrack-route-options")) return { useYouTrackRouteOptions: () => ({ configurationVersion: 2, enabled: false, options: [], status: "ready" }) };
       if (name.endsWith("integration-target")) return routing;
       if (name.endsWith("defect-route-choices")) return { defectRouteChoices };
@@ -56,7 +56,7 @@ test("both entry points save edited Markdown, fields and attachments, preserve c
     assert.equal(render().props.error, "Retry"); assert.equal(created, 0);
     assert.equal((render().props.value as { actualResult: string }).actualResult, markdown);
     fail = false; await invoke(render(), "onSubmit", { preventDefault() {} });
-    assert.equal(created, 1); assert.equal(calls[0].operationKey, calls[1].operationKey);
+    assert.equal(created, 1); assert.equal(drawerDismissed, 1); assert.equal(calls[0].operationKey, calls[1].operationKey);
     const saved = calls[1]; assert.equal(saved.payload.sourceCaseId, direct ? "source-case" : undefined); assert.equal(saved.payload.actualResult, markdown);
     assert.equal(saved.payload.expectedResult, "# Expected\n\nOrder list");
     assert.equal(saved.payload.runId, inline ? "run" : null); assert.equal(saved.payload.stepId, inline ? "step" : null);

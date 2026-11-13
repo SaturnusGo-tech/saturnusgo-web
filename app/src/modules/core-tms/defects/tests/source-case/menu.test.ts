@@ -4,8 +4,8 @@ import { componentHarness, nodes, invoke } from "../../../portfolios/tests/suppo
 import type { CaseDetailHeaderActions } from "../../../presentation/cases/detail/header/CaseDetailHeaderActions";
 import type { WorkspaceExecutionDialogs } from "../../../presentation/workspace-dialogs/WorkspaceExecutionDialogs";
 
-test("case menu offers a fourth action, closes on selection and protects archived cases", () => {
-  const h = componentHarness(undefined, { document: { addEventListener() {}, removeEventListener() {} } });
+test("native case menu dispatches bug creation and protects archived or edited cases", () => {
+  const h = componentHarness();
   const { CaseDetailHeaderActions: View } = h.load<{ CaseDetailHeaderActions: typeof CaseDetailHeaderActions }>(
     new URL("../../../presentation/cases/detail/header/CaseDetailHeaderActions.tsx", import.meta.url));
   let opened = 0;
@@ -13,18 +13,25 @@ test("case menu offers a fourth action, closes on selection and protects archive
     testCase: { id: "case", projectId: "project", key: "TC-1", archivedAt: null },
     onRunCase() {}, onToggleFullscreen() {}, onClone() {}, onArchive() {}, onCreateDefect: () => { opened++; } };
   const render = () => nodes(h.render(() => View(props as never)));
-  invoke(render().find(n => n.props["aria-haspopup"] === "menu")!, "onClick");
-  const items = render().filter(n => n.props.role === "menuitem");
-  assert.equal(items.length, 4);
-  assert.ok(JSON.stringify(items[3]).includes("Завести баг-репорт"));
-  invoke(items[3], "onClick"); assert.equal(opened, 1);
-  assert.equal(render().filter(n => n.props.role === "menuitem").length, 0);
+  let all = render();
+  let menu = all.find(n => n.type === "DropdownMenu")!;
+  const items = all.filter(n => n.type === "DropdownItem");
+  assert.deepEqual(items.map(n => n.key), ["key", "link", "clone", "defect", "quarantine"]);
+  assert.equal(items.find(n => n.key === "defect")?.props.textValue, "Завести баг-репорт");
+  assert.notEqual(menu.props.closeOnSelect, false);
+  invoke(menu, "onAction", "defect"); assert.equal(opened, 1);
   Object.assign(props.testCase, { archivedAt: "2026-09-20T00:00:00Z" });
-  invoke(render().find(n => n.props["aria-haspopup"] === "menu")!, "onClick");
-  const disabled = render().filter(n => n.props.role === "menuitem")[3];
-  assert.equal(disabled.props.disabled, true); invoke(disabled, "onClick"); assert.equal(opened, 1);
-  Object.assign(props, { onCreateDefect: undefined });
-  assert.equal(render().filter(n => n.props.role === "menuitem").length, 3);
+  menu = render().find(n => n.type === "DropdownMenu")!;
+  assert.ok((menu.props.disabledKeys as string[]).includes("defect"));
+  invoke(menu, "onAction", "defect"); assert.equal(opened, 1);
+  Object.assign(props.testCase, { archivedAt: null });
+  props.editorOpen = true; all = render();
+  assert.equal(all.find(n => n.type === "Button" && n.props["aria-label"] === "Другие действия")?.props.isDisabled, true);
+  invoke(all.find(n => n.type === "DropdownMenu")!, "onAction", "defect"); assert.equal(opened, 1);
+  Object.assign(props, { editorOpen: false, onCreateDefect: undefined });
+  assert.equal(render().some(n => n.type === "DropdownItem" && n.key === "defect"), false);
+  props.creating = true;
+  assert.equal(render().some(n => n.type === "DropdownMenu"), false);
   h.dispose();
 });
 
