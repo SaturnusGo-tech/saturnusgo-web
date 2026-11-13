@@ -46,9 +46,11 @@ test("answer validation matches the server's 16k answer and eight-image total li
   assert.throws(() => validateGuideAnswer({ ...base, citations: Array.from({ length: 9 }, () => ({ articleId: "a", sectionId: "b", title: "c" })) }));
 });
 
-test("all 20 explicitly retained screenshot tuples resolve to current canonical media in their original article and locale", () => {
+test("retained screenshot tuples resolve canonically and the replaced legacy import screenshots stay unavailable", () => {
   assert.equal(historicalGuideMedia.length, 20);
   assert.equal(new Set(historicalGuideMedia.map(item => item.src)).size, 20);
+  const retiredImportIds = new Set(["settings-03-exchange-20260928-rows-en-20260928", "settings-03-exchange-20260928"]);
+  let retainedContexts = 0, retiredContexts = 0;
   for (const alias of historicalGuideMedia) {
     const catalog = documentationCatalog(alias.locale, true);
     const bytes = readFileSync(resolve("public", alias.src.slice(1)));
@@ -56,6 +58,17 @@ test("all 20 explicitly retained screenshot tuples resolve to current canonical 
     for (const context of alias.contexts) {
       const article = catalog.articleById.get(context.articleId)!;
       const section = article.sections.find(item => item.id === context.sectionId)!;
+      if (retiredImportIds.has(alias.id)) {
+        assert.ok((context.articleId === "import-export" && context.sectionId === "walkthrough")
+          || (context.articleId === "permissions" && context.sectionId === "settings-walkthrough"));
+        assert.equal(documentationSectionMedia(section).some(item => matchesHistoricalGuideMedia(context.articleId, context.sectionId, alias, item)), false);
+        if (context.articleId === "import-export") assert.equal(documentationSectionMedia(section).length, 0, "the redesigned import walkthrough is text-only");
+        const retired: GuideVisual = { ...context, layout: "steps", items: [{ id: alias.id, src: alias.src,
+          title: "Saved", instruction: "Saved", result: "Saved", alt: "Saved" }] };
+        assert.deepEqual(visibleGuideVisuals([retired], catalog.articleById), []);
+        retiredContexts++;
+        continue;
+      }
       const canonical = documentationSectionMedia(section).find(item => matchesHistoricalGuideMedia(context.articleId, context.sectionId, alias, item))!;
       assert.ok(canonical, alias.src);
       const supplied = { ...canonical, id: alias.id, src: alias.src, title: "Untrusted saved title", alt: "Untrusted alt" };
@@ -64,8 +77,10 @@ test("all 20 explicitly retained screenshot tuples resolve to current canonical 
       assert.equal(visible[0].steps[0].image.src, canonical.src);
       assert.equal(visible[0].steps[0].image.alt, canonical.alt); assert.equal(visible[0].steps[0].title, canonical.title);
       assert.ok(visible[0].steps[0].image.width > 0); assert.ok(visible[0].steps[0].image.height > 0);
+      retainedContexts++;
     }
   }
+  assert.equal(retainedContexts, 18); assert.equal(retiredContexts, 4);
 });
 
 test("historical compatibility rejects changed IDs, URLs, locale, section and inaccessible articles", () => {

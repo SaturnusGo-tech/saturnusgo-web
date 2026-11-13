@@ -3,6 +3,7 @@ import test from "node:test";
 import { componentHarness, invoke, nodes } from "../../../../portfolios/tests/support/component-harness";
 import type { RunsView } from "../../RunsView";
 import { runScopeState } from "../../state/run-view-state";
+import { casePriority, executableSteps } from "../../../../helpers/cases/caseRevision";
 
 function setup() {
   const h = componentHarness(); let layout = "list"; let focused = false; const statuses: string[] = [];
@@ -12,7 +13,8 @@ function setup() {
     if (name.endsWith("useRunFocus")) return { useRunFocus: () => ({ focused, ready: true, toggle: () => { focused = !focused; } }) };
     if (name.endsWith("run-view-state")) return { runScopeState };
     if (name.endsWith("attempt-editing")) return { canEditRunAttempt: () => true };
-    if (name.endsWith("caseRevision")) return { executableSteps: (snapshot: { steps: unknown[] }) => snapshot.steps };
+    if (name.endsWith("caseRevision")) return { casePriority, executableSteps };
+    if (name.endsWith("useLoadingFeedback")) return { useLoadingFeedback: (pending: boolean) => pending };
     if (name.endsWith("labels")) return { localizedLabel: (_locale: string, value: string) => value };
     if (name.endsWith("executionStatus")) return { statusIcon: {} };
     if (name.endsWith("useRunKeyboardShortcuts")) return { useRunKeyboardShortcuts() {} };

@@ -104,14 +104,14 @@ test("failed save preserves the open draft and retry keeps the same operation ke
   await s.submit(s.rename("Retry this draft"));
   let tree = s.render();
   assert.equal(nameNode(tree).props.value, "Retry this draft");
-  assert.equal(tree.some(node => node.props.role === "alert"), true);
+  assert.equal(tree.some(node => node.type === "ErrorToast" && node.props.message === getProjectDialogCopy("en").projectError), true);
   assert.equal(saveNode(tree).props.disabled, false); assert.equal(s.saved.length, 0); assert.equal(s.cancelled(), 0);
   s.respond(async () => response("Retry this draft")); await s.submit(tree); tree = s.render();
   assert.equal(s.requests.length, 2);
   assert.ok(s.requests[0].options?.idempotencyKey);
   assert.equal(s.requests[0].options?.idempotencyKey, s.requests[1].options?.idempotencyKey);
   assert.equal(s.saved[0].project.name, "Retry this draft");
-  assert.equal(tree.some(node => node.props.role === "alert"), false);
+  assert.equal(tree.some(node => node.type === "ErrorToast" && node.props.message), false);
 });
 
 test("Escape dismisses an idle inline draft without saving", t => {

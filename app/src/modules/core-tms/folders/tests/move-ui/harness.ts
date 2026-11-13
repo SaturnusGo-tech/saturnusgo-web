@@ -44,6 +44,7 @@ export function casesMoveHarness(hiddenTree = false) {
   const { CasesView: View } = h.load<{ CasesView: typeof CasesView }>(new URL("../../../presentation/cases/CasesView.tsx", import.meta.url), name => {
     if (name.endsWith("useCasesViewController")) return { useCasesViewController: () => view };
     if (name.endsWith("useCaseBrowserFocus")) return { useCaseBrowserFocus: () => () => {} };
+    if (name.endsWith("useCasePanelExit")) return { useCasePanelExit: () => (close: () => void) => close() };
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en", languageTag: "en-US", t: (key: string) => key }) };
     return name === "react/jsx-runtime" ? { jsx, jsxs: jsx } : name.endsWith(".css") ? { default: proxy } : proxy;
   });

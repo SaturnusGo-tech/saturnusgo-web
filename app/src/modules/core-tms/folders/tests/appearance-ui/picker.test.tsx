@@ -6,11 +6,15 @@ import { act, create } from "react-test-renderer";
 import type { RepositoryFolder } from "../../model/folder";
 import type { useFolderAppearanceEditor } from "../../state/appearance-editor/useFolderAppearanceEditor";
 const require = createRequire(import.meta.url), oldCss = require.extensions[".css"], oldReact = Object.getOwnPropertyDescriptor(globalThis, "React");
+const emojiId = require.resolve("../../../presentation/common/emoji/EmojiPicker"), oldEmoji = require.cache[emojiId];
 const globals = ["window", "self"] as const, oldGlobals = globals.map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)] as const);
 let Picker: typeof import("../../presentation/appearance/picker/FolderAppearancePicker")["FolderAppearancePicker"];
 before(async () => { require.extensions[".css"] = module => { module.exports = {}; }; const events = new EventTarget(); const eventHost = { addEventListener: events.addEventListener.bind(events), removeEventListener: events.removeEventListener.bind(events), dispatchEvent: events.dispatchEvent.bind(events) }; Object.assign(globalThis, { React, window: eventHost, self: eventHost });
+  // These tests exercise icons/GIF/upload; native emoji browser initialization has its own boundary tests.
+  require.cache[emojiId] = { id: emojiId, filename: emojiId, loaded: true, exports: { EmojiPicker: () => null } } as NodeModule;
   ({ FolderAppearancePicker: Picker } = await import("../../presentation/appearance/picker/FolderAppearancePicker")); });
 after(() => { if (oldCss) require.extensions[".css"] = oldCss; else delete require.extensions[".css"];
+  if (oldEmoji) require.cache[emojiId] = oldEmoji; else delete require.cache[emojiId];
   if (oldReact) Object.defineProperty(globalThis, "React", oldReact); else Reflect.deleteProperty(globalThis, "React");
   for (const [key, descriptor] of oldGlobals) { if (descriptor) Object.defineProperty(globalThis, key, descriptor); else Reflect.deleteProperty(globalThis, key); } });
 

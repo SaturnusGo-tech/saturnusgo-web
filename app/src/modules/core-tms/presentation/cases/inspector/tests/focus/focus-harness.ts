@@ -43,6 +43,7 @@ export function focusHarness(initialVisible = true) {
       if (name === "react/jsx-runtime") return { jsx, jsxs: jsx };
       if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en", languageTag: "en-US", t: (key: string) => key }) };
       if (name.endsWith("useCaseBrowserFocus")) return { useCaseBrowserFocus: () => () => {} };
+      if (name.endsWith("useCasePanelExit")) return { useCasePanelExit: () => (close: () => void) => close() };
       if (name.endsWith("useCasesViewController")) return { useCasesViewController: () => view };
       if (name.endsWith(".css")) return { default: proxy };
       return proxy;

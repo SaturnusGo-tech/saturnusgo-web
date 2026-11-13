@@ -29,8 +29,13 @@ test("every documented article and section is addressable and all cross-links re
 });
 test("the built-in article catalog and walkthroughs contain English copy", () => {
   assert.doesNotMatch(JSON.stringify(docGroups), /[\u0400-\u04ff]/u);
+  // Walkthroughs preserve these actual saved record names rather than silently translating user data.
+  const savedNames: Record<string, readonly string[]> = {
+    portfolios: ["Руководство Falcon"], swagger: ["API заказов", "Кабинет хоста"],
+  };
   for (const article of docArticles) {
-    assert.doesNotMatch(JSON.stringify(article), /[\u0400-\u04ff]/u, article.id);
+    const copy = (savedNames[article.id] ?? []).reduce((text, name) => text.replaceAll(name, "Saved record name"), JSON.stringify(article));
+    assert.doesNotMatch(copy, /[\u0400-\u04ff]/u, article.id);
   }
 });
 test("all catalog services are documented with accurate implementation availability", () => {

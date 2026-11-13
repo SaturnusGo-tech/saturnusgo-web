@@ -31,8 +31,9 @@ test("suggestions submit immediately and are disabled during a response; reset a
   assert.equal(busySuggestion.props.disabled, true);
   chat.busy = false; chat.draft = "Retry question"; chat.error = "unavailable";
   invoke(all().find(node => node.props["aria-label"] === "New chat")!, "onClick"); assert.equal(resets, 1);
-  const retry = all().find(node => node.type === "button" && nodes(node).some(child => Array.isArray(child.props.children) && child.props.children.includes("Try again")))!;
-  invoke(retry, "onClick"); assert.equal(retries, 1);
+  const retry = all().find(node => node.type === "ErrorToast" && node.props.retryLabel === guideChatCopy.en.retry)!;
+  assert.equal(retry.props.message, guideChatCopy.en.unavailable);
+  invoke(retry, "onRetry"); assert.equal(retries, 1);
 });
 
 test("assistant sources open only verified internal article and section links", () => {

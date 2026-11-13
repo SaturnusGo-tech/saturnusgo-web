@@ -8,6 +8,7 @@ export function browserFocusHarness() {
   class Element {
     visible = true; isConnected = true; children: Element[] = []; focused = 0;
     getClientRects() { return this.visible && this.isConnected ? [{}] : []; }
+    getBoundingClientRect() { return { width: this.visible && this.isConnected ? 320 : 0 }; }
     contains(value: Element | null) { return value === this || this.children.includes(value!); }
     querySelector() { return this.children[0] ?? null; }
     focus() { this.focused++; document.activeElement = this; }
@@ -24,6 +25,7 @@ export function browserFocusHarness() {
   runInNewContext(ts.transpileModule(readFileSync(new URL("../../layout/useCaseBrowserFocus.ts", import.meta.url), "utf8"), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2021 },
   }).outputText, { module, exports: module.exports, document, HTMLElement: Element,
+    getComputedStyle: (element: Element) => ({ visibility: element.visible ? "visible" : "hidden" }),
     requestAnimationFrame: (fn: () => void) => { frames.set(++id, fn); return id; }, cancelAnimationFrame: (key: number) => frames.delete(key),
     ResizeObserver: class { constructor(private callback: () => void) {} observe() { observers.add(this.callback); } disconnect() { observers.delete(this.callback); } },
     require: () => ({ useRef(value: unknown) { const index = cursor++; slots[index] ??= { current: value }; return slots[index]; },

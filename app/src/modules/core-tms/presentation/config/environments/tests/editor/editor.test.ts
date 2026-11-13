@@ -26,7 +26,7 @@ test("edit uses freshly loaded data and ETag; retry preserves draft and operatio
   const name = tree.find(node => node.type === "input" && node.props["aria-label"] === "Name")!;
   assert.equal(name.props.value, "Fresh"); invoke(name, "onChange", { target: { value: "Renamed" } });
   tree = s.render(true); await invoke(tree.find(node => node.type === "form")!, "onSubmit", { preventDefault() {} });
-  tree = s.render(true); assert.equal(tree.some(node => node.props.role === "alert"), true);
+  tree = s.render(true); assert.equal(tree.some(node => node.type === "ErrorToast" && node.props.message === getEnvironmentDialogCopy("en").error), true);
   await invoke(tree.find(node => node.type === "form")!, "onSubmit", { preventDefault() {} });
   assert.equal(calls[0].etag, "etag-v2"); assert.equal(calls[0].name, "Renamed"); assert.equal(calls[0].operationKey, calls[1].operationKey); assert.ok(s.saved());
 });
@@ -34,5 +34,5 @@ test("failed version lookup never permits overwriting an environment", async () 
   let calls = 0; const s = setup(async () => { throw Error("unavailable"); }, async () => { calls++; });
   s.render(true); await tick(); const tree = s.render(true);
   await invoke(tree.find(node => node.type === "form")!, "onSubmit", { preventDefault() {} });
-  assert.equal(calls, 0); assert.equal(tree.some(node => node.props.role === "alert"), true);
+  assert.equal(calls, 0); assert.equal(tree.some(node => node.type === "ErrorToast" && node.props.message === getEnvironmentDialogCopy("en").error), true);
 });

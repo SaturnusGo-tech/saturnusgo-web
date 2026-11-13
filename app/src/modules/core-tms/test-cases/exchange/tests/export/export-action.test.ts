@@ -2,7 +2,11 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import type { ExportCasesAction } from "../../library/presentation/export/ExportCasesAction";
 import { componentHarness, invoke, nodes } from "../../../../portfolios/tests/support/component-harness";
-import { AnchoredSelect } from "../../../../../../shared/components/anchored-popup/select/AnchoredSelect";
+
+const originalCss = require.extensions[".css"];
+require.extensions[".css"] = (module: NodeModule) => { module.exports = { entrance: "entrance" }; };
+const { AnchoredSelect } = require("../../../../../../shared/components/anchored-popup/select/AnchoredSelect") as typeof import("../../../../../../shared/components/anchored-popup/select/AnchoredSelect");
+if (originalCss) require.extensions[".css"] = originalCss; else delete require.extensions[".css"];
 
 const projects = [{ id: "a", key: "A", name: "Alpha" }, { id: "b", key: "B", name: "Другой проект" }];
 function fixture(ru = false, disabled = false, initial = projects[0], reducedMotion = false) {

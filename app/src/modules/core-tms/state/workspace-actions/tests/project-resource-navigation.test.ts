@@ -10,6 +10,7 @@ import { mergeProjectCollections, type ProjectCollections } from "../../workspac
 import { createWorkspaceRequests } from "../../workspace/requests/workspace-requests";
 import { resolveSelectedCase } from "../../../test-cases/navigation/selection/selected-case";
 import { defaultWorkingRun } from "../../../runs/model/history/run-history";
+import { casePriority } from "../../../helpers/cases/caseRevision";
 
 type Pending<T> = { id: string; signal: AbortSignal; resolve: (value: T) => void; reject: (error: Error) => void };
 const emptyCollections: ProjectCollections = { testCases: [], runs: [], suites: [], environments: [], defects: [], externalLinks: [] };
@@ -39,6 +40,7 @@ function harness() {
     if (name.endsWith("project-collections")) return { mergeProjectCollections };
     if (name.endsWith("selected-case")) return { resolveSelectedCase };
     if (name.endsWith("run-history")) return { defaultWorkingRun };
+    if (name.endsWith("caseRevision")) return { casePriority };
     if (name.endsWith("workspace-api")) return {
       loadProjectCollections: (_http: unknown, id: string, signal: AbortSignal) => new Promise<ProjectCollections>((resolve, reject) => collections.push({ id, signal, resolve, reject })),
     };

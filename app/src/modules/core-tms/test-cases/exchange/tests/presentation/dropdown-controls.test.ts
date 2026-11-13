@@ -1,11 +1,15 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { AnchoredSelect } from "../../../../../../shared/components/anchored-popup/select/AnchoredSelect";
-import { AnchoredAutocomplete } from "../../../../../../shared/components/anchored-popup/autocomplete/AnchoredAutocomplete";
 import { componentHarness, invoke, nodes } from "../../../../portfolios/tests/support/component-harness";
 import type { ImportDestination } from "../../library/presentation/destination/ImportDestination";
 import type { ImportHistoryPage } from "../../library/presentation/history/ImportHistoryPage";
 import { importCopy } from "../../localization/import-copy";
+
+const originalCss = require.extensions[".css"];
+require.extensions[".css"] = (module: NodeModule) => { module.exports = { entrance: "entrance" }; };
+const { AnchoredSelect } = require("../../../../../../shared/components/anchored-popup/select/AnchoredSelect") as typeof import("../../../../../../shared/components/anchored-popup/select/AnchoredSelect");
+const { AnchoredAutocomplete } = require("../../../../../../shared/components/anchored-popup/autocomplete/AnchoredAutocomplete") as typeof import("../../../../../../shared/components/anchored-popup/autocomplete/AnchoredAutocomplete");
+if (originalCss) require.extensions[".css"] = originalCss; else delete require.extensions[".css"];
 
 const projects = [{ id: "a", key: "A", name: "Alpha" }, { id: "b", key: "B", name: "Другой проект" }];
 const resolve = (name: string) => {
