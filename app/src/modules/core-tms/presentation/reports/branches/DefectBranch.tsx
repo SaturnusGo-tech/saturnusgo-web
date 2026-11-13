@@ -15,7 +15,7 @@ export function DefectBranch({ group, branch, expanded, workspaceId, selectedDef
   expanded: boolean; workspaceId?: string; selectedDefectId: string | null;
   onToggle: () => void; onSelectDefect: (id: string) => void; onLoadMore: () => void; onRetry: () => void;
 }) {
-  const { locale, t } = useTmsLocale();
+  const { locale } = useTmsLocale();
   const id = useId();
   const reduced = useReducedMotion();
   const label = localizedComponentLabel(locale, group.component) || (locale === "ru" ? "Без компонента" : "No component");
@@ -25,9 +25,6 @@ export function DefectBranch({ group, branch, expanded, workspaceId, selectedDef
       <ChevronRight size={14} className={styles.chevron} data-expanded={expanded || undefined} aria-hidden="true" />
       {expanded ? <FolderOpen size={15} className={styles.folderIcon} aria-hidden="true" /> : <Folder size={15} className={styles.folderIcon} aria-hidden="true" />}
       <span className={styles.folderLabel} title={label}>{label}</span>
-      {group.open > 0 && <span className={styles.openCount}>{group.open} {t("reports.openShort")}</span>}
-      {group.critical > 0 && <span className={styles.critical} title={locale === "ru" ? "Открытые критические баги" : "Open critical bugs"}>{group.critical} {t("reports.criticalShort")}</span>}
-      <span className={styles.count} title={locale === "ru" ? "Всего баг-репортов" : "Total bug reports"}>{group.total}</span>
     </button>
     <AnimatePresence initial={false}>
       {expanded && <motion.div id={id} initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}

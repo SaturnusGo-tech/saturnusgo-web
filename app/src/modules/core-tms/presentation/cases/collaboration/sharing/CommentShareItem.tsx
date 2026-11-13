@@ -1,5 +1,7 @@
 import { Check, Link2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { writeClipboardText } from "../../../../../../shared/lib/clipboard";
+import { showErrorToast } from "../../../common/error/ErrorToast";
 import css from "./sharing.module.css";
 
 export function CommentShareItem({ ru, link, compact = false, resource = "comment", visibleLabel }: {
@@ -20,10 +22,12 @@ export function CommentShareItem({ ru, link, compact = false, resource = "commen
   async function share() {
     const value = link();
     try {
-      await navigator.clipboard.writeText(value);
+      await writeClipboardText(value);
       setCopied(true); setFallback("");
     } catch {
-      setFallback(value);
+      setCopied(false);
+      setFallback(resource === "defect" ? "" : value);
+      if (resource === "defect") showErrorToast({ message: ru ? "Не удалось скопировать ссылку" : "Couldn’t copy the bug report link" });
     }
   }
   return <span ref={container} className={compact ? css.compact : undefined}>

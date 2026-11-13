@@ -5,6 +5,7 @@ import { componentHarness, invoke, nodes } from "../../../../portfolios/tests/su
 import { localizedLabel } from "../../../../localization/format/labels";
 import type { DefectReportHeader } from "../../detail/header/DefectReportHeader";
 import type { DefectRetest } from "../../../../runs/verification/state/defect/useDefectRetest";
+import { buildDefectDeepLink } from "../../../../defects/navigation/defect-deep-link";
 
 const defect = { id: "private-defect-id", projectId: "project", key: "GUIDE-BUG-2", title: "Balance stays unchanged",
   status: "verified", createdAt: "2026-11-13T09:00:00Z", archivedAt: null } as Defect;
@@ -15,6 +16,7 @@ function setup(locale: "ru" | "en", input = defect, reducedMotion = false) {
     new URL("../../detail/header/DefectReportHeader.tsx", import.meta.url), name => {
       if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale, t: (key: string) => key }) };
       if (name.endsWith("labels")) return { localizedLabel };
+      if (name.endsWith("defect-deep-link")) return { buildDefectDeepLink };
       if (name === "framer-motion") return { useReducedMotion: () => reducedMotion };
       return undefined;
     });
@@ -86,4 +88,15 @@ test("header tabs respect reduced motion", () => {
   const f = setup("en", defect, true);
   assert.equal(f.tree.find(node => node.type === "Tabs")?.props.disableAnimation, true);
   f.h.dispose();
+});
+
+test("copying a report preserves its company, project and archived-resource scope", () => {
+  for (const archivedAt of [null, "2026-11-13T10:00:00Z"]) {
+    const f = setup("en", { ...defect, archivedAt });
+    f.h.navigate("https://company.falcon.example/work/?workspaceId=stale&view=cases&projectId=other&caseId=case-1#old");
+    const share = f.tree.find(node => node.type === "CommentShareItem")!;
+    const actual = (share.props.link as () => string)();
+    assert.equal(actual, "https://company.falcon.example/work/?workspaceId=workspace&projectId=project&view=reports&defectId=private-defect-id" + (archivedAt ? "&archivedDefect=true" : ""));
+    f.h.dispose();
+  }
 });

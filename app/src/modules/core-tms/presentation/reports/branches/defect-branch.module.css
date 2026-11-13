@@ -6,8 +6,6 @@
 .chevron[data-expanded] { transform: rotate(90deg); }
 .folderIcon { flex: none; color: var(--falcon-icon-muted); }
 .folderLabel { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 550; }
-.count, .openCount, .critical { flex: none; color: var(--falcon-text-muted); font-size: 11px; font-variant-numeric: tabular-nums; }
-.count { min-width: 20px; text-align: end; }
 .reveal { overflow: hidden; }
 .children { display: grid; gap: 4px; list-style: none; margin: 0; margin-inline-start: 16px; padding: 4px 0 0; padding-inline-start: 18px; }
 .children > li { position: relative; min-width: 0; }
@@ -52,7 +50,6 @@
 .skeleton span { height: 34px; max-width: 640px; border-radius: 7px; background: linear-gradient(100deg,var(--falcon-panel) 25%,var(--falcon-hover) 48%,var(--falcon-panel) 72%); background-size: 220% 100%; animation: shimmer 1.5s ease infinite; }
 @keyframes shimmer { to { background-position: -220% 0; } }
 @container (max-width: 380px) {
-  .openCount { display: none; }
   .leaf .row { grid-template-columns: 16px minmax(0, 1fr) 20px; padding-inline: 6px; column-gap: 6px; }
 }
 @media (prefers-reduced-motion: reduce) { .skeleton span { animation: none; } .chevron, .leaf .row { transition: none; } }
