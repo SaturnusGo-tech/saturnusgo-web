@@ -14,7 +14,7 @@ export function DefectRow({ defect, selected, onSelect }: {
   const priority = priorityLabel(locale, defect.priority);
   const status = localizedLabel(locale, defect.status);
   return <li className={styles.leaf}>
-    <Button type="button" size="sm" variant="light" className={styles.row} data-defect-row data-selected={selected || undefined}
+    <Button type="button" size="sm" variant="light" disableRipple className={styles.row} data-defect-row data-selected={selected || undefined}
       onPress={() => onSelect(defect.id)} aria-current={selected ? "page" : undefined}>
       <span className={styles.priority} role="img" aria-label={priority} title={priority}>
         <PriorityIcon level={defect.priority} empty="circle" size={14} />
