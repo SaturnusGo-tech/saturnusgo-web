@@ -1,0 +1,10 @@
+.trigger { display: grid; place-items: center; flex: none; width: 28px; min-width: 28px; height: 28px; min-height: 28px; padding: 0; border: 1px solid var(--falcon-border); border-radius: 50%; color: var(--falcon-icon); background: var(--falcon-control); }
+.trigger[data-tree] { border-color: transparent; background: transparent; border-radius: 7px; }
+.trigger:is(:hover, [aria-expanded="true"]) { color: var(--falcon-text); background: var(--falcon-hover); }
+.trigger:focus-visible { outline: 1px solid var(--falcon-focus); outline-offset: 1px; }
+.menu { width: max-content; min-width: 195px; max-width: min(285px, calc(100vw - 24px)); padding: 6px; border: 1px solid var(--falcon-border); border-radius: 11px; background: var(--falcon-elevated); color: var(--falcon-text); box-shadow: var(--falcon-shadow-popover); font-size: 13px; }
+.list { display: grid; gap: 2px; margin: 0; padding: 0; }
+.item { display: flex; align-items: center; gap: 9px; width: 100%; min-height: 33px; padding: 5px 8px; border-radius: 6px; font: inherit; color: inherit; }
+.title { white-space: normal; overflow-wrap: anywhere; }
+.item:is([data-hover="true"], [data-focus-visible="true"]) { background: var(--falcon-selected); }
+.destructive { color: var(--falcon-danger); }

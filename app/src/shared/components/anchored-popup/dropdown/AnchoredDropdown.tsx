@@ -5,6 +5,6 @@ import { anchoredPopupMotion } from "../motion/anchored-popup-motion";
 
 export function AnchoredDropdown(props: DropdownProps) {
   const reduced = useReducedMotion();
-  return <Dropdown {...props} disableAnimation={reduced ? true : props.disableAnimation}
+  return <Dropdown {...props} triggerScaleOnOpen={false} disableAnimation={reduced ? true : props.disableAnimation}
     motionProps={anchoredPopupMotion(props.motionProps)}/>;
 }

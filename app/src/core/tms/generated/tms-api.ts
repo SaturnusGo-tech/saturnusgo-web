@@ -7464,6 +7464,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/workspaces/{workspaceId}/projects/{projectId}/product-docs/{docId}/delete": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Logically remove a page or folder and all descendants, including independently archived branches. Requires workspace administrator or QA manager. Never purges immutable publications or pinned run evidence; exact published versions remain read-only. Pass current lifecycleVersion as expectedDraftVersion. */
+        post: operations["deleteProductDoc"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -13451,6 +13475,13 @@ export interface components {
                 id: string;
                 title: string;
             }[];
+            /** @description Current server lifecycle version for archive or delete concurrency; independent of the selected published draft. */
+            lifecycleVersion: number;
+            /**
+             * Format: date-time
+             * @description Present only on retained exact published history after logical removal; all mutation capabilities are false.
+             */
+            deletedAt?: string;
         };
         ProductDocSection: {
             id: string;
@@ -13486,6 +13517,15 @@ export interface components {
                 created?: components["schemas"]["ProductDocActivityEvent"];
                 published?: components["schemas"]["ProductDocActivityEvent"];
             };
+            /** @description Current server lifecycle version for archive or delete concurrency; independent of the selected published draft. */
+            lifecycleVersion: number;
+            /**
+             * Format: date-time
+             * @description Present only on retained exact published history after logical removal; all mutation capabilities are false.
+             */
+            deletedAt?: string;
+            canArchive: boolean;
+            canDelete: boolean;
         };
         ProductDocActivityEvent: {
             identityId: string;
@@ -13498,6 +13538,8 @@ export interface components {
             nextCursor: string | null;
             canEdit: boolean;
             canPublish: boolean;
+            canArchive: boolean;
+            canDelete: boolean;
         };
         ProductDocDiagramInput: {
             /** @description The process to diagram, without leading or trailing whitespace. */
@@ -13748,6 +13790,13 @@ export interface components {
             category: components["schemas"]["NotificationCategory"];
             labelRu: string;
             labelEn: string;
+        };
+        ProductDocDeleteResult: {
+            draftVersion: number;
+            /** Format: date-time */
+            deletedAt: string;
+            /** @description Number of current or archived documents logically removed in this branch. Immutable publications and run evidence are retained. */
+            affectedCount: number;
         };
     };
     responses: {
@@ -30020,6 +30069,49 @@ export interface operations {
             429: components["responses"]["GifRateLimited"];
             500: components["responses"]["InternalError"];
             503: components["responses"]["GifUnavailable"];
+        };
+    };
+    deleteProductDoc: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                docId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductDocLifecycleInput"];
+            };
+        };
+        responses: {
+            /** @description The branch was logically removed, or the identical request was replayed. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProductDocDeleteResult"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
         };
     };
 }

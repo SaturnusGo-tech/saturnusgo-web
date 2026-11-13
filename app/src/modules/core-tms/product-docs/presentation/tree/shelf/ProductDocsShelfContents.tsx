@@ -8,9 +8,10 @@ import type { useProductDocList } from "../../../state/tree/useProductDocList";
 import { ProductDocsArchive } from "../../archive/ProductDocsArchive";
 import { ReadState } from "../../status/ReadState";
 import { ProductDocsOverview } from "../ProductDocsOverview";
+import type { ProductDocLifecycleContext } from "../../../state/lifecycle/product-doc-lifecycle-context";
 
 export function ProductDocsShelfContents({ api, scope, copy, locale, projectName, shelf, project,
-  recent, starred, canArchive, refresh, onChanged, onOpen, onBrowseRecent }: {
+  recent, starred, canArchive, refresh, onChanged, onOpen, onBrowseRecent, lifecycle }: {
   api: ProductDocsApi;
   scope: ProductDocScope;
   copy: ProductDocsCopy;
@@ -21,12 +22,13 @@ export function ProductDocsShelfContents({ api, scope, copy, locale, projectName
   recent: readonly string[];
   starred: readonly string[];
   canArchive: boolean;
+  lifecycle: ProductDocLifecycleContext;
   refresh: number;
   onChanged(): void;
   onOpen(node: ProductDocNode, caseId?: string): void;
   onBrowseRecent(): void;
 }) {
-  if (shelf === "archive" && canArchive) return <ProductDocsArchive api={api} scope={scope} copy={copy} refresh={refresh} onChanged={onChanged} />;
+  if (shelf === "archive" && canArchive) return <ProductDocsArchive api={api} scope={scope} copy={copy} refresh={refresh} onChanged={onChanged} lifecycle={lifecycle} />;
   if (!project.data || (project.error && !project.data.nodes.length)) {
     return <ReadState copy={copy} status={project.loading ? "loading" : "error"} retry={project.retry} />;
   }

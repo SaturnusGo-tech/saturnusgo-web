@@ -1,14 +1,12 @@
 "use client";
 
 import type { MDXEditorMethods } from "@mdxeditor/editor";
-import { useImperativeHandle, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import { useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import type { TmsLocale } from "../../../localization/model/locale";
 import { productDocSaveError } from "./actions/navigation/productDocSaveError";
 import { emptyProductDocTaxonomy } from "../../domain/product-doc-taxonomy";
-import type { ProductDocDetail, ProductDocScope, ProductDocsApi } from "../../domain/product-docs";
-import { productDocsCopy, type ProductDocsCopy } from "../../localization/copy";
-import { productDocDraftKey, type ProductDocDraftBuffer } from "../../state/draft/draft-buffer";
+import { productDocsCopy } from "../../localization/copy";
+import { productDocDraftKey } from "../../state/draft/draft-buffer";
 import { useProductDocMarkdownImport } from "./import/useProductDocMarkdownImport";
 import { useBufferedProductDocDraft } from "../../state/draft/buffer/useBufferedProductDocDraft";
 import { ProductDocReviewAction } from "../review/ProductDocReviewAction";
@@ -18,27 +16,14 @@ import { ProductDocPublishPreview } from "./impact/ProductDocPublishPreview";
 import { DraftActions } from "./actions/DraftActions";
 import { changeTitleHighlights, trimTitleHighlights } from "./title/model/productDocTitleHighlights";
 import styles from "./editor.module.css";
+import type { ProductDocDraftProps } from "./model/product-doc-draft-props";
+import { ProductDocItemMenu } from "../lifecycle/menu/ProductDocItemMenu";
 import { ProductDocRelatedCases } from "../related-cases/ProductDocRelatedCases";
 import { ProductDocDraftSurface } from "./surface/ProductDocDraftSurface";
 import { editorMarkdownToSections, sectionsToEditorMarkdown } from "./sections/productDocMarkdown";
-export type RequestNewProductDoc = (create: () => void) => void;
+export type { RequestNewProductDoc } from "./model/product-doc-draft-props";
 
-export function ProductDocDraft({ api, scope, document, copy, locale, drafts, editorActionsRef, requestNewPageRef, projectName, subdocs, onClose, onSaved, onPublished, onOpenCase }: {
-  api: ProductDocsApi;
-  scope: ProductDocScope;
-  document: ProductDocDetail;
-  copy: ProductDocsCopy;
-  projectName: string;
-  subdocs?: ReactNode;
-  locale: TmsLocale;
-  onClose(): void;
-  onSaved(): void;
-  onPublished(): void;
-  onOpenCase?(location: { projectId: string; caseId: string }): void;
-  drafts: ProductDocDraftBuffer;
-  editorActionsRef?: RefObject<HTMLDivElement | null>;
-  requestNewPageRef?: RefObject<RequestNewProductDoc | null>;
-}) {
+export function ProductDocDraft({ api, scope, document, copy, locale, drafts, editorActionsRef, requestNewPageRef, projectName, subdocs, onClose, onSaved, onPublished, onOpenCase, lifecycle }: ProductDocDraftProps) {
   const ru = locale === "ru";
   const folder = document.kind === "folder";
   const bufferKey = productDocDraftKey(scope, document.id);
@@ -155,6 +140,7 @@ export function ProductDocDraft({ api, scope, document, copy, locale, drafts, ed
     review={!folder && document.canEdit && <ProductDocReviewAction target={{ ...scope, docId: document.id }} locale={locale}
       source={{ kind: "draft", draftVersion: baseline.version, dirty: dirty || !baseline.title.trim(),
         canPublish: document.canPublish, sections: baseline.sections }} disabled={busy || mediaBusy} />}
+    lifecycle={lifecycle && <ProductDocItemMenu context={lifecycle} node={document} permissions={document} disabled={busy || mediaBusy} />}
     canPublish={!folder && document.canPublish} publishLabel={publishLabel}
     canSave={!busy && !mediaBusy && dirty && valid} canSubmit={!busy && !mediaBusy && canPublish}
     onSave={(publish) => { void save(publish); }}

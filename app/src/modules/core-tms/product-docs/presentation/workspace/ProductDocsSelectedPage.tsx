@@ -10,14 +10,16 @@ import { ProductDocRelatedCases } from "../related-cases/ProductDocRelatedCases"
 import { ProductDocArticle } from "../article/ProductDocArticle";
 import { ProductDocDraft, type RequestNewProductDoc } from "../draft/ProductDocDraft";
 import { ProductDocSectionContents } from "../tree/sections/ProductDocSectionContents";
+import type { ProductDocLifecycleContext } from "../../state/lifecycle/product-doc-lifecycle-context";
 
 export function ProductDocsSelectedPage({ api, scope, locale, copy, page, selection, editing, projectName,
   drafts, editorActionsRef, requestNewPageRef, refresh, canEdit, starred, folderCreation, subdocs, context,
-  onCloseDraft, onSaved, onOpen, onSelectSection, onOpenCase }: {
+  onCloseDraft, onSaved, onOpen, onSelectSection, onOpenCase, lifecycle }: {
   api: ProductDocsApi;
   scope: ProductDocScope;
   locale: TmsLocale;
   copy: ProductDocsCopy;
+  lifecycle?: ProductDocLifecycleContext;
   page: ProductDocDetail;
   selection: ProductDocSelection;
   editing: boolean;
@@ -43,7 +45,7 @@ export function ProductDocsSelectedPage({ api, scope, locale, copy, page, select
   </> : subdocs;
   if (editing) return <ProductDocDraft key={page.id} api={api} scope={scope} document={page} locale={locale}
     copy={copy} projectName={projectName ?? copy.title} subdocs={articleFooter} drafts={drafts}
-    editorActionsRef={editorActionsRef} requestNewPageRef={requestNewPageRef}
+    editorActionsRef={editorActionsRef} requestNewPageRef={requestNewPageRef} lifecycle={lifecycle}
     onClose={() => onCloseDraft()} onPublished={() => onCloseDraft(true)} onSaved={onSaved} onOpenCase={onOpenCase} />;
   if (page.kind === "folder") return <ProductDocSectionContents api={api} scope={scope} node={page}
     copy={copy} locale={locale} refresh={refresh} draft={canEdit} starred={starred} onOpen={onOpen} createPage={folderCreation} />;

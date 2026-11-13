@@ -13,13 +13,16 @@ import { ProductDocSectionIcon } from "../tree/appearance/ProductDocSectionIcon"
 import shelf from "../tree/shelves/shelves.module.css";
 import shared from "../product-docs.module.css";
 import styles from "./archive.module.css";
+import { ProductDocItemMenu } from "../lifecycle/menu/ProductDocItemMenu";
+import type { ProductDocLifecycleContext } from "../../state/lifecycle/product-doc-lifecycle-context";
 
-export function ProductDocsArchive({ api, scope, copy, refresh, onChanged }: {
+export function ProductDocsArchive({ api, scope, copy, refresh, onChanged, lifecycle }: {
   api: ProductDocsApi;
   scope: ProductDocScope;
   copy: ProductDocsCopy;
   refresh: number;
   onChanged(): void;
+  lifecycle?: ProductDocLifecycleContext;
 }) {
   const list = useProductDocList(api, scope, { archived: true, refresh });
   const heading = useId();
@@ -73,6 +76,8 @@ export function ProductDocsArchive({ api, scope, copy, refresh, onChanged }: {
             onClick={() => void restore(node)}>
             <RotateCcw size={14} aria-hidden="true" />{busy === node.id ? copy.saving : copy.restore}
           </button>}
+          {lifecycle && <ProductDocItemMenu context={lifecycle} node={node} permissions={list.data ?? {}}
+            disabled={Boolean(busy) || list.loading || list.error} />}
         </li>)}
       </ul>}
       {list.error || (list.loading && !nodes.length)

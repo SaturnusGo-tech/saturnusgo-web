@@ -68,6 +68,23 @@ test("generic item and selection APIs remain typed and controlled for Select and
   assert.deepEqual(changes, ["new-id", "new-id", "Changed search"]);
 });
 
+test("anchored dropdowns keep trigger geometry fixed without changing caller scroll-block policy", async () => {
+  let view!: ReactTestRenderer;
+  const render = (triggerScaleOnOpen?: boolean, shouldBlockScroll?: boolean) => <AnchoredDropdown
+    triggerScaleOnOpen={triggerScaleOnOpen} shouldBlockScroll={shouldBlockScroll}>{[]}</AnchoredDropdown>;
+  try {
+    await act(async () => { view = create(render() as unknown as RendererElement); });
+    const hero = () => view.root.find(node => typeof node.type === "string" && node.type.endsWith("-dropdown"));
+    assert.equal(hero().props.triggerScaleOnOpen, false, "the positioning anchor must never shrink on expansion");
+    assert.equal(hero().props.shouldBlockScroll, undefined, "preserve HeroUI's existing default");
+    for (const shouldBlockScroll of [false, true]) {
+      await act(async () => view.update(render(true, shouldBlockScroll) as unknown as RendererElement));
+      assert.equal(hero().props.triggerScaleOnOpen, false);
+      assert.equal(hero().props.shouldBlockScroll, shouldBlockScroll);
+    }
+  } finally { await act(async () => view?.unmount()); }
+});
+
 test("reduced motion wins while explicit top-level and nested instant modes retain their semantics", async () => {
   for (const [index, Component] of components.entries()) {
     const Control = Component as React.ElementType;

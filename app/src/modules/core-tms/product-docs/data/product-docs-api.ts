@@ -49,6 +49,11 @@ export function createProductDocsApi(http: TmsHttpClient): ProductDocsApi {
     setArchived: (scope, id, archived, input) => http.mutate<Contract["ProductDocArchiveResult"]>(
       docPath(scope, id) + (archived ? "/archive" : "/restore"), "POST", input satisfies Contract["ProductDocLifecycleInput"],
     ),
+    async delete(scope, id, input, options) {
+      return (await http.mutateResource<Contract["ProductDocDeleteResult"]>(
+        docPath(scope, id) + "/delete", "POST", input satisfies Contract["ProductDocLifecycleInput"], options,
+      )).data;
+    },
     setAppearance: (scope, id, input) => http.mutate<Contract["ProductDocDraftVersion"]>(
       docPath(scope, id) + "/appearance", "PATCH", input satisfies Contract["ProductDocAppearanceInput"],
     ),

@@ -7,7 +7,7 @@ export function createDocsMoveFixture(ru: boolean, log: (message: string) => voi
   const t = (en: string, russian: string) => ru ? russian : en;
   const node = (id: string, parentId: string | null, kind: ProductDocNode["kind"], title: string,
     appearance?: ProductDocNode["appearance"]): ProductDocDetail => ({ id, parentId, kind, title, appearance,
-    draftVersion: 3, publishedVersion: 2, version: null, canEdit: true, canPublish: true, sections: [] });
+    draftVersion: 3, lifecycleVersion: 3, publishedVersion: 2, version: null, canEdit: true, canPublish: true, canArchive: true, canDelete: true, sections: [] });
   const docs = [
     node("platform", null, "folder", t("Product architecture", "Архитектура продукта"), { kind: "icon", iconId: "compass", color: "#5797F6" }),
     node("current", "platform", "folder", t("Host calendar and bookings", "Календарь хоста и бронирования"), { kind: "icon", iconId: "calendar", color: "#7D75ED" }),
@@ -36,7 +36,7 @@ export function createDocsMoveFixture(ru: boolean, log: (message: string) => voi
   };
   const unavailable = async (): Promise<never> => { throw new Error("This local fixture supports reading and moving documents only."); };
   const api: ProductDocsApi = {
-    create: unavailable, save: unavailable, publish: unavailable, setArchived: unavailable, setAppearance: unavailable,
+    create: unavailable, save: unavailable, publish: unavailable, setArchived: unavailable, delete: unavailable, setAppearance: unavailable,
     listComments: unavailable, postComment: unavailable, getImpact: unavailable, listArticleCases: unavailable,
     listCaseRequirements: unavailable, listRunRequirements: unavailable, linkRequirement: unavailable, unlinkRequirement: unavailable,
     async availability(scope) { validScope(scope); return true; },
@@ -46,7 +46,7 @@ export function createDocsMoveFixture(ru: boolean, log: (message: string) => voi
       const rows = docs.filter(item => item.parentId === parentId), pageSize = parentId === null ? 3 : 40;
       log(`List ${parentId ?? "root"} · page ${Math.floor(offset / pageSize) + 1}`);
       return { nodes: rows.slice(offset, offset + pageSize), nextCursor: offset + pageSize < rows.length ? String(offset + pageSize) : null,
-        canEdit: true, canPublish: true };
+        canEdit: true, canPublish: true, canArchive: true, canDelete: true };
     },
     async get(scope, id, options) {
       validScope(scope); options?.signal?.throwIfAborted();
@@ -69,7 +69,7 @@ export function createDocsMoveFixture(ru: boolean, log: (message: string) => voi
         throw Object.assign(new Error("Parent must be published"), { code: "PRODUCT_DOC_PARENT_UNPUBLISHED" });
       }
       await new Promise(resolve => setTimeout(resolve, 300));
-      page.parentId = input.parentId; page.draftVersion += 1;
+      page.parentId = input.parentId; page.draftVersion += 1; page.lifecycleVersion = page.draftVersion;
       log(`Memory only: moved ${page.id} → ${input.parentId ?? "root"}`);
       return { draftVersion: page.draftVersion };
     },

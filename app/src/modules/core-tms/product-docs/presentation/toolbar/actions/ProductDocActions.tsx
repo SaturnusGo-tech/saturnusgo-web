@@ -3,14 +3,15 @@ import { AnchoredDropdown as Dropdown } from "../../../../../../shared/component
 import { AnchoredPopover as Popover } from "../../../../../../shared/components/anchored-popup/popover/AnchoredPopover";
 
 import { addToast, Button, DropdownItem, DropdownMenu, DropdownTrigger, Input, PopoverContent } from "@heroui/react";
-import { Archive, Clock3, Download, Ellipsis, FolderInput, Link2, MessageSquare, Pencil, Star } from "lucide-react";
+import { Clock3, Download, FolderInput, Link2, MessageSquare, Pencil, Star } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { writeClipboardText } from "../../../../../../shared/lib/clipboard";
 import type { TmsLocale } from "../../../../localization/model/locale";
 import type { ProductDocDetail, ProductDocNode, ProductDocsApi, ProductDocScope } from "../../../domain/product-docs";
 import type { ProductDocsCopy } from "../../../localization/copy";
 import { MoveProductDoc } from "../MoveProductDoc";
-import { ArchiveProductDoc } from "../../archive/ArchiveProductDoc";
+import { ProductDocItemMenu } from "../../lifecycle/menu/ProductDocItemMenu";
+import type { ProductDocLifecycleContext } from "../../../state/lifecycle/product-doc-lifecycle-context";
 import { ProductDocReviewAction } from "../../review/ProductDocReviewAction";
 import { ProductDocSectionAppearance } from "../../tree/appearance/ProductDocSectionAppearance";
 import { exportProductDocHeading } from "../../draft/sections/productDocMarkdown";
@@ -24,6 +25,7 @@ type Props = {
   path?: readonly ProductDocNode[];
   copy: ProductDocsCopy;
   locale: TmsLocale;
+  lifecycle: ProductDocLifecycleContext;
   starred: boolean;
   showDiscussion: boolean;
   onDiscussion(): void;
@@ -31,15 +33,13 @@ type Props = {
   onStar(): void;
   onVersion(version?: number): void;
   onChanged(): void;
-  onArchived(): void;
 };
 
 export function ProductDocActions({
   api, scope, document: page, path, copy, locale, starred, showDiscussion,
-  onDiscussion, onEdit, onStar, onVersion, onChanged, onArchived,
+  onDiscussion, onEdit, onStar, onVersion, onChanged, lifecycle,
 }: Props) {
   const [moving, setMoving] = useState(false);
-  const [archiving, setArchiving] = useState(false);
   const [link, setLink] = useState("");
   const [limit, setLimit] = useState(20);
   const shareLink = useRef<HTMLInputElement>(null);
@@ -72,7 +72,6 @@ export function ProductDocActions({
       fill={starred ? "var(--product-doc-star)" : "none"} aria-hidden="true" />, run: onStar }] : []),
     ...(canChange && page.canPublish ? [{ key: "move", label: copy.move, icon: <FolderInput size={16} aria-hidden="true" />, run: () => setMoving(true) }] : []),
     ...(hasPublication ? [{ key: "export", label: copy.exportMarkdown, icon: <Download size={16} aria-hidden="true" />, run: () => downloadMarkdown(page) }] : []),
-    ...(canChange && page.canPublish ? [{ key: "archive", label: copy.archiveItem, icon: <Archive size={16} aria-hidden="true" />, run: () => setArchiving(true) }] : []),
   ];
   return <div className={styles.controls}>
     {canChange && page.kind === "folder" && <ProductDocSectionAppearance key={page.id} api={api}
@@ -117,27 +116,10 @@ export function ProductDocActions({
         <p className={styles.copyFallback}>{copy.copyLinkFailed}</p>
       </PopoverContent>
     </Popover>}
-    {pageActions.length > 0 && <Dropdown placement="bottom-end" classNames={menuClasses} shouldCloseOnScroll={false}>
-      <DropdownTrigger>
-        <Button isIconOnly size="sm" variant="light" className={styles.icon} ref={moreButton} aria-label={copy.pageActions}>
-          <Ellipsis size={18} aria-hidden="true" />
-        </Button>
-      </DropdownTrigger>
-      <DropdownMenu aria-label={copy.pageActions} classNames={listClasses} itemClasses={itemClasses}
-        onAction={(key) => pageActions.find((item) => item.key === key)?.run()}>
-        {pageActions.map((item) => <DropdownItem key={item.key} textValue={item.label} startContent={item.icon}>{item.label}</DropdownItem>)}
-      </DropdownMenu>
-    </Dropdown>}
+    <ProductDocItemMenu context={lifecycle} node={page} permissions={page} items={pageActions} buttonRef={moreButton} />
     {moving && <MoveProductDoc api={api} scope={scope} document={page} copy={copy} path={path} onMoved={onChanged}
       onClose={() => {
         setMoving(false);
-        moreButton.current?.focus({ preventScroll: true });
-      }} />}
-    {archiving && <ArchiveProductDoc api={api} scope={scope} node={page} copy={copy}
-      onArchived={() => { setArchiving(false); onArchived(); }}
-      onClose={(stale) => {
-        setArchiving(false);
-        if (stale) onChanged();
         moreButton.current?.focus({ preventScroll: true });
       }} />}
   </div>;

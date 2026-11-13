@@ -12,6 +12,8 @@ export interface ProductDocNode {
   kind: "folder" | "page";
   title: string;
   draftVersion: number;
+  /** Additive server metadata; absent values never authorize lifecycle actions. */
+  lifecycleVersion?: number;
   publishedVersion: number | null;
   archivedAt?: string | null;
   appearance?: FolderAppearance;
@@ -32,6 +34,8 @@ export interface ProductDocDetail extends ProductDocNode {
   version: number | null;
   canEdit: boolean;
   canPublish: boolean;
+  canArchive?: boolean;
+  canDelete?: boolean;
   titleHighlights?: ProductDocTitleHighlight[];
   properties?: ProductDocProperties;
   activity?: components["schemas"]["ProductDocDetail"]["activity"];
@@ -50,6 +54,8 @@ export interface ProductDocList {
   nextCursor: string | null;
   canEdit: boolean;
   canPublish: boolean;
+  canArchive?: boolean;
+  canDelete?: boolean;
 }
 export interface ProductDocRequirements { requirements: ProductDocRequirement[]; canEdit: boolean; nextCursor: string | null }
 export interface ProductDocComment {
@@ -76,6 +82,8 @@ export interface ProductDocsApi {
   setArchived(scope: ProductDocScope, docId: string, archived: boolean, input: {
     expectedDraftVersion: number;
   }): Promise<{ draftVersion: number; archivedAt: string | null; affectedCount: number }>;
+  delete(scope: ProductDocScope, docId: string, input: { expectedDraftVersion: number },
+    options: { idempotencyKey: string }): Promise<{ draftVersion: number; deletedAt: string; affectedCount: number }>;
   setAppearance(scope: ProductDocScope, docId: string, input: {
     appearance: FolderAppearance; expectedDraftVersion: number;
   }): Promise<{ draftVersion: number }>;

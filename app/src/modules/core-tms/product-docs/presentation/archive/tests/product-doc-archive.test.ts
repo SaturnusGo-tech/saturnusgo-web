@@ -6,8 +6,7 @@ import type { ProductDocDetail, ProductDocNode, ProductDocsApi } from "../../../
 import { productDocsCopy } from "../../../localization/copy";
 import type { useProductDocList } from "../../../state/tree/useProductDocList";
 import type { useProductDocResource } from "../../../state/useProductDocResource";
-import type { useProductDocSelection } from "../../../state/useProductDocSelection";
-import type { ArchiveProductDoc } from "../ArchiveProductDoc";
+import type { ProductDocLifecycleDialog } from "../../lifecycle/dialog/ProductDocLifecycleDialog";
 import type { ProductDocsArchive } from "../ProductDocsArchive";
 
 const scope = { workspaceId: "workspace", projectId: "project" };
@@ -24,19 +23,16 @@ test("archiving a published page confirms against the current draft version", as
   const resource = h.load<{ useProductDocResource: typeof useProductDocResource }>(
     new URL("../../../state/useProductDocResource.ts", import.meta.url),
   );
-  const selection = h.load<{ useProductDocSelection: typeof useProductDocSelection }>(
-    new URL("../../../state/useProductDocSelection.ts", import.meta.url),
-    (name) => name.endsWith("useProductDocResource") ? resource : undefined,
-  );
-  const { ArchiveProductDoc: View } = h.load<{ ArchiveProductDoc: typeof ArchiveProductDoc }>(
-    new URL("../ArchiveProductDoc.tsx", import.meta.url),
+  const { ProductDocLifecycleDialog: View } = h.load<{ ProductDocLifecycleDialog: typeof ProductDocLifecycleDialog }>(
+    new URL("../../lifecycle/dialog/ProductDocLifecycleDialog.tsx", import.meta.url),
     (name) => name === "@heroui/react" ? { Button: "Button" }
       : name.endsWith("product-doc-response") ? { productDocErrorCode }
-      : name.endsWith("useProductDocSelection") ? selection : undefined,
+      : name.endsWith("draft-buffer") ? { productDocDraftKey: (scope: { workspaceId: string; projectId: string }, id: string) => JSON.stringify([scope.workspaceId, scope.projectId, id]) }
+      : name.endsWith("useProductDocResource") ? resource : undefined,
   );
   const published: ProductDocNode = { ...node, kind: "page", publishedVersion: 1 };
-  const draft: ProductDocDetail = { ...published, title: "Updated checklist", draftVersion: 7,
-    sections: [], version: null, canEdit: true, canPublish: true };
+  const draft: ProductDocDetail = { ...published, title: "Updated checklist", draftVersion: 1,
+    lifecycleVersion: 7, sections: [], version: 1, canEdit: false, canPublish: false, canArchive: true };
   const reads: Parameters<ProductDocsApi["get"]>[] = [];
   const calls: Parameters<ProductDocsApi["setArchived"]>[] = [];
   let loadDraft!: (current: ProductDocDetail) => void;
@@ -53,16 +49,23 @@ test("archiving a published page confirms against the current draft version", as
   } as ProductDocsApi;
   let archived = 0;
   let closed = false;
-  const render = () => nodes(h.render(() => View({
-    api, scope, node: published, copy, onArchived: () => { archived++; }, onClose: () => { closed = true; },
-  })));
+  const render = () => {
+    const rendered = nodes(h.render(() => View({
+      context: { api, scope, copy, locale: "en", drafts: new Map(), onCompleted: () => { archived++; }, onChanged: () => {} },
+      node: published, mode: "archive", canEdit: false, onClose: () => { closed = true; },
+    })));
+    const modal = rendered.find(node => node.type === "ProductDocModal")!;
+    return typeof modal.props.children === "function" ? [...rendered, ...nodes(modal.props.children(() => {
+      if (!modal.props.busy) closed = true;
+    }))] : rendered;
+  };
   const findConfirm = (items: ReturnType<typeof render>) => items.find(
     (item) => item.type === "Button" && item.props.children === copy.archiveItem,
   );
   const initial = findConfirm(render());
   assert.ok(initial);
   assert.equal(initial.props.isDisabled, true);
-  assert.equal(reads[0][2]?.draft, true);
+  assert.equal(reads[0][2]?.draft, false, "readers must not request private draft content to archive a readable publication");
   invoke(initial, "onPress");
   assert.equal(calls.length, 0);
   loadDraft(draft);
@@ -81,7 +84,7 @@ test("archiving a published page confirms against the current draft version", as
   assert.equal(archived, 0);
   assert.equal(calls.length, 1);
   assert.deepEqual(calls[0].slice(0, 3), [scope, node.id, true]);
-  assert.equal(calls[0][3].expectedDraftVersion, draft.draftVersion);
+  assert.equal(calls[0][3].expectedDraftVersion, draft.lifecycleVersion);
   complete({ draftVersion: 8, archivedAt: "2026-11-08T00:00:00Z", affectedCount: 1 });
   await flush();
   assert.equal(archived, 1);

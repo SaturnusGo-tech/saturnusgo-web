@@ -10,7 +10,7 @@ import chrome from "../../product-docs.module.css";
 import styles from "../editor.module.css";
 import { ProductDocCodexAction } from "./codex/ProductDocCodexAction";
 
-export function DraftActions({ copy, locale, scope, folder, canPublish, publishLabel, canSave, canSubmit, busy, mediaBusy, saved, review, onSave, onClose }: {
+export function DraftActions({ copy, locale, scope, folder, canPublish, publishLabel, canSave, canSubmit, busy, mediaBusy, saved, review, lifecycle, onSave, onClose }: {
   copy: ProductDocsCopy;
   locale: TmsLocale;
   scope: ProductDocScope;
@@ -23,6 +23,7 @@ export function DraftActions({ copy, locale, scope, folder, canPublish, publishL
   mediaBusy: boolean;
   saved: boolean;
   review?: ReactNode;
+  lifecycle?: ReactNode;
   onSave(publish: boolean): void;
   onClose(): void;
 }) {
@@ -41,6 +42,7 @@ export function DraftActions({ copy, locale, scope, folder, canPublish, publishL
     </Button>
     {canPublish && <Button className={`${chrome.primary} ${styles.publish}`}
       isDisabled={!canSubmit} onPress={() => onSave(true)}>{publishLabel}</Button>}
+    {lifecycle}
     {folder ? <Button className={styles.saveDraft} isDisabled={busy} onPress={onClose}>{copy.cancel}</Button>
       : <ProductDocTooltip label={closeLabel}><Button isIconOnly className={styles.closeEditor} aria-label={closeLabel}
         isDisabled={busy} onPress={onClose}><X size={17} aria-hidden="true" /></Button></ProductDocTooltip>}

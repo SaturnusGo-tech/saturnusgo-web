@@ -88,7 +88,7 @@
 
 .row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) 28px 28px;
   min-height: 32px;
   min-width: 0;
   align-items: stretch;
@@ -97,13 +97,17 @@
 }
 
 .row:has(.sectionMark) {
-  grid-template-columns: 28px minmax(0, 1fr) auto;
+  grid-template-columns: 28px minmax(0, 1fr) 28px 28px;
   padding-inline-start: 3px;
 }
 
 .sectionMark {
   display: grid;
   place-items: center;
+}
+.itemActions { display: grid; place-items: center; min-inline-size: 28px; }
+@media (hover: hover) and (pointer: fine) {
+  .row:not(:hover):not(:focus-within) .itemActions :global([data-doc-item-menu]) { opacity: 0; }
 }
 
 .sectionMark + .node {

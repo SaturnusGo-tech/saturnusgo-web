@@ -20,7 +20,7 @@ const document: ProductDocDetail = { id: "doc", parentId: null, kind: "page", ti
   draftVersion: 2, publishedVersion: 1, version: null, sections: [{ id: "intro", title: "", markdown: "Current draft" }], canEdit: true, canPublish: true };
 type Host = Parameters<ReactTestRenderer["root"]["findByType"]>[0];
 const ui = { DraftActions: "draft-actions", ProductDocDraftNavigation: "draft-navigation", ProductDocDraftSurface: "draft-surface",
-  ProductDocRelatedCases: "related-cases", ProductDocReviewAction: "review-action", ProductDocPublishPreview: "publish-preview" };
+  ProductDocRelatedCases: "related-cases", ProductDocReviewAction: "review-action", ProductDocPublishPreview: "publish-preview", ProductDocItemMenu: "item-menu" };
 
 function loadDraft() {
   const module = { exports: {} };
@@ -74,6 +74,24 @@ async function beginPublish(t: TestContext) {
   await act(async () => renderer.root.findByType(ui.ProductDocPublishPreview as Host).props.onPublish(2));
   return { renderer, resolve, reject, attempts: () => attempts };
 }
+
+test("a fresh Untitled draft retains lifecycle actions while save and publish are unavailable", async t => {
+  const { ProductDocDraft } = loadDraft();
+  const api = {} as ProductDocsApi, drafts = new Map(), copy = productDocsCopy("en");
+  const fresh: ProductDocDetail = { ...document, title: copy.untitledPage, sections: [], draftVersion: 1,
+    lifecycleVersion: 1, publishedVersion: null, canArchive: true, canDelete: true };
+  let renderer!: ReactTestRenderer;
+  t.after(() => act(() => renderer.unmount()));
+  await act(async () => { renderer = create(<ProductDocDraft api={api} scope={scope} document={fresh} copy={copy} locale="en"
+    projectName="Project" drafts={drafts} lifecycle={{ api, scope, copy, locale: "en", drafts, onCompleted() {}, onChanged() {} }}
+    onSaved={() => {}} onClose={() => {}} onPublished={() => {}} />); });
+  const actions = renderer.root.findByType(ui.DraftActions as Host).props;
+  assert.equal(actions.canSave, false); assert.equal(actions.canSubmit, false);
+  assert.equal(actions.lifecycle.type, ui.ProductDocItemMenu);
+  assert.equal(actions.lifecycle.props.node, fresh);
+  assert.equal(actions.lifecycle.props.permissions.canArchive, true);
+  assert.equal(actions.lifecycle.props.disabled, false);
+});
 
 test("publish confirmation stays mounted and busy until publication replaces the editor", async t => {
   const { renderer, resolve } = await beginPublish(t);

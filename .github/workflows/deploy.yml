@@ -38,6 +38,9 @@ jobs:
       - name: Test anchored popup contracts
         run: npm run test:tms-overlays
 
+      - name: Test product documentation
+        run: npm run test:tms-product-docs
+
       - name: Test TMS Worker release controls
         run: npm run test:tms-worker
 
