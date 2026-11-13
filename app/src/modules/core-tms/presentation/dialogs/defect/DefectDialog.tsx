@@ -14,13 +14,14 @@ import { useYouTrackRouteOptions } from "../../../defects/presentation/use-youtr
 import { defectRouteChoices } from "../../../defects/presentation/defect-route-choices";
 import { getDefectDialogCopy } from "./copy";
 import { useDrawerDismiss } from "../../common/drawer/useDrawerDismiss";
+import type { DefectTraceabilityChoices } from "../defect-form/model";
 import type { DefectCaseSource } from "../../../defects/model/case-source";
 type DefectDialogProps = {
-  sourceCase?: DefectCaseSource;
+  sourceCase?: DefectCaseSource; traceability?: DefectTraceabilityChoices;
   workspaceId: string; projectId: string; run: TestRunSummary | null; item: RunItem | null; components: string[];
   offline: boolean; onClose: () => void; onCreated: (defect: Defect) => void;
 };
-export function DefectDialog({ workspaceId, projectId, run, item, sourceCase, components, offline, onClose,
+export function DefectDialog({ workspaceId, projectId, run, item, sourceCase, traceability, components, offline, onClose,
   onCreated }: DefectDialogProps) {
   const http = useTmsHttpClient();
   const attachments = useAttachmentClient();
@@ -84,11 +85,13 @@ export function DefectDialog({ workspaceId, projectId, run, item, sourceCase, co
     : youTrackStatus === "loading" ? copy.youTrackLoading : copy.youTrackRequired;
   const [files, setFiles] = useState<File[]>([]);
   const [link, setLink] = useState("");
+  const [sourceFolderId, setSourceFolderId] = useState<string | null | undefined>(undefined);
+  const [reproductionSharedSteps, setReproductionSharedSteps] = useState<readonly { sharedStepId: string; revision: number }[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [operationKey] = useState(() => crypto.randomUUID());
   const value = { title, description, preconditions, testData, actualResult: actual, expectedResult: expected,
-    component, severity, priority, reproducibility, assigneeIdentityId, link };
+    component, severity, priority, reproducibility, assigneeIdentityId, link, sourceFolderId, reproductionSharedSteps };
   const leave = useFormLeave(value, { busy: submitting,
     revision: [editedRoute?.value, files.map(file => [file.name, file.size, file.type, file.lastModified])],
     extraDirty: files.length > 0 || Boolean(editedRoute && editedRoute.initial !== editedRoute.value) });
@@ -103,9 +106,11 @@ export function DefectDialog({ workspaceId, projectId, run, item, sourceCase, co
     setSubmitting(true);
     setError("");
     const payload: Omit<Defect,
-      "id" | "key" | "createdAt" | "attachmentIds" | "linkIds" | "externalIssue"> = {
+      "id" | "key" | "createdAt" | "attachmentIds" | "linkIds" | "externalIssue"> & { sourceFolderId?: string | null; reproductionSharedSteps?: typeof reproductionSharedSteps } = {
       projectId,
       ...(sourceCase ? { sourceCaseId: sourceCase.testCase.id } : {}),
+      ...(!occurrence && !sourceCase && sourceFolderId !== undefined ? { sourceFolderId } : {}),
+      ...(!occurrence && reproductionSharedSteps.length ? { reproductionSharedSteps } : {}),
       title,
       description,
       preconditions,
@@ -133,7 +138,8 @@ export function DefectDialog({ workspaceId, projectId, run, item, sourceCase, co
       setSubmitting(false);
     }
   }
-  return <DefectForm workspaceId={workspaceId} offline={offline}
+  return <DefectForm workspaceId={workspaceId} offline={offline} runOccurrence={Boolean(occurrence)}
+    traceability={traceability ? { ...traceability, locked: Boolean(occurrence || sourceCase) } : undefined}
     context={item ? `${item.caseKey} · ${run?.name} · ${run?.environment.name}` : sourceCase ? `${sourceCase.testCase.key} · ${sourceCase.revision.title}` : undefined}
     value={value}
     onChange={patch => {
@@ -149,6 +155,8 @@ export function DefectDialog({ workspaceId, projectId, run, item, sourceCase, co
       if (patch.reproducibility !== undefined) setReproducibility(patch.reproducibility);
       if (patch.assigneeIdentityId !== undefined) setAssignee(patch.assigneeIdentityId);
       if (patch.link !== undefined) setLink(patch.link);
+      if ("sourceFolderId" in patch) setSourceFolderId(patch.sourceFolderId);
+      if (patch.reproductionSharedSteps !== undefined) setReproductionSharedSteps(patch.reproductionSharedSteps);
     }}
     components={localizedComponentOptions}
     routing={{ value: integrationChoice, onChange: changeRoute, options: routeOptions,

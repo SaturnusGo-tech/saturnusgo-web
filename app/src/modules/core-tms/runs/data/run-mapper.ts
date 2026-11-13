@@ -7,7 +7,7 @@ import type {
   RunItemSummary,
   TestRunSummary,
 } from "../../../../core/tms/contracts/legacy-contract";
-import { mapTestCaseRevision } from "../../test-cases/data/test-case-mapper";
+import { mapRunSnapshot } from "./snapshot/mapRunSnapshot";
 
 type Api = components["schemas"];
 
@@ -93,7 +93,7 @@ export function mapRunAttempt(dto: Api["RunAttempt"]): RunAttempt {
 export function mapRunItem(dto: Api["RunItem"]): RunItem {
   return {
     ...mapRunItemSummary(dto),
-    snapshot: mapTestCaseRevision(dto.snapshot),
+    snapshot: mapRunSnapshot(dto.snapshot),
     attempts: [mapRunAttempt(dto.activeAttempt)],
   };
 }

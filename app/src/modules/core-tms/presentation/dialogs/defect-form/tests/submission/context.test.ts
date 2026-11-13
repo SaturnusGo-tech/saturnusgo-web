@@ -11,7 +11,7 @@ test("opening a bug from Reports never attaches the last viewed run; creation fr
   const run = { id: "old-run", status: "completed" }, item = { id: "old-item" };
   for (const view of ["reports", "cases", "runs"]) {
     const model = { view, dialog: "defect", project: { id: "current-project" }, data: { workspace: { id: "workspace" }, testCases: [] },
-      projectCases: [], selectedRun: run, selectedRunItem: item, connection: "connected" };
+      folders: { items: [], loading: false, error: "" }, sharedSteps: { items: [], status: "ready" }, projectCases: [], selectedRun: run, selectedRunItem: item, connection: "connected" };
     const node = h.render(() => View({ model } as never)) as unknown as Node;
     assert.equal(node.props.projectId, "current-project");
     assert.equal(node.props.run, view === "runs" ? run : null);

@@ -1,0 +1,12 @@
+.section { display: grid; gap: 10px; min-inline-size: 0; }
+.section h3 { margin: 0; font-size: 14px; font-weight: 600; color: var(--falcon-text); }
+.hint { margin: 0; color: var(--falcon-text-muted); font-size: 12px; line-height: 1.5; }
+.list { display: grid; gap: 6px; padding: 0; border: 0; margin: 0; list-style: none; counter-reset: scenario; }
+.row { display: flex; gap: 7px; align-items: center; min-inline-size: 0; color: var(--falcon-text-secondary); font-size: 13px; }
+.row::before { counter-increment: scenario; content: counter(scenario) "."; color: var(--falcon-text-muted); font-variant-numeric: tabular-nums; }
+.row > svg { flex: none; }
+.title { min-inline-size: 0; flex: 1; overflow-wrap: anywhere; }
+.title small { display: block; color: var(--falcon-text-muted); font-size: 11px; }
+.row .action { min-inline-size: 26px; inline-size: 26px; block-size: 28px; border-radius: 7px; padding: 0; color: var(--falcon-text-muted); background: transparent; }
+.action:hover { color: var(--falcon-text); background: var(--falcon-hover); }
+.action:focus-visible { outline: 1px solid var(--falcon-focus); outline-offset: 2px; }

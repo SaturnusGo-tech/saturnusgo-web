@@ -31,9 +31,9 @@ export const item: Api["RunItem"] = {
     lifecycle: "ready", priority: "high", component: "Checkout", ownerIdentityId: null, tags: [], estimatedMinutes: 2,
     testData: "", steps: [
       { id: "step-1", order: 1, action: "Open checkout", expectedResult: "Checkout opens", required: true,
-        attachmentIds: [], sharedStepId: null, sharedStep: null },
+        attachmentIds: [], sharedStepId: null },
       { id: "step-2", order: 2, action: "Pay from original snapshot", expectedResult: "Payment succeeds", required: true,
-        attachmentIds: [], sharedStepId: null, sharedStep: null },
+        attachmentIds: [], sharedStepId: null },
     ], checklist: [{ id: "check-1", order: 3, text: "Original confirmation", required: true }], attachmentIds: [],
     changeNote: "Original revision", createdBy: "identity-1", createdAt: time },
   activeAttempt: { rowVersion: 2, attemptNo: 2, status: "failed", actualResult: "Payment fails", comment: "",

@@ -11,11 +11,13 @@ import { DefectEvidence } from "./evidence/DefectEvidence";
 import { useDefectFileTransfer } from "./evidence/transfer/useDefectFileTransfer";
 import { DefectResults } from "./results/DefectResults";
 import { validateDefectDraft } from "./validation/validateDefectDraft";
-import type { DefectDraft, DefectDraftErrors, DefectRouting } from "./model";
+import type { DefectDraft, DefectDraftErrors, DefectRouting, DefectTraceabilityChoices } from "./model";
+import { DefectSharedReproduction } from "./reproduction/DefectSharedReproduction";
 import css from "./form.module.css";
 
 type Props = {
   workspaceId: string; offline: boolean; context?: string;
+  traceability?: DefectTraceabilityChoices; runOccurrence?: boolean;
   value: DefectDraft; onChange: (patch: Partial<DefectDraft>) => void;
   components: { value: string; label: string }[]; routing: DefectRouting;
   files: File[]; onFilesChange: (files: File[]) => void;
@@ -48,7 +50,7 @@ export function DefectForm(props: Props) {
       onDragOverCapture={evidence.onDragOverCapture} onDragEnterCapture={evidence.onDragEnterCapture}
       onDragLeaveCapture={evidence.onDragLeaveCapture} onDragEndCapture={evidence.onDragEndCapture}
       data-defect-drawer
-      data-testid={value.reproduction !== undefined ? "inline-defect-composer" : "defect-composer"}
+      data-testid={props.runOccurrence ? "inline-defect-composer" : "defect-composer"}
       ref={element => { props.panelRef.current = element?.parentElement ?? null; if (element) element.inert = closing; }}>
         <div className={`${inspector.creationHeader} ${css.titleField}`}>
           <div className={css.titleShell} data-input-shell data-invalid={Boolean(errors.title)}>
@@ -71,9 +73,9 @@ export function DefectForm(props: Props) {
               value={value.preconditions} ru={ru} onChange={preconditions => onChange({ preconditions })} disabled={submitting} />
             <CreationNarrativeSection section="testData" hideEdit allowAttachments={false} title={ru ? "Тестовые данные" : "Test data"}
               value={value.testData} ru={ru} onChange={testData => onChange({ testData })} disabled={submitting} />
-            {value.reproduction !== undefined && <CreationNarrativeSection section="description" hideEdit allowAttachments={false} title={ru ? "Шаги воспроизведения" : "Steps to reproduce"} ru={ru}
-              value={value.reproduction} error={errors.reproduction}
-              onChange={reproduction => onChange({ reproduction })} disabled={submitting} />}
+            {props.traceability && !props.runOccurrence && <DefectSharedReproduction
+              value={value.reproductionSharedSteps ?? []} choices={props.traceability} ru={ru} disabled={submitting}
+              onChange={reproductionSharedSteps => onChange({ reproductionSharedSteps })} />}
             <DefectResults ru={ru} actual={value.actualResult} expected={value.expectedResult} error={errors.actualResult}
               onActualChange={actualResult => onChange({ actualResult })}
               onExpectedChange={expectedResult => onChange({ expectedResult })} />
@@ -82,7 +84,7 @@ export function DefectForm(props: Props) {
           </fieldset>
           </main>
           <DefectProperties workspaceId={props.workspaceId} offline={props.offline} disabled={submitting}
-              value={value} onChange={onChange} components={props.components} routing={routing} showRoutingError={attempted} />
+              value={value} onChange={onChange} components={props.components} routing={routing} showRoutingError={attempted} traceability={props.traceability} />
         </div>
         {props.error && <FormError message={props.error} />}
       </div>

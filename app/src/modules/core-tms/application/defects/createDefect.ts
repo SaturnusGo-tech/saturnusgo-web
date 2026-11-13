@@ -9,7 +9,10 @@ import { createUid } from "../../helpers/id/createUid";
 import type { TmsLocale } from "../../localization/model/locale";
 
 type DefectPayload = Omit<Defect,
-  "id" | "key" | "createdAt" | "attachmentIds" | "linkIds" | "externalIssue">;
+  "id" | "key" | "createdAt" | "attachmentIds" | "linkIds" | "externalIssue"> & {
+    sourceFolderId?: string | null;
+    reproductionSharedSteps?: readonly { sharedStepId: string; revision: number }[];
+  };
 
 export async function createDefect(input: {
   http: TmsHttpClient;
@@ -41,6 +44,10 @@ export async function createDefect(input: {
   const body = {
     projectId: input.payload.projectId,
     ...(input.payload.sourceCaseId ? { sourceCaseId: input.payload.sourceCaseId } : {}),
+    ...(input.payload.sourceFolderId !== undefined ? { sourceFolderId: input.payload.sourceFolderId } : {}),
+    ...(input.payload.reproductionSharedSteps?.length ? {
+      reproductionSharedSteps: input.payload.reproductionSharedSteps.map(reference => ({ ...reference })),
+    } : {}),
     title: input.payload.title,
     description: input.payload.description,
     preconditions: input.payload.preconditions,

@@ -6,7 +6,8 @@ import { createLatestReleaseReader } from "../../model/latest/source";
 import { parseDesktopRelease } from "../../model/latest/release";
 
 test("an older desktop skips the bundled intermediate release and loads the current published installer", async t => {
-  const version = "0.2.12", requests: { url: string; init?: RequestInit }[] = [];
+  const [major, minor, patch] = release.version.split(".").map(Number);
+  const version = `${major}.${minor}.${patch + 1}`, requests: { url: string; init?: RequestInit }[] = [];
   const latest = { ...release, version, baseUrl: `https://saturnusgo.com/falcon/desktop/beta/${version}/`,
     artifacts: release.artifacts.map(artifact => ({ ...artifact, file: artifact.file.replace(release.version, version) })) };
   t.mock.method(globalThis, "fetch", async (url: RequestInfo | URL, init?: RequestInit) => {

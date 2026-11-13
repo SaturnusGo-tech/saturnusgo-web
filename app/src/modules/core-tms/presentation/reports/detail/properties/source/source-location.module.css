@@ -1,0 +1,10 @@
+.source { display: grid; gap: 6px; min-inline-size: 0; font-size: 13px; line-height: 20px; }
+.source dt { display: flex; align-items: center; gap: 7px; color: var(--falcon-text-secondary); }
+.source dt svg { color: var(--falcon-icon); flex: none; }
+.source dd { min-inline-size: 0; margin: 0; }
+.source .link { display: block; inline-size: 100%; min-inline-size: 0; min-block-size: 22px; block-size: auto; padding: 0; border: 0; border-radius: 6px; color: var(--falcon-text); background: transparent; font: inherit; text-align: start; }
+.source .link:hover { background: transparent; text-decoration: underline; text-decoration-color: var(--falcon-border-strong); text-underline-offset: 3px; }
+.link:focus-visible { outline: 1px solid var(--falcon-focus); outline-offset: 3px; }
+.path { display: block; min-inline-size: 0; }
+.missing, .error { color: var(--falcon-text-muted); font-size: 12px; }
+.error { display: block; margin-block-start: 4px; line-height: 1.5; }

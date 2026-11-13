@@ -5,6 +5,7 @@ import { resolveDefectExecutionStep } from "../../../../defects/execution-contex
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import type { DefectRetest } from "../../../../runs/verification/state/defect/useDefectRetest";
 import { buildCaseDeepLink } from "../../../../test-cases/navigation/case-deep-link";
+import { DefectReproduction } from "./reproduction/DefectReproduction";
 import { DefectRetestMetadata } from "./DefectRetestMetadata";
 import css from "./execution-context.module.css";
 
@@ -14,7 +15,9 @@ export function DefectExecutionContext({ defect, context, retest, onOpenRun }: {
 }) {
   const { locale, t } = useTmsLocale(); const ru = locale === "ru";
   const { run, item, pending, error } = context;
-  const step = resolveDefectExecutionStep(item, defect.stepId);
+  const capturedFailure = defect.reproduction?.steps.find(step => step.failed);
+  const step = defect.reproduction ? (capturedFailure ? { order: capturedFailure.order, text: capturedFailure.action } : null)
+    : resolveDefectExecutionStep(item, defect.stepId);
   const missing = pending ? (ru ? "Загрузка…" : "Loading…") : (ru ? "Недоступно" : "Unavailable");
   return <section className={css.context} aria-labelledby="defect-execution-heading" aria-busy={pending}>
     <header className={css.heading}>
@@ -34,15 +37,21 @@ export function DefectExecutionContext({ defect, context, retest, onOpenRun }: {
         <span className={css.label}>{t("reports.runItem")}</span>
         {item ? <button type="button" className={css.link} onClick={() => onOpenRun(defect.runId!, item.id)}>{item.snapshot.title}</button> : <span className={css.muted}>{missing}</span>}
       </div>
-      <div className={css.row} data-failed-step>
+      {capturedFailure?.sharedStep && <div className={css.row}>
+        <Circle size={8} className={css.dot} aria-hidden="true" />
+        <span className={css.label}>{ru ? "Общий сценарий" : "Shared scenario"}</span>
+        <span className={css.step}>{capturedFailure.sharedStep.title}</span>
+      </div>}
+      {(defect.stepId || capturedFailure) && <div className={css.row} data-failed-step>
         <CircleX size={15} className={css.failed} aria-hidden="true" />
         <strong className={css.label}>{ru ? "Проваленный шаг" : "Failed step"}</strong>
         <strong className={css.step}>{step ? `${step.order}. ${step.text}` : defect.stepId ? missing : (ru ? "Не указан" : "Not specified")}</strong>
-      </div>
+      </div>}
     </div> : defect.sourceCaseId ? <a className={css.link} href={buildCaseDeepLink(
       typeof window === "undefined" ? "https://tms.saturnusgo.com/" : window.location.href,
       { projectId: defect.projectId, caseId: defect.sourceCaseId })}>{ru ? "Открыть тест-кейс" : "Open test case"}</a>
       : <p className={css.muted}>{t("reports.noRunContext")}</p>}
+    <DefectReproduction key={defect.id} reproduction={defect.reproduction} ru={ru} />
     {error && <p role="status" className={css.muted}>{ru ? "Часть исходного контекста недоступна." : "Some original execution details are unavailable."}</p>}
     {retest && (retest.latest || retest.contextError) && <DefectRetestMetadata retest={retest} />}
   </section>;

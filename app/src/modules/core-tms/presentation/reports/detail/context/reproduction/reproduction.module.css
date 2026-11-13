@@ -1,0 +1,23 @@
+.section { min-inline-size: 0; margin-block-start: 16px; }
+.section .disclosure { display: flex; justify-content: flex-start; gap: 8px; inline-size: 100%; min-inline-size: 0; min-block-size: 32px; padding: 5px 0; border: 0; border-radius: 7px; background: transparent; color: var(--falcon-text); font-size: 13px; font-weight: 550; text-align: start; }
+.disclosure small { color: var(--falcon-text-muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.section .disclosure:hover { background: transparent; }
+.disclosure:focus-visible { outline: 1px solid var(--falcon-focus); outline-offset: 3px; }
+.chevron { flex: none; transition: transform 140ms ease-out; transform: rotate(-90deg); color: var(--falcon-icon); }
+.chevron[data-open="true"] { transform: rotate(0); }
+.body { margin-block-start: 8px; }
+.explanation { margin: 0 0 12px; color: var(--falcon-text-muted); font-size: 12px; line-height: 1.5; }
+.steps { list-style: none; padding: 0; margin: 0; display: grid; gap: 15px; }
+.step { min-inline-size: 0; font-size: 13px; line-height: 1.6; }
+.instruction { display: flex; align-items: flex-start; gap: 8px; min-inline-size: 0; }
+.order { flex: none; min-inline-size: 18px; color: var(--falcon-text-muted); font-variant-numeric: tabular-nums; }
+.action { flex: 1; min-inline-size: 0; overflow-wrap: anywhere; }
+.shared { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px; margin-block-end: 6px; color: var(--falcon-text-secondary); }
+.shared svg { flex: none; align-self: center; }
+.shared strong { font-size: 12px; font-weight: 550; overflow-wrap: anywhere; }
+.shared small { color: var(--falcon-text-muted); font-size: 11px; }
+.failed { display: inline-flex; gap: 4px; align-items: center; color: var(--falcon-danger); font-size: 11px; flex: none; padding-block-start: 3px; }
+.metadata { display: grid; grid-template-columns: minmax(80px, .25fr) minmax(0, 1fr); gap: 8px; margin-block-start: 4px; margin-inline-start: 26px; min-inline-size: 0; overflow-wrap: anywhere; }
+.metadata > span { color: var(--falcon-text-muted); font-size: 11px; }
+@container (max-width: 480px) { .failed > span { display: none; } .metadata { grid-template-columns: minmax(0, 1fr); gap: 1px; } }
+@media (prefers-reduced-motion: reduce) { .chevron { transition: none; } }

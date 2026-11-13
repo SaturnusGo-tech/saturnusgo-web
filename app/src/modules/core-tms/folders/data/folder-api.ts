@@ -7,6 +7,10 @@ export function folderBase(scope: FolderScope) {
   return `/workspaces/${encodeURIComponent(scope.workspaceId)}/projects/${encodeURIComponent(scope.projectId)}/folders`;
 }
 
+export function getFolder(http: TmsHttpClient, scope: FolderScope, id: string, signal: AbortSignal) {
+  return http.getResource<RepositoryFolder>(`${folderBase(scope)}/${encodeURIComponent(id)}`, signal);
+}
+
 export async function listFolders(http: TmsHttpClient, scope: FolderScope, signal: AbortSignal) {
   const items: RepositoryFolder[] = [];
   const seen = new Set<string>();

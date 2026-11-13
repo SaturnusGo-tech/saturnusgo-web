@@ -2,6 +2,8 @@
 
 import { useId } from "react";
 import type { Defect, ExternalLink, TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
+import type { RepositoryFolder } from "../../../folders/model/folder";
+import { useDefectSourceNavigation } from "../../../defects/traceability/state/useDefectSourceNavigation";
 import { useDefectExecutionContext } from "../../../defects/execution-context/state/useDefectExecutionContext";
 import type { DefectRetest } from "../../../runs/verification/state/defect/useDefectRetest";
 import inspector from "../../cases/inspector/caseInspector.module.css";
@@ -15,8 +17,10 @@ import detail from "./defect-detail.module.css";
 
 export type { DetailTab } from "./header/DefectReportHeader";
 
-export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTabChange, onBack, onOpenRun, retest, connected = false, canComment = false }: {
+export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTabChange, onBack, onOpenRun, onOpenFolder, folders, projectName, retest, connected = false, canComment = false }: {
   retest?: DefectRetest;
+  folders?: readonly RepositoryFolder[]; projectName?: string;
+  onOpenFolder?: (projectId: string, path: string, folderId: string | null) => void;
   connected?: boolean; canComment?: boolean;
   workspaceId?: string;
   defect: Defect;
@@ -29,6 +33,8 @@ export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTab
 }) {
   const tabsId = useId();
   const archived = Boolean(defect.archivedAt);
+  const source = useDefectSourceNavigation({ workspaceId: workspaceId ?? "", defect, connected: Boolean(workspaceId) && connected,
+    folders, onOpenFolder });
   const context = useDefectExecutionContext({ workspaceId: workspaceId ?? "", defect, run, connected: Boolean(workspaceId) && connected });
 
   return <article className={`${inspector.shell} ${detail.shell}`} data-testid="defect-report-detail" data-defect-archived={archived || undefined}>
@@ -43,7 +49,8 @@ export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTab
             <DefectDiscussion key={defect.id} defectId={defect.id} projectId={defect.projectId} connected={connected} canComment={canComment} />
           </div>}
         </div>
-        <DefectReportProperties defect={defect} workspaceId={workspaceId} />
+        <DefectReportProperties defect={defect} workspaceId={workspaceId}
+          onOpenSource={source.canOpen ? source.open : undefined} sourcePending={source.pending} sourceError={source.error} projectName={projectName} />
       </div> : <DefectReportAttachments attachmentIds={defect.attachmentIds} links={links} />}
     </div>
   </article>;

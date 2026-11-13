@@ -42126,7 +42126,7 @@
             ],
             "properties": {
               "snapshot": {
-                "$ref": "#/components/schemas/TestCaseRevision"
+                "$ref": "#/components/schemas/RunCaseSnapshot"
               },
               "activeAttempt": {
                 "$ref": "#/components/schemas/RunAttempt"
@@ -42563,6 +42563,26 @@
             "type": "string",
             "maxLength": 20000,
             "description": "Markdown-formatted test data used to reproduce the defect."
+          },
+          "sourceLocation": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DefectSourceLocation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reproduction": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DefectReproduction"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         }
       },
@@ -42685,6 +42705,27 @@
             "type": "string",
             "maxLength": 20000,
             "description": "Markdown-formatted test data used to reproduce the defect."
+          },
+          "sourceFolderId": {
+            "oneOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "maxLength": 128
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Manual-only existing repository folder ID; null explicitly selects root. Omission leaves no manual location. Cannot combine with sourceCaseId or a run occurrence."
+          },
+          "reproductionSharedSteps": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "$ref": "#/components/schemas/DefectSharedStepReference"
+            },
+            "description": "Ordered exact authorized shared revisions resolved server-side and frozen. Cannot combine with a run occurrence. Empty selection preserves existing idempotency fingerprints."
           }
         },
         "allOf": [
@@ -64325,6 +64366,516 @@
           "data",
           "meta"
         ]
+      },
+      "RunSnapshotStep": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "order",
+          "action",
+          "expectedResult",
+          "required",
+          "attachmentIds"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "order": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "action": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LongText"
+              }
+            ],
+            "minLength": 1
+          },
+          "expectedResult": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LongText"
+              }
+            ],
+            "minLength": 1
+          },
+          "testData": {
+            "$ref": "#/components/schemas/LongText"
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "attachmentIds": {
+            "type": "array",
+            "maxItems": 100,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          "sharedStepId": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Shared procedure identity captured in this executed snapshot; null for an ordinary instruction."
+          },
+          "sharedStepTitle": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 300,
+            "description": "Scenario title captured in this snapshot."
+          },
+          "sharedStepRevision": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "description": "Exact captured shared procedure revision; null when legacy provenance did not retain it."
+          },
+          "sharedStepReferenceId": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Original shared reference step identity; legacy snapshots return null."
+          },
+          "sharedStepItemId": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Original shared procedure item identity; legacy snapshots return null."
+          }
+        }
+      },
+      "RunCaseSnapshot": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "revision",
+          "title",
+          "description",
+          "preconditions",
+          "type",
+          "lifecycle",
+          "priority",
+          "component",
+          "ownerIdentityId",
+          "tags",
+          "estimatedMinutes",
+          "testData",
+          "steps",
+          "checklist",
+          "attachmentIds",
+          "changeNote",
+          "createdBy",
+          "createdAt",
+          "customFields",
+          "productGroupId",
+          "productId",
+          "regression"
+        ],
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "description": {
+            "$ref": "#/components/schemas/LongText"
+          },
+          "preconditions": {
+            "$ref": "#/components/schemas/LongText"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "manual",
+              "checklist",
+              "automated"
+            ],
+            "description": "The server validates the fully resolved revision. Automated revisions require at least one complete step and an empty checklist; manual revisions keep their existing zero-step allowance."
+          },
+          "lifecycle": {
+            "$ref": "#/components/schemas/TestCaseLifecycle"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/Priority"
+          },
+          "priorityAssigned": {
+            "type": "boolean",
+            "const": false,
+            "description": "False when priority is unassigned. The effective priority remains medium for compatibility. Omitted for explicitly assigned and historical priorities."
+          },
+          "component": {
+            "$ref": "#/components/schemas/ShortText"
+          },
+          "ownerIdentityId": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tags": {
+            "type": "array",
+            "maxItems": 100,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$"
+            }
+          },
+          "estimatedMinutes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "testData": {
+            "$ref": "#/components/schemas/LongText"
+          },
+          "steps": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "$ref": "#/components/schemas/RunSnapshotStep"
+            }
+          },
+          "checklist": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "$ref": "#/components/schemas/ChecklistItem"
+            }
+          },
+          "attachmentIds": {
+            "type": "array",
+            "maxItems": 500,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          "changeNote": {
+            "$ref": "#/components/schemas/ShortText"
+          },
+          "createdBy": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "customFields": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/CustomFieldSnapshot"
+            }
+          },
+          "productGroupId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "productId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "regression": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "manual"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "properties": {
+                "checklist": {
+                  "maxItems": 0
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "automated"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "properties": {
+                "steps": {
+                  "minItems": 1
+                },
+                "checklist": {
+                  "maxItems": 0
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "checklist"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "properties": {
+                "steps": {
+                  "maxItems": 0
+                }
+              }
+            }
+          }
+        ],
+        "description": "Immutable case revision and materialized instructions captured when the run item was created. Shared procedure provenance never follows later library changes."
+      },
+      "DefectSourceLocation": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "folderId",
+          "folderPath",
+          "capturedAt",
+          "origin"
+        ],
+        "properties": {
+          "folderId": {
+            "oneOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "maxLength": 128
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "folderPath": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "capturedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "origin": {
+            "type": "string",
+            "enum": [
+              "run",
+              "case",
+              "manual"
+            ]
+          }
+        },
+        "description": "Immutable repository placement at detection. Null folderId denotes explicitly selected repository root. Missing historical snapshots remain null; resolve stable IDs to navigate to current placement."
+      },
+      "DefectSharedStepReference": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sharedStepId",
+          "revision"
+        ],
+        "properties": {
+          "sharedStepId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+            "maxLength": 128
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "DefectReproductionStep": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "order",
+          "action",
+          "expectedResult",
+          "testData",
+          "required",
+          "sharedStep",
+          "failed"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "order": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "action": {
+            "type": "string",
+            "maxLength": 20000
+          },
+          "expectedResult": {
+            "type": "string",
+            "maxLength": 20000
+          },
+          "testData": {
+            "type": "string",
+            "maxLength": 20000
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "sharedStep": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "title",
+                  "revision"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                    "maxLength": 128
+                  },
+                  "title": {
+                    "type": "string",
+                    "maxLength": 300
+                  },
+                  "revision": {
+                    "oneOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "failed": {
+            "type": "boolean"
+          }
+        },
+        "description": "Ordered immutable instructions; failed identifies the selected occurrence step. Manual shared instructions never assert execution results. Legacy unavailable shared revision is null."
+      },
+      "DefectReproduction": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "origin",
+          "caseId",
+          "caseRevision",
+          "steps"
+        ],
+        "properties": {
+          "origin": {
+            "type": "string",
+            "enum": [
+              "run",
+              "shared_steps"
+            ]
+          },
+          "caseId": {
+            "oneOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "maxLength": 128
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "caseRevision": {
+            "oneOf": [
+              {
+                "type": "integer",
+                "minimum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "steps": {
+            "type": "array",
+            "maxItems": 50000,
+            "items": {
+              "$ref": "#/components/schemas/DefectReproductionStep"
+            }
+          }
+        },
+        "description": "Frozen run snapshot through selected occurrence step, or exact manually selected shared revisions. With no occurrence step retain full run sequence and mark no row failed. Manual instructions have null caseId/caseRevision and are bounded to 2000 steps, 500000 JS characters and 2MB storage. Run-derived instructions preserve the accepted immutable run snapshot content bounds (up to 500 case steps expanded into 100 shared items each)."
       }
     }
   }

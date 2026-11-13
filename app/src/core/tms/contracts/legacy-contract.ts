@@ -1,6 +1,7 @@
 import type { components } from "../generated/tms-api";
 import type { CaseFields } from "./custom-fields/case-fields";
 import type { TestCaseRevision, TestRunSummary } from "./execution-contract";
+import type { DefectReproduction, DefectSourceLocation } from "./defect-traceability/traceability";
 export type {
   ExecutionStatus, RunAttempt, RunAttemptSummary, RunItem, RunItemSummary, RunProgress,
   SharedStepItem, SharedStepSnapshot, StepResult, TestCaseRevision, TestRun, TestRunSummary, TestStep,
@@ -85,6 +86,9 @@ export type Suite = SuiteSummary & {
 };
 
 export type Defect = Pick<components["schemas"]["Defect"], "preconditions" | "testData"> & {
+  sourceLocation?: DefectSourceLocation | null;
+  reproduction?: DefectReproduction | null;
+  attemptNo?: number | null;
   sourceCaseId?: string | null;
   archivedAt?: string | null;
   id: string;

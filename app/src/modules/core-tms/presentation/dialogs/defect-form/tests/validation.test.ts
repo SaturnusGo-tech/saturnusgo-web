@@ -10,8 +10,6 @@ test("a standalone bug accepts Markdown without requiring an unrelated run descr
   assert.deepEqual(validateDefectDraft(draft, true), {});
   assert.deepEqual(Object.keys(validateDefectDraft({ ...draft, title: " ", actualResult: "\n" }, true)), ["title", "actualResult"]);
 });
-test("a step-linked bug requires description and reproduction and reports the exact fields", () => {
-  const linked = { ...draft, reproduction: " " };
-  assert.deepEqual(Object.keys(validateDefectDraft(linked, false)), ["description", "reproduction"]);
-  assert.deepEqual(validateDefectDraft({ ...linked, description: "After login", reproduction: "1. Log in\n2. Open orders" }, false), {});
+test("selected shared revisions do not require duplicated narrative instructions", () => {
+  assert.deepEqual(validateDefectDraft({ ...draft, reproductionSharedSteps: [{ sharedStepId: "shared-1", revision: 3 }] }, false), {});
 });

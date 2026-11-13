@@ -171,7 +171,8 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
       selectedDefectStatus={model.selectedDefectResource.status}
       onRetrySelectedDefect={model.selectedDefectResource.retry}
       onNew={() => void requestAuthoringLeave(() => model.setDialog("defect"))}
-      onOpenRun={model.openRun} defectRetest={model.defectRetest}
+      onOpenRun={model.openRun} defectRetest={model.defectRetest} folders={model.folders.items}
+      onOpenFolder={(projectId, path, folderId) => { if (projectId === model.projectId) model.selectFolder(path, folderId ?? "root"); }}
     />
   );
 }

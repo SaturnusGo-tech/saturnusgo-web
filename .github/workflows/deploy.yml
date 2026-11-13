@@ -75,6 +75,9 @@ jobs:
       - name: Test TMS contract adapters
         run: npm run test:tms-adapters
 
+      - name: Test defect traceability and original execution provenance
+        run: npm run test:tms-defect-traceability
+
       - name: Build static export
         env:
           BUILD_TARGET: export

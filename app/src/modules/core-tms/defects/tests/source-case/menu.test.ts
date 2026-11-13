@@ -45,6 +45,7 @@ test("case defect uses the captured project and never inherits a selected run", 
   let data = { workspace: { id: "w" }, testCases: [{ projectId: "source-project", component: "Orders" },
     { projectId: "other", component: "Wrong" }], defects: [] as unknown[] };
   const model = { dialog: "case-defect", caseDefectSource: source, data, project: { id: "other" },
+    folders: { items: [], loading: false, error: "" }, sharedSteps: { items: [], status: "ready" },
     view: "runs", selectedRun: { id: "stale-run" }, selectedRunItem: { id: "stale-item" }, connection: "connected",
     closeResourceEditors() {}, setDialog: () => { closed = true; }, notify() {},
     setData: (change: (value: typeof data) => typeof data) => { data = change(data); },

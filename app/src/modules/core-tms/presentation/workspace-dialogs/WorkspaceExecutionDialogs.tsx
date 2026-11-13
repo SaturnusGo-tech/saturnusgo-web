@@ -77,6 +77,9 @@ export function WorkspaceExecutionDialogs({
         key={source?.testCase.id ?? "standalone"}
         projectId={source?.testCase.projectId ?? model.project!.id}
         sourceCase={source}
+        traceability={{ folders: model.folders.items.filter(folder => folder.projectId === (source?.testCase.projectId ?? model.project?.id)),
+          sharedSteps: model.sharedSteps.items.filter(item => item.projectId === (source?.testCase.projectId ?? model.project?.id)), loading: model.folders.loading || model.sharedSteps.status === "loading",
+          error: model.folders.error || (model.sharedSteps.status === "error" ? "unavailable" : "") }}
         run={!source && model.view === "runs" ? model.selectedRun : null}
         item={!source && model.view === "runs" ? model.selectedRunItem : null}
         components={model.data.testCases.filter(testCase => testCase.projectId === (source?.testCase.projectId ?? model.project?.id)).map(testCase => testCase.component)}

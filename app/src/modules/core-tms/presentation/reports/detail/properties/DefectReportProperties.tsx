@@ -7,10 +7,13 @@ import { ResponsibleName } from "../../../../workspace/members/presentation/Resp
 import { PriorityIcon, priorityLabel } from "../../../common/properties/PriorityIcon";
 import { PropertyLabelTokens } from "../../../common/properties/metadata/PropertyLabelField";
 import { PropertyValue } from "../../../common/properties/select/PropertySelect";
+import { DefectSourceLocation } from "./source/DefectSourceLocation";
 import { PropertyRow } from "./PropertyRow";
 import styles from "./defect-report-properties.module.css";
 
-export function DefectReportProperties({ defect, workspaceId }: { defect: Defect; workspaceId?: string }) {
+export function DefectReportProperties({ defect, workspaceId, onOpenSource, sourcePending, sourceError, projectName }: {
+  defect: Defect; workspaceId?: string; projectName?: string; onOpenSource?: () => void; sourcePending?: boolean; sourceError?: string;
+}) {
   const { locale, t } = useTmsLocale();
   const severity = localizedLabel(locale, defect.severity);
   const priority = priorityLabel(locale, defect.priority);
@@ -21,6 +24,8 @@ export function DefectReportProperties({ defect, workspaceId }: { defect: Defect
     <section className={styles.properties}>
       <h3>{t("reports.properties")}</h3>
       <dl className={styles.list}>
+        <DefectSourceLocation location={defect.sourceLocation} ru={locale === "ru"} onOpen={onOpenSource}
+          pending={sourcePending} error={sourceError} projectName={projectName} />
         <PropertyRow label={t("reports.severity")} value={severity}
           icon={<TriangleAlert size={15} aria-hidden="true" className={styles.severity} data-level={defect.severity} />} />
         <PropertyRow label={t("reports.priority")} value={priority} icon={<PriorityIcon level={defect.priority} empty="circle" />} />

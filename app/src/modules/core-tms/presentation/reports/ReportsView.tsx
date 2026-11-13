@@ -3,6 +3,7 @@
 import { ErrorToast } from "../common/error/ErrorToast";
 import { useNavigationValue } from "../../state/navigation/context/useNavigationValue";
 import { useCallback } from "react";
+import type { RepositoryFolder } from "../../folders/model/folder";
 import type { Defect, ExternalLink, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { TessiqLoader } from "../common/loading/TessiqLoader";
@@ -14,8 +15,10 @@ import type { DefectRetest } from "../../runs/verification/state/defect/useDefec
 import surface from "./reports.module.css";
 
 export function ReportsView({ workspaceId, projectId, projectName = "", defects, runs, links, selectedDefectId, onSelectDefect,
-  selectedDefectStatus, onRetrySelectedDefect, onNew, onOpenRun, defectRetest, connected = false, canComment = false, creating = false }: {
+  selectedDefectStatus, onRetrySelectedDefect, onNew, onOpenRun, onOpenFolder, folders, defectRetest, connected = false, canComment = false, creating = false }: {
   defectRetest?: DefectRetest;
+  folders?: readonly RepositoryFolder[];
+  onOpenFolder?: (projectId: string, path: string, folderId: string | null) => void;
   connected?: boolean; canComment?: boolean; creating?: boolean;
   workspaceId?: string; projectId?: string; projectName?: string;
   defects: Defect[];
@@ -68,7 +71,7 @@ export function ReportsView({ workspaceId, projectId, projectName = "", defects,
             tab={detailTab}
             onTabChange={setDetailTab}
             onBack={() => selectDefect(null)}
-            onOpenRun={onOpenRun} retest={defectRetest}
+            onOpenRun={onOpenRun} onOpenFolder={onOpenFolder} folders={folders} projectName={projectName} retest={defectRetest}
           />
         : selectedDefectStatus === "error"
           ? <ErrorToast message={locale === "ru" ? "Не удалось открыть баг-репорт" : "Could not open the bug report"}

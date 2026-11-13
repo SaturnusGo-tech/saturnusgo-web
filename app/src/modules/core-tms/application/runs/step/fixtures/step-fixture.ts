@@ -12,7 +12,7 @@ export function item(): RunItem {
     snapshot: { customFields: [], productGroupId: null, productId: null, regression: false, revision: 1, title: "Verify immutable source", description: "", preconditions: "",
       type: "manual", lifecycle: "ready", priority: "high", component: "GitHub",
       ownerIdentityId: null, tags: [], estimatedMinutes: null, testData: "",
-      steps: [{ id: "step-1", order: 1, action: "Inspect source", expectedResult: "SHA matches", required: true, attachmentIds: [], sharedStepId: null, sharedStep: null }],
+      steps: [{ id: "step-1", order: 1, action: "Inspect source", expectedResult: "SHA matches", required: true, attachmentIds: [], sharedStepId: null }],
       checklist: [], attachmentIds: [], changeNote: "Created", createdBy: "identity-1", createdAt: time },
     activeAttempt: { rowVersion: 1, attemptNo: 2, status: "in_progress", actualResult: "", comment: "",
       blockedReason: "", attachmentIds: [], startedAt: time, completedAt: null,

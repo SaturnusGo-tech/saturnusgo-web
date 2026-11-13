@@ -14,6 +14,7 @@ test("report detail passes scoped source context before the unchanged body and k
   const context = { pending: false, error: false };
   const loaded = h.load<{ DefectReportDetail: typeof DefectReportDetail }>(
     new URL("../../detail/DefectReportDetail.tsx", import.meta.url), name => {
+      if (name.endsWith("useDefectSourceNavigation")) return { useDefectSourceNavigation: () => ({ canOpen: false, pending: false, error: "" }) };
       if (name.endsWith("useDefectExecutionContext")) return { useDefectExecutionContext: (input: unknown) => { inputs.push(input); return context; } };
       for (const key of ["DefectReportHeader", "DefectReportProperties", "DefectExecutionContext", "DefectReportContent", "DefectDiscussion", "DefectReportAttachments"]) {
         if (name.endsWith(key)) return { [key]: key };

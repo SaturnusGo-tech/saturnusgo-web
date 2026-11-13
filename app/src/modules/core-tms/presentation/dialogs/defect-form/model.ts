@@ -8,7 +8,8 @@ export type DefectDraft = {
   testData: string;
   actualResult: string;
   expectedResult: string;
-  reproduction?: string;
+  sourceFolderId?: string | null;
+  reproductionSharedSteps?: readonly { sharedStepId: string; revision: number }[];
   component: string;
   severity: Defect["severity"];
   priority: Defect["priority"];
@@ -24,4 +25,10 @@ export type DefectRouting = {
   resolved: boolean;
   message: string;
 };
-export type DefectDraftErrors = Partial<Record<"title" | "actualResult" | "description" | "reproduction", string>>;
+export type DefectDraftErrors = Partial<Record<"title" | "actualResult" | "description", string>>;
+
+export type DefectTraceabilityChoices = {
+  folders: readonly import("../../../folders/model/folder").RepositoryFolder[];
+  sharedSteps: readonly import("../../../shared-steps/model/shared-step").SharedStepSummary[];
+  loading?: boolean; error?: string; locked?: boolean;
+};

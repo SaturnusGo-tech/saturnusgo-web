@@ -55,7 +55,7 @@ test("both entry points save edited Markdown, fields and attachments, preserve c
     const markdown = "## Actual\n\n**Empty** order history.\n\n- No rows\n- No message";
     const file = { name: "evidence.png", size: 100 };
     invoke(render(), "onChange", { title: "Missing orders", description: "After login", preconditions, testData, actualResult: markdown,
-      expectedResult: "# Expected\n\nOrder list", reproduction: "1. Log in", severity: "critical", priority: "medium",
+      expectedResult: "# Expected\n\nOrder list", sourceFolderId: "chosen-folder", reproductionSharedSteps: [{ sharedStepId: "shared-1", revision: 3 }], severity: "critical", priority: "medium",
       reproducibility: "Sometimes", component: "Payments", assigneeIdentityId: "qa-anna", link: "app://orders" });
     invoke(render(), "onFilesChange", [file]);
     await invoke(render(), "onSubmit", { preventDefault() {} });
@@ -73,7 +73,10 @@ test("both entry points save edited Markdown, fields and attachments, preserve c
     assert.equal(saved.payload.severity, "critical"); assert.equal(saved.payload.reproducibility, "Sometimes");
     assert.equal(saved.payload.assigneeIdentityId, "qa-anna"); assert.equal(saved.payload.component, "Payments");
     assert.equal(saved.link, "app://orders"); assert.equal(saved.files[0], file);
-    if (inline) assert.ok(saved.payload.description.includes("1. Log in"));
+    assert.equal(saved.payload.description, "After login");
+    const request = saved.payload as typeof saved.payload & { sourceFolderId?: string; reproductionSharedSteps?: unknown };
+    assert.equal(request.sourceFolderId, inline || direct ? undefined : "chosen-folder");
+    assert.deepEqual(JSON.parse(JSON.stringify(request.reproductionSharedSteps ?? [])), inline ? [] : [{ sharedStepId: "shared-1", revision: 3 }]);
     h.dispose();
   }
 });

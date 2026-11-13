@@ -77,3 +77,15 @@ for (const inline of [false, true]) {
     assert.equal(f.releases(), 1); assert.ok(f.closes() >= 1);
   });
 }
+
+test("manual folder and shared scenario choices participate in unsaved protection", async t => {
+  const f = fixture(false); t.after(() => f.h.dispose()); f.render();
+  invoke(f.render(), "onChange", { sourceFolderId: "folder" }); f.render();
+  assert.equal(f.session()?.dirty, true);
+  await invoke(f.render(), "onClose"); assert.equal(f.closes(), 0);
+  invoke(f.render(), "onChange", { reproductionSharedSteps: [{ sharedStepId: "shared", revision: 3 }] }); f.render();
+  const previous = f.session()?.revision;
+  invoke(f.render(), "onChange", { reproductionSharedSteps: [{ sharedStepId: "shared", revision: 4 }] }); f.render();
+  assert.notEqual(f.session()?.revision, previous);
+  f.approve(); await invoke(f.render(), "onClose"); assert.equal(f.closes(), 1);
+});

@@ -5,23 +5,26 @@ import { PropertySelect } from "../../../common/properties/select/PropertySelect
 import { PropertyRail } from "../../../common/properties/rail/PropertyRail";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import { getDefectDialogCopy } from "../../defect/copy";
-import type { DefectDraft, DefectRouting } from "../model";
+import type { DefectDraft, DefectRouting, DefectTraceabilityChoices } from "../model";
 import { DefectRoutingHelp } from "../help/DefectRoutingHelp";
+import { DefectFolderField } from "../placement/DefectFolderField";
 import css from "./properties.module.css";
 
 type Props = {
-  workspaceId: string; offline: boolean; disabled: boolean;
+  workspaceId: string; offline: boolean; disabled: boolean; traceability?: DefectTraceabilityChoices;
   value: DefectDraft; onChange: (patch: Partial<DefectDraft>) => void;
   components: { value: string; label: string }[]; routing: DefectRouting; showRoutingError: boolean;
 };
 const severityIcons = { critical: OctagonAlert, high: Flame, medium: CircleDot, low: Minus };
 
-export function DefectProperties({ workspaceId, offline, disabled, value, onChange, components, routing, showRoutingError }: Props) {
+export function DefectProperties({ workspaceId, offline, disabled, value, onChange, components, routing, showRoutingError, traceability }: Props) {
   const { locale } = useTmsLocale();
   const ru = locale === "ru";
   const copy = getDefectDialogCopy(locale);
   const severityLevels = ["critical", "high", "medium", "low"] as const;
   return <PropertyRail label={ru ? "Свойства дефекта" : "Defect properties"} title={ru ? "Свойства" : "Properties"}>
+      {traceability && !traceability.locked && <DefectFolderField value={value.sourceFolderId}
+        choices={traceability} ru={ru} disabled={disabled} onChange={sourceFolderId => onChange({ sourceFolderId })} />}
       <PropertySelect locale={locale} label={copy.component} searchLabel={ru ? "Найти компонент…" : "Find a component…"}
         value={value.component} options={components.map(component => ({ ...component, icon: <Box size={15} aria-hidden="true" /> }))}
         onChange={component => onChange({ component })} disabled={disabled} />

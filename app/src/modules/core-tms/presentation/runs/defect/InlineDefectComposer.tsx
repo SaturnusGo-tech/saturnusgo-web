@@ -69,7 +69,6 @@ export function InlineDefectComposer({ workspaceId, projectId, run, item, step, 
   const [description, setDescription] = useState(t("inlineDefect.descriptionDefault", { action: step.action }));
   const [preconditions, setPreconditions] = useState(item.snapshot.preconditions ?? "");
   const [testData, setTestData] = useState(item.snapshot.testData ?? "");
-  const [repro, setRepro] = useState(`${executableSteps(item.snapshot).map((entry, index) => `${index + 1}. ${entry.action}.`).join("\n")}`);
   const [link, setLink] = useState(/^https:\/\//i.test(run.environment.baseUrl) ? run.environment.baseUrl : "");
   const [files, setFiles] = useState<File[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -77,7 +76,7 @@ export function InlineDefectComposer({ workspaceId, projectId, run, item, step, 
   const [operationKey] = useState(() => crypto.randomUUID());
 
   const value = { title, description, preconditions, testData, actualResult: actual, expectedResult: expected,
-    reproduction: repro, component, severity, priority, reproducibility, assigneeIdentityId, link };
+    component, severity, priority, reproducibility, assigneeIdentityId, link };
   const leave = useFormLeave(value, { busy: submitting,
     revision: [editedRoute?.value, files.map(file => [file.name, file.size, file.type, file.lastModified])],
     extraDirty: files.length > 0 || Boolean(editedRoute && editedRoute.initial !== editedRoute.value) });
@@ -93,7 +92,7 @@ export function InlineDefectComposer({ workspaceId, projectId, run, item, step, 
     setSubmitting(true);
     setError("");
     const payload: Omit<Defect, "id" | "key" | "createdAt" | "attachmentIds" | "linkIds" | "externalIssue"> = {
-      projectId, title, description: `${description}\n\n${t("inlineDefect.reproSection")}:\n${repro}`,
+      projectId, title, description,
       preconditions, testData, severity, priority, status: "open", reproducibility, assigneeIdentityId,
       component, integrationTarget: routing.target,
       labels: defectClientLabels(true), runId: run.id, runItemId: item.id,
@@ -110,7 +109,7 @@ export function InlineDefectComposer({ workspaceId, projectId, run, item, step, 
   }
 
   const componentChoices = componentOptions.map((value) => ({ value, label: localizedComponentLabel(locale, value) }));
-  return <DefectForm workspaceId={workspaceId} offline={offline}
+  return <DefectForm workspaceId={workspaceId} offline={offline} runOccurrence
     context={`${item.caseKey} · ${t("inlineDefect.linkStep")} ${step.order} · ${run.environment.name}`}
     value={value}
     onChange={patch => {
@@ -120,7 +119,6 @@ export function InlineDefectComposer({ workspaceId, projectId, run, item, step, 
       if (patch.testData !== undefined) setTestData(patch.testData);
       if (patch.actualResult !== undefined) setActual(patch.actualResult);
       if (patch.expectedResult !== undefined) setExpected(patch.expectedResult);
-      if (patch.reproduction !== undefined) setRepro(patch.reproduction);
       if (patch.component !== undefined) setComponent(patch.component);
       if (patch.severity !== undefined) setSeverity(patch.severity);
       if (patch.priority !== undefined) setPriority(patch.priority);

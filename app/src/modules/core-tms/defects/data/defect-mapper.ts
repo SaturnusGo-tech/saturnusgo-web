@@ -6,6 +6,11 @@ export function mapDefect(dto: components["schemas"]["Defect"]): Defect {
     id: dto.id,
     projectId: dto.projectId,
     sourceCaseId: dto.sourceCaseId ?? null,
+    sourceLocation: dto.sourceLocation ? { ...dto.sourceLocation } : null,
+    reproduction: dto.reproduction ? { ...dto.reproduction, steps: dto.reproduction.steps.map(step => ({
+      ...step, sharedStep: step.sharedStep ? { ...step.sharedStep } : null,
+    })) } : null,
+    attemptNo: dto.occurrence?.attemptNo ?? null,
     ...(dto.archivedAt ? { archivedAt: dto.archivedAt } : {}),
     key: dto.key,
     title: dto.title,

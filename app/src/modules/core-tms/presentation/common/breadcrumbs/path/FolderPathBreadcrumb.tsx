@@ -3,12 +3,12 @@ import { ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import css from "./folder-path-breadcrumb.module.css";
 
-export function FolderPathBreadcrumb({ path, ru }: { path: string; ru: boolean }) {
+export function FolderPathBreadcrumb({ path, ru, rootLabel }: { path: string; ru: boolean; rootLabel?: string }) {
   const viewport = useRef<HTMLSpanElement>(null);
   const content = useRef<HTMLSpanElement>(null);
   const [distance, setDistance] = useState(0);
   const segments = path.split("/").filter(Boolean);
-  const labels = segments.length ? segments : [ru ? "Корень проекта" : "Project root"];
+  const labels = rootLabel ? [rootLabel, ...segments] : segments.length ? segments : [ru ? "Корень проекта" : "Project root"];
   useEffect(() => {
     const measure = () => setDistance(Math.max(0, (content.current?.scrollWidth ?? 0) - (viewport.current?.clientWidth ?? 0)));
     const observer = new ResizeObserver(measure);
@@ -16,7 +16,7 @@ export function FolderPathBreadcrumb({ path, ru }: { path: string; ru: boolean }
     if (content.current) observer.observe(content.current);
     measure();
     return () => observer.disconnect();
-  }, [path, ru]);
+  }, [path, ru, rootLabel]);
   return <span ref={viewport} className={css.viewport} data-folder-breadcrumb data-overflow={distance > 1}
     style={{ "--path-distance": `${-distance}px`, "--path-duration": `${Math.max(4, distance / 35 + 2)}s` } as CSSProperties}>
     <span className={css.accessible}>{labels.join(" › ")}</span>

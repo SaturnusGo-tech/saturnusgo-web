@@ -9144,7 +9144,7 @@ export interface components {
             etag: string;
         };
         RunItem: components["schemas"]["RunItemSummary"] & {
-            snapshot: components["schemas"]["TestCaseRevision"];
+            snapshot: components["schemas"]["RunCaseSnapshot"];
             activeAttempt: components["schemas"]["RunAttempt"];
         };
         RunItemStatusUpdateRequest: {
@@ -9224,6 +9224,8 @@ export interface components {
             preconditions: string;
             /** @description Markdown-formatted test data used to reproduce the defect. */
             testData: string;
+            sourceLocation?: components["schemas"]["DefectSourceLocation"] | null;
+            reproduction?: components["schemas"]["DefectReproduction"] | null;
         };
         DefectCreateRequest: {
             projectId: components["schemas"]["Identifier"];
@@ -9248,6 +9250,10 @@ export interface components {
             preconditions?: string;
             /** @description Markdown-formatted test data used to reproduce the defect. */
             testData?: string;
+            /** @description Manual-only existing repository folder ID; null explicitly selects root. Omission leaves no manual location. Cannot combine with sourceCaseId or a run occurrence. */
+            sourceFolderId?: string | null;
+            /** @description Ordered exact authorized shared revisions resolved server-side and frozen. Cannot combine with a run occurrence. Empty selection preserves existing idempotency fingerprints. */
+            reproductionSharedSteps?: components["schemas"]["DefectSharedStepReference"][];
         } & unknown;
         DefectPatchRequest: {
             title?: string;
@@ -14014,6 +14020,96 @@ export interface components {
                 hasMore: boolean;
                 nextCursor: string | null;
             };
+        };
+        RunSnapshotStep: {
+            id: components["schemas"]["Identifier"];
+            order: number;
+            action: components["schemas"]["LongText"];
+            expectedResult: components["schemas"]["LongText"];
+            testData?: components["schemas"]["LongText"];
+            required: boolean;
+            attachmentIds: components["schemas"]["Identifier"][];
+            /** @description Shared procedure identity captured in this executed snapshot; null for an ordinary instruction. */
+            sharedStepId?: components["schemas"]["Identifier"] | null;
+            /** @description Scenario title captured in this snapshot. */
+            sharedStepTitle?: string | null;
+            /** @description Exact captured shared procedure revision; null when legacy provenance did not retain it. */
+            sharedStepRevision?: number | null;
+            /** @description Original shared reference step identity; legacy snapshots return null. */
+            sharedStepReferenceId?: components["schemas"]["Identifier"] | null;
+            /** @description Original shared procedure item identity; legacy snapshots return null. */
+            sharedStepItemId?: components["schemas"]["Identifier"] | null;
+        };
+        /** @description Immutable case revision and materialized instructions captured when the run item was created. Shared procedure provenance never follows later library changes. */
+        RunCaseSnapshot: {
+            revision: number;
+            title: string;
+            description: components["schemas"]["LongText"];
+            preconditions: components["schemas"]["LongText"];
+            /**
+             * @description The server validates the fully resolved revision. Automated revisions require at least one complete step and an empty checklist; manual revisions keep their existing zero-step allowance.
+             * @enum {string}
+             */
+            type: "manual" | "checklist" | "automated";
+            lifecycle: components["schemas"]["TestCaseLifecycle"];
+            priority: components["schemas"]["Priority"];
+            /**
+             * @description False when priority is unassigned. The effective priority remains medium for compatibility. Omitted for explicitly assigned and historical priorities.
+             * @constant
+             */
+            priorityAssigned?: false;
+            component: components["schemas"]["ShortText"];
+            ownerIdentityId: components["schemas"]["Identifier"] | null;
+            tags: string[];
+            estimatedMinutes: number | null;
+            testData: components["schemas"]["LongText"];
+            steps: components["schemas"]["RunSnapshotStep"][];
+            checklist: components["schemas"]["ChecklistItem"][];
+            attachmentIds: components["schemas"]["Identifier"][];
+            changeNote: components["schemas"]["ShortText"];
+            createdBy: components["schemas"]["Identifier"];
+            createdAt: components["schemas"]["Timestamp"];
+            customFields: components["schemas"]["CustomFieldSnapshot"][];
+            productGroupId: string | null;
+            productId: string | null;
+            /** @default false */
+            regression: boolean;
+        } & (unknown & unknown & unknown);
+        /** @description Immutable repository placement at detection. Null folderId denotes explicitly selected repository root. Missing historical snapshots remain null; resolve stable IDs to navigate to current placement. */
+        DefectSourceLocation: {
+            folderId: string | null;
+            folderPath: string;
+            /** Format: date-time */
+            capturedAt: string;
+            /** @enum {string} */
+            origin: "run" | "case" | "manual";
+        };
+        DefectSharedStepReference: {
+            sharedStepId: string;
+            revision: number;
+        };
+        /** @description Ordered immutable instructions; failed identifies the selected occurrence step. Manual shared instructions never assert execution results. Legacy unavailable shared revision is null. */
+        DefectReproductionStep: {
+            id: string;
+            order: number;
+            action: string;
+            expectedResult: string;
+            testData: string;
+            required: boolean;
+            sharedStep: {
+                id: string;
+                title: string;
+                revision: number | null;
+            } | null;
+            failed: boolean;
+        };
+        /** @description Frozen run snapshot through selected occurrence step, or exact manually selected shared revisions. With no occurrence step retain full run sequence and mark no row failed. Manual instructions have null caseId/caseRevision and are bounded to 2000 steps, 500000 JS characters and 2MB storage. Run-derived instructions preserve the accepted immutable run snapshot content bounds (up to 500 case steps expanded into 100 shared items each). */
+        DefectReproduction: {
+            /** @enum {string} */
+            origin: "run" | "shared_steps";
+            caseId: string | null;
+            caseRevision: number | null;
+            steps: components["schemas"]["DefectReproductionStep"][];
         };
     };
     responses: {

@@ -12,6 +12,10 @@ export type TestStep = {
   required: boolean;
   attachmentIds?: string[];
   sharedStepId?: string | null;
+  sharedStepTitle?: string | null;
+  sharedStepRevision?: number | null;
+  sharedStepReferenceId?: string | null;
+  sharedStepItemId?: string | null;
   sharedStep?: SharedStepSnapshot | null;
 };
 

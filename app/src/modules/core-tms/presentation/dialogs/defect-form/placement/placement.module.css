@@ -1,0 +1,6 @@
+.field { display: grid; gap: 4px; min-inline-size: 0; }
+.label { color: var(--falcon-text-muted); font-size: 11px; font-weight: 500; }
+.path { min-inline-size: 0; flex: 1; }
+.menu { padding: 0 !important; inline-size: min(350px, calc(100vw - 32px)); }
+.status { color: var(--falcon-text-muted); font-size: 11px; line-height: 1.5; }
+.menu .clear { margin: 6px; min-block-size: 28px; block-size: auto; border-radius: 8px; padding: 5px 9px; border: 0; background: transparent; color: var(--falcon-text-secondary); font-size: 12px; }
