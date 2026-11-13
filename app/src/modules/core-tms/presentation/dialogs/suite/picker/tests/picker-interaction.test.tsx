@@ -101,3 +101,19 @@ test("an empty Related Cases picker explains how to link cases to the article", 
     assert.deepEqual(h.scopes, []);
   } finally { h.dispose(); }
 });
+
+test("Related Cases omits row metadata while retaining ID search, full title and accessible selection", () => {
+  const h = setup(false, { purpose: "related-cases" });
+  try {
+    assert.equal(h.root().findAllByProps({ className: "caseMeta" }).length, 0);
+    assert.equal(h.root().findAllByProps({ className: "caseFolder" }).length, 0);
+    h.search("QA-2");
+    const title = h.root().findByProps({ className: "caseTitle" });
+    assert.equal(title.children.join(""), "Create booking");
+    assert.equal(title.props.title, "Create booking");
+    act(() => h.root().findByProps({ "aria-label": "Select QA-2: Create booking" }).props.onChange());
+    act(() => h.root().findByProps({ "aria-label": "Select visible cases" }).props.onChange());
+    assert.deepEqual(h.toggles, ["b"]);
+    assert.deepEqual(h.scopes, [["b"]]);
+  } finally { h.dispose(); }
+});

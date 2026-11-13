@@ -58,7 +58,8 @@ export function SuiteCasePicker({ cases, folders, selected, projectName, ru, rea
               <span>{ru ? "Выбрать видимые" : "Select visible"}</span></label>}
           <span className={styles.resultCount} role="status">{visible.length} {ru ? "кейсов" : "cases"}</span>
         </div>
-        {visible.length ? <PickerRows cases={visible} selected={selected} ru={ru} readonly={readOnly} onToggle={onToggle} />
+        {visible.length ? <PickerRows cases={visible} selected={selected} ru={ru} readonly={readOnly}
+          showMetadata={purpose !== "related-cases"} onToggle={onToggle} />
           : <div className={styles.empty}><Search width={24} height={24} aria-hidden="true" />
             <strong>{active.length ? (ru ? "Кейсы не найдены" : "No matching cases") : (ru ? "Здесь пока нет кейсов" : "No cases here yet")}</strong>
             <p>{active.length ? (ru ? "Попробуйте другой запрос, приоритет или папку." : "Try another search, priority, or folder.")
