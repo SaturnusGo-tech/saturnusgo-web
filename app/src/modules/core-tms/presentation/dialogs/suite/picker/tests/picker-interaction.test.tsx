@@ -10,7 +10,7 @@ import ts from "typescript";
 import type { SuiteCasePicker, SuiteCasePickerProps } from "../SuiteCasePicker";
 import * as model from "../model/picker-model";
 
-function setup(readonly = false) {
+function setup(readonly = false, overrides: Partial<SuiteCasePickerProps> = {}) {
   const modules = new Map<string, unknown>();
   function load(url: URL): unknown {
     if (modules.has(url.href)) return modules.get(url.href);
@@ -42,6 +42,7 @@ function setup(readonly = false) {
       { id: "b", key: "QA-2", title: "Create booking", folderId: "calendar", folderPath: "/Host/Calendar", priority: "medium", tags: [], archivedAt: null },
       { id: "c", key: "QA-3", title: "Sign out", folderId: null, folderPath: "/", priority: "low", tags: [], archivedAt: null }],
     onScope: (ids: readonly string[]) => scopes.push([...ids]), onToggle: (id: string) => toggles.push(id),
+    ...overrides,
   } as unknown as SuiteCasePickerProps;
   let view: ReactTestRenderer;
   act(() => { view = create(<Picker {...props} />, { createNodeMock: () => ({ open: false, indeterminate: false }) }); });
@@ -88,5 +89,15 @@ test("case and current-folder breadcrumbs keep full path tooltips and localize t
     assert.equal(text(h.root().findByProps({ className: "caseFolder" })), "Unfiled");
     assert.equal(h.root().findByProps({ className: "caseFolder" }).props.title, "/");
     assert.deepEqual(h.scopes, []); assert.deepEqual(h.toggles, []);
+  } finally { h.dispose(); }
+});
+
+test("an empty Related Cases picker explains how to link cases to the article", () => {
+  const h = setup(false, { purpose: "related-cases", cases: [], folders: [] });
+  try {
+    const empty = h.root().findByProps({ className: "empty" });
+    assert.equal(empty.findByType("p").children.join(""), "Add test cases to the project to link them to this article.");
+    assert.equal(h.root().findByProps({ "aria-label": "Select visible cases" }).props.disabled, true);
+    assert.deepEqual(h.scopes, []);
   } finally { h.dispose(); }
 });

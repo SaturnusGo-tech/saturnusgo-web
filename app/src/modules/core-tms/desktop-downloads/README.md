@@ -17,9 +17,9 @@ node scripts/publish-desktop-downloads.mjs --verify
 To publish a new manifest after validating the desktop artifacts, use the existing Wrangler login and specify its Cloudflare account without placing credentials in source:
 
 ```sh
-CLOUDFLARE_ACCOUNT_ID=<account-id> node scripts/publish-desktop-downloads.mjs --upload --directory /absolute/path/to/falcon-desktop/dist
+CLOUDFLARE_ACCOUNT_ID=<account-id> node scripts/publish-desktop-downloads.mjs --upload --directory /absolute/path/to/falcon-desktop/dist --managed-host "$(hostname)"
 ```
 
 The script verifies each local artifact against the manifest, uploads only absent keys, and then checks public headers, byte length and streamed SHA-256. An existing installer key is never overwritten; a mismatched object fails verification. A changed installer must use a new release version and prefix.
 
-Only after every installer and checksum passes verification does publishing replace `falcon/desktop/beta/latest.json` with `Cache-Control: no-store`. The script rejects a newer existing pointer before verification and checks again just before replacing it, then reads back the exact published manifest. Serialize publishing jobs: Wrangler does not expose conditional R2 writes, so competing publishers must not run concurrently. `--verify` performs no writes and verifies the latest pointer as well as every immutable artifact. Old builds are retained.
+Only after every installer and checksum passes verification does publishing replace `falcon/desktop/beta/latest.json` with `Cache-Control: no-store`. The script rejects a newer existing pointer before verification and checks again just before replacing it, then reads back the exact published manifest. Publishing and retention apply share an atomic lock at `~/.falcon-desktop-release/writer.lock`, outside all worktrees. `--verify` performs no writes and verifies the latest pointer as well as every immutable artifact. See the [installer retention runbook](../../../../../scripts/desktop-downloads/README.md) for initialization, dry-run review, grace periods, and the single managed host requirement.

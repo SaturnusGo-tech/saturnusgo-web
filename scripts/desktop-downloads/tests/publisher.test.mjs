@@ -82,3 +82,17 @@ test("release ordering follows SemVer and rejects malformed or unsafe manifest p
   await assert.rejects(f.run({ release: { ...f.manifest, artifacts: [{ ...f.manifest.artifacts[0], file: "../installer.dmg" }, ...f.manifest.artifacts.slice(1)] } }), /Invalid desktop artifact/);
   assert.deepEqual(f.calls, []);
 });
+
+test("partial uploads never run cleanup and housekeeping failure preserves verified publication", async t => {
+  const f = await fixture(t); let started = 0, completed = 0;
+  const lifecycle = { async beforePublish() { started++; }, async afterPublish() { completed++; throw Error("cleanup unavailable"); } };
+  const file = f.manifest.artifacts[0];
+  f.store.set(f.manifest.prefix + file.file, { ...file, data: Buffer.alloc(file.bytes) });
+  await assert.rejects(f.run({ lifecycle }), /Public artifact mismatch/);
+  assert.equal(started, 1); assert.equal(completed, 0);
+  const g = await fixture(t), logs = [];
+  await g.run({ lifecycle, log: line => logs.push(JSON.parse(line)) });
+  assert.equal(completed, 1);
+  assert.deepEqual(JSON.parse(g.store.get(latestKey).data), g.manifest);
+  assert.ok(logs.some(item => item.installerRetention === "failed" && item.published));
+});

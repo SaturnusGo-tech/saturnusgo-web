@@ -3,6 +3,7 @@ import type React from "react";
 import { falconBrandIcons, falconBrandPreview } from "../src/modules/core-falcon-public/shared/brand-metadata";
 import "../src/modules/core-tms/presentation/theme/falcon-theme.css";
 import { FalconToastProvider } from "../src/modules/core-tms/presentation/workspace/ui/FalconToastProvider";
+import { PublicNavigationTracker } from "../src/modules/core-falcon-public/navigation/browser/PublicNavigationTracker";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://tms.saturnusgo.com"),
@@ -31,6 +32,7 @@ export const metadata: Metadata = {
 
 export default function FalconLayout({ children }: { readonly children: React.ReactNode }) {
   return <>
+    <PublicNavigationTracker />
     <div data-falcon-shell id="app-main" style={{ padding: 0 }}>{children}</div>
     <FalconToastProvider />
   </>;

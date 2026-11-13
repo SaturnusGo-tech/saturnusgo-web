@@ -2,50 +2,18 @@
 import { createHash } from "node:crypto";
 import { createReadStream } from "node:fs";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
+import { tmpdir, hostname } from "node:os";
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";
 import { spawn } from "node:child_process";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-export const latestKey = "falcon/desktop/beta/latest.json";
+import { compareVersions, latestKey, validateRelease } from "./desktop-downloads/release/manifest.mjs";
+export { compareVersions, latestKey };
+import { withReleaseLock } from "./desktop-downloads/release/lock.mjs";
+import { createCloudflareStore } from "./desktop-downloads/storage/cloudflare.mjs";
+import { createPublishingLifecycle } from "./desktop-downloads/provenance/publish.mjs";
 const latestUrl = `https://saturnusgo.com/${latestKey}`;
-function version(value) {
-  const match = typeof value === "string" && /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([\da-zA-Z-]+(?:\.[\da-zA-Z-]+)*))?(?:\+[\da-zA-Z-]+(?:\.[\da-zA-Z-]+)*)?$/.exec(value);
-  if (!match || match[4]?.split(".").some(part => /^0\d+$/.test(part))) throw new Error("Invalid desktop version");
-  return match;
-}
-const text = (a, b) => a === b ? 0 : a < b ? -1 : 1;
-const numeric = (a, b) => a.length - b.length || text(a, b);
-export function compareVersions(a, b) {
-  const left = version(a), right = version(b);
-  for (const index of [1, 2, 3]) { const order = numeric(left[index], right[index]); if (order) return order; }
-  const l = left[4]?.split(".") ?? [], r = right[4]?.split(".") ?? [];
-  if (!l.length || !r.length) return l.length ? -1 : r.length ? 1 : 0;
-  for (let index = 0; index < Math.max(l.length, r.length); index++) {
-    if (l[index] === undefined) return -1; if (r[index] === undefined) return 1;
-    if (l[index] === r[index]) continue;
-    const ln = /^\d+$/.test(l[index]), rn = /^\d+$/.test(r[index]);
-    return ln && rn ? numeric(l[index], r[index]) : ln !== rn ? ln ? -1 : 1 : text(l[index], r[index]);
-  }
-  return 0;
-}
-function validateRelease(release) {
-  version(release?.version);
-  if (release.channel !== "beta" || release.baseUrl !== `https://saturnusgo.com/falcon/desktop/beta/${release.version}/` ||
-    release.prefix !== `falcon/desktop/beta/${release.version}/` || typeof release.bucket !== "string" || !/^[a-z0-9-]+$/.test(release.bucket) ||
-    release.checksums !== "SHA256SUMS.txt" || !Array.isArray(release.artifacts) || release.artifacts.length !== 3) throw new Error("Invalid desktop manifest");
-  const formats = { "mac-arm64": ["mac", "beta.dmg", "application/x-apple-diskimage"], "mac-x64": ["mac", "beta.dmg", "application/x-apple-diskimage"],
-    "win-x64": ["windows", "beta-setup.exe", "application/vnd.microsoft.portable-executable"] };
-  const seen = new Set();
-  for (const file of release.artifacts) {
-    const format = file && Object.hasOwn(formats, file.id) && formats[file.id];
-    if (!format || seen.has(file.id) || file.platform !== format[0] || file.file !== `Falcon-${release.version}-${file.id}-${format[1]}` ||
-      file.contentType !== format[2] || !Number.isSafeInteger(file.bytes) || file.bytes <= 0 || typeof file.sha256 !== "string" || !/^[a-f0-9]{64}$/.test(file.sha256) ||
-      ![file.label, file.minimum].every(text => typeof text === "string" && text.trim().length > 0 && text.length < 120)) throw new Error("Invalid desktop artifact");
-    seen.add(file.id);
-  }
-}
 async function putObject(bucket, key, path, file, cacheControl) {
   await new Promise((done, fail) => {
     const command = process.platform === "win32" ? "wrangler.cmd" : "wrangler";
@@ -55,7 +23,10 @@ async function putObject(bucket, key, path, file, cacheControl) {
     child.once("error", fail); child.once("close", code => code === 0 ? done() : fail(new Error(`Upload failed: ${key}`)));
   });
 }
-export async function publishDesktopDownloads({ release, directory, upload = false, request = fetch, put = putObject, log = console.log }) {
+export async function publishDesktopDownloads(options) {
+  return options.upload ? withReleaseLock(() => publish(options)) : publish(options);
+}
+async function publish({ release, directory, upload = false, request = fetch, put = putObject, log = console.log, lifecycle }) {
   validateRelease(release);
   const readLatest = async (missing = false) => {
     const response = await request(`${latestUrl}?verify=${Date.now()}`, { cache: "no-store", redirect: "error", credentials: "omit" });
@@ -65,7 +36,10 @@ export async function publishDesktopDownloads({ release, directory, upload = fal
     if (compareVersions(latest.version, release.version) > 0) throw new Error(`Refusing to replace newer release ${latest.version} with ${release.version}`);
     return latest;
   };
-  if (upload) await readLatest(true);
+  if (upload) {
+    await readLatest(true);
+    await lifecycle?.beforePublish(release);
+  }
 const hash = async body => {
   const digest = createHash("sha256"); let bytes = 0;
   for await (const chunk of body) { bytes += chunk.length; digest.update(chunk); }
@@ -109,12 +83,19 @@ for (const file of files) {
   const latest = await readLatest();
   if (JSON.stringify(latest) !== JSON.stringify(release)) throw new Error("Latest desktop manifest does not match the verified release");
   log(JSON.stringify({ latest: latest.version, url: latestUrl }));
+  if (upload && lifecycle) {
+    try { await lifecycle.afterPublish(release); }
+    catch (error) { log(JSON.stringify({ installerRetention: "failed", release: release.version, reason: error.message, published: true })); }
+  }
 }
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2), upload = args.includes("--upload"), verify = args.includes("--verify");
   const index = args.indexOf("--directory"), directory = index < 0 ? null : args[index + 1];
-  if ((!upload && !verify) || (upload && !directory)) throw new Error("Usage: node scripts/publish-desktop-downloads.mjs --verify | --upload --directory /absolute/path/to/falcon-desktop/dist");
+  if ((!upload && !verify) || (upload && !directory)) throw new Error("Usage: node scripts/publish-desktop-downloads.mjs --verify | --upload --directory /absolute/path/to/falcon-desktop/dist --managed-host <hostname>");
   if (upload && !process.env.CLOUDFLARE_ACCOUNT_ID) throw new Error("Set CLOUDFLARE_ACCOUNT_ID before publishing.");
   const release = JSON.parse(await readFile(join(root, "app/src/modules/core-tms/desktop-downloads/model/release.json"), "utf8"));
-  await publishDesktopDownloads({ release, directory, upload });
+  const hostIndex = args.indexOf("--managed-host");
+  if (upload && args[hostIndex + 1] !== hostname()) throw new Error("Publishing requires --managed-host matching this exclusive publishing host");
+  const lifecycle = upload ? createPublishingLifecycle({ store: await createCloudflareStore() }) : undefined;
+  await publishDesktopDownloads({ release, directory, upload, lifecycle });
 }

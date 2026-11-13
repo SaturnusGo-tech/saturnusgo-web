@@ -19,7 +19,7 @@
 .wrapper { z-index: 172; }
 .backdrop { z-index: 171; background: var(--falcon-scrim); }
 .drawer { inline-size: min(480px, calc(100vw - 12px)); max-inline-size: calc(100vw - 12px); background: var(--falcon-surface); color: var(--falcon-text); border-inline-start: 1px solid var(--falcon-border); border-radius: 0; box-shadow: -12px 0 35px rgb(0 0 0 / 12%); }
-.pickerDrawer { inline-size: min(1024px, calc(100vw - 12px)); }
+.pickerDrawer { inline-size: min(960px, calc(100vw - 12px)); max-inline-size: min(960px, calc(100vw - 12px)); }
 .header { display: flex; flex: none; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; border-block-end: 1px solid var(--falcon-border); }
 .header h2 { display: flex; align-items: center; gap: 9px; margin: 0; padding: 0; font-size: 17px; font-weight: 600; }
 .total { color: var(--falcon-text-secondary); font-size: 12px; font-weight: 400; }
@@ -30,6 +30,9 @@
 .pickerBody { display: flex; flex-direction: column; gap: 12px; padding: 14px 18px; }
 .pickerBody > p { margin: 0; }
 .pickerFieldset { min-inline-size: 0; margin: 0; padding: 0; border: 0; }
+.catalogState { display: flex; flex-direction: column; min-inline-size: 0; min-block-size: clamp(220px, 40dvh, 360px); }
+.catalogError { display: grid; place-items: center; flex: 1; text-align: center; }
+.catalogError > p { max-inline-size: 36ch; margin: 0; }
 .footer { display: flex; align-items: center; gap: 8px; padding: 12px 18px; border-block-start: 1px solid var(--falcon-border); }
 .footer > span { margin-inline-end: auto; }
 .error { color: var(--falcon-danger); font-size: 13px; }

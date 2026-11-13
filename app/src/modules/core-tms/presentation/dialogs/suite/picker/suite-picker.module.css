@@ -10,6 +10,15 @@
 .filterTrigger[data-active],.selectedFilter[aria-pressed=true]{background:var(--falcon-hover);border-color:var(--falcon-text-muted)}
 .selectedFilter span{font-variant-numeric:tabular-nums;color:var(--falcon-text-muted)}
 .browser{display:grid;grid-template-columns:minmax(150px,190px) minmax(0,1fr);border-top:1px solid var(--falcon-border-subtle);min-width:0}
+.picker[data-purpose="related-cases"] .browser{grid-template-columns:minmax(280px,.92fr) minmax(0,1fr)}
+.picker[data-purpose="related-cases"] .folders{padding-inline-end:16px}
+.picker[data-purpose="related-cases"] .folderRow{align-items:flex-start}
+.picker[data-purpose="related-cases"] .folderButton{align-items:flex-start;line-height:18px}
+.picker[data-purpose="related-cases"] .folderButton>span:not([data-folder-visual]){overflow:visible;overflow-wrap:anywhere;white-space:normal;text-overflow:clip}
+.picker[data-purpose="related-cases"] .folderButton>[data-folder-visual]{margin-block-start:1px}
+.picker[data-purpose="related-cases"] .folderButton small{line-height:18px}
+.picker[data-purpose="related-cases"] .mobileFolders summary>[data-folder-visual]{flex:none}
+.picker[data-purpose="related-cases"] .mobileFolders summary>span:not([data-folder-visual]){flex:1;min-inline-size:0}
 .folders{min-width:0;padding:12px 12px 12px 0;border-right:1px solid var(--falcon-border-subtle)}
 .folderNav{display:flex;flex-direction:column;gap:2px;min-width:0}
 .folderHeading{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--falcon-text-muted);font-size:11px;font-weight:500;padding:2px 8px 10px;line-height:16px}

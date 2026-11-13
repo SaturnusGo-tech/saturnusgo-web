@@ -3,15 +3,15 @@
 import { useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { FalconBrandMark } from "../../../shared/components/brand/FalconBrandMark";
+import { FalconLegalHeader } from "../navigation/presentation/FalconLegalHeader";
 import styles from "../privacy/privacy.module.css";
 import type { LegalDocument } from "./readLegalDocument";
 
 type Locale = "en" | "ru";
 
 const labels = {
-  en: { home: "Falcon home", language: "Document language", related: "Related policies", terms: "Terms of Service", privacy: "Privacy Policy", billing: "Subscription and Billing" },
-  ru: { home: "Главная Falcon", language: "Язык документа", related: "Другие документы", terms: "Условия использования", privacy: "Политика конфиденциальности", billing: "Условия подписки и оплаты" },
+  en: { language: "Document language", related: "Related policies", terms: "Terms of Service", privacy: "Privacy Policy", billing: "Subscription and Billing" },
+  ru: { language: "Язык документа", related: "Другие документы", terms: "Условия использования", privacy: "Политика конфиденциальности", billing: "Условия подписки и оплаты" },
 };
 const routes: Record<LegalDocument, string> = { terms: "/terms/", privacy: "/privacy/", billing: "/billing-terms/" };
 
@@ -27,16 +27,10 @@ export function FalconLegalPage({ document, versions }: { document: LegalDocumen
 
   const copy = labels[locale];
   return <div className={styles.page} lang={locale}>
-    <header className={styles.header}>
-      <a className={styles.brand} href={locale === "ru" ? "/ru/" : "/"} aria-label={copy.home}>
-        <FalconBrandMark className={styles.brandMark} />
-        falcon<span className={styles.brandArrow} aria-hidden="true">↗</span>
-      </a>
-      <nav className={styles.languages} aria-label={copy.language}>
-        <a href="?lang=en" lang="en" aria-current={locale === "en" ? "page" : undefined}>English</a>
-        <a href="?lang=ru" lang="ru" aria-current={locale === "ru" ? "page" : undefined}>Русский</a>
-      </nav>
-    </header>
+    <FalconLegalHeader locale={locale} languageLabel={copy.language} browserHome={locale === "ru" ? "/ru/" : "/"}>
+      <a href="?lang=en" lang="en" aria-current={locale === "en" ? "page" : undefined}>English</a>
+      <a href="?lang=ru" lang="ru" aria-current={locale === "ru" ? "page" : undefined}>Русский</a>
+    </FalconLegalHeader>
     <main className={styles.content}>
       <article className={styles.legalBody}>
         <Markdown remarkPlugins={[remarkGfm]} components={{

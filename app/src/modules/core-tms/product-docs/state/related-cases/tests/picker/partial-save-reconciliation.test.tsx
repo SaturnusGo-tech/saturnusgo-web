@@ -21,7 +21,9 @@ async function pickerFixture(t: TestContext, partial = true, pauseReconcile = fa
       : name.endsWith("load-related-cases") ? { loadRelatedCases } : name.endsWith("save-related-cases") ? { saveRelatedCases }
         : name.endsWith("case-requirements-events") ? { subscribeCaseRequirementsChanged } : undefined);
   const { RelatedCasePicker: picker } = h.load<{ RelatedCasePicker: typeof RelatedCasePicker }>(new URL("../../../../presentation/related-cases/picker/RelatedCasePicker.tsx", import.meta.url), name =>
-    name.endsWith("useProductDocCaseCatalog") ? { useProductDocCaseCatalog: () => ({ status: "ready", data: {
+    name === "framer-motion" ? { useReducedMotion: () => false, motion: { div: "motion.div" }, AnimatePresence: "AnimatePresence" }
+      : name.endsWith("useLoadingFeedback") ? { useLoadingFeedback: (pending: boolean) => pending }
+      : name.endsWith("useProductDocCaseCatalog") ? { useProductDocCaseCatalog: () => ({ status: "ready", data: {
       cases: ["a", "b", "c"].map(id => ({ id, title: id })), folders: [] } }) }
       : name.endsWith("product-doc-related-cases") ? { relatedCasesChanged, toggleRelatedCases } : undefined);
   const persisted = new Set(["a"]);

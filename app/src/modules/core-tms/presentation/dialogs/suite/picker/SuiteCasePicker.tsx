@@ -13,9 +13,10 @@ import styles from "./suite-picker.module.css";
 export type SuiteCasePickerProps = {
   cases: readonly TestCaseSummary[]; folders: readonly RepositoryFolder[]; selected: ReadonlySet<string>;
   projectName: string; ru: boolean; readonly?: boolean; onToggle: (id: string) => void; onScope: (ids: readonly string[]) => void;
+  purpose?: "suite" | "related-cases";
 };
 
-export function SuiteCasePicker({ cases, folders, selected, projectName, ru, readonly: readOnly, onToggle, onScope }: SuiteCasePickerProps) {
+export function SuiteCasePicker({ cases, folders, selected, projectName, ru, readonly: readOnly, purpose = "suite", onToggle, onScope }: SuiteCasePickerProps) {
   const [query, setQuery] = useState(""), [folder, setFolder] = useState(""), [priority, setPriority] = useState<PickerPriority>("all");
   const [selectedOnly, setSelectedOnly] = useState(false);
   const checkbox = useRef<HTMLInputElement>(null), mobileFolders = useRef<HTMLDetailsElement>(null), searchId = useId();
@@ -32,7 +33,7 @@ export function SuiteCasePicker({ cases, folders, selected, projectName, ru, rea
   const chooseFolder = (id: string) => { setFolder(id); if (mobileFolders.current) mobileFolders.current.open = false; };
   const navigation = <PickerFolders folders={entries} count={active.length} current={scope} projectName={projectName} ru={ru} onChoose={chooseFolder} />;
   const filtered = Boolean(query || scope || priority !== "all" || (selectedOnly && !readOnly));
-  return <section className={styles.picker} aria-label={ru ? "Выбор тест-кейсов" : "Choose test cases"}>
+  return <section className={styles.picker} data-purpose={purpose} aria-label={ru ? "Выбор тест-кейсов" : "Choose test cases"}>
     <div className={styles.toolbar}>
       <div className={styles.search} data-input-shell><Search width={17} height={17} aria-hidden="true" />
         <label className={styles.srOnly} htmlFor={searchId}>{ru ? "Найти тест-кейс" : "Find a test case"}</label>
@@ -61,7 +62,8 @@ export function SuiteCasePicker({ cases, folders, selected, projectName, ru, rea
           : <div className={styles.empty}><Search width={24} height={24} aria-hidden="true" />
             <strong>{active.length ? (ru ? "Кейсы не найдены" : "No matching cases") : (ru ? "Здесь пока нет кейсов" : "No cases here yet")}</strong>
             <p>{active.length ? (ru ? "Попробуйте другой запрос, приоритет или папку." : "Try another search, priority, or folder.")
-              : (ru ? "Добавьте тест-кейсы в проект, чтобы включить их в набор." : "Add test cases to the project to include them in a suite.")}</p>
+              : purpose === "related-cases" ? (ru ? "Добавьте тест-кейсы в проект, чтобы связать их с этой статьёй." : "Add test cases to the project to link them to this article.")
+                : (ru ? "Добавьте тест-кейсы в проект, чтобы включить их в набор." : "Add test cases to the project to include them in a suite.")}</p>
             {filtered && <button type="button" onClick={() => { setQuery(""); setPriority("all"); setFolder(""); setSelectedOnly(false); }}>
               {ru ? "Сбросить фильтры" : "Clear filters"}</button>}
           </div>}

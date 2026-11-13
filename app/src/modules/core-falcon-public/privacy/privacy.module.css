@@ -4,6 +4,9 @@ html:has(.page),body:has(.page){height:auto;min-height:100%;overflow-x:clip;over
 .brand { display: flex; gap: 14px; align-items: center; font-size: 24px; font-weight: 600; letter-spacing: -.055em; text-decoration: none; }
 .brandMark { --falcon-brand-mark-size: 24px; }
 .brandArrow { font-weight: 400; font-size: 21px; }
+.headerNavigation { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 32px; }
+.back { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 0; font-size: 14px; text-decoration: none; }
+.back:hover { text-decoration: underline; }
 .languages { display: flex; flex-wrap: wrap; gap: 20px; font-size: 12px; }
 .languages a { color: var(--falcon-text-muted); text-decoration: none; }
 .languages a[aria-current="page"] { color: var(--falcon-text); text-decoration: underline; text-underline-offset: 6px; }

@@ -19,6 +19,8 @@ import { verifyCompanyDocument, unavailableCompanyDocument } from "./gateway/com
 import { readConsentPolicy } from "./gateway/protocol/security/read-consent-policy.mjs";
 import { PUBLIC_SUPPORT_PATH } from "./gateway/protocol/route-policy.mjs";
 import { LATEST_DESKTOP_RELEASE_PATH, serveLatestDesktopRelease } from "./gateway/desktop/latest/response.mjs";
+import { desktopPublicEntry } from "./gateway/desktop/navigation/public-entry.mjs";
+import { varyPublicEntry } from "./gateway/desktop/navigation/public-entry-cache.mjs";
 
 const APP_PATH_NO_SLASH = APP_PATH.slice(0, -1);
 const FORWARDED_HEADERS = [
@@ -79,8 +81,11 @@ function routeForRequestPath(pathname) {
 }
 
 function redirectToCanonicalPath(url, pathname) {
+  const originalPathname = url.pathname;
   url.pathname = pathname;
-  return secureResponse(Response.redirect(url.toString(), 302));
+  const response = secureResponse(Response.redirect(url.toString(), 302));
+  varyPublicEntry(originalPathname, response.headers);
+  return response;
 }
 
 function redirectLegacyCompanyInvitation(url, env) {
@@ -224,6 +229,7 @@ async function proxyToPublicSite(request, incoming, originPath, managed = false,
     ? await env.FALCON_STATIC_ASSETS.fetch(upstreamRequest)
     : await fetch(upstreamRequest);
   const responseHeaders = new Headers(upstreamResponse.headers);
+  varyPublicEntry(incoming.pathname, responseHeaders);
   if ((incoming.pathname === APP_PATH || routeForRequestPath(incoming.pathname)) &&
       !['/', '/ru/', '/privacy/', '/terms/', '/billing-terms/', '/trial-terms/'].includes(incoming.pathname)) responseHeaders.set('x-robots-tag','noindex, nofollow');
   responseHeaders.delete("set-cookie");
@@ -320,6 +326,8 @@ export default {
     if (audience && documentRequest) {
       const verified = await verifyCompanyDocument(request, env, audience);
       if (!verified.ok) return secureResponse(unavailableCompanyDocument(verified.status, request.method === "HEAD"), true);
+      const desktopEntry = desktopPublicEntry(request);
+      if (desktopEntry) return secureResponse(desktopEntry, true);
       if (!verified.authOnly && incoming.hostname !== TMS_HOST && ["/", "/login/", "/login", "/signup/", "/signup", "/cloud-login/", "/cloud-login"].includes(incoming.pathname)) {
         if (audience === "platform" && publicAuthEnabled(TMS_HOST, env)) {
           const invitation = redirectLegacyCompanyInvitation(incoming, env);
@@ -337,6 +345,10 @@ export default {
         }
         return redirectToCanonicalPath(incoming, audience === "platform" ? "/sandbox/" : APP_PATH);
       }
+    }
+    if (!audience) {
+      const desktopEntry = desktopPublicEntry(request);
+      if (desktopEntry) return secureResponse(desktopEntry);
     }
     if (!audience && /^\/(sandbox|admin|profile)(?:\/|$)/.test(incoming.pathname)) return notFoundResponse();
     if (!publicPersonal && ["/signup", "/signup/"].includes(incoming.pathname)) return redirectToCanonicalPath(incoming, "/cloud-login/");

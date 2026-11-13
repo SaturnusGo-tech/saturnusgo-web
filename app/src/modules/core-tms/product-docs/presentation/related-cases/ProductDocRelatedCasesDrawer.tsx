@@ -3,6 +3,7 @@
 import { Button, Drawer, DrawerBody, DrawerContent, DrawerHeader } from "@heroui/react";
 import { useReducedMotion } from "framer-motion";
 import { ErrorToast } from "../../../presentation/common/error/ErrorToast";
+import { TessiqLoader } from "../../../presentation/common/loading/TessiqLoader";
 import { useRef } from "react";
 import { ListChecks, Plus, X } from "lucide-react";
 import type { ProductDocCase, ProductDocScope } from "../../domain/product-docs";
@@ -45,12 +46,12 @@ export function ProductDocRelatedCasesDrawer(props: Props) {
           <X size={17} aria-hidden="true" />
         </Button>
       </header>
-      {open && selecting && editable ? <RelatedCasePicker scope={scope} baseline={cases} projectName={projectName} ru={ru}
+      {open && selecting && editable ? <RelatedCasePicker key={`${scope.workspaceId}:${scope.projectId}`} scope={scope} baseline={cases} projectName={projectName} ru={ru}
         busy={busy} failed={saveFailed} canApply={!loading && !loadFailed} onCancel={() => onSelect(false)} onApply={async selection => {
           if (await onSave(selection)) onSelect(false);
         }} /> : <DrawerBody className={styles.body}>
         {loadFailed ? <ErrorToast message={ru ? "Не удалось загрузить связанные кейсы." : "Could not load related cases."} />
-          : loading ? <p role="status">{ru ? "Загрузка…" : "Loading…"}</p> : cases.length ? <ul className={styles.list}>
+          : loading ? <TessiqLoader pane branded label={ru ? "Загрузка связанных кейсов…" : "Loading related cases…"} /> : cases.length ? <ul className={styles.list}>
           {cases.map(item => <li key={item.caseId}>
             <button type="button" className={styles.caseLink} disabled={!onOpenCase || busy} onClick={() => openCase(item.caseId)}>
               <ListChecks size={15} aria-hidden="true" /><span>{item.title}</span>
