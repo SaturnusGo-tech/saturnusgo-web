@@ -52,13 +52,14 @@ export function SharedStepsView({ resource, folders = [] }: { resource: Resource
       <header className={styles.header}>
         <div><h1>{ru ? "Общие шаги" : "Shared steps"}<span>{resource.items.length || ""}</span></h1>
           <p>{ru ? "Повторяемые сценарии проекта" : "Reusable project procedures"}</p></div>
-        <div className={styles.headerActions}><SharedStepSearch value={query} onChange={setQuery} ru={ru} />
+        <div className={styles.headerActions}>
+          <div className={styles.locationSearch}>
+            {resource.items.length > 0 && <SharedStepSectionFilter items={resource.items} value={section} ru={ru} onChange={setSection} />}
+            <SharedStepSearch value={query} onChange={setQuery} ru={ru} />
+          </div>
           <button type="button" className={styles.primaryButton} onClick={create}><Plus size={16} />{ru ? "Общий шаг" : "Shared step"}</button>
         </div>
       </header>
-      {resource.items.length > 0 && <div className={styles.sectionFilter}>
-        <SharedStepSectionFilter items={resource.items} value={section} ru={ru} onChange={setSection} />
-      </div>}
       {resource.status === "error" ? <ErrorToast message={ru ? "Не удалось загрузить общие шаги" : "Could not load shared steps"} retryLabel={ru ? "Повторить" : "Retry"} onRetry={resource.refresh} />
         : <DeferredPane pending={resource.status === "loading" && !resource.items.length} variant="list" label={ru ? "Загрузка общих шагов" : "Loading shared steps"}>
           {rows.length > 0 && <SharedStepList items={rows} ru={ru} locale={locale} archiveEnabled={resource.archiveEnabled}

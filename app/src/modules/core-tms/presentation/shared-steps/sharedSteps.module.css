@@ -43,6 +43,10 @@
 .header h1 span { margin-left: 9px; color: var(--falcon-text-muted); font-size: 14px; font-weight: 400; letter-spacing: 0; }
 .header p { margin: 4px 0 0; color: var(--falcon-text-muted); font-size: 13px; line-height: 21px; }
 .headerActions { display: flex; align-items: center; flex: none; min-width: 0; max-width: 100%; gap: 8px; }
+.locationSearch { display: flex; align-items: center; justify-content: flex-end; min-inline-size: 0; gap: 6px; }
+.locationSearch [data-input-shell] { --tms-focus-border: var(--falcon-text-muted); --tms-focus-ring: transparent; }
+.locationSearch [data-input-shell]:focus-within { border-color: var(--falcon-text-muted); outline: 0; box-shadow: none; }
+.locationSearch input:is(:focus, :focus-visible) { outline: 0; box-shadow: none; }
 .view :is(button, input):focus-visible, .editor :is(button, input):focus-visible { outline: 2px solid var(--falcon-text-muted); outline-offset: 3px; box-shadow: none; }
 .primaryButton,
 .secondaryButton,
@@ -76,7 +80,12 @@
 .sharedRail { padding-left: 10px; border-left: 1px solid var(--falcon-discovery-border); }
 .editor .paper .sharedRail textarea { color: var(--falcon-text); background: transparent; border-color: transparent; }
 .addButton { margin: 2px 0 0 35px; background: transparent; border-color: transparent; }
-@container shared-steps (max-width: 760px) { .header { align-items: flex-start; flex-wrap: wrap; gap: 16px; } .headerActions { margin-left: auto; } }
+@container shared-steps (max-width: 1000px) {
+  .header { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px 8px; }
+  .headerActions { display: contents; }
+  .headerActions > .primaryButton { grid-column: 2; grid-row: 1; }
+  .locationSearch { grid-column: 1 / -1; grid-row: 2; min-block-size: 36px; }
+}
 @media (max-width: 640px) { .view { padding: 24px 18px 48px; } .editorHeader { grid-template-columns: 30px minmax(0,1fr); padding: 18px; gap: 8px; } .editorActions { grid-column: 1/-1; justify-content: flex-end; } .editorScroll { padding: 8px 18px 42px; } }
 
 .editorFields { min-width: 0; border: 0; padding: 0; margin: 0 auto; }
@@ -91,5 +100,3 @@
 .archiveActions { display: flex; justify-content: flex-end; gap: 8px; }
 .dangerButton { min-height: 36px; padding: 0 13px; border: 1px solid var(--falcon-danger-border); border-radius: 10px; color: var(--falcon-danger-on-solid); background: var(--falcon-danger-solid); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
 .dangerButton:disabled { opacity: .48; cursor: default; }
-
-.sectionFilter { display: flex; align-items: center; margin: -12px 0 15px; }

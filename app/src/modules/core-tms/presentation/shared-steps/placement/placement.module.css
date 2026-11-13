@@ -1,2 +1,1 @@
-.placement { display: grid; gap: 8px; min-width: 0; margin: 0 0 30px; }
-.placement p { margin: 0; max-width: 62ch; color: var(--falcon-text-secondary); font-size: 12px; line-height: 1.5; }
+.placement { display: flex; min-width: 0; margin: 14px 0 0 38px; max-inline-size: min(640px, calc(100% - 38px)); font-size: 13px; }

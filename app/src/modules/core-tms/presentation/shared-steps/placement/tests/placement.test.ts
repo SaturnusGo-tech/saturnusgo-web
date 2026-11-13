@@ -11,7 +11,7 @@ function setup(t: TestContext, overrides: Partial<Parameters<typeof SharedStepPl
     new URL("../SharedStepPlacement.tsx", import.meta.url));
   const tree = nodes(h.render(() => Placement({ draft: { ...emptySharedStepDraft(), folderId: "archived" },
     currentPath: "/Host/Authentication", folders: [], ru: false, onChange: value => events.push(value), ...overrides })));
-  return { events, pick: (path: string) => invoke(tree.find(node => node.type === "FolderPathPicker")!, "onChange", path) };
+  return { events, tree, pick: (path: string) => invoke(tree.find(node => node.type === "FolderPathPicker")!, "onChange", path) };
 }
 
 test("reselecting a placement omitted from active folders preserves its stable ID", t => {
@@ -32,4 +32,12 @@ test("choosing another active folder or project root changes placement explicitl
   const h = setup(t, { folders: [{ id: "payments", path: "/Payments" }] });
   h.pick("/Payments"); h.pick("/");
   assert.deepEqual(h.events.map(value => value.folderId), ["payments", null]);
+});
+
+test("placement is a compact breadcrumb without a visual label or explanatory copy", t => {
+  const h = setup(t), picker = h.tree.find(node => node.type === "FolderPathPicker")!;
+  assert.equal(picker.props.inline, true);
+  assert.equal(picker.props.allowCreate, false);
+  assert.equal(h.tree.some(node => node.type === "p"), false);
+  assert.equal(picker.props.label, "Choose a folder");
 });

@@ -7,8 +7,8 @@ import { FolderPathBreadcrumb } from "../../../common/breadcrumbs/path/FolderPat
 import controls from "../../../common/properties/property-controls.module.css";
 import css from "./folderPathPicker.module.css";
 
-export function FolderPathPicker({ value, folders, onChange, ru, disabled, allowCreate = true, label: customLabel }: {
-  value: string; folders: readonly string[]; onChange(value: string): void; ru: boolean; disabled?: boolean; allowCreate?: boolean; label?: string;
+export function FolderPathPicker({ value, folders, onChange, ru, disabled, allowCreate = true, label: customLabel, inline = false }: {
+  value: string; folders: readonly string[]; onChange(value: string): void; ru: boolean; disabled?: boolean; allowCreate?: boolean; label?: string; inline?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -38,8 +38,8 @@ export function FolderPathPicker({ value, folders, onChange, ru, disabled, allow
     if (paths.includes(candidate) || (canCreate && !options.length)) choose(candidate);
     else event.currentTarget.querySelector<HTMLElement>('[role=option]:not([aria-disabled=true])')?.focus();
   }
-  return <div className={css.root}>
-    <span className={css.label}>{label}</span>
+  return <div className={css.root} data-inline={inline || undefined}>
+    {!inline && <span className={css.label}>{label}</span>}
     <PropertyPopover label={label} triggerLabel={`${label}, ${pathLabel(value)}`} open={open} onOpenChange={setMenu} disabled={disabled}
       menuClassName={css.menu} onMenuKeyDown={submitSearch} trigger={<>
         <FolderVisual path={value} /><span className={css.selection}><FolderPathBreadcrumb path={value} ru={ru}/></span><ChevronDown size={13} aria-hidden="true"/>

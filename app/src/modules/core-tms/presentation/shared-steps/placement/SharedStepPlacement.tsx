@@ -14,10 +14,8 @@ export function SharedStepPlacement({ draft, folders, currentPath, ru, disabled,
     if (folder) onChange({ ...draft, folderId: folder.id });
   };
   return <div className={css.placement}>
-    <FolderPathPicker value={path} folders={folders.map(folder => folder.path)} allowCreate={false}
-      label={ru ? "Раздел репозитория" : "Repository section"} ru={ru} disabled={disabled}
+    <FolderPathPicker value={path} folders={folders.map(folder => folder.path)} allowCreate={false} inline
+      label={ru ? "Выбрать папку" : "Choose a folder"} ru={ru} disabled={disabled}
       onChange={selectPath} />
-    <p>{ru ? "Необязательно. Помогает найти общий шаг; использовать его можно в любом разделе проекта."
-      : "Optional. Organize this procedure here and reuse it anywhere in the project."}</p>
   </div>;
 }

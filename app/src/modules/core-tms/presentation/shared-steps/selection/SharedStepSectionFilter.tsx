@@ -1,4 +1,4 @@
-import { Folder } from "lucide-react";
+import { ChevronDown, Folder } from "lucide-react";
 import type { SharedStepSummary } from "../../../shared-steps/model/shared-step";
 import { sharedStepSections } from "../../../shared-steps/model/catalog/shared-step-catalog";
 import { FolderPathBreadcrumb } from "../../common/breadcrumbs/path/FolderPathBreadcrumb";
@@ -12,7 +12,8 @@ export function SharedStepSectionFilter({ items, value, ru, onChange }: {
   const options = [{ value: "all", label: all }, ...sharedStepSections(items).map(path => ({
     value: path, label: path === "/" ? (ru ? "Корень проекта" : "Project root") : path.split("/").filter(Boolean).join(" › "),
   }))];
-  return <PropertySelect locale={ru ? "ru" : "en"} label={ru ? "Раздел" : "Section"}
+  return <div className={css.section}><PropertySelect locale={ru ? "ru" : "en"} label={ru ? "Раздел" : "Section"}
     searchLabel={ru ? "Найти раздел" : "Find a section"} value={value} options={options} onChange={onChange} menuClassName={css.sectionMenu}
-    displayValue={<><Folder size={14} aria-hidden="true" />{value === "all" ? <span>{all}</span> : <FolderPathBreadcrumb path={value} ru={ru} />}</>} />;
+    displayValue={<><Folder size={14} aria-hidden="true" /><FolderPathBreadcrumb path={value === "all" ? "/" : value} ru={ru}
+      rootLabel={value === "all" ? (ru ? "Весь проект" : "Whole project") : undefined} /><ChevronDown size={12} aria-hidden="true" /></>} /></div>;
 }

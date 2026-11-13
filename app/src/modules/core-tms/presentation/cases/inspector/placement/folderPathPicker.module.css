@@ -1,5 +1,8 @@
 .root { display: grid; gap: 6px; min-inline-size: 0; --falcon-focus: var(--falcon-text-secondary); }
 .label { font-size: 12px; color: var(--falcon-text-muted); }
+.root[data-inline] { display: flex; max-inline-size: 100%; }
+.root[data-inline] > button { min-block-size: 30px; padding: 3px 7px; gap: 7px; font-size: 13px; }
+.root[data-inline] > button > svg { flex: none; inline-size: 14px; block-size: 14px; }
 .selection { flex: 1; min-inline-size: 0; max-inline-size: 100%; font-size: 13px; line-height: 18px; }
 .menu.menu { inline-size: min(480px, calc(100vw - 24px)); --falcon-focus: var(--falcon-text-secondary); --tms-focus-ring: transparent; --tms-focus-border: transparent; }
 .menu.menu [data-slot="base"]:has(> [data-slot="main-wrapper"]) { padding: 10px 10px 4px; }

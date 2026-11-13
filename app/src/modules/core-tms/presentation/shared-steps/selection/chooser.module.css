@@ -1,4 +1,7 @@
 .chooser { min-width: 0; width: 100%; }
+.section { display: flex; flex: 0 1 auto; min-inline-size: 0; max-inline-size: 300px; font-size: 13px; }
+.section > button { min-block-size: 30px; gap: 7px; padding: 3px 7px; }
+.section > button > svg { flex: none; }
 :is(.chooser, .sectionMenu) { --falcon-focus: var(--falcon-text-secondary); --tms-focus-ring: transparent; --tms-focus-border: transparent; }
 .chooser > [data-slot="base"], .sectionMenu [data-slot="base"]:has(> [data-slot="main-wrapper"]) { padding: 10px 10px 4px; }
 :is(.chooser, .sectionMenu) [data-slot="input-wrapper"] { min-height: 38px; padding-inline: 12px; border: 1px solid var(--falcon-border); border-radius: 12px; background: var(--falcon-selected); box-shadow: none; }

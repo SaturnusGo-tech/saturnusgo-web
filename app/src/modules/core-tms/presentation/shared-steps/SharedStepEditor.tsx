@@ -73,8 +73,6 @@ export function SharedStepEditor({ draft, saving, locked = false, error, ru, fol
       <ErrorToast message={error} />
       <fieldset className={styles.editorFields} disabled={saving || locked}>
       <div className={styles.paper}>
-        <SharedStepPlacement draft={draft} folders={folders} currentPath={currentPath} ru={ru}
-          disabled={saving || locked} onChange={onChange} />
         <div className={styles.scenarioHeading}>
           <h2>{ru ? "Шаги" : "Steps"}</h2>
           <span>{draft.items.length}</span>
@@ -94,6 +92,8 @@ export function SharedStepEditor({ draft, saving, locked = false, error, ru, fol
             <Plus size={15} />{ru ? "Добавить шаг" : "Add step"}
           </button>
         </div>
+        <SharedStepPlacement draft={draft} folders={folders} currentPath={currentPath} ru={ru}
+          disabled={saving || locked} onChange={onChange} />
       </div>
       </fieldset>
     </div>

@@ -61,3 +61,17 @@ test("search filters the library without dropping the creation action", t => {
   assert.equal(h.render().find(node => node.type === "SharedStepEmpty")!.props.searching, true);
   assert.ok(h.create(h.render()));
 });
+
+test("section navigation precedes search and keeps all, root and nested scope distinct", t => {
+  const h = setup(t);
+  h.resource.items = ["/", "/Host", "/Host/Login", "/Payments"].map((folderPath, index) => ({
+    ...item(String(index)), title: `Procedure ${index}`, folderPath, itemCount: 1, usageCount: 0,
+  }));
+  const tree = h.render();
+  assert.ok(tree.findIndex(node => node.type === "SharedStepSectionFilter") < tree.findIndex(node => node.type === "SharedStepSearch"));
+  const choose = (path: string) => invoke(h.render().find(node => node.type === "SharedStepSectionFilter")!, "onChange", path);
+  const titles = () => (h.render().find(node => node.type === "SharedStepList")!.props.items as SharedStepSummary[]).map(row => row.title);
+  choose("/Host"); assert.deepEqual(titles(), ["Procedure 1", "Procedure 2"]);
+  choose("/"); assert.deepEqual(titles(), ["Procedure 0"]);
+  choose("all"); assert.equal(titles().length, 4);
+});
