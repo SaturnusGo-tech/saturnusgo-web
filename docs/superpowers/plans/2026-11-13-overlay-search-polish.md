@@ -26,7 +26,7 @@
 - [x] Supporting layout: full-width Shared Steps; collapse hidden Codex action space.
 - [x] Global QL: four known launch implementations move into localized search with keyboard hint. Preserve query/close/filter behavior. Test keyboard scope.
 - [x] Verify: architecture, typecheck, relevant suites, actual component harness both themes, responsive bounds, menu/confirmation frames. Review combined diff.
-- [ ] Commit/push source; one canonical Pages build and publish; wait exact deployment; inspect live menus/query/run layout; record receipt.
+- [x] Commit/push source; one canonical Pages build and publish; wait exact deployment; inspect live menus/query/run layout; record receipt.
 
 ## Verification evidence
 - Typecheck and architecture checks passed (2,714 files).
@@ -37,3 +37,8 @@
 - Independent lifecycle/overlay review: no actionable findings.
 - Existing lint script only prints “lint skipped”; no lint-pass claim.
 - Evidence outside source: falcon-overlay-search-20261113, including menu-frames.json and confirmation-frames.json.
+
+## Production result
+Source `36d7df17d550b8a6d5614664d4712a7dd31dce3d` published in Pages commit `997778b6a7641fe9c62d0746e0aaa70074ee7c6f`; deployment [43363262315](https://github.com/SaturnusGo-tech/saturnusgo-web.github.io/actions/runs/43363262315) completed successfully.
+
+Live browser checks passed for Product group, archive actions, confirmation/cancellation, Starred centering, run case rows/priority, Cmd+L QL, and current run filters. Production menu frame samples increased from opacity0 to1 monotonically with fixed195×82geometry. No business data was changed. Native macOS/Windows were not separately exercised.
