@@ -71,7 +71,7 @@ export function useWorkspaceModel() {
     state.connection === "connected", derived.project?.id ?? "", derived.projectDefects,
     defectNavigation.selectedDefectId, defectNavigation.selectedDefectIncludesArchived,
   );
-  const sharedSteps = useSharedSteps(derived.project?.id ?? "", state.connection);
+  const sharedSteps = useSharedSteps(derived.project?.id ?? "", state.connection, folders.items);
   const verification = useWorkspaceVerification(state, derived, openRun);
   useEffect(() => {
     if (state.canWriteNavigation() && state.view === "reports" && selectedDefectResource.status === "ready"

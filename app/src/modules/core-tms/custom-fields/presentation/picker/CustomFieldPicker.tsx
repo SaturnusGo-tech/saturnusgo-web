@@ -82,7 +82,7 @@ export function CustomFieldPicker({ field, selected, onChange, parentValueId, al
     {unclassified.length > 0 && <p className={css.hint}>{ru ? "Выбор продукта без группы снимет текущую группу." : "Choosing an unclassified product clears the current group."}</p>}
     {parentNeeded && <p className={css.hint}>{ru ? "Для остальных продуктов выберите группу." : "Choose a group for other products."}</p>}
     {page.loading && <LoadingOrb label={ru ? "Загрузка…" : "Loading…"} />}
-    {!!page.failure && <div role="alert" className={css.hint}>{customFieldError(page.failure, ru)}
+    {Boolean(page.failure) && <div role="alert" className={css.hint}>{customFieldError(page.failure, ru)}
       <Button type="button" size="sm" variant="light" onPress={page.refresh}>{ru ? "Повторить" : "Retry"}</Button>
     </div>}
     {page.cursor && <Button type="button" size="sm" variant="light" className={properties.add}

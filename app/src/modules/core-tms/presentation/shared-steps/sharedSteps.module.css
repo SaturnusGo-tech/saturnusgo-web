@@ -91,3 +91,5 @@
 .archiveActions { display: flex; justify-content: flex-end; gap: 8px; }
 .dangerButton { min-height: 36px; padding: 0 13px; border: 1px solid var(--falcon-danger-border); border-radius: 10px; color: var(--falcon-danger-on-solid); background: var(--falcon-danger-solid); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
 .dangerButton:disabled { opacity: .48; cursor: default; }
+
+.sectionFilter { display: flex; align-items: center; margin: -12px 0 15px; }

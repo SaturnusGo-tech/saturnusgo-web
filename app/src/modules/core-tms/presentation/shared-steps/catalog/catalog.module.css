@@ -20,3 +20,6 @@
 @container shared-steps (max-width: 900px) { .columns { grid-template-columns: minmax(180px,1fr) 55px 70px 60px 32px; gap: 10px; } .row .open { grid-template-columns: minmax(180px,1fr) 55px 70px 60px; gap: 10px; padding-right: 10px; } .date { display: none; } }
 @container shared-steps (max-width: 600px) { .columns { grid-template-columns: minmax(120px,1fr) 55px 40px 32px; } .columns > :nth-child(4) { display: none; } .row .open { grid-template-columns: minmax(120px,1fr) 55px 40px; } .revision { display: none; } .name { gap: 8px; } .name strong { font-size: 13px; } }
 @media (hover: none) { .remove { opacity: 1; } }
+
+.identity { display: grid; min-width: 0; gap: 3px; }
+.identity [data-folder-breadcrumb] { font-size: 12px; }

@@ -13,21 +13,23 @@ import { SharedStepAttachmentEditor } from "./attachments/SharedStepAttachmentEd
 import { SharedStepList } from "./catalog/SharedStepList";
 import { SharedStepSearch } from "./catalog/SharedStepSearch";
 import { SharedStepEmpty } from "./empty/SharedStepEmpty";
+import { SharedStepSectionFilter } from "./selection/SharedStepSectionFilter";
+import { filterSharedSteps } from "../../shared-steps/model/catalog/shared-step-catalog";
 import styles from "./sharedSteps.module.css";
 
 type Resource = ReturnType<typeof useSharedSteps>;
 
-export function SharedStepsView({ resource }: { resource: Resource }) {
+export function SharedStepsView({ resource, folders = [] }: { resource: Resource; folders?: readonly { id: string; path: string }[] }) {
   const { locale } = useTmsLocale(), ru = locale === "ru";
   const [query, setQuery] = useState("");
+  const [section, setSection] = useState("all");
   const [draft, setDraft] = useState<SharedStepDraft | null>(null);
   const [removing, setRemoving] = useState<SharedStepSummary | null>(null);
   const [editing, setEditing] = useState<SharedStep | null>(null);
   const [openingId, setOpeningId] = useState<string | null>(null);
   const request = useRef(0);
   useEffect(() => () => { request.current++; }, []);
-  const rows = resource.items.filter(item =>
-    item.title.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
+  const rows = filterSharedSteps(resource.items, query, section);
   const beginEdit = async (id: string) => {
     const token = ++request.current; setOpeningId(id);
     const current = await resource.open(id);
@@ -35,13 +37,13 @@ export function SharedStepsView({ resource }: { resource: Resource }) {
     setOpeningId(null);
     if (!current) return;
     transitionContent(() => { if (token !== request.current) return;
-      setEditing(current); setDraft({ title: current.current.title, items: current.current.items, changeNote: "" }); });
+      setEditing(current); setDraft({ folderId: current.folderId, title: current.current.title, items: current.current.items, changeNote: "" }); });
   };
   const create = () => {
     request.current++; setOpeningId(null);
     transitionContent(() => { setEditing(null); setDraft(emptySharedStepDraft()); });
   };
-  if (draft) return <SharedStepAttachmentEditor draft={draft} resource={resource}
+  if (draft) return <SharedStepAttachmentEditor draft={draft} resource={resource} folders={folders}
     current={editing} ru={ru} onChange={setDraft}
     onClose={() => transitionContent(() => { setDraft(null); setEditing(null); resource.close(); })} />;
 
@@ -54,12 +56,15 @@ export function SharedStepsView({ resource }: { resource: Resource }) {
           <button type="button" className={styles.primaryButton} onClick={create}><Plus size={16} />{ru ? "Общий шаг" : "Shared step"}</button>
         </div>
       </header>
+      {resource.items.length > 0 && <div className={styles.sectionFilter}>
+        <SharedStepSectionFilter items={resource.items} value={section} ru={ru} onChange={setSection} />
+      </div>}
       {resource.status === "error" ? <ErrorToast message={ru ? "Не удалось загрузить общие шаги" : "Could not load shared steps"} retryLabel={ru ? "Повторить" : "Retry"} onRetry={resource.refresh} />
         : <DeferredPane pending={resource.status === "loading" && !resource.items.length} variant="list" label={ru ? "Загрузка общих шагов" : "Loading shared steps"}>
           {rows.length > 0 && <SharedStepList items={rows} ru={ru} locale={locale} archiveEnabled={resource.archiveEnabled}
             openingId={openingId} onOpen={id => void beginEdit(id)} onRemove={setRemoving} />}
           {resource.status !== "loading" && rows.length === 0 &&
-            <SharedStepEmpty searching={Boolean(query.trim())} ru={ru} onReset={() => setQuery("")} />}
+            <SharedStepEmpty searching={Boolean(query.trim()) || section !== "all"} ru={ru} onReset={() => { setQuery(""); setSection("all"); }} />}
         </DeferredPane>}
     </div>
     {removing && <ArchiveSharedStepDialog item={removing} resource={resource} ru={ru} onClose={() => setRemoving(null)} />}

@@ -8531,6 +8531,8 @@ export interface components {
             title: string;
             items: components["schemas"]["SharedStepItemInput"][];
             changeNote?: components["schemas"]["ShortText"];
+            /** @description Optional repository module home. Null means project root; omitted creation uses root, omitted revision preserves the current home. Reuse remains project-wide. */
+            folderId?: string | null;
         };
         SharedStepRevision: {
             revision: number;
@@ -8550,6 +8552,10 @@ export interface components {
             archivedAt: string | null;
             createdAt: components["schemas"]["Timestamp"];
             updatedAt: components["schemas"]["Timestamp"];
+            /** @description Stable repository module home identity, or null for project root. */
+            folderId: string | null;
+            /** @description Canonical current repository path; project root is /. This placement does not constrain reuse. */
+            folderPath: string;
         };
         SharedStepSummary: {
             id: components["schemas"]["Identifier"];
@@ -8564,6 +8570,10 @@ export interface components {
             createdAt: components["schemas"]["Timestamp"];
             updatedAt: components["schemas"]["Timestamp"];
             etag: string;
+            /** @description Stable repository module home identity, or null for project root. */
+            folderId: string | null;
+            /** @description Canonical current repository path; project root is /. This placement does not constrain reuse. */
+            folderPath: string;
         };
         SharedStepEnvelope: {
             data: components["schemas"]["SharedStep"];
@@ -17609,6 +17619,10 @@ export interface operations {
                 /** @description Requested page size. */
                 limit?: components["parameters"]["Limit"];
                 q?: string;
+                /** @description Filter exact module home. Omit for all homes; mutually exclusive with unfiled=true. Cursors are bound to this scope and q. */
+                folderId?: components["schemas"]["Identifier"];
+                /** @description True selects only shared steps at project root. Mutually exclusive with folderId. */
+                unfiled?: boolean;
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -24476,6 +24490,8 @@ export interface operations {
                 status?: "active" | "archived" | "all";
                 search?: string;
                 parentValueId?: string;
+                /** @description For product values with parentValueId only, also list legacy products without a group. Existing parent associations remain unchanged. The cursor is bound to this mode. */
+                includeUnclassified?: boolean;
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */

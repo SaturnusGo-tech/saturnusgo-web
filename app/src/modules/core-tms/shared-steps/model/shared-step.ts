@@ -20,6 +20,8 @@ export type SharedStepRevision = Readonly<{
 export type SharedStep = Readonly<{
   id: string;
   projectId: string;
+  folderId: string | null;
+  folderPath: string;
   currentRevision: number;
   current: SharedStepRevision;
   revisionCount: number;
@@ -32,6 +34,8 @@ export type SharedStep = Readonly<{
 export type SharedStepSummary = Readonly<{
   id: string;
   projectId: string;
+  folderId: string | null;
+  folderPath: string;
   currentRevision: number;
   title: string;
   itemCount: number;
@@ -44,6 +48,7 @@ export type SharedStepSummary = Readonly<{
 }>;
 
 export type SharedStepDraft = Readonly<{
+  folderId?: string | null;
   title: string;
   items: readonly SharedStepItem[];
   changeNote: string;
@@ -51,6 +56,7 @@ export type SharedStepDraft = Readonly<{
 
 export const emptySharedStepDraft = (): SharedStepDraft => ({
   title: "",
+  folderId: null,
   items: [{ id: `shared-item-${crypto.randomUUID()}`, order: 1, action: "",
     expectedResult: "", testData: "", required: true, attachmentIds: [] }],
   changeNote: "",

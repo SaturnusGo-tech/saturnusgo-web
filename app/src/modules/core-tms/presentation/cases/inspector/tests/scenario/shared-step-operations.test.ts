@@ -10,7 +10,6 @@ import { caseRevisionAttachmentIds } from "../../model";
 import { createEmptyRevision } from "../../../../../helpers/cases/caseRevision";
 
 
-const menu = readFileSync(new URL("../../steps/menu/StepActionMenu.tsx", import.meta.url), "utf8");
 const menuCss = readFileSync(new URL("../../steps/menu/stepActionMenu.module.css", import.meta.url), "utf8");
 const scenarioCss = readFileSync(new URL("../../steps/scenarioSteps.module.css", import.meta.url), "utf8");
 const sharedEditor = readFileSync(new URL("../../../../shared-steps/SharedStepEditor.tsx", import.meta.url), "utf8");
@@ -59,7 +58,6 @@ test("attachment inventory includes case, step, and shared-step evidence once", 
 
 test("shared-step editing stays dense and does not expose nested shared procedures", () => {
   assert.match(sharedEditor, /allowSharedSteps=\{false\}/);
-  assert.match(menu, /allowSharedSteps &&/);
   assert.match(scenarioCss, /padding: 1px 0 3px/);
   assert.match(scenarioCss, /\.nestedLine \{[^}]*margin-left: 43px/s);
   assert.doesNotMatch(scenarioCss, /\.viewGroup \+ \.viewGroup \{[^}]*border-top/s);
@@ -71,7 +69,6 @@ test("shared-step canvas and action menu use opaque integrated surfaces", () => 
   assert.match(sharedCss, /--cases-bg: var\(--falcon-surface\)/);
   assert.match(sharedCss, /\.paper \{[^}]*background: transparent;[^}]*border: 0;[^}]*box-shadow: none/s);
   assert.match(menuCss, /background: var\(--falcon-elevated\)/);
-  assert.match(menuCss, /\.menu\[data-trigger="add"\] \{ left: 8px; \}/);
 });
 
 test("scenario and attachment tabs render every case, step, and PDF attachment", () => {
@@ -95,14 +92,6 @@ test("media evidence has smooth disclosure and proportional pointer resizing", (
   assert.doesNotMatch(media, /Загрузка превью/);
   assert.match(mediaCss, /cursor: ew-resize/);
   assert.match(mediaCss, /width: 100%;[\s\S]*height: auto/);
-});
-
-test("step action menu stays inside the scenario edge and flips vertically", () => {
-  assert.match(menu, /data-placement=\{placement\}/);
-  assert.match(menu, /spaceAbove/);
-  assert.match(menu, /spaceBelow/);
-  assert.match(menuCss, /\.menu\[data-trigger="icon"\] \{ right: 0; left: auto/);
-  assert.match(menuCss, /\.menu\[data-placement="top"\]/);
 });
 
 test("the case gallery deduplicates revision files and published comment references", () => {

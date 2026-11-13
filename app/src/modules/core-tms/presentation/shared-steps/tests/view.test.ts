@@ -2,10 +2,11 @@ import assert from "node:assert/strict";
 import { test, type TestContext } from "node:test";
 import { componentHarness, invoke, nodes, type Node } from "../../../portfolios/tests/support/component-harness";
 import { emptySharedStepDraft, type SharedStep, type SharedStepSummary } from "../../../shared-steps/model/shared-step";
+import { filterSharedSteps } from "../../../shared-steps/model/catalog/shared-step-catalog";
 import type { useSharedSteps } from "../../../shared-steps/state/useSharedSteps";
 import type { SharedStepsView } from "../SharedStepsView";
 
-const item = (id: string): SharedStep => ({ id, projectId: "p", currentRevision: 1, revisionCount: 1,
+const item = (id: string): SharedStep => ({ id, projectId: "p", folderId: null, folderPath: "/", currentRevision: 1, revisionCount: 1,
   current: { ...emptySharedStepDraft(), title: `Procedure ${id}`, revision: 1, createdAt: "2026-11-03T00:00:00Z", createdBy: "qa" },
   archivedAt: null, etag: id, createdAt: "2026-11-03T00:00:00Z", updatedAt: "2026-11-03T00:00:00Z" });
 function setup(t: TestContext, items: SharedStepSummary[] = []) {
@@ -15,6 +16,7 @@ function setup(t: TestContext, items: SharedStepSummary[] = []) {
     open: (id: string) => new Promise<SharedStep>(resolve => pending.set(id, resolve)) } as unknown as ReturnType<typeof useSharedSteps>;
   const { SharedStepsView: View } = h.load<{ SharedStepsView: typeof SharedStepsView }>(new URL("../SharedStepsView.tsx", import.meta.url), name => {
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en" }) };
+    if (name.endsWith("shared-step-catalog")) return { filterSharedSteps };
     if (name.endsWith("model/shared-step")) return { emptySharedStepDraft };
   });
   const render = () => nodes(h.render(() => View({ resource })));

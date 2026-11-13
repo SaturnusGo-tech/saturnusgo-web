@@ -6,10 +6,13 @@ import type { TestStep } from "../../../../core/tms/contracts/legacy-contract";
 import type { SharedStepDraft } from "../../shared-steps/model/shared-step";
 import { SharedStepSavedAttachments } from "./attachments/SharedStepSavedAttachments";
 import { ScenarioStepEditor } from "../cases/inspector/steps/editor/ScenarioStepEditor";
+import { SharedStepPlacement } from "./placement/SharedStepPlacement";
 import styles from "./sharedSteps.module.css";
 
-export function SharedStepEditor({ draft, saving, locked = false, error, ru, onChange, onCancel, onSave }: {
+export function SharedStepEditor({ draft, saving, locked = false, error, ru, folders = [], currentPath, onChange, onCancel, onSave }: {
   draft: SharedStepDraft;
+  folders?: readonly { id: string; path: string }[];
+  currentPath?: string;
   saving: boolean;
   locked?: boolean;
   error?: string;
@@ -70,6 +73,8 @@ export function SharedStepEditor({ draft, saving, locked = false, error, ru, onC
       <ErrorToast message={error} />
       <fieldset className={styles.editorFields} disabled={saving || locked}>
       <div className={styles.paper}>
+        <SharedStepPlacement draft={draft} folders={folders} currentPath={currentPath} ru={ru}
+          disabled={saving || locked} onChange={onChange} />
         <div className={styles.scenarioHeading}>
           <h2>{ru ? "Шаги" : "Steps"}</h2>
           <span>{draft.items.length}</span>

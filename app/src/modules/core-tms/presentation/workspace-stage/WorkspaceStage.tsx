@@ -15,7 +15,6 @@ import { WorkspacePortfoliosStage } from "./portfolios/WorkspacePortfoliosStage"
 import { transitionContent } from "../workspace/motion/transition/content-transition";
 import { settingsSectionLink } from "../config/navigation/settings-section-route";
 import { navigateWorkspace, visitWorkspace } from "../../state/navigation/browser/workspace-history";
-import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { DocumentationEntry } from "../../documentation/presentation/DocumentationEntry";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
 import type { DashboardDrill, DashboardDrillRow } from "../../dashboards/model/dashboard-analytics";
@@ -36,10 +35,9 @@ import { WorkspaceCasesStage } from "./cases/WorkspaceCasesStage";
 import { AttachmentLibrary } from "../../attachments/presentation/library/AttachmentLibrary";
 
 export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
-  const { t } = useTmsLocale();
   const session = useOptionalTmsSession();
-  const metadata = useWorkspaceCapabilities(model.data.workspace.id, !!session);
-  const codexAvailable = !!metadata.value;
+  const metadata = useWorkspaceCapabilities(model.data.workspace.id, Boolean(session));
+  const codexAvailable = Boolean(metadata.value);
   const maintenance = (content: ReactNode) => <WorkspaceMaintenanceProvider model={model}>{content}</WorkspaceMaintenanceProvider>;
   async function selectDrillProject(projectId?: string) {
     if (projectId && projectId !== model.project?.id) await model.chooseProject(projectId);
@@ -127,7 +125,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
   if (model.view === "api") return <ApiTestingView key={model.data.workspace.id}
     scope={{ workspaceId: model.data.workspace.id, projectId: model.projectId }} canManage={model.canManageIntegrations} />;
   if (model.view === "hooks" && (model.project || codexAvailable)) return <HooksView workspaceId={model.data.workspace.id} projectId={model.project?.id ?? ""}
-    canManage={model.canManageIntegrations && !!model.project} capabilities={model.data.meta.authorization.capabilities} connected={model.connection === "connected"} />;
+    canManage={model.canManageIntegrations && Boolean(model.project)} capabilities={model.data.meta.authorization.capabilities} connected={model.connection === "connected"} />;
   if (!model.project) {
     return (
       <ProjectOnboarding
@@ -157,7 +155,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
     return maintenance(<WorkspaceCasesStage model={model} />);
   }
   if (model.view === "shared-steps") {
-    return <SharedStepsView key={model.project.id} resource={model.sharedSteps} />;
+    return <SharedStepsView key={model.project.id} resource={model.sharedSteps} folders={model.folders.items.filter(folder => !folder.archivedAt)} />;
   }
   if (model.view === "suites") return <WorkspaceSuitesStage key={`${model.data.workspace.id}:${model.project.id}`} model={model} />;
   if (model.view === "runs") return maintenance(<WorkspaceRunsStage model={model} />);

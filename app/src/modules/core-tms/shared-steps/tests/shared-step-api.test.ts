@@ -35,7 +35,7 @@ test("shared-step adapter uses project-scoped collection routes", async () => {
 
 test("archive sends the listed version and stable operation key without editing shared content", async () => {
   const calls: { path: string; method: string; body: unknown; options: unknown }[] = [];
-  const listed = { id: "shared-a", projectId: "project-a", title: "Sign in", currentRevision: 3,
+  const listed = { id: "shared-a", projectId: "project-a", title: "Sign in", folderId: null, folderPath: "/", currentRevision: 3,
     itemCount: 1, usageCount: 4, revisionCount: 3, archivedAt: null,
     etag: '\"shared-step:shared-a:v5\"', createdAt: "2026-09-08T00:00:00.000Z", updatedAt: "2026-09-08T00:00:00.000Z" };
   const http = { async mutateResource(path: string, method: string, body: unknown, options: unknown) {

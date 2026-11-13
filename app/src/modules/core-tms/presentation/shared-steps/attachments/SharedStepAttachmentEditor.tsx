@@ -7,11 +7,12 @@ import { useSharedStepAssetSave } from "../../../shared-steps/state/attachments/
 import { CaseAttachmentDraftProvider } from "../../cases/inspector/attachments/CaseAttachmentDraftContext";
 import { SharedStepEditor } from "../SharedStepEditor";
 
-export function SharedStepAttachmentEditor({ draft, current, resource, ru, onChange, onClose }: {
+export function SharedStepAttachmentEditor({ draft, current, resource, ru, folders = [], onChange, onClose }: {
   draft: SharedStepDraft;
   current: SharedStep | null;
   resource: ReturnType<typeof useSharedSteps>;
   ru: boolean;
+  folders?: readonly { id: string; path: string }[];
   onChange: (draft: SharedStepDraft) => void;
   onClose: () => void;
 }) {
@@ -20,7 +21,7 @@ export function SharedStepAttachmentEditor({ draft, current, resource, ru, onCha
   return <CaseAttachmentDraftProvider locale={ru ? "ru" : "en"}
     enabled={resource.attachmentsEnabled && !assets.saving && !assets.locked}
     entries={assets.entries} validStepIds={validStepIds} onEntries={assets.setEntries}>
-    <SharedStepEditor draft={draft} ru={ru} onChange={onChange} onCancel={onClose}
+    <SharedStepEditor draft={draft} folders={folders} currentPath={current?.folderPath} ru={ru} onChange={onChange} onCancel={onClose}
       saving={assets.saving} locked={assets.locked} error={assets.error}
       onSave={() => void assets.save(draft, current).then((saved) => { if (saved) onClose(); })} />
   </CaseAttachmentDraftProvider>;

@@ -14,7 +14,7 @@ const resource = (value: Api["SharedStep"], etag: string | null): SharedStep => 
   })) },
 });
 const body = (draft: SharedStepDraft): Api["SharedStepWriteRequest"] => ({
-  title: draft.title, changeNote: draft.changeNote,
+  title: draft.title, changeNote: draft.changeNote, folderId: draft.folderId,
   items: draft.items.map(({ id, order, action, expectedResult, testData, required, attachmentIds }) => ({
     id, order, action, expectedResult, testData, required, attachmentIds: [...attachmentIds],
   })),
@@ -22,9 +22,23 @@ const body = (draft: SharedStepDraft): Api["SharedStepWriteRequest"] => ({
 
 export async function listSharedSteps(http: TmsHttpClient, projectId: string,
   signal?: AbortSignal): Promise<SharedStepSummary[]> {
-  const envelope = await http.get<Api["SharedStepListEnvelope"]>(
-    `/projects/${encodeURIComponent(projectId)}/shared-steps?limit=100`, signal);
-  return envelope.data.map(summary);
+  const items = new Map<string, SharedStepSummary>();
+  const seen = new Set<string>();
+  let cursor: string | null = null;
+  do {
+    signal?.throwIfAborted();
+    const query = new URLSearchParams({ limit: "100" });
+    if (cursor) query.set("cursor", cursor);
+    const envelope = await http.get<Api["SharedStepListEnvelope"]>(
+      `/projects/${encodeURIComponent(projectId)}/shared-steps?${query}`, signal);
+    signal?.throwIfAborted();
+    envelope.data.forEach(value => items.set(value.id, summary(value)));
+    cursor = envelope.meta.nextCursor;
+    if (envelope.meta.hasMore && !cursor) throw new Error("Shared-step pagination cursor is missing.");
+    if (cursor && seen.has(cursor)) throw new Error("Shared-step pagination did not advance.");
+    if (cursor) seen.add(cursor);
+  } while (cursor);
+  return [...items.values()];
 }
 
 export async function getSharedStep(http: TmsHttpClient, projectId: string,

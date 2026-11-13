@@ -1,0 +1,18 @@
+.chooser { min-width: 0; width: 100%; }
+:is(.chooser, .sectionMenu) { --falcon-focus: var(--falcon-text-secondary); --tms-focus-ring: transparent; --tms-focus-border: transparent; }
+.chooser > [data-slot="base"], .sectionMenu [data-slot="base"]:has(> [data-slot="main-wrapper"]) { padding: 10px 10px 4px; }
+:is(.chooser, .sectionMenu) [data-slot="input-wrapper"] { min-height: 38px; padding-inline: 12px; border: 1px solid var(--falcon-border); border-radius: 12px; background: var(--falcon-selected); box-shadow: none; }
+:is(.chooser, .sectionMenu) [data-slot="input-wrapper"]:is(:focus-within, [data-focus="true"]) { border-color: var(--falcon-text-muted); outline: 0; box-shadow: none; }
+:is(.chooser, .sectionMenu) [data-slot="input-wrapper"]::before, :is(.chooser, .sectionMenu) [data-slot="input-wrapper"]::after { display: none; }
+:is(.chooser, .sectionMenu) [data-slot="inner-wrapper"], :is(.chooser, .sectionMenu) input { border: 0 !important; outline: 0 !important; box-shadow: none !important; border-radius: inherit; background: transparent; }
+.sectionMenu.sectionMenu { inline-size: min(480px, calc(100vw - 24px)); }
+.sectionMenu [data-slot="title"] { white-space: nowrap; }
+.filter { padding: 7px 8px; border-bottom: 1px solid var(--falcon-border-subtle); }
+.list { max-height: min(360px, 45dvh); overflow-y: auto; padding: 6px; scrollbar-color: var(--falcon-border-subtle) transparent; }
+.options { display: grid; gap: 2px; list-style: none; margin: 0; padding: 0; }
+.option { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 8px 10px; border-radius: 9px; color: var(--falcon-text); background: transparent; cursor: pointer; }
+.option > svg { flex: none; color: var(--falcon-text-secondary); }
+.option:is([data-hover="true"], [data-focus-visible="true"]) { background: var(--falcon-hover); outline: 0; }
+.title { display: grid; min-width: 0; gap: 3px; text-align: start; }
+.title strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 500; }
+.title [data-folder-breadcrumb] { font-size: 12px; }

@@ -1,5 +1,6 @@
 "use client";
 
+import { useSharedStepInsertion } from "./insertion/useSharedStepInsertion";
 import { FalconCheckbox } from "../../../common/checkbox/FalconCheckbox";
 import { Plus, Trash2 } from "lucide-react";
 import type {
@@ -18,7 +19,7 @@ import { SharedStepBlock } from "./shared/SharedStepBlock";
 import { ScenarioTextInput } from "./editor/ScenarioTextInput";
 import { ScenarioStepView } from "./viewer/ScenarioStepView";
 import {
-  duplicateStepAfter, emptyScenarioStep, insertStepAfter, sharedScenarioStep,
+  duplicateStepAfter, emptyScenarioStep, insertStepAfter,
 } from "./stepOperations";
 import css from "./scenarioSteps.module.css";
 
@@ -36,6 +37,7 @@ type Props = {
 export function InspectorSteps({
   layout = "list", revision, editing, autoFocus = true, ru, sharedSteps, onResolveSharedStep, onPatch,
 }: Props) {
+  const sharedInsertion = useSharedStepInsertion(revision, onResolveSharedStep, onPatch, editing);
   function updateStep(id: string, next: Partial<TestStep>) {
     onPatch({
       steps: revision.steps.map((step) => step.id === id ? { ...step, ...next } : step),
@@ -64,14 +66,7 @@ export function InspectorSteps({
       ? `scenario-${step.id}-expected` : `scenario-${step.id}-0`)?.focus());
   }
 
-  async function insertSharedAfter(index: number, id: string) {
-    const value = await onResolveSharedStep(id);
-    if (!value) return;
-    const snapshot = { id: value.id, title: value.current.title,
-      revision: value.currentRevision, items: value.current.items.map((item) => ({ ...item,
-        attachmentIds: [...item.attachmentIds] })) };
-    onPatch({ steps: insertStepAfter(revision.steps, index, sharedScenarioStep(index + 2, snapshot)) });
-  }
+  const insertSharedAfter = sharedInsertion.insert;
 
   const duplicate = (index: number) => onPatch({ steps: duplicateStepAfter(revision.steps, index) });
   const remove = (id: string) => onPatch({ steps: revision.steps
@@ -96,7 +91,13 @@ export function InspectorSteps({
     </div>;
   }
 
-  return <div className={css.editor} data-scenario-layout={layout} data-scenario-motion>
+  return <div className={css.editor} data-scenario-layout={layout} data-scenario-motion aria-busy={sharedInsertion.pending || undefined}>
+    {sharedInsertion.error && <p role="alert">{ru ? "Не удалось добавить общий шаг. Повторите выбор." : "Could not add the shared step. Please select it again."}</p>}
+    {revision.type !== "checklist" && revision.steps.length > 0 && <div className={css.addStepMenu}>
+      <StepActionMenu trigger="start" ru={ru} sharedSteps={sharedSteps}
+        onAdd={(withExpected) => addAfter(-1, withExpected)}
+        onInsertShared={(id) => void insertSharedAfter(-1, id)} />
+    </div>}
     {revision.type === "checklist"
       ? revision.checklist.map((item, index) => <ChecklistRow
           key={item.id}

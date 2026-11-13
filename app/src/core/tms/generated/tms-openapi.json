@@ -4494,6 +4494,25 @@
               "minLength": 1,
               "maxLength": 300
             }
+          },
+          {
+            "name": "folderId",
+            "in": "query",
+            "required": false,
+            "description": "Filter exact module home. Omit for all homes; mutually exclusive with unfiled=true. Cursors are bound to this scope and q.",
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "unfiled",
+            "in": "query",
+            "required": false,
+            "description": "True selects only shared steps at project root. Mutually exclusive with folderId.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
           }
         ],
         "responses": {
@@ -18979,6 +18998,16 @@
               "type": "string",
               "maxLength": 128,
               "description": "Optional product group; omit to include unclassified legacy values and all groups."
+            }
+          },
+          {
+            "name": "includeUnclassified",
+            "in": "query",
+            "required": false,
+            "description": "For product values with parentValueId only, also list legacy products without a group. Existing parent associations remain unchanged. The cursor is bound to this mode.",
+            "schema": {
+              "type": "boolean",
+              "default": false
             }
           }
         ],
@@ -39072,6 +39101,15 @@
           },
           "changeNote": {
             "$ref": "#/components/schemas/ShortText"
+          },
+          "folderId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+            "maxLength": 128,
+            "description": "Optional repository module home. Null means project root; omitted creation uses root, omitted revision preserves the current home. Reuse remains project-wide."
           }
         }
       },
@@ -39126,7 +39164,9 @@
           "revisionCount",
           "archivedAt",
           "createdAt",
-          "updatedAt"
+          "updatedAt",
+          "folderId",
+          "folderPath"
         ],
         "properties": {
           "id": {
@@ -39158,6 +39198,21 @@
           },
           "updatedAt": {
             "$ref": "#/components/schemas/Timestamp"
+          },
+          "folderId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+            "maxLength": 128,
+            "description": "Stable repository module home identity, or null for project root."
+          },
+          "folderPath": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500,
+            "description": "Canonical current repository path; project root is /. This placement does not constrain reuse."
           }
         }
       },
@@ -39175,7 +39230,9 @@
           "archivedAt",
           "createdAt",
           "updatedAt",
-          "etag"
+          "etag",
+          "folderId",
+          "folderPath"
         ],
         "properties": {
           "id": {
@@ -39223,6 +39280,21 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 300
+          },
+          "folderId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+            "maxLength": 128,
+            "description": "Stable repository module home identity, or null for project root."
+          },
+          "folderPath": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500,
+            "description": "Canonical current repository path; project root is /. This placement does not constrain reuse."
           }
         }
       },

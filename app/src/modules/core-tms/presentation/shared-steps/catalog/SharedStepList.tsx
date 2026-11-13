@@ -1,5 +1,6 @@
 import { Braces, Link2, Trash2 } from "lucide-react";
 import type { SharedStepSummary } from "../../../shared-steps/model/shared-step";
+import { FolderPathBreadcrumb } from "../../common/breadcrumbs/path/FolderPathBreadcrumb";
 import css from "./catalog.module.css";
 
 export function SharedStepList({ items, ru, locale, archiveEnabled, openingId, onOpen, onRemove }: {
@@ -13,7 +14,7 @@ export function SharedStepList({ items, ru, locale, archiveEnabled, openingId, o
     <ul className={css.list}>{items.map(item => <li key={item.id} className={css.row} data-shared-step-id={item.id}>
       <button type="button" className={css.open} aria-busy={openingId === item.id || undefined} aria-label={`${ru ? "Открыть общий шаг" : "Open shared step"}: ${item.title}`}
         onClick={() => onOpen(item.id)}>
-        <span className={css.name}><Braces size={18} strokeWidth={1.5} aria-hidden="true" /><strong title={item.title}>{item.title}</strong></span>
+        <span className={css.name}><Braces size={18} strokeWidth={1.5} aria-hidden="true" /><span className={css.identity}><strong title={item.title}>{item.title}</strong><FolderPathBreadcrumb path={item.folderPath ?? "/"} ru={ru} /></span></span>
         <span className={css.count}>{item.itemCount}<small>{ru ? " шагов" : " steps"}</small></span>
         <span className={css.usage} data-used={item.usageCount > 0 || undefined} title={ru ? "Тест-кейсов используют этот блок" : "Test cases using this block"}><Link2 size={13} aria-hidden="true" />{item.usageCount}</span>
         <span className={css.revision}>r{item.currentRevision}</span>
