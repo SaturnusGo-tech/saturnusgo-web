@@ -26,6 +26,7 @@
 .rows > * { min-inline-size: 0; max-inline-size: 100%; }
 .detailsBody { gap: 24px; }
 .owner { max-inline-size: calc(100% - 52px); }
+.creationOwner { max-inline-size: 100%; }
 .rows > :has([data-case-member-name]) { margin-inline-start: 2px; max-inline-size: calc(100% - 2px); }
 .rows button:has(> [data-case-member-name]) { margin-inline-start: 0; }
 .rows > [data-case-member-name] { margin-inline-start: 7px; max-inline-size: calc(100% - 7px); }

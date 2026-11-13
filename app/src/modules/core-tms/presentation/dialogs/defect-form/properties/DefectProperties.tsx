@@ -2,6 +2,7 @@ import { Box, CircleDot, Flame, Minus, OctagonAlert, Plug, Repeat2 } from "lucid
 import { PropertyIdentityField } from "../../../common/properties/metadata/identity/PropertyIdentityField";
 import { PriorityIcon, priorityLevels } from "../../../common/properties/PriorityIcon";
 import { PropertySelect } from "../../../common/properties/select/PropertySelect";
+import { PropertyRail } from "../../../common/properties/rail/PropertyRail";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import { getDefectDialogCopy } from "../../defect/copy";
 import type { DefectDraft, DefectRouting } from "../model";
@@ -20,9 +21,7 @@ export function DefectProperties({ workspaceId, offline, disabled, value, onChan
   const ru = locale === "ru";
   const copy = getDefectDialogCopy(locale);
   const severityLevels = ["critical", "high", "medium", "low"] as const;
-  return <aside className={css.properties} aria-label={ru ? "Свойства дефекта" : "Defect properties"}>
-    <h3>{ru ? "Свойства" : "Properties"}</h3>
-    <div className={css.rows}>
+  return <PropertyRail label={ru ? "Свойства дефекта" : "Defect properties"} title={ru ? "Свойства" : "Properties"}>
       <PropertySelect locale={locale} label={copy.component} searchLabel={ru ? "Найти компонент…" : "Find a component…"}
         value={value.component} options={components.map(component => ({ ...component, icon: <Box size={15} aria-hidden="true" /> }))}
         onChange={component => onChange({ component })} disabled={disabled} />
@@ -52,6 +51,5 @@ export function DefectProperties({ workspaceId, offline, disabled, value, onChan
         <DefectRoutingHelp />
       </div>
       {showRoutingError && !routing.resolved && <small className={css.error} role="alert">{routing.message}</small>}
-    </div>
-  </aside>;
+  </PropertyRail>;
 }

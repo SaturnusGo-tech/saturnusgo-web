@@ -1,7 +1,11 @@
-.root{display:grid;gap:6px;min-width:0}.label{font-size:12px;color:var(--falcon-text-muted)}.trigger{display:flex;align-items:center;gap:7px;min-width:0;width:100%;border:1px solid var(--falcon-border-strong);border-radius:10px;padding:8px 10px;background:transparent;text-align:left;color:inherit;font:inherit}.trigger>svg{flex-shrink:0}.crumbs{display:flex;flex-wrap:wrap;gap:4px;flex:1;min-width:0;font-size:12px}.crumbs>span{display:inline-flex;align-items:center;gap:4px;overflow-wrap:anywhere}.panel{position:fixed;inset:auto;box-sizing:border-box;width:min(320px,calc(100vw - 24px));padding:10px;border:1px solid var(--falcon-border-strong);border-radius:14px;background:var(--falcon-panel);color:var(--falcon-text);box-shadow:var(--falcon-shadow-popover)}.search{display:flex;align-items:center;gap:6px}.search input{min-width:0;width:100%;padding:7px;border:0;background:transparent;color:inherit}.options{max-height:240px;overflow:auto;margin-top:6px}.options button{display:flex;align-items:center;gap:8px;width:100%;padding:9px 7px;border:0;border-radius:7px;background:transparent;color:inherit;text-align:left}.options button:hover{background:var(--falcon-hover)}
-.options button:focus-visible,.trigger:focus-visible{outline:2px solid currentColor;outline-offset:-2px}.options button>svg{flex-shrink:0}.create>span{display:grid;gap:4px;min-width:0}.create .crumbs{color:var(--falcon-text-muted)}.hint{margin:8px 7px 2px;font-size:11px;line-height:1.45;color:var(--falcon-text-muted)}
-.panel{display:flex;flex-direction:column;overflow:hidden}.options{flex:1 1 auto;min-height:0}.search,.hint{flex-shrink:0}
-.trigger{height:36px;min-height:36px;box-sizing:border-box;overflow:hidden}.selection{flex:1;min-width:0;font-size:12px;line-height:18px}.selection>span{width:100%}
-@media(prefers-reduced-motion:reduce){.trigger .selection>span[data-overflow],.trigger .selection>span[data-overflow]>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;overflow-wrap:normal}}
-
-.panel .search[data-input-shell]{min-height:34px;padding:0 8px;border:1px solid var(--falcon-border);border-radius:10px;color:var(--falcon-text-muted)}
+.root { display: grid; gap: 6px; min-inline-size: 0; }
+.label { font-size: 12px; color: var(--falcon-text-muted); }
+.selection { min-inline-size: 0; max-inline-size: 100%; font-size: 13px; line-height: 18px; }
+.selection > span { max-inline-size: 100%; }
+.menu.menu { inline-size: min(320px, calc(100vw - 24px)); }
+.create { display: grid; gap: 2px; min-inline-size: 0; }
+.path { color: var(--falcon-text-muted); font-size: 12px; overflow-wrap: anywhere; }
+.hint { margin: 0; padding: 8px 14px 12px; font-size: 11px; line-height: 1.45; color: var(--falcon-text-muted); }
+@media (prefers-reduced-motion: reduce) {
+  .selection > span[data-overflow], .selection > span[data-overflow] > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; overflow-wrap: normal; }
+}

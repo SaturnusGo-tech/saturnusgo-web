@@ -1,0 +1,28 @@
+.rail {
+  display: flex;
+  flex-direction: column;
+  align-self: start;
+  gap: 9px;
+  min-inline-size: 0;
+  padding-inline-start: 22px;
+  border-inline-start: 1px solid var(--falcon-border-subtle);
+  font-size: 13px;
+}
+.rail h3 {
+  margin: 0;
+  color: var(--falcon-text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 19px;
+}
+.rows {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: start;
+  gap: 2px;
+  min-inline-size: 0;
+}
+.rows > * { min-inline-size: 0; max-inline-size: 100%; }
+@container (max-width: 680px) {
+  .rail { padding: 24px 0 0; border-inline-start: 0; border-block-start: 1px solid var(--falcon-border-subtle); }
+}

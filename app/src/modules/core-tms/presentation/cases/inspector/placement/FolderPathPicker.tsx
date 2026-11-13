@@ -1,8 +1,10 @@
+import { Listbox, ListboxItem } from "@heroui/react";
+import { useEffect, useState, type KeyboardEvent } from "react";
+import { Check, ChevronDown, Plus } from "lucide-react";
 import { FolderVisual } from "../../../../folders/presentation/appearance/visual/FolderVisual";
-import { useCallback, useId, useRef, useState, type KeyboardEvent } from "react";
-import { ArrowRight, Check, ChevronDown, Plus, Search } from "lucide-react";
-import { useAnchoredPopup } from "../../../common/popup/useAnchoredPopup";
+import { PropertyPopover, PropertySearch } from "../../../common/properties/select/PropertySelect";
 import { OverflowLabel } from "../../../common/select/overflow/OverflowLabel";
+import controls from "../../../common/properties/property-controls.module.css";
 import css from "./folderPathPicker.module.css";
 
 export function FolderPathPicker({ value, folders, onChange, ru, disabled }: {
@@ -10,78 +12,49 @@ export function FolderPathPicker({ value, folders, onChange, ru, disabled }: {
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const root = useRef<HTMLDivElement>(null);
-  const trigger = useRef<HTMLButtonElement>(null);
-  const panel = useRef<HTMLDivElement>(null);
-  const panelId = useId();
-  const close = useCallback(() => setOpen(false), []);
-  const visible = open && !disabled;
-  useAnchoredPopup(visible, false, root, trigger, panel, close, 320);
+  useEffect(() => { if (disabled) { setOpen(false); setQuery(""); } }, [disabled]);
   const paths = [...new Set(["/", value, ...folders])].filter(Boolean);
   const search = query.trim();
   const candidate = search.startsWith("/") ? search : `/${search}`;
   const options = paths.filter(path => path.toLocaleLowerCase().includes(search.toLocaleLowerCase()));
   const canCreate = Boolean(search) && !paths.includes(candidate);
+  const choices = [...options.map(path => ({ path, create: false })), ...(canCreate ? [{ path: candidate, create: true }] : [])];
+  const label = ru ? "Папка" : "Folder";
+  function setMenu(next: boolean) {
+    setOpen(next && !disabled);
+    if (!next) setQuery("");
+  }
   function choose(path: string) {
     if (disabled) return;
     onChange(path);
-    close();
-    trigger.current?.focus();
+    setMenu(false);
   }
-  function choices() {
-    return Array.from(panel.current?.querySelectorAll<HTMLButtonElement>("[data-folder-choice]:not(:disabled)") ?? []);
-  }
-  function navigate(event: KeyboardEvent<HTMLDivElement>) {
-    if (!visible) return;
-    if (event.key === "Escape") {
-      event.preventDefault(); event.stopPropagation(); close(); trigger.current?.focus();
-    } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-      const buttons = choices();
-      if (!buttons.length) return;
-      event.preventDefault();
-      const current = buttons.findIndex(button => button === document.activeElement);
-      const next = current < 0 ? (event.key === "ArrowDown" ? 0 : buttons.length - 1)
-        : (current + (event.key === "ArrowDown" ? 1 : -1) + buttons.length) % buttons.length;
-      buttons[next]?.focus();
-    }
-  }
-  function submitSearch(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key !== "Enter" || event.nativeEvent?.isComposing) return;
+  function submitSearch(event: KeyboardEvent<HTMLElement>) {
+    if (event.key !== "Enter" || event.nativeEvent.isComposing || (event.target as HTMLElement).tagName !== "INPUT") return;
     event.preventDefault();
-    if (!search) return;
+    event.stopPropagation();
+    if (!search || disabled) return;
     if (paths.includes(candidate) || (canCreate && !options.length)) choose(candidate);
-    else choices()[0]?.focus();
+    else event.currentTarget.querySelector<HTMLElement>('[role=option]:not([aria-disabled=true])')?.focus();
   }
-  return <div className={css.root} ref={root} onKeyDown={navigate}>
-    <span className={css.label}>{ru ? "Папка" : "Folder"}</span>
-    <button type="button" ref={trigger} disabled={disabled} className={css.trigger} aria-label={ru ? "Папка" : "Folder"} aria-description={value}
-      aria-haspopup="dialog" aria-expanded={visible} aria-controls={visible ? panelId : undefined}
-      onClick={() => { setQuery(""); setOpen(!open); }}>
-      <FolderVisual path={value} /><span className={css.selection}><OverflowLabel text={value}/></span><ChevronDown size={13} aria-hidden="true"/>
-    </button>
-    {visible && <div id={panelId} className={css.panel} ref={panel} popover="manual" role="dialog" aria-label={ru ? "Выбрать папку" : "Choose folder"}>
-      <label className={css.search} data-input-shell><Search size={14} aria-hidden="true"/>
-        <input autoFocus value={query} onChange={event => setQuery(event.target.value)} onKeyDown={submitSearch}
-          placeholder={ru ? "Найти или создать папку" : "Find or create a folder"}
-          aria-label={ru ? "Путь к папке" : "Folder path"}/>
-      </label>
-      <div className={css.options}>
-        {options.map(path => <button type="button" key={path} data-folder-choice data-folder-path={path}
-          aria-pressed={path === value} onClick={() => choose(path)}>
-          <FolderVisual path={path} /><FolderBreadcrumb path={path}/>{path === value && <Check size={14} aria-hidden="true"/>}
-        </button>)}
-        {canCreate && <button type="button" className={css.create} data-folder-choice data-folder-create onClick={() => choose(candidate)}>
-          <Plus size={14} aria-hidden="true"/><span>{ru ? "Создать папку" : "Create folder"}<FolderBreadcrumb path={candidate}/></span>
-        </button>}
-      </div>
+  return <div className={css.root}>
+    <span className={css.label}>{label}</span>
+    <PropertyPopover label={label} triggerLabel={`${label}, ${value}`} open={open} onOpenChange={setMenu} disabled={disabled}
+      menuClassName={css.menu} onMenuKeyDown={submitSearch} trigger={<>
+        <FolderVisual path={value} /><span className={css.selection}><OverflowLabel text={value}/></span><ChevronDown size={13} aria-hidden="true"/>
+      </>}>
+      <PropertySearch label={ru ? "Найти или создать папку" : "Find or create a folder"} value={query} onChange={setQuery} disabled={disabled}/>
+      <Listbox aria-label={label} classNames={{ base: controls.list, list: controls.options }}
+        selectionMode="single" hideSelectedIcon disallowEmptySelection selectedKeys={[value]}
+        emptyContent={ru ? "Ничего не найдено" : "No results"} itemClasses={{ base: controls.option, title: controls.optionTitle }}>
+        {choices.map(({ path, create }) => <ListboxItem key={create ? `create:${path}` : path} textValue={create ? `${ru ? "Создать папку" : "Create folder"} ${path}` : path}
+          data-folder-path={create ? undefined : path} data-folder-create={create || undefined} isDisabled={disabled}
+          onPress={() => choose(path)} startContent={create ? <Plus size={14} aria-hidden="true"/> : <FolderVisual path={path}/>}
+          endContent={!create && path === value ? <Check className={controls.selectedIcon} size={14} aria-hidden="true"/> : undefined}>
+          {create ? <span className={css.create}><span>{ru ? "Создать папку" : "Create folder"}</span><span className={css.path}>{path}</span></span> : path}
+        </ListboxItem>)}
+      </Listbox>
       {canCreate && <p className={css.hint}>{ru ? "Папка будет создана при сохранении кейса." : "The folder will be created when you save the case."}</p>}
-    </div>}
+    </PropertyPopover>
   </div>;
-}
-
-function FolderBreadcrumb({ path }: { path: string }) {
-  const parts = path.split("/").filter(Boolean);
-  return <span className={css.crumbs}>{parts.map((part, index) => <span key={index}>
-    {index > 0 && <ArrowRight size={11} aria-hidden="true"/>}<span>{part}</span>
-  </span>)}{!parts.length && "/"}</span>;
 }

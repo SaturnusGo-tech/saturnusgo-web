@@ -11,13 +11,13 @@ import rail from "../propertyRail.module.css";
 type Field = "ownerIdentityId" | "tags";
 type Props = {
   testCaseId?: string; revision: TestCaseRevision; editing: boolean;
-  disabled?: boolean; ru: boolean; onPatch: (next: Partial<TestCaseRevision>) => void;
+  disabled?: boolean; ru: boolean; creating?: boolean; onPatch: (next: Partial<TestCaseRevision>) => void;
   onRequestEdit?: () => void;
   documentation?: ReactNode;
   tagSuggestions?: readonly string[];
 };
 
-export function InspectorDetails({ revision, editing, disabled, ru, onPatch, testCaseId, onRequestEdit, documentation, tagSuggestions }: Props) {
+export function InspectorDetails({ revision, editing, disabled, ru, creating, onPatch, testCaseId, onRequestEdit, documentation, tagSuggestions }: Props) {
   const { workspaceId, offline } = useWorkspacePeople();
   const locale = ru ? "ru" : "en";
   const member = useMemberName(workspaceId, revision.ownerIdentityId, offline);
@@ -34,7 +34,7 @@ export function InspectorDetails({ revision, editing, disabled, ru, onPatch, tes
   const request = (field: Field) => !disabled && onRequestEdit ? () => { setActiveField(field); onRequestEdit(); } : undefined;
   return <div className={rail.detailsBody}>
     <div className={rail.rows}>
-      <div className={rail.owner}><PropertyAssigneeField workspaceId={workspaceId} locale={locale} includeAgents
+      <div className={creating ? rail.creationOwner : rail.owner}><PropertyAssigneeField workspaceId={workspaceId} locale={locale} includeAgents
         offline={offline} disabled={disabled} autoOpen={activeField === "ownerIdentityId"} value={assignee}
         onRequestEdit={!offline ? request("ownerIdentityId") : undefined}
         onChange={active("ownerIdentityId") ? (next) => {

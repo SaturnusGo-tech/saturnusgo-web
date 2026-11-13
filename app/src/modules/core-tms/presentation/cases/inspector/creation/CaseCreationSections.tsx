@@ -1,17 +1,14 @@
 import { ScenarioLayoutToggle } from "../../../common/scenario/ScenarioLayoutToggle";
 import { useScenarioLayout } from "../../../common/scenario/useScenarioLayout";
-import { CaseCustomFields } from "../fields/CaseCustomFields";
-import { FolderPathPicker } from "../placement/FolderPathPicker";
 import type { TestCaseRevision } from "../../../../../../core/tms/contracts/legacy-contract";
 import { useState } from "react";
 import type { TmsLocale } from "../../../../localization/model/locale";
-import { CaseMetadataControls } from "../../detail/metadata/CaseMetadataControls";
-import { InspectorDetails } from "../details/InspectorDetails";
 import type { CaseInspectorEditor } from "../model";
 import { CreationNarrativeSection } from "./CreationNarrativeSection";
 import { InspectorSteps } from "../steps/InspectorSteps";
 import css from "../caseInspector.module.css";
-import rail from "../propertyRail.module.css";
+import { CaseCreationProperties } from "./properties/CaseCreationProperties";
+import properties from "./properties/caseCreationProperties.module.css";
 import type { SharedStep, SharedStepSummary } from "../../../../shared-steps/model/shared-step";
 import { DraftRequirements } from "../../../../product-docs/requirements/draft/DraftRequirements";
 
@@ -37,7 +34,7 @@ export function CaseCreationSections({
       <dl className={css.compactSummary}>{documentation}</dl>
     </CreationSection>
   </div>;
-  return <div className={`${css.content} ${css.creationContent} ${css.overviewLayout} ${rail.layout}`}>
+  return <div className={`${css.content} ${css.creationContent} ${css.overviewLayout} ${properties.layout}`}>
     <main className={css.primaryColumn}>
       <CreationNarrativeSection section="description" title={ru ? "Описание" : "Description"}
         value={revision.description} ru={ru} onChange={(description) => patch({ description })} />
@@ -48,20 +45,8 @@ export function CaseCreationSections({
           sharedSteps={sharedSteps} onResolveSharedStep={onResolveSharedStep} onPatch={patch} />
       </CreationSection>
     </main>
-    <aside className={`${css.sideRail} ${rail.sideRail}`} aria-label={ru ? "Свойства нового тест-кейса" : "New test case properties"}>
-      <CreationSection title={ru ? "Расположение" : "Placement"}>
-        <FolderPathPicker value={editor.folderPath} folders={editor.folders} onChange={editor.onFolderPath} ru={ru} disabled={editor.submitting} />
-      </CreationSection>
-      <CreationSection title={ru ? "Поля" : "Custom fields"}>
-        <CaseCustomFields projectId={editor.projectId} revision={revision} editing creating requiredFields={editor.requiredFields}
-          canCreate={editor.canCreateFieldValues} disabled={editor.submitting} ru={ru} onPatch={patch} />
-      </CreationSection>
-      <CreationSection title={ru ? "Свойства" : "Properties"}>
-        <CaseMetadataControls locale={locale} revision={revision} editing disabled={editor.submitting} onChange={editor.onChange} />
-      </CreationSection>
-      <section data-rail-details><InspectorDetails tagSuggestions={tagSuggestions} revision={revision} editing
-        disabled={editor.submitting} ru={ru} onPatch={patch} documentation={documentation} /></section>
-    </aside>
+    <CaseCreationProperties locale={locale} revision={revision} editor={editor}
+      tagSuggestions={tagSuggestions} documentation={documentation} />
   </div>;
 }
 

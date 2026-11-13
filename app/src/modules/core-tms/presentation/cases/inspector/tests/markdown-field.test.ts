@@ -13,6 +13,7 @@ const layoutStyles = readFileSync(new URL("../../cases.module.css", import.meta.
 const listingStyles = readFileSync(new URL("../../listing/caseListing.module.css", import.meta.url), "utf8");
 const content = readFileSync(new URL("../CaseInspectorContent.tsx", import.meta.url), "utf8");
 const creation = readFileSync(new URL("../creation/CaseCreationSections.tsx", import.meta.url), "utf8");
+const creationProperties = readFileSync(new URL("../creation/properties/CaseCreationProperties.tsx", import.meta.url), "utf8");
 const creationNarrative = readFileSync(new URL("../creation/CreationNarrativeSection.tsx", import.meta.url), "utf8");
 const detailPanel = readFileSync(new URL("../../detail/CaseDetailPanel.tsx", import.meta.url), "utf8");
 const details = readFileSync(new URL("../details/InspectorDetails.tsx", import.meta.url), "utf8");
@@ -169,7 +170,8 @@ test("create mode shares the same calm two-column hierarchy and stable action ba
   assert.match(content, /creating && editor[\s\S]*<CaseCreationSections/);
   assert.match(creation, /css\.overviewLayout/);
   assert.match(creation, /<main className=\{css\.primaryColumn\}>[\s\S]*Описание[\s\S]*Предусловия[\s\S]*Сценарий/);
-  assert.match(creation, /<aside className=\{[^\n]*rail\.sideRail[\s\S]*Расположение[\s\S]*Свойства[\s\S]*<InspectorDetails/);
+  assert.match(creation, /<CaseCreationProperties locale=\{locale\} revision=\{revision\} editor=\{editor\}/);
+  assert.match(creationProperties, /<PropertyRail[\s\S]*Свойства[\s\S]*<FolderPathPicker[\s\S]*<CaseCustomFields[\s\S]*<CaseMetadataControls[\s\S]*<InspectorDetails/);
   assert.doesNotMatch(creation, /number=|creationTone_|<details/);
   assert.match(creation, /CreationNarrativeSection[\s\S]*section="description"/);
   assert.match(creationNarrative, /onChange=\{editing && !disabled \? onChange : undefined\}/);
