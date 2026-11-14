@@ -1,3 +1,4 @@
+import { TestDataRoute } from "../../test-data/composition/TestDataRoute";
 import { requestAuthoringLeave } from "../../authoring/leave/application/authoring-leave";
 import { useWorkspaceCapabilities } from "../../auth/spaces/capabilities/composition/useWorkspaceCapabilities";
 import type { ReactNode } from "react";
@@ -135,6 +136,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
       />
     );
   }
+  if (model.view === "test-data") return <TestDataRoute onOpenCase={id => { model.setSelectedCaseId(id); model.setView("cases"); }} />;
   if (model.view === "custom-fields") return <CustomFieldsPage key={`${model.data.workspace.id}:${model.project.id}`}
     workspaceId={model.data.workspace.id} projectId={model.project.id} connected={model.connection === "connected"}
     canManageFields={model.data.meta.authorization.capabilities.includes("project:manage")}

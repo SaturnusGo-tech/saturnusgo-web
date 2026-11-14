@@ -32,8 +32,14 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit --pretty false --incremental false
 
+      - name: Lint Test Data vertical slice
+        run: npm run lint:tdm
+
       - name: Check TMS architecture
         run: npm run architecture:tms
+
+      - name: Test Test Data integration
+        run: npm run test:tms-test-data
 
       - name: Test anchored popup contracts
         run: npm run test:tms-overlays

@@ -1,0 +1,16 @@
+import type { DataType } from "../bindings/binding";
+export type DataField = { readonly key: string; readonly type: DataType; readonly value?: string | boolean; readonly description?: string; readonly isSecret?: boolean };
+export type Dataset = { readonly id: string; readonly name: string; readonly description: string; readonly environmentId: string | null;
+  readonly revision: number; readonly currentVersionId: string; readonly currentVersion: number; readonly fieldCount: number;
+  readonly usedIn: number; readonly updatedAt: string; readonly archived: boolean };
+export type DatasetVersion = { readonly id: string; readonly version: number; readonly environmentId: string | null; readonly fields: readonly DataField[]; readonly createdAt: string };
+export type Credential = { readonly id: string; readonly name: string; readonly description: string; readonly environmentId: string;
+  readonly revision: number; readonly fields: readonly DataField[]; readonly activeSecretVersionId: string; readonly usedIn: number; readonly updatedAt: string; readonly disabled: boolean };
+export type DatasetDraft = { readonly name: string; readonly description: string; readonly environmentId: string | null; readonly fields: readonly (DataField & { readonly value: string | boolean })[] };
+export type CredentialDraft = { readonly name: string; readonly description: string; readonly environmentId: string; readonly fields: readonly DataField[] };
+export type ResourcePage<T> = { readonly items: readonly T[]; readonly cursor: string | null };
+export type DataUsage = { readonly id: string; readonly title: string; readonly key: string };
+export type DataEnvironment = { readonly id: string; readonly name: string };
+export type TdmPermissions = { readonly read: boolean; readonly bind: boolean; readonly create: boolean; readonly update: boolean;
+  readonly archive: boolean; readonly credentialCreate: boolean; readonly credentialUpdate: boolean;
+  readonly rotate: boolean; readonly disable: boolean; readonly reveal: boolean; readonly use: boolean };

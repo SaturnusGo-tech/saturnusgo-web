@@ -7605,6 +7605,359 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/datasets": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        get: operations["listTdmDatasets"];
+        put?: never;
+        post: operations["createTdmDataset"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/datasets/{datasetId}": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                datasetId: string;
+            };
+            cookie?: never;
+        };
+        get: operations["getTdmDataset"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/datasets/{datasetId}/versions": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                datasetId: string;
+            };
+            cookie?: never;
+        };
+        get: operations["listTdmDatasetVersions"];
+        put?: never;
+        post: operations["reviseTdmDataset"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/datasets/{datasetId}/versions/{versionId}": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                datasetId: string;
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        get: operations["getTdmDatasetVersion"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/datasets/{datasetId}/archive": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                datasetId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["archiveTdmDataset"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/datasets/{datasetId}/restore": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                datasetId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["restoreTdmDataset"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/datasets/{datasetId}/usage": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                datasetId: string;
+            };
+            cookie?: never;
+        };
+        get: operations["listTdmDatasetUsage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/configuration": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        get: operations["getTdmConfiguration"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/credentials": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listTdmCredentials"];
+        put?: never;
+        post: operations["createTdmCredential"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/credentials/{credentialId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getTdmCredential"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["updateTdmCredential"];
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/credentials/{credentialId}/rotate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["rotateTdmCredential"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/credentials/{credentialId}/disable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["disableTdmCredential"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/credentials/{credentialId}/reveal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["revealTdmCredential"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/profile/credential-reveal-proof": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["issueCredentialRevealProof"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/credentials/{credentialId}/usage": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                credentialId: string;
+            };
+            cookie?: never;
+        };
+        get: operations["listTdmCredentialUsage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/test-data/bindings:validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Validate draft bindings and step references without secret values */
+        post: operations["validateTestDataBindings"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/test-runs/{runId}/items/{itemId}/attempts/{attemptNo}/test-data": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read pinned attempt data; null for legacy/no-data attempts */
+        get: operations["getAttemptTestDataManifest"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/test-runs/{runId}/test-data:preflight": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Check one bounded page of run candidates without preparing data */
+        post: operations["preflightRunTestData"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -8628,6 +8981,7 @@ export interface components {
             productId: string | null;
             /** @default false */
             regression: boolean;
+            testDataBindings?: components["schemas"]["TestDataBindings"];
         } & (unknown & unknown & unknown);
         TestCase: {
             id: components["schemas"]["Identifier"];
@@ -8670,6 +9024,7 @@ export interface components {
             changeNote?: components["schemas"]["ShortText"];
             /** @description Stable registered value IDs. PATCH merges supplied fields by fieldId; empty valueIds clears an optional field. Omitted fields are retained. Product requires its explicit matching group, except an existing unclassified legacy value. Regression defaults to false. */
             customFields?: components["schemas"]["CustomFieldSelection"][];
+            testDataBindings?: components["schemas"]["TestDataBindings"];
         } & (unknown & unknown & unknown);
         TestCasePatchRequest: {
             folderPath?: string;
@@ -8694,6 +9049,7 @@ export interface components {
             changeNote?: components["schemas"]["ShortText"];
             /** @description Stable registered value IDs. PATCH merges supplied fields by fieldId; empty valueIds clears an optional field. Omitted fields are retained. Product requires its explicit matching group, except an existing unclassified legacy value. Regression defaults to false. */
             customFields?: components["schemas"]["CustomFieldSelection"][];
+            testDataBindings?: components["schemas"]["TestDataBindings"];
         };
         TestCaseCloneRequest: {
             title?: string;
@@ -10369,7 +10725,7 @@ export interface components {
                 authorization: {
                     /** @enum {string} */
                     role: "workspace_admin" | "qa_manager" | "tester" | "reporter" | "viewer";
-                    capabilities: ("workspace:read" | "workspace:manage" | "project:read" | "project:manage" | "environment:read" | "environment:manage" | "test_case:read" | "test_case:manage" | "suite:read" | "suite:manage" | "run:read" | "run:manage" | "run:archive" | "run:execute" | "defect:read" | "defect:manage" | "report:read" | "report:manage" | "attachment:read" | "attachment:manage" | "audit:read" | "integration:read" | "integration:manage")[];
+                    capabilities: ("workspace:read" | "workspace:manage" | "project:read" | "project:manage" | "environment:read" | "environment:manage" | "test_case:read" | "test_case:manage" | "suite:read" | "suite:manage" | "run:read" | "run:manage" | "run:archive" | "run:execute" | "defect:read" | "defect:manage" | "report:read" | "report:manage" | "attachment:read" | "attachment:manage" | "audit:read" | "integration:read" | "integration:manage" | "test_data:read" | "test_data:create" | "test_data:update" | "test_data:archive" | "test_data:bind" | "test_data:audit_read" | "credential:create" | "credential:update" | "credential:rotate" | "credential:disable" | "credential:use" | "credential:reveal")[];
                 };
             };
         };
@@ -14074,6 +14430,7 @@ export interface components {
             productId: string | null;
             /** @default false */
             regression: boolean;
+            testDataBindings?: components["schemas"]["TestDataBindings"];
         } & (unknown & unknown & unknown);
         /** @description Immutable repository placement at detection. Null folderId denotes explicitly selected repository root. Missing historical snapshots remain null; resolve stable IDs to navigate to current placement. */
         DefectSourceLocation: {
@@ -14110,6 +14467,304 @@ export interface components {
             caseId: string | null;
             caseRevision: number | null;
             steps: components["schemas"]["DefectReproductionStep"][];
+        };
+        /** @enum {string} */
+        TdmDataValueType: "String" | "Integer" | "Decimal" | "Boolean" | "Email" | "URL" | "Date" | "DateTime" | "JSON";
+        TdmDataField: {
+            key: string;
+            type: components["schemas"]["TdmDataValueType"];
+            /** @description Integer and Decimal use exact decimal strings; JSON uses serialized JSON text. Boolean uses a boolean. No secrets. */
+            value: string | boolean;
+            description?: string;
+        };
+        TdmDatasetDraft: {
+            name: string;
+            description?: string;
+            environmentId?: string | null;
+            fields: components["schemas"]["TdmDataField"][];
+        };
+        TdmDataset: {
+            id: string;
+            name: string;
+            description: string;
+            environmentId: string | null;
+            /** @enum {string} */
+            status: "ACTIVE" | "ARCHIVED";
+            currentVersionId: string;
+            currentVersion: number;
+            revision: number;
+            fieldCount: number;
+            usedIn: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        TdmDatasetVersion: {
+            id: string;
+            datasetId: string;
+            version: number;
+            fields: components["schemas"]["TdmDataField"][];
+            createdBy: string;
+            /** Format: date-time */
+            createdAt: string;
+            environmentId: string | null;
+        };
+        TdmDatasetConsumer: {
+            caseId: string;
+            caseKey: string;
+            title: string;
+        };
+        TdmPage: {
+            nextCursor: string | null;
+        };
+        /** @enum {string} */
+        TdmErrorCode: "TEST_DATA_INVALID" | "DATA_ALIAS_CONFLICT" | "DATA_BINDING_NOT_FOUND" | "DATA_FIELD_NOT_FOUND" | "DATA_VERSION_CONFLICT" | "DATA_PRECONDITION_REQUIRED" | "DATA_PRECONDITION_FAILED" | "DATA_ACCESS_DENIED" | "DATA_ENVIRONMENT_MISMATCH" | "CREDENTIAL_DISABLED" | "CREDENTIAL_VERSION_CHANGED" | "SECRET_REVEAL_FORBIDDEN" | "SECRET_STORE_UNAVAILABLE" | "DATA_RESOURCE_IN_USE" | "RATE_LIMITED" | "INTERNAL_ERROR";
+        TdmError: {
+            error: {
+                code: components["schemas"]["TdmErrorCode"];
+                message: string;
+                details: {
+                    [key: string]: string | number;
+                };
+                requestId: string;
+            };
+        };
+        TdmConfiguration: {
+            enabled: boolean;
+            credentialsAvailable: boolean;
+            limits: {
+                /** @default 64 */
+                aliasLength: number;
+                /** @default 120 */
+                nameLength: number;
+                /** @default 2000 */
+                descriptionLength: number;
+                /** @default 8192 */
+                stringBytes: number;
+                /** @default 65536 */
+                jsonBytes: number;
+                /** @default 50 */
+                datasetFields: number;
+                /** @default 50 */
+                bindings: number;
+                /** @default 50 */
+                pageSize: number;
+                /** @default 30 */
+                revealSeconds: number;
+            };
+            permissions: string[];
+            /** @description Current sign-in session supports deliberate credential step-up verification. */
+            revealVerificationAvailable: boolean;
+        };
+        CredentialMetadata: {
+            workspaceId: string;
+            projectId: string;
+            id: string;
+            name: string;
+            description: string;
+            environmentId: string;
+            fields: components["schemas"]["CredentialField"][];
+            nonSecretValues: {
+                [key: string]: string | boolean;
+            };
+            activeSecretVersionId: string;
+            /** @enum {string} */
+            status: "active" | "disabled";
+            rowVersion: number;
+            usedIn: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        CredentialField: {
+            key: string;
+            /** @enum {string} */
+            type: "String" | "Integer" | "Decimal" | "Boolean" | "Email" | "URL" | "Date" | "DateTime" | "JSON";
+            isSecret: boolean;
+        };
+        CredentialDefinition: {
+            name: string;
+            description?: string;
+            environmentId: string;
+            fields: {
+                key: string;
+                /** @enum {string} */
+                type: "String" | "Integer" | "Decimal" | "Boolean" | "Email" | "URL" | "Date" | "DateTime" | "JSON";
+                isSecret: boolean;
+                value: unknown;
+            }[];
+        };
+        CredentialMetadataPatch: {
+            name?: string;
+            description?: string;
+        };
+        CredentialRotation: {
+            secrets: {
+                [key: string]: string;
+            };
+        };
+        CredentialReveal: {
+            field: string;
+            environmentId: string;
+            secretVersionId: string;
+            stepUpProof: string;
+            reason?: string;
+            executionId?: string;
+        };
+        CredentialRevealResult: {
+            value: string;
+            /** @constant */
+            displayTimeoutSeconds: 30;
+        };
+        CredentialRevealProofRequest: {
+            workspaceId: string;
+            projectId: string;
+            credentialId: string;
+            secretVersionId: string;
+            field: string;
+            executionId?: string;
+        };
+        CredentialRevealProofResult: {
+            proof: string;
+            /** Format: date-time */
+            expiresAt: string;
+        };
+        TestDataBindingIdentity: {
+            id: string;
+            alias: string;
+            required: boolean;
+        };
+        TestDataStaticDefinition: {
+            name: string;
+            /** @enum {string} */
+            type: "String" | "Integer" | "Decimal" | "Boolean" | "Email" | "URL" | "Date" | "DateTime" | "JSON";
+            value: string | boolean;
+            description?: string;
+        };
+        TestDataBinding: {
+            id: string;
+            alias: string;
+            required: boolean;
+            /** @enum {string} */
+            sourceType: "STATIC";
+            staticDefinition: components["schemas"]["TestDataStaticDefinition"];
+        } | {
+            id: string;
+            alias: string;
+            required: boolean;
+            /** @enum {string} */
+            sourceType: "DATASET";
+            sourceId: string;
+            sourceVersionId: string;
+        } | {
+            id: string;
+            alias: string;
+            required: boolean;
+            /** @enum {string} */
+            sourceType: "CREDENTIAL";
+            sourceId: string;
+        };
+        TestDataBindings: components["schemas"]["TestDataBinding"][];
+        TestDataValidationFinding: {
+            code: string;
+            alias?: string;
+            field?: string;
+            stepId?: string;
+            /** @enum {string} */
+            section?: "action" | "expectedResult";
+            offset?: number;
+        };
+        TestDataVariable: {
+            token: string;
+            alias: string;
+            field: string;
+            type: string;
+            source: string;
+            secret: boolean;
+        };
+        TestDataReferencedResource: {
+            alias: string;
+            id: string;
+            name: string;
+            /** @enum {string} */
+            sourceType: "STATIC" | "DATASET" | "CREDENTIAL";
+            versionId?: string;
+            currentVersionId?: string;
+            /** @description Ordinal of the pinned immutable dataset version; absent for static values and credentials. */
+            version?: number;
+            /** @description Environment of the pinned dataset version or credential metadata; null for environment-independent sources. */
+            environmentId?: string | null;
+            /**
+             * @description Current resource lifecycle status: uppercase for datasets, lowercase for credentials. This does not assert external account availability.
+             * @enum {string}
+             */
+            status?: "ACTIVE" | "ARCHIVED" | "active" | "disabled";
+        };
+        TestDataValidationRequest: {
+            bindings: components["schemas"]["TestDataBindings"];
+            steps: {
+                id: string;
+                action: string;
+                expectedResult: string;
+            }[];
+            environmentId?: string | null;
+            caseId?: string;
+            revision?: number;
+        };
+        TestDataValidationResult: {
+            valid: boolean;
+            errors: components["schemas"]["TestDataValidationFinding"][];
+            warnings: components["schemas"]["TestDataValidationFinding"][];
+            variables: components["schemas"]["TestDataVariable"][];
+            referencedResources: components["schemas"]["TestDataReferencedResource"][];
+        };
+        TestDataManifestField: {
+            key: string;
+            type: string;
+            secret: boolean;
+            value?: string | boolean;
+        };
+        TestDataManifestSource: {
+            alias: string;
+            /** @enum {string} */
+            sourceType: "STATIC" | "DATASET" | "CREDENTIAL";
+            id: string;
+            name: string;
+            versionId?: string;
+            fields: components["schemas"]["TestDataManifestField"][];
+        };
+        TestDataManifest: {
+            id: string;
+            runId: string;
+            runItemId: string;
+            attemptNo: number;
+            caseId: string;
+            caseRevision: number;
+            environmentId: string | null;
+            /** Format: date-time */
+            preparedAt: string;
+            sources: components["schemas"]["TestDataManifestSource"][];
+        };
+        TestDataValidationEnvelope: {
+            data: components["schemas"]["TestDataValidationResult"];
+        };
+        TestDataManifestEnvelope: {
+            data: components["schemas"]["TestDataManifest"] | null;
+        };
+        TestDataPreflightItem: {
+            itemId: string;
+            valid: boolean;
+            errors: components["schemas"]["TestDataValidationFinding"][];
+            warnings: components["schemas"]["TestDataValidationFinding"][];
+        };
+        TestDataPreflightEnvelope: {
+            data: {
+                valid: boolean;
+                items: components["schemas"]["TestDataPreflightItem"][];
+                nextAfter: number | null;
+            };
         };
     };
     responses: {
@@ -30625,6 +31280,2010 @@ export interface operations {
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listTdmDatasets: {
+        parameters: {
+            query?: {
+                search?: string;
+                status?: "ACTIVE" | "ARCHIVED";
+                cursor?: string;
+                limit?: number;
+                /** @description Name ascending or most recently updated first; each has stable ID tie-break. */
+                sort?: "name" | "updatedAt";
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Test data result. Secret material is never included. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    "X-Next-Cursor": components["headers"]["XNextCursor"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmDataset"][];
+                        page: components["schemas"]["TdmPage"];
+                    };
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            401: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            404: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+        };
+    };
+    createTdmDataset: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TdmDatasetDraft"];
+            };
+        };
+        responses: {
+            /** @description Test data result. Secret material is never included. */
+            201: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmDataset"];
+                    };
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            401: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            404: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+        };
+    };
+    getTdmDataset: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                datasetId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Test data result. Secret material is never included. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmDataset"];
+                    };
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            401: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            404: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+        };
+    };
+    listTdmDatasetVersions: {
+        parameters: {
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                datasetId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Test data result. Secret material is never included. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    "X-Next-Cursor": components["headers"]["XNextCursor"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmDatasetVersion"][];
+                        page: components["schemas"]["TdmPage"];
+                    };
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            401: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            404: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+        };
+    };
+    reviseTdmDataset: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                datasetId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TdmDatasetDraft"];
+            };
+        };
+        responses: {
+            /** @description Test data result. Secret material is never included. */
+            201: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmDataset"];
+                    };
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            401: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            404: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            412: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            428: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+        };
+    };
+    getTdmDatasetVersion: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                datasetId: string;
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Test data result. Secret material is never included. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmDatasetVersion"];
+                    };
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            401: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            404: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+        };
+    };
+    archiveTdmDataset: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                datasetId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Test data result. Secret material is never included. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmDataset"];
+                    };
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            401: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            404: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            412: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            428: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+        };
+    };
+    restoreTdmDataset: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                datasetId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Test data result. Secret material is never included. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmDataset"];
+                    };
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            401: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            404: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            412: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            428: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+        };
+    };
+    listTdmDatasetUsage: {
+        parameters: {
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                datasetId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Test data result. Secret material is never included. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    "X-Next-Cursor": components["headers"]["XNextCursor"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmDatasetConsumer"][];
+                        page: components["schemas"]["TdmPage"];
+                    };
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            401: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            404: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+        };
+    };
+    getTdmConfiguration: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Rollout and effective capabilities; no values. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmConfiguration"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listTdmCredentials: {
+        parameters: {
+            query?: {
+                q?: string;
+                limit?: number;
+                cursor?: string;
+                includeDisabled?: "true" | "false";
+                sort?: "name" | "updatedAt";
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: string;
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Safe credential metadata or explicitly authorized single-field reveal. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "no-store";
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "X-Next-Cursor": components["headers"]["XNextCursor"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CredentialMetadata"][];
+                        page: {
+                            nextCursor: string | null;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["UnprocessableEntity"];
+            429: components["responses"]["TooManyRequests"];
+            /** @description Unexpected error without internal details. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    createTdmCredential: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: string;
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CredentialDefinition"];
+            };
+        };
+        responses: {
+            /** @description Safe credential metadata or explicitly authorized single-field reveal. */
+            201: {
+                headers: {
+                    "Cache-Control"?: "no-store";
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Idempotency-Replayed"?: "true" | "false";
+                    ETag: components["headers"]["ETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CredentialMetadata"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["UnprocessableEntity"];
+            429: components["responses"]["TooManyRequests"];
+            /** @description Unexpected error without internal details. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getTdmCredential: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: string;
+                projectId: string;
+                credentialId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Safe credential metadata or explicitly authorized single-field reveal. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "no-store";
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    ETag: components["headers"]["ETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CredentialMetadata"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["UnprocessableEntity"];
+            429: components["responses"]["TooManyRequests"];
+            /** @description Unexpected error without internal details. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    updateTdmCredential: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+                "If-Match": string;
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: string;
+                projectId: string;
+                credentialId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CredentialMetadataPatch"];
+            };
+        };
+        responses: {
+            /** @description Safe credential metadata or explicitly authorized single-field reveal. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "no-store";
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Idempotency-Replayed"?: "true" | "false";
+                    ETag: components["headers"]["ETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CredentialMetadata"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            /** @description Unexpected error without internal details. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    rotateTdmCredential: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+                "If-Match": string;
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: string;
+                projectId: string;
+                credentialId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CredentialRotation"];
+            };
+        };
+        responses: {
+            /** @description Safe credential metadata or explicitly authorized single-field reveal. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "no-store";
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Idempotency-Replayed"?: "true" | "false";
+                    ETag: components["headers"]["ETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CredentialMetadata"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            /** @description Unexpected error without internal details. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    disableTdmCredential: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+                "If-Match": string;
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: string;
+                projectId: string;
+                credentialId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Safe credential metadata or explicitly authorized single-field reveal. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "no-store";
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Idempotency-Replayed"?: "true" | "false";
+                    ETag: components["headers"]["ETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CredentialMetadata"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            /** @description Unexpected error without internal details. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    revealTdmCredential: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: string;
+                projectId: string;
+                credentialId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CredentialReveal"];
+            };
+        };
+        responses: {
+            /** @description Safe credential metadata or explicitly authorized single-field reveal. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "no-store";
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CredentialRevealResult"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["UnprocessableEntity"];
+            429: components["responses"]["TooManyRequests"];
+            /** @description Unexpected error without internal details. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    issueCredentialRevealProof: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CredentialRevealProofRequest"];
+            };
+        };
+        responses: {
+            /** @description Safe credential metadata or explicitly authorized single-field reveal. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "no-store";
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CredentialRevealProofResult"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["UnprocessableEntity"];
+            429: components["responses"]["TooManyRequests"];
+            /** @description Unexpected error without internal details. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listTdmCredentialUsage: {
+        parameters: {
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                credentialId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Test data result. Secret material is never included. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    "X-Next-Cursor": components["headers"]["XNextCursor"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmDatasetConsumer"][];
+                        page: components["schemas"]["TdmPage"];
+                    };
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            401: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            404: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Safe typed Test Data error. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+        };
+    };
+    validateTestDataBindings: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TestDataValidationRequest"];
+            };
+        };
+        responses: {
+            /** @description Safe test data metadata */
+            200: {
+                headers: {
+                    "Cache-Control"?: "no-store";
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TestDataValidationEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getAttemptTestDataManifest: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: string;
+                runId: string;
+                itemId: string;
+                attemptNo: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Safe test data metadata */
+            200: {
+                headers: {
+                    "Cache-Control"?: "no-store";
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TestDataManifestEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    preflightRunTestData: {
+        parameters: {
+            query?: {
+                limit?: number;
+                after?: number;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: string;
+                runId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Safe test data metadata */
+            200: {
+                headers: {
+                    "Cache-Control"?: "no-store";
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TestDataPreflightEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
             500: components["responses"]["InternalError"];
         };
     };

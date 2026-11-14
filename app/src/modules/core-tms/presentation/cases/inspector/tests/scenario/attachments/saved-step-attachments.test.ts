@@ -29,6 +29,7 @@ function load(path: string) {
     if (name.endsWith("ScenarioMarkdown")) return { ScenarioMarkdown: () => null };
     if (name.endsWith("ScenarioTextInput")) return { ScenarioTextInput: () => null };
     if (name.endsWith("StepActionMenu")) return { StepActionMenu: () => null };
+    if (name.endsWith("StepDataFindings")) return { StepDataFindings: () => null };
     throw new Error(`Unexpected import ${name}`);
   } });
   return module.exports;

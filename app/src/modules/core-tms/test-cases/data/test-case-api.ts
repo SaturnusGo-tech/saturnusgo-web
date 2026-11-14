@@ -38,6 +38,7 @@ function revisionWrite(revision: TestCaseRevision) {
     tags: normalizeRevisionTags(revision.tags),
     estimatedMinutes: revision.estimatedMinutes,
     testData: revision.testData,
+    testDataBindings: revision.testDataBindings?.map(binding => structuredClone(binding)),
     steps: revision.steps.map(({ id, order, action, expectedResult, testData, required, sharedStepId }) => (
       { id, order, action, expectedResult, testData, required, sharedStepId: sharedStepId ?? null }
     )),
@@ -52,7 +53,6 @@ export async function listTestCases(http: TmsHttpClient, projectId: string, sign
   const items: Api["TestCaseSummary"][] = [];
   const seenCursors = new Set<string>();
   let cursor: string | null = null;
-  let meta: Api["PageMeta"] = { limit: LIST_PAGE_SIZE, hasMore: false, nextCursor: null };
   for (let page = 0; page < LIST_PAGE_LIMIT; page += 1) {
     signal?.throwIfAborted();
     const query = new URLSearchParams({ projectId, includeArchived: "true", limit: String(LIST_PAGE_SIZE) });
@@ -60,7 +60,7 @@ export async function listTestCases(http: TmsHttpClient, projectId: string, sign
     if (cursor) query.set("cursor", cursor);
     const envelope = await http.get<Api["TestCaseListEnvelope"]>(`/test-cases?${query}`, signal);
     items.push(...envelope.data);
-    meta = envelope.meta;
+    const meta = envelope.meta;
     if (items.length > LIST_CASE_LIMIT || (items.length >= LIST_CASE_LIMIT && meta.hasMore)) throw new Error("Test-case collection exceeds the supported 10,000-case workspace limit.");
     if (!meta.hasMore || !meta.nextCursor) return { items: items.map(mapTestCaseSummary), meta };
     if (seenCursors.has(meta.nextCursor)) throw new Error("Test-case pagination returned a repeated cursor.");

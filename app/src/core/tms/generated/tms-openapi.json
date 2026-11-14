@@ -3,7 +3,7 @@
   "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
   "info": {
     "title": "TMS API",
-    "version": "1.0.0-checkpoint.12",
+    "version": "1.0.0-checkpoint.13",
     "description": "Versioned production contract for accepted TMS behavior. All timestamps are UTC RFC 3339 values, all identifiers are opaque, and all cursors and ETags must be treated as opaque strings."
   },
   "servers": [
@@ -3387,7 +3387,7 @@
             "$ref": "#/components/responses/InternalError"
           }
         },
-        "description": "Lists nonarchived defects in the authorized project. q is a literal, case-insensitive substring of key, title, description, component, labels, assignee identity ID or active workspace member name/email, with Unicode NFKC and Russian ё/е normalization. component is the exact stored label, including empty string for unclassified records. Default order is updatedAt descending, ID descending. severitySort orders low to critical (asc) or critical to low (desc), then updatedAt/ID descending. Cursors are bound to project, status, run, component, q and severitySort and reject changed filters. scope defaults to all for compatibility; active excludes verified/closed, closed selects those statuses. It intersects other filters before pagination, totals and grouping. Cursors bind scope; legacy cursors are accepted only for all."
+        "description": "Lists nonarchived defects in the authorized project. q is a literal, case-insensitive substring of key, title, description, component, labels, assignee identity ID or active workspace member name/email, with Unicode NFKC and Russian \u0451/\u0435 normalization. component is the exact stored label, including empty string for unclassified records. Default order is updatedAt descending, ID descending. severitySort orders low to critical (asc) or critical to low (desc), then updatedAt/ID descending. Cursors are bound to project, status, run, component, q and severitySort and reject changed filters. scope defaults to all for compatibility; active excludes verified/closed, closed selects those statuses. It intersects other filters before pagination, totals and grouping. Cursors bind scope; legacy cursors are accepted only for all."
       },
       "post": {
         "tags": [
@@ -5880,7 +5880,7 @@
           "Dashboards"
         ],
         "summary": "List bounded dashboard summaries newest first",
-        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project’s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
+        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project\u2019s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
         "operationId": "listDashboards",
         "x-tms-pagination": "cursor",
         "parameters": [
@@ -15693,7 +15693,7 @@
         "tags": [
           "Billing"
         ],
-        "description": "Starts an eligible Individual or Startup test checkout. Personal workspaces may choose Startup directly. Active paid Individual upgrades charge only the ceiling-rounded positive price difference for the remaining paid period and preserve the original renewal anniversary; the next monthly renewal uses the full Startup catalog price. The checkout freezes its subtotal before tax for up to 30 minutes, ending no later than paid-through, and binds the subscription version. Hosting readiness is checked before checkout and confirmation. Opening or declining checkout grants no new access. Enterprise and unbilled legacy company enrollment require contact sales. First personal Startup checkout requires a ready Startup setup and startupSetupId, startupSetupVersion and confirmWorkspaceConversion=true. Setup changes invalidate open quotes. Startup checkout requires the current owner’s original authentication or required MFA confirmation within 10 minutes. Handoffs do not refresh that authentication time. Missing or stale proof returns HTTP403 REAUTHENTICATION_REQUIRED. Missing, changed, unready or expired personal Startup setup returns HTTP 409 BILLING_STARTUP_SETUP_REQUIRED; reopen company setup and create a new checkout command after preparation. Temporary hosting unavailability returns HTTP 503 BILLING_TEAM_UNAVAILABLE and may retry the unchanged command.",
+        "description": "Starts an eligible Individual or Startup test checkout. Personal workspaces may choose Startup directly. Active paid Individual upgrades charge only the ceiling-rounded positive price difference for the remaining paid period and preserve the original renewal anniversary; the next monthly renewal uses the full Startup catalog price. The checkout freezes its subtotal before tax for up to 30 minutes, ending no later than paid-through, and binds the subscription version. Hosting readiness is checked before checkout and confirmation. Opening or declining checkout grants no new access. Enterprise and unbilled legacy company enrollment require contact sales. First personal Startup checkout requires a ready Startup setup and startupSetupId, startupSetupVersion and confirmWorkspaceConversion=true. Setup changes invalidate open quotes. Startup checkout requires the current owner\u2019s original authentication or required MFA confirmation within 10 minutes. Handoffs do not refresh that authentication time. Missing or stale proof returns HTTP403 REAUTHENTICATION_REQUIRED. Missing, changed, unready or expired personal Startup setup returns HTTP 409 BILLING_STARTUP_SETUP_REQUIRED; reopen company setup and create a new checkout command after preparation. Temporary hosting unavailability returns HTTP 503 BILLING_TEAM_UNAVAILABLE and may retry the unchanged command.",
         "parameters": [
           {
             "$ref": "#/components/parameters/BillingIdempotencyKey"
@@ -21290,7 +21290,7 @@
           "Notifications"
         ],
         "operationId": "archiveReadNotifications",
-        "summary": "Archive only this member’s already-read inbox entries",
+        "summary": "Archive only this member\u2019s already-read inbox entries",
         "parameters": [
           {
             "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
@@ -21500,7 +21500,7 @@
             "managedTenant": []
           }
         ],
-        "description": "Requires a current fully authenticated managed company session. Revokes only the current identity’s grant in the verified company and writes one append-only audit event atomically. Replays are idempotent. Unknown, foreign and already revoked IDs return the same empty 204 to avoid disclosing another identity’s connections. Revocation immediately blocks current Falcon requests and future refreshes. The request has no body and cannot transfer or edit a grant.",
+        "description": "Requires a current fully authenticated managed company session. Revokes only the current identity\u2019s grant in the verified company and writes one append-only audit event atomically. Replays are idempotent. Unknown, foreign and already revoked IDs return the same empty 204 to avoid disclosing another identity\u2019s connections. Revocation immediately blocks current Falcon requests and future refreshes. The request has no body and cannot transfer or edit a grant.",
         "x-tms-idempotency": "not-applicable",
         "responses": {
           "204": {
@@ -21619,7 +21619,7 @@
             "managedTenant": []
           }
         ],
-        "description": "Available only when employee mode is enabled. Scope comes from the verified company hostname and current human managed session. Ordinary REST does not accept MCP bearer credentials. Requires current workspace_admin role and integrations entitlement, revalidated in the transaction. If-Match is the quoted rowVersion; stale values fail VERSION_CONFLICT. Repeated command IDs replay, changed versions conflict. Deactivation releases the occupied seat, advances securityVersion and atomically revokes this employee’s grants plus legacy unbound grants for the current verified company Codex MCP resource. Human sessions and unrelated integrations remain intact.",
+        "description": "Available only when employee mode is enabled. Scope comes from the verified company hostname and current human managed session. Ordinary REST does not accept MCP bearer credentials. Requires current workspace_admin role and integrations entitlement, revalidated in the transaction. If-Match is the quoted rowVersion; stale values fail VERSION_CONFLICT. Repeated command IDs replay, changed versions conflict. Deactivation releases the occupied seat, advances securityVersion and atomically revokes this employee\u2019s grants plus legacy unbound grants for the current verified company Codex MCP resource. Human sessions and unrelated integrations remain intact.",
         "responses": {
           "200": {
             "description": "Success",
@@ -22240,7 +22240,7 @@
             "managedTenant": []
           }
         ],
-        "description": "Requires a current tenant workspace_admin, revalidated against the stored managed session. Scope derives from the verified company hostname. Lists only that company’s Codex employee grants and legacy Codex MCP grants across human owners. Includes human and project names; never returns tokens, OAuth payloads or session/security versions. Missing historical project names are null. Stable descending createdAt/id cursor is company- and status-bound; expired classification uses a cursor-stable as-of time. Listing remains available after employee disable or entitlement loss to permit access review.",
+        "description": "Requires a current tenant workspace_admin, revalidated against the stored managed session. Scope derives from the verified company hostname. Lists only that company\u2019s Codex employee grants and legacy Codex MCP grants across human owners. Includes human and project names; never returns tokens, OAuth payloads or session/security versions. Missing historical project names are null. Stable descending createdAt/id cursor is company- and status-bound; expired classification uses a cursor-stable as-of time. Listing remains available after employee disable or entitlement loss to permit access review.",
         "x-tms-pagination": "cursor",
         "parameters": [
           {
@@ -22336,7 +22336,7 @@
             "managedTenant": []
           }
         ],
-        "description": "Requires a current tenant workspace_admin and same-company Origin, revalidated under the company administration lock. Only this company’s Codex grants can be revoked; foreign or unrelated grants return NOT_FOUND. Grant revocation, audit actor attribution and command receipt commit atomically. Idempotency-Key replay returns the original revocation time, and reusing the key for another grant conflicts. Repeated revocation never adds another audit event. Existing identity-owner OAuth disconnect endpoints retain their own authorization.",
+        "description": "Requires a current tenant workspace_admin and same-company Origin, revalidated under the company administration lock. Only this company\u2019s Codex grants can be revoked; foreign or unrelated grants return NOT_FOUND. Grant revocation, audit actor attribution and command receipt commit atomically. Idempotency-Key replay returns the original revocation time, and reusing the key for another grant conflicts. Repeated revocation never adds another audit event. Existing identity-owner OAuth disconnect endpoints retain their own authorization.",
         "x-tms-idempotency": "required",
         "x-tms-concurrency": "not-applicable",
         "parameters": [
@@ -31894,6 +31894,3978 @@
           }
         }
       }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/datasets": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "operationId": "listTdmDatasets",
+        "tags": [
+          "Test Data"
+        ],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 120
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ACTIVE",
+                "ARCHIVED"
+              ],
+              "default": "ACTIVE"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 50
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "name",
+                "updatedAt"
+              ],
+              "default": "name"
+            },
+            "description": "Name ascending or most recently updated first; each has stable ID tie-break."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Test data result. Secret material is never included.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "X-Next-Cursor": {
+                "$ref": "#/components/headers/XNextCursor"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data",
+                    "page"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "maxItems": 50,
+                      "items": {
+                        "$ref": "#/components/schemas/TdmDataset"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/TdmPage"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          }
+        },
+        "x-tms-pagination": "cursor"
+      },
+      "post": {
+        "operationId": "createTdmDataset",
+        "tags": [
+          "Test Data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Test data result. Secret material is never included.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TdmDataset"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "required",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TdmDatasetDraft"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/datasets/{datasetId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "datasetId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getTdmDataset",
+        "tags": [
+          "Test Data"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Test data result. Secret material is never included.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TdmDataset"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/datasets/{datasetId}/versions": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "datasetId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "listTdmDatasetVersions",
+        "tags": [
+          "Test Data"
+        ],
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Test data result. Secret material is never included.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "X-Next-Cursor": {
+                "$ref": "#/components/headers/XNextCursor"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data",
+                    "page"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "maxItems": 50,
+                      "items": {
+                        "$ref": "#/components/schemas/TdmDatasetVersion"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/TdmPage"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          }
+        },
+        "x-tms-pagination": "cursor"
+      },
+      "post": {
+        "operationId": "reviseTdmDataset",
+        "tags": [
+          "Test Data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Test data result. Secret material is never included.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TdmDataset"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TdmDatasetDraft"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/datasets/{datasetId}/versions/{versionId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "datasetId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          }
+        },
+        {
+          "name": "versionId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getTdmDatasetVersion",
+        "tags": [
+          "Test Data"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Test data result. Secret material is never included.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TdmDatasetVersion"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/datasets/{datasetId}/archive": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "datasetId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "archiveTdmDataset",
+        "tags": [
+          "Test Data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Test data result. Secret material is never included.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TdmDataset"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required"
+      }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/datasets/{datasetId}/restore": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "datasetId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "restoreTdmDataset",
+        "tags": [
+          "Test Data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Test data result. Secret material is never included.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TdmDataset"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required"
+      }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/datasets/{datasetId}/usage": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "datasetId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "listTdmDatasetUsage",
+        "tags": [
+          "Test Data"
+        ],
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Test data result. Secret material is never included.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "X-Next-Cursor": {
+                "$ref": "#/components/headers/XNextCursor"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data",
+                    "page"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "maxItems": 50,
+                      "items": {
+                        "$ref": "#/components/schemas/TdmDatasetConsumer"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/TdmPage"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          }
+        },
+        "x-tms-pagination": "cursor"
+      }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/configuration": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "operationId": "getTdmConfiguration",
+        "tags": [
+          "Test Data"
+        ],
+        "responses": {
+          "200": {
+            "description": "Rollout and effective capabilities; no values.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TdmConfiguration"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/credentials": {
+      "get": {
+        "operationId": "listTdmCredentials",
+        "tags": [
+          "Test Data"
+        ],
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 120
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          },
+          {
+            "name": "includeDisabled",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ],
+              "default": "false"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "name",
+                "updatedAt"
+              ],
+              "default": "updatedAt"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/XRequestId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Safe credential metadata or explicitly authorized single-field reveal.",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              },
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "X-Next-Cursor": {
+                "$ref": "#/components/headers/XNextCursor"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CredentialMetadata"
+                      }
+                    },
+                    "page": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "nextCursor": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "nextCursor"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "page"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          },
+          "500": {
+            "description": "Unexpected error without internal details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            }
+          }
+        },
+        "x-tms-pagination": "cursor"
+      },
+      "post": {
+        "operationId": "createTdmCredential",
+        "tags": [
+          "Test Data"
+        ],
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "$ref": "#/components/parameters/XRequestId"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Safe credential metadata or explicitly authorized single-field reveal.",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              },
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Idempotency-Replayed": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "true",
+                    "false"
+                  ]
+                }
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CredentialMetadata"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          },
+          "500": {
+            "description": "Unexpected error without internal details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CredentialDefinition"
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "required"
+      }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/credentials/{credentialId}": {
+      "get": {
+        "operationId": "getTdmCredential",
+        "tags": [
+          "Test Data"
+        ],
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "credentialId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "$ref": "#/components/parameters/XRequestId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Safe credential metadata or explicitly authorized single-field reveal.",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              },
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CredentialMetadata"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          },
+          "500": {
+            "description": "Unexpected error without internal details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateTdmCredential",
+        "tags": [
+          "Test Data"
+        ],
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "credentialId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\"[1-9]\\d*\"$"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/XRequestId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Safe credential metadata or explicitly authorized single-field reveal.",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              },
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Idempotency-Replayed": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "true",
+                    "false"
+                  ]
+                }
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CredentialMetadata"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          },
+          "500": {
+            "description": "Unexpected error without internal details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            }
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CredentialMetadataPatch"
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required"
+      }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/credentials/{credentialId}/rotate": {
+      "post": {
+        "operationId": "rotateTdmCredential",
+        "tags": [
+          "Test Data"
+        ],
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "credentialId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\"[1-9]\\d*\"$"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/XRequestId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Safe credential metadata or explicitly authorized single-field reveal.",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              },
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Idempotency-Replayed": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "true",
+                    "false"
+                  ]
+                }
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CredentialMetadata"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          },
+          "500": {
+            "description": "Unexpected error without internal details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            }
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CredentialRotation"
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required"
+      }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/credentials/{credentialId}/disable": {
+      "post": {
+        "operationId": "disableTdmCredential",
+        "tags": [
+          "Test Data"
+        ],
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "credentialId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\"[1-9]\\d*\"$"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/XRequestId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Safe credential metadata or explicitly authorized single-field reveal.",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              },
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Idempotency-Replayed": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "true",
+                    "false"
+                  ]
+                }
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CredentialMetadata"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          },
+          "500": {
+            "description": "Unexpected error without internal details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            }
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          }
+        },
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required"
+      }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/credentials/{credentialId}/reveal": {
+      "post": {
+        "operationId": "revealTdmCredential",
+        "tags": [
+          "Test Data"
+        ],
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "credentialId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "$ref": "#/components/parameters/XRequestId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Safe credential metadata or explicitly authorized single-field reveal.",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              },
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CredentialRevealResult"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          },
+          "500": {
+            "description": "Unexpected error without internal details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CredentialReveal"
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "not-applicable"
+      }
+    },
+    "/profile/credential-reveal-proof": {
+      "post": {
+        "operationId": "issueCredentialRevealProof",
+        "tags": [
+          "Test Data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/XRequestId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Safe credential metadata or explicitly authorized single-field reveal.",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              },
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CredentialRevealProofResult"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          },
+          "500": {
+            "description": "Unexpected error without internal details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CredentialRevealProofRequest"
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "not-applicable"
+      }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/credentials/{credentialId}/usage": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "credentialId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "listTdmCredentialUsage",
+        "tags": [
+          "Test Data"
+        ],
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Test data result. Secret material is never included.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "X-Next-Cursor": {
+                "$ref": "#/components/headers/XNextCursor"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data",
+                    "page"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "maxItems": 50,
+                      "items": {
+                        "$ref": "#/components/schemas/TdmDatasetConsumer"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/TdmPage"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Safe typed Test Data error.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TdmError"
+                }
+              }
+            }
+          }
+        },
+        "x-tms-pagination": "cursor"
+      }
+    },
+    "/projects/{projectId}/test-data/bindings:validate": {
+      "post": {
+        "tags": [
+          "Test data"
+        ],
+        "summary": "Validate draft bindings and step references without secret values",
+        "operationId": "validateTestDataBindings",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "$ref": "#/components/parameters/XRequestId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Safe test data metadata",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              },
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestDataValidationEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestDataValidationRequest"
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "not-applicable"
+      }
+    },
+    "/projects/{projectId}/test-runs/{runId}/items/{itemId}/attempts/{attemptNo}/test-data": {
+      "get": {
+        "tags": [
+          "Test data"
+        ],
+        "summary": "Read pinned attempt data; null for legacy/no-data attempts",
+        "operationId": "getAttemptTestDataManifest",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "runId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "attemptNo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "$ref": "#/components/parameters/XRequestId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Safe test data metadata",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              },
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestDataManifestEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/projects/{projectId}/test-runs/{runId}/test-data:preflight": {
+      "post": {
+        "tags": [
+          "Test data"
+        ],
+        "summary": "Check one bounded page of run candidates without preparing data",
+        "operationId": "preflightRunTestData",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "runId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          {
+            "$ref": "#/components/parameters/XRequestId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Safe test data metadata",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              },
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestDataPreflightEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "x-tms-idempotency": "not-applicable"
+      }
     }
   },
   "components": {
@@ -39539,6 +43511,9 @@
           "regression": {
             "type": "boolean",
             "default": false
+          },
+          "testDataBindings": {
+            "$ref": "#/components/schemas/TestDataBindings"
           }
         },
         "allOf": [
@@ -39796,6 +43771,9 @@
               "$ref": "#/components/schemas/CustomFieldSelection"
             },
             "description": "Stable registered value IDs. PATCH merges supplied fields by fieldId; empty valueIds clears an optional field. Omitted fields are retained. Product requires its explicit matching group, except an existing unclassified legacy value. Regression defaults to false."
+          },
+          "testDataBindings": {
+            "$ref": "#/components/schemas/TestDataBindings"
           }
         },
         "allOf": [
@@ -39961,6 +43939,9 @@
               "$ref": "#/components/schemas/CustomFieldSelection"
             },
             "description": "Stable registered value IDs. PATCH merges supplied fields by fieldId; empty valueIds clears an optional field. Omitted fields are retained. Product requires its explicit matching group, except an existing unclassified legacy value. Regression defaults to false."
+          },
+          "testDataBindings": {
+            "$ref": "#/components/schemas/TestDataBindings"
           }
         }
       },
@@ -47645,7 +51626,7 @@
                   "capabilities": {
                     "type": "array",
                     "uniqueItems": true,
-                    "maxItems": 23,
+                    "maxItems": 35,
                     "items": {
                       "type": "string",
                       "enum": [
@@ -47671,7 +51652,19 @@
                         "attachment:manage",
                         "audit:read",
                         "integration:read",
-                        "integration:manage"
+                        "integration:manage",
+                        "test_data:read",
+                        "test_data:create",
+                        "test_data:update",
+                        "test_data:archive",
+                        "test_data:bind",
+                        "test_data:audit_read",
+                        "credential:create",
+                        "credential:update",
+                        "credential:rotate",
+                        "credential:disable",
+                        "credential:use",
+                        "credential:reveal"
                       ]
                     }
                   }
@@ -50489,7 +54482,7 @@
             "minLength": 12,
             "maxLength": 256,
             "writeOnly": true,
-            "description": "12–128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
+            "description": "12\u2013128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
           }
         },
         "required": [
@@ -51112,7 +55105,7 @@
             "minLength": 12,
             "maxLength": 256,
             "writeOnly": true,
-            "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
+            "description": "12\u2013128 Unicode code points; maximum 512 UTF-8 bytes."
           }
         },
         "required": [
@@ -51213,7 +55206,7 @@
                 "minLength": 12,
                 "maxLength": 256,
                 "writeOnly": true,
-                "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
+                "description": "12\u2013128 Unicode code points; maximum 512 UTF-8 bytes."
               },
               "resetMfa": {
                 "type": "boolean",
@@ -54988,7 +58981,7 @@
           "locale",
           "messages"
         ],
-        "description": "1–20 messages with at most 32000 content characters total. Last message must be user. Assistant history is untrusted conversational context, never knowledge.",
+        "description": "1\u201320 messages with at most 32000 content characters total. Last message must be user. Assistant history is untrusted conversational context, never knowledge.",
         "properties": {
           "locale": {
             "type": "string",
@@ -64618,6 +68611,9 @@
           "regression": {
             "type": "boolean",
             "default": false
+          },
+          "testDataBindings": {
+            "$ref": "#/components/schemas/TestDataBindings"
           }
         },
         "allOf": [
@@ -64876,6 +68872,1416 @@
           }
         },
         "description": "Frozen run snapshot through selected occurrence step, or exact manually selected shared revisions. With no occurrence step retain full run sequence and mark no row failed. Manual instructions have null caseId/caseRevision and are bounded to 2000 steps, 500000 JS characters and 2MB storage. Run-derived instructions preserve the accepted immutable run snapshot content bounds (up to 500 case steps expanded into 100 shared items each)."
+      },
+      "TdmDataValueType": {
+        "type": "string",
+        "enum": [
+          "String",
+          "Integer",
+          "Decimal",
+          "Boolean",
+          "Email",
+          "URL",
+          "Date",
+          "DateTime",
+          "JSON"
+        ]
+      },
+      "TdmDataField": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "type",
+          "value"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "maxLength": 64,
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          },
+          "type": {
+            "$ref": "#/components/schemas/TdmDataValueType"
+          },
+          "value": {
+            "oneOf": [
+              {
+                "type": "string",
+                "maxLength": 65536
+              },
+              {
+                "type": "boolean"
+              }
+            ],
+            "description": "Integer and Decimal use exact decimal strings; JSON uses serialized JSON text. Boolean uses a boolean. No secrets."
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2000
+          }
+        }
+      },
+      "TdmDatasetDraft": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "fields"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "environmentId": {
+            "oneOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fields": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/TdmDataField"
+            }
+          }
+        }
+      },
+      "TdmDataset": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "description",
+          "environmentId",
+          "status",
+          "currentVersionId",
+          "currentVersion",
+          "revision",
+          "fieldCount",
+          "usedIn",
+          "createdAt",
+          "updatedAt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "environmentId": {
+            "oneOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "ARCHIVED"
+            ]
+          },
+          "currentVersionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "currentVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "fieldCount": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50
+          },
+          "usedIn": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "TdmDatasetVersion": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "datasetId",
+          "version",
+          "fields",
+          "createdBy",
+          "createdAt",
+          "environmentId"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "datasetId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "fields": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/TdmDataField"
+            }
+          },
+          "createdBy": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "environmentId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "TdmDatasetConsumer": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "caseId",
+          "caseKey",
+          "title"
+        ],
+        "properties": {
+          "caseId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "caseKey": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
+      "TdmPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "nextCursor"
+        ],
+        "properties": {
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2048
+          }
+        }
+      },
+      "TdmErrorCode": {
+        "type": "string",
+        "enum": [
+          "TEST_DATA_INVALID",
+          "DATA_ALIAS_CONFLICT",
+          "DATA_BINDING_NOT_FOUND",
+          "DATA_FIELD_NOT_FOUND",
+          "DATA_VERSION_CONFLICT",
+          "DATA_PRECONDITION_REQUIRED",
+          "DATA_PRECONDITION_FAILED",
+          "DATA_ACCESS_DENIED",
+          "DATA_ENVIRONMENT_MISMATCH",
+          "CREDENTIAL_DISABLED",
+          "CREDENTIAL_VERSION_CHANGED",
+          "SECRET_REVEAL_FORBIDDEN",
+          "SECRET_STORE_UNAVAILABLE",
+          "DATA_RESOURCE_IN_USE",
+          "RATE_LIMITED",
+          "INTERNAL_ERROR"
+        ]
+      },
+      "TdmError": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "code",
+              "message",
+              "details",
+              "requestId"
+            ],
+            "properties": {
+              "code": {
+                "$ref": "#/components/schemas/TdmErrorCode"
+              },
+              "message": {
+                "type": "string"
+              },
+              "details": {
+                "type": "object",
+                "additionalProperties": {
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ]
+                }
+              },
+              "requestId": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "TdmConfiguration": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "enabled",
+          "credentialsAvailable",
+          "limits",
+          "permissions",
+          "revealVerificationAvailable"
+        ],
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "credentialsAvailable": {
+            "type": "boolean"
+          },
+          "limits": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "aliasLength",
+              "nameLength",
+              "descriptionLength",
+              "stringBytes",
+              "jsonBytes",
+              "datasetFields",
+              "bindings",
+              "pageSize",
+              "revealSeconds"
+            ],
+            "properties": {
+              "aliasLength": {
+                "type": "integer",
+                "minimum": 1,
+                "default": 64
+              },
+              "nameLength": {
+                "type": "integer",
+                "minimum": 1,
+                "default": 120
+              },
+              "descriptionLength": {
+                "type": "integer",
+                "minimum": 1,
+                "default": 2000
+              },
+              "stringBytes": {
+                "type": "integer",
+                "minimum": 1,
+                "default": 8192
+              },
+              "jsonBytes": {
+                "type": "integer",
+                "minimum": 1,
+                "default": 65536
+              },
+              "datasetFields": {
+                "type": "integer",
+                "minimum": 1,
+                "default": 50
+              },
+              "bindings": {
+                "type": "integer",
+                "minimum": 1,
+                "default": 50
+              },
+              "pageSize": {
+                "type": "integer",
+                "minimum": 1,
+                "default": 50
+              },
+              "revealSeconds": {
+                "type": "integer",
+                "minimum": 1,
+                "default": 30
+              }
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "revealVerificationAvailable": {
+            "type": "boolean",
+            "description": "Current sign-in session supports deliberate credential step-up verification."
+          }
+        }
+      },
+      "CredentialMetadata": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "workspaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "projectId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "environmentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "fields": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/CredentialField"
+            }
+          },
+          "nonSecretValues": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
+            }
+          },
+          "activeSecretVersionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "disabled"
+            ]
+          },
+          "rowVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "usedIn": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "environmentId",
+          "fields",
+          "nonSecretValues",
+          "activeSecretVersionId",
+          "status",
+          "rowVersion",
+          "usedIn",
+          "createdAt",
+          "updatedAt",
+          "workspaceId",
+          "projectId"
+        ]
+      },
+      "CredentialField": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "String",
+              "Integer",
+              "Decimal",
+              "Boolean",
+              "Email",
+              "URL",
+              "Date",
+              "DateTime",
+              "JSON"
+            ]
+          },
+          "isSecret": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "key",
+          "type",
+          "isSecret"
+        ]
+      },
+      "CredentialDefinition": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "environmentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "fields": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 50,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "String",
+                    "Integer",
+                    "Decimal",
+                    "Boolean",
+                    "Email",
+                    "URL",
+                    "Date",
+                    "DateTime",
+                    "JSON"
+                  ]
+                },
+                "isSecret": {
+                  "type": "boolean"
+                },
+                "value": {}
+              },
+              "required": [
+                "key",
+                "type",
+                "isSecret",
+                "value"
+              ]
+            }
+          }
+        },
+        "required": [
+          "name",
+          "environmentId",
+          "fields"
+        ]
+      },
+      "CredentialMetadataPatch": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2000
+          }
+        },
+        "required": [],
+        "minProperties": 1
+      },
+      "CredentialRotation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "secrets": {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 50,
+            "additionalProperties": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192
+            }
+          }
+        },
+        "required": [
+          "secrets"
+        ]
+      },
+      "CredentialReveal": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "field": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+          },
+          "environmentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "secretVersionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "stepUpProof": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "executionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "field",
+          "environmentId",
+          "secretVersionId",
+          "stepUpProof"
+        ]
+      },
+      "CredentialRevealResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "value": {
+            "type": "string"
+          },
+          "displayTimeoutSeconds": {
+            "type": "integer",
+            "const": 30
+          }
+        },
+        "required": [
+          "value",
+          "displayTimeoutSeconds"
+        ]
+      },
+      "CredentialRevealProofRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "workspaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "projectId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "credentialId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "secretVersionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "field": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+          },
+          "executionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "workspaceId",
+          "projectId",
+          "credentialId",
+          "secretVersionId",
+          "field"
+        ]
+      },
+      "CredentialRevealProofResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "proof": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "proof",
+          "expiresAt"
+        ]
+      },
+      "TestDataBindingIdentity": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "alias": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+          },
+          "required": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "alias",
+          "required"
+        ]
+      },
+      "TestDataStaticDefinition": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "String",
+              "Integer",
+              "Decimal",
+              "Boolean",
+              "Email",
+              "URL",
+              "Date",
+              "DateTime",
+              "JSON"
+            ]
+          },
+          "value": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "boolean"
+              }
+            ]
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "name",
+          "type",
+          "value"
+        ]
+      },
+      "TestDataBinding": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "alias": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "sourceType": {
+                "type": "string",
+                "enum": [
+                  "STATIC"
+                ]
+              },
+              "staticDefinition": {
+                "$ref": "#/components/schemas/TestDataStaticDefinition"
+              }
+            },
+            "required": [
+              "id",
+              "alias",
+              "required",
+              "sourceType",
+              "staticDefinition"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "alias": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "sourceType": {
+                "type": "string",
+                "enum": [
+                  "DATASET"
+                ]
+              },
+              "sourceId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "sourceVersionId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              }
+            },
+            "required": [
+              "id",
+              "alias",
+              "required",
+              "sourceType",
+              "sourceId",
+              "sourceVersionId"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "alias": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "sourceType": {
+                "type": "string",
+                "enum": [
+                  "CREDENTIAL"
+                ]
+              },
+              "sourceId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              }
+            },
+            "required": [
+              "id",
+              "alias",
+              "required",
+              "sourceType",
+              "sourceId"
+            ]
+          }
+        ],
+        "discriminator": {
+          "propertyName": "sourceType"
+        }
+      },
+      "TestDataBindings": {
+        "type": "array",
+        "maxItems": 50,
+        "items": {
+          "$ref": "#/components/schemas/TestDataBinding"
+        }
+      },
+      "TestDataValidationFinding": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "field": {
+            "type": "string"
+          },
+          "stepId": {
+            "type": "string"
+          },
+          "section": {
+            "type": "string",
+            "enum": [
+              "action",
+              "expectedResult"
+            ]
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "code"
+        ]
+      },
+      "TestDataVariable": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "field": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "secret": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "token",
+          "alias",
+          "field",
+          "type",
+          "source",
+          "secret"
+        ]
+      },
+      "TestDataReferencedResource": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "alias": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "sourceType": {
+            "type": "string",
+            "enum": [
+              "STATIC",
+              "DATASET",
+              "CREDENTIAL"
+            ]
+          },
+          "versionId": {
+            "type": "string"
+          },
+          "currentVersionId": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Ordinal of the pinned immutable dataset version; absent for static values and credentials."
+          },
+          "environmentId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Environment of the pinned dataset version or credential metadata; null for environment-independent sources."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "ARCHIVED",
+              "active",
+              "disabled"
+            ],
+            "description": "Current resource lifecycle status: uppercase for datasets, lowercase for credentials. This does not assert external account availability."
+          }
+        },
+        "required": [
+          "alias",
+          "id",
+          "name",
+          "sourceType"
+        ]
+      },
+      "TestDataValidationRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "bindings": {
+            "$ref": "#/components/schemas/TestDataBindings"
+          },
+          "steps": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "action": {
+                  "type": "string",
+                  "maxLength": 50000
+                },
+                "expectedResult": {
+                  "type": "string",
+                  "maxLength": 50000
+                }
+              },
+              "required": [
+                "id",
+                "action",
+                "expectedResult"
+              ]
+            }
+          },
+          "environmentId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 128
+          },
+          "caseId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "bindings",
+          "steps"
+        ],
+        "dependentRequired": {
+          "caseId": [
+            "revision"
+          ],
+          "revision": [
+            "caseId"
+          ]
+        }
+      },
+      "TestDataValidationResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "valid": {
+            "type": "boolean"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TestDataValidationFinding"
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TestDataValidationFinding"
+            }
+          },
+          "variables": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TestDataVariable"
+            }
+          },
+          "referencedResources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TestDataReferencedResource"
+            }
+          }
+        },
+        "required": [
+          "valid",
+          "errors",
+          "warnings",
+          "variables",
+          "referencedResources"
+        ]
+      },
+      "TestDataManifestField": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "secret": {
+            "type": "boolean"
+          },
+          "value": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "boolean"
+              }
+            ]
+          }
+        },
+        "required": [
+          "key",
+          "type",
+          "secret"
+        ]
+      },
+      "TestDataManifestSource": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "alias": {
+            "type": "string"
+          },
+          "sourceType": {
+            "type": "string",
+            "enum": [
+              "STATIC",
+              "DATASET",
+              "CREDENTIAL"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "versionId": {
+            "type": "string"
+          },
+          "fields": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/TestDataManifestField"
+            }
+          }
+        },
+        "required": [
+          "alias",
+          "sourceType",
+          "id",
+          "name",
+          "fields"
+        ]
+      },
+      "TestDataManifest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "runId": {
+            "type": "string"
+          },
+          "runItemId": {
+            "type": "string"
+          },
+          "attemptNo": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "caseId": {
+            "type": "string"
+          },
+          "caseRevision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "environmentId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "preparedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "sources": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/TestDataManifestSource"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "runId",
+          "runItemId",
+          "attemptNo",
+          "caseId",
+          "caseRevision",
+          "environmentId",
+          "preparedAt",
+          "sources"
+        ]
+      },
+      "TestDataValidationEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/TestDataValidationResult"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "TestDataManifestEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TestDataManifest"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "TestDataPreflightItem": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "itemId": {
+            "type": "string"
+          },
+          "valid": {
+            "type": "boolean"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TestDataValidationFinding"
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TestDataValidationFinding"
+            }
+          }
+        },
+        "required": [
+          "itemId",
+          "valid",
+          "errors",
+          "warnings"
+        ]
+      },
+      "TestDataPreflightEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "valid": {
+                "type": "boolean"
+              },
+              "items": {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                  "$ref": "#/components/schemas/TestDataPreflightItem"
+                }
+              },
+              "nextAfter": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0
+              }
+            },
+            "required": [
+              "valid",
+              "items",
+              "nextAfter"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
       }
     }
   }

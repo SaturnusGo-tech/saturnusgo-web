@@ -1,5 +1,6 @@
 "use client";
 
+import { StepDataFindings } from "../../../../../test-data/presentation/variables/StepDataFindings";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import type { TestStep } from "../../../../../../../core/tms/contracts/legacy-contract";
@@ -64,7 +65,7 @@ export function ScenarioStepEditor(props: Props) {
         <span className={css.lineNumber}>{props.order}</span>
         {collapsed ? <p className={css.collapsedCopy}>{props.step.action.split("\n")[0] || (props.ru ? "Шаг" : "Step")}</p>
           : <ScenarioMarkdownInput
-            id={`scenario-${props.step.id}-0`} ru={props.ru}
+            allowVariables id={`scenario-${props.step.id}-0`} ru={props.ru}
             value={props.step.action} label={`${props.ru ? "Шаг" : "Step"} ${props.order}`}
             placeholder={props.ru ? "Действие или запрос" : "Action or request"}
             autoFocus={props.autoFocus}
@@ -76,7 +77,7 @@ export function ScenarioStepEditor(props: Props) {
 
     {!collapsed && <div className={css.expectedBlock} data-input-shell>
       <span className={css.expectedLabel}>{props.ru ? "Ожидаемый результат" : "Expected result"}</span>
-      <ScenarioMarkdownInput ru={props.ru}
+      <ScenarioMarkdownInput ru={props.ru} allowVariables
         id={`scenario-${props.step.id}-expected`}
         value={props.step.expectedResult}
         label={`${props.ru ? "Ожидаемый результат шага" : "Expected result for step"} ${props.order}`}
@@ -98,6 +99,7 @@ export function ScenarioStepEditor(props: Props) {
       />
     </div>}
     {!collapsed && !props.attachmentScope && <SavedScenarioAttachments ids={props.step.attachmentIds} />}
+    {!collapsed && <StepDataFindings stepId={props.step.id} ru={props.ru} />}
     {!collapsed && props.attachments}
   </article>;
 }

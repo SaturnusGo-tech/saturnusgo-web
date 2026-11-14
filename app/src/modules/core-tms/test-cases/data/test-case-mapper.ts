@@ -42,6 +42,7 @@ export function mapTestCaseRevision(dto: ApiRevision): TestCaseRevision {
     tags: [...dto.tags],
     estimatedMinutes: dto.estimatedMinutes,
     testData: dto.testData,
+    testDataBindings: dto.testDataBindings?.map(binding => structuredClone(binding)),
     steps: dto.steps.map((step) => ({ ...step,
       attachmentIds: [...step.attachmentIds],
       sharedStepId: step.sharedStepId ?? null,

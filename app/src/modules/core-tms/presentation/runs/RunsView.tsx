@@ -1,3 +1,4 @@
+import { ExecutionDataPanel } from "../../test-data/presentation/execution/ExecutionDataPanel";
 import { ErrorToast } from "../common/error/ErrorToast";
 import { LoadingOrb } from "../../../../shared/components/loading/LoadingOrb";
 import { Requirements } from "../../product-docs/requirements/Requirements";
@@ -146,6 +147,7 @@ export function RunsView({ embedded = false, executionPending = false, emptyFilt
               <header><h2>{t("runs.preconditions")}</h2></header>
               <MarkdownField value={selectedItem.snapshot.preconditions ?? ""} label={t("runs.preconditions")} emptyLabel={locale === "ru" ? "Предусловия не указаны." : "No preconditions."} allowAttachments={false} />
             </section>
+            <ExecutionDataPanel scope={{ runId: selectedRun.id, itemId: selectedItem.id, attemptNo: attempt.attemptNo }} refreshVersion={`${selectedItem.rowVersion}:${selectedItem.status}`} configured={Boolean(selectedItem.snapshot.testDataBindings?.length)} ru={locale === "ru"} />
             <section className={`${runStyles.contentSection} ${runStyles.scenarioSection}`} data-run-scenario>
               <header><h2>{locale === "ru" ? "Сценарий" : "Scenario"}</h2><span>{executionEntries.length}</span><ScenarioLayoutToggle value={layout} onChange={value => { if (value === "grid") { setPropertiesOpen(false); restoreProperties.current = false; } setLayout(value); }} ru={locale === "ru"} /></header>
               <div className={runStyles.steps} data-scenario-layout={layout} data-scenario-motion role="table" aria-label={selectedItem.snapshot.title}>

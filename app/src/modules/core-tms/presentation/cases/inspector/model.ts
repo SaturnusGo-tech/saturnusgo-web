@@ -111,6 +111,7 @@ export function copyInspectorRevision(revision: TestCaseRevision): TestCaseRevis
   return {
     ...revision,
     ...copyCaseFields(revision),
+    testDataBindings: revision.testDataBindings?.map(binding => structuredClone(binding)),
     tags: [...revision.tags],
     attachmentIds: [...revision.attachmentIds],
     steps: revision.steps.map((step) => ({
@@ -139,7 +140,7 @@ export function restoreInspectorSection(
     checklist: snapshot.checklist.map((item) => ({ ...item })),
   };
   if (section === "preconditions") return { ...current, preconditions: snapshot.preconditions };
-  if (section === "testData") return { ...current, testData: snapshot.testData };
+  if (section === "testData") return { ...current, testData: snapshot.testData, testDataBindings: snapshot.testDataBindings?.map(binding => structuredClone(binding)) };
   if (section === "details") return {
     ...current,
     testData: snapshot.testData,

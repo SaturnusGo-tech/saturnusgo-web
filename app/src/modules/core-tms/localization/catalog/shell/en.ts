@@ -41,6 +41,7 @@ export const enShellMessages = {
   "nav.runs": "Test runs",
   "nav.suites": "Suites",
   "nav.hooks": "Hooks",
+  "nav.testData": "Test Data",
   "nav.files": "Attachments",
   "nav.reports": "Reports",
   "nav.config": "Settings",

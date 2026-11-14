@@ -1,3 +1,4 @@
+import type { TestDataBinding } from "./test-data/bindings";
 import type { CaseFields } from "./custom-fields/case-fields";
 import type { components } from "../generated/tms-api";
 
@@ -42,6 +43,7 @@ export type TestCaseRevision = CaseFields & {
   tags: string[];
   estimatedMinutes: number | null;
   testData: string;
+  testDataBindings?: readonly TestDataBinding[];
   steps: TestStep[];
   checklist: Array<{ id: string; order: number; text: string; required: boolean }>;
   attachmentIds: string[];

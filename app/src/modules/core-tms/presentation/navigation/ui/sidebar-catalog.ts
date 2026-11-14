@@ -1,6 +1,6 @@
 import { BarChart, Batches, BookOpen, CodeSquareSlash, ConnectApps, Folders, Home, Play, Stack, SuitcaseWorkBusiness, Text } from "@openai/apps-sdk-ui/components/Icon";
 import type { ComponentType, SVGProps } from "react";
-import { Paperclip } from "lucide-react";
+import { Database, Paperclip } from "lucide-react";
 import type { TmsMessageKey } from "../../../localization/catalog/messages";
 import type { SidebarGroupId, SidebarNavigationId } from "../model/sidebar-navigation";
 
@@ -9,6 +9,7 @@ export const sidebarCatalog = {
   cases: { labelKey: "nav.cases", icon: SuitcaseWorkBusiness },
   "product-docs": { labelKey: "nav.productDocs", icon: BookOpen },
   "shared-steps": { labelKey: "nav.sharedSteps", icon: Batches },
+  "test-data": { labelKey: "nav.testData", icon: Database },
   runs: { labelKey: "nav.runs", icon: Play },
   suites: { labelKey: "nav.suites", icon: Stack },
   portfolios: { labelKey: "nav.portfolios", icon: Folders },

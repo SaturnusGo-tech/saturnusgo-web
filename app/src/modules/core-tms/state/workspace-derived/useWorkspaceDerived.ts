@@ -45,9 +45,9 @@ export function useWorkspaceDerived(
   const selectedSuite = state.selectedSuiteDetail?.id === state.selectedSuiteId
     ? state.selectedSuiteDetail
     : null;
-  const projectEnvironments = state.data.environments.filter(
+  const projectEnvironments = useMemo(() => state.data.environments.filter(
     (item) => item.projectId === project?.id,
-  );
+  ), [state.data.environments, project?.id]);
   const projectRuns = state.data.runs.filter(
     (item) => item.projectId === project?.id,
   );

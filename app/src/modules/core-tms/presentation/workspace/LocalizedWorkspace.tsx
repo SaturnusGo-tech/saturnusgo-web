@@ -1,5 +1,8 @@
 "use client";
 
+import { TdmWorkspaceProvider } from "../../test-data/composition/TdmWorkspaceProvider";
+import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
+
 import { FolderAppearanceProvider } from "../../folders/presentation/appearance/context/FolderAppearanceProvider";
 import { WorkspaceConnectorProvider } from "../../connectors/application/context/WorkspaceConnectorContext";
 import { WorkspacePeopleProvider } from "../../workspace/members/context/WorkspacePeopleContext";
@@ -39,6 +42,7 @@ export function LocalizedWorkspace() {
   const model = useWorkspaceModel();
   useWorkspaceStartupPending(model.connection === "loading");
   const http = useOptionalTmsHttpClient();
+  const session = useOptionalTmsSession();
   useMemberPresence(http, model.data.workspace.id, model.connection === "connected");
   const pageRef = usePageAppearance([model.view, model.project?.id, model.repositoryScope.key, model.connection].join(":"));
   useHistoryScroll(pageRef);
@@ -78,6 +82,8 @@ export function LocalizedWorkspace() {
 
   return (
     <WorkspaceUiProvider locale={languageTag} notice={model.notice}>
+    <TdmWorkspaceProvider workspaceId={model.data.workspace.id} projectId={model.project?.id ?? ""} actorId={session?.subject ?? ""}
+      active={model.connection === "connected"} environments={model.projectEnvironments}>
     <AuthoringLeaveHost />
     <FolderAppearanceProvider resource={model.folders} workspaceId={model.data.workspace.id} projectId={model.project?.id}><WorkspacePeopleProvider workspaceId={model.data.workspace.id} offline={model.connection !== "connected"}>
     <WorkspaceConnectorProvider workspaceId={model.data.workspace.id} projectId={model.project?.id ?? ""} active={model.connection === "connected" && !!model.project && model.data.meta.authorization.capabilities.includes("integration:read")}>
@@ -143,6 +149,6 @@ export function LocalizedWorkspace() {
       </div>
       <WorkspaceDialogs model={model} />
     </div></WorkspaceConnectorProvider></WorkspacePeopleProvider></FolderAppearanceProvider>
-    </WorkspaceUiProvider>
+    </TdmWorkspaceProvider></WorkspaceUiProvider>
   );
 }

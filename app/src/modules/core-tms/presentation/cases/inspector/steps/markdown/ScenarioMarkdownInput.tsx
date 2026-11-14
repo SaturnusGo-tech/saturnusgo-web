@@ -1,5 +1,7 @@
 "use client";
 
+import { useVariableSuggestions } from "../../../../../test-data/presentation/variables/useVariableSuggestions";
+
 import { Bold, Code, FileCode2, List, Pencil, Check } from "lucide-react";
 import { useLayoutEffect, useRef, useState, type ReactNode, type ClipboardEventHandler, type DragEventHandler } from "react";
 import { ScenarioMarkdown } from "./ScenarioMarkdown";
@@ -19,7 +21,7 @@ import { useTextareaEmoji } from "../../../../common/emoji/selection/useTextarea
 
 type Props = {
   id?: string; value: string; label: string; placeholder: string; ru: boolean;
-  autoFocus?: boolean; hideEditButton?: boolean; footerOnlyWhileEditing?: boolean; onChange: (value: string) => void;
+  allowVariables?: boolean; autoFocus?: boolean; hideEditButton?: boolean; footerOnlyWhileEditing?: boolean; onChange: (value: string) => void;
   onPaste?: ClipboardEventHandler<HTMLTextAreaElement>;
   onDragOver?: DragEventHandler<HTMLDivElement>;
   onDrop?: DragEventHandler<HTMLDivElement>;
@@ -32,6 +34,7 @@ export function ScenarioMarkdownInput(props: Props) {
   const [emojiOpen, setEmojiOpen] = useState(false);
   const input = useRef<HTMLTextAreaElement>(null);
   const history = useStepHistory(props.value, props.onChange, input);
+  const variables = useVariableSuggestions(props.value, input, Boolean(props.allowVariables), history.record, props.ru);
   const emoji = useTextareaEmoji(props.value, input, (next, caret) => {
     history.boundary(); history.record(next, false, {start:caret,end:caret}); setEditing(true);
   }, history.boundary);
@@ -56,7 +59,7 @@ export function ScenarioMarkdownInput(props: Props) {
     requestAnimationFrame(() => input.current?.focus({ preventScroll: true }));
   }
   function preview() {
-    setEditing(false);
+    variables.close(); setEditing(false);
     requestAnimationFrame(() => (props.hideEditButton ? previewRef.current : editButton.current)?.focus({ preventScroll: true }));
   }
   function format(kind: StepFormat) {
@@ -95,15 +98,16 @@ export function ScenarioMarkdownInput(props: Props) {
         onClick={preview}><Check size={14} /></button>
     </div></div></div>
     <textarea ref={input} id={props.id} rows={1} hidden={!sourceVisible} data-code={/```|~~~/.test(props.value)} value={props.value}
-      aria-label={props.label} placeholder={props.placeholder} autoFocus={props.autoFocus}
+      {...variables.attributes} onSelect={variables.refresh} aria-label={props.label} placeholder={props.placeholder} autoFocus={props.autoFocus}
       onFocus={() => setEditing(true)} onChange={(event) => history.record(event.target.value, (event.nativeEvent as InputEvent).inputType === "insertText")}
       onPaste={(event) => { props.onPaste?.(event); history.boundary(); pasteMarkdown(event, history.record); }}
       onKeyDown={(event) => {
-        if (history.onKeyDown(event)) return;
         if (event.nativeEvent.isComposing) return;
+        if (variables.onKeyDown(event) || history.onKeyDown(event)) return;
         if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "b") { event.preventDefault(); format("bold"); }
         if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); preview(); }
       }} />
+    {editing && variables.menu}
     {!sourceVisible && <div ref={previewRef} className={css.preview}
       role={props.hideEditButton ? "button" : undefined} tabIndex={props.hideEditButton ? 0 : undefined}
       aria-label={props.hideEditButton ? `${props.ru ? "Изменить" : "Edit"}: ${props.label}` : undefined}

@@ -1,7 +1,7 @@
+import { TestDataSection } from "../../../../test-data/presentation/bindings/TestDataSection";
 import { ScenarioLayoutToggle } from "../../../common/scenario/ScenarioLayoutToggle";
 import { useScenarioLayout } from "../../../common/scenario/useScenarioLayout";
 import type { TestCaseRevision } from "../../../../../../core/tms/contracts/legacy-contract";
-import { useState } from "react";
 import type { TmsLocale } from "../../../../localization/model/locale";
 import type { CaseInspectorEditor } from "../model";
 import { CreationNarrativeSection } from "./CreationNarrativeSection";
@@ -40,6 +40,7 @@ export function CaseCreationSections({
         value={revision.description} ru={ru} onChange={(description) => patch({ description })} />
       <CreationNarrativeSection section="preconditions" title={ru ? "Предусловия" : "Preconditions"}
         value={revision.preconditions} ru={ru} onChange={(preconditions) => patch({ preconditions })} />
+      <TestDataSection ru={ru} />
       <CreationSection title={ru ? "Сценарий" : "Scenario"} headingActions={<><span className={css.count}>{revision.type === "checklist" ? revision.checklist.length : revision.steps.length}</span>{revision.type !== "checklist" && <ScenarioLayoutToggle value={layout} onChange={setLayout} ru={ru} />}</>}>
         <InspectorSteps revision={revision} editing layout={layout} autoFocus={false} ru={ru}
           sharedSteps={sharedSteps} onResolveSharedStep={onResolveSharedStep} onPatch={patch} />

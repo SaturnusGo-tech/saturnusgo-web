@@ -8,7 +8,7 @@
     "export": "next export",
     "build:static": "next build && next export",
     "start": "next start",
-    "lint": "echo \"(lint skipped)\"",
+    "lint": "npm run lint:tdm",
     "clean": "rm -rf .next out dist",
     "build:once": "next build",
     "build:standalone": "npm run clean && BUILD_TARGET=standalone npm run build:once && mkdir -p dist/standalone && cp -R .next/standalone dist/standalone && cp -R public dist/standalone/public || true",
@@ -61,7 +61,9 @@
     "test:tms-security": "tsx --test --test-concurrency=2 app/src/modules/core-tms/profile/security/tests/navigation/*.test.tsx app/src/modules/core-tms/company-administration/tests/password/*.test.tsx app/src/modules/core-tms/company-administration/tests/profile/*.test.tsx app/src/modules/core-tms/company-administration/tests/devices/*.test.tsx app/src/modules/core-tms/auth/google-link/tests/presentation/*.test.tsx app/src/modules/core-tms/development-preview/security/tests/*.test.ts",
     "test:desktop-downloads": "node --test scripts/desktop-downloads/tests/*.test.mjs scripts/desktop-downloads/retention/tests/*.test.mjs scripts/desktop-downloads/provenance/tests/*.test.mjs scripts/desktop-downloads/storage/tests/*.test.mjs",
     "test:tms-team": "tsx --test app/src/modules/core-tms/workspace/members/avatar/tests/*.test.tsx app/src/modules/core-tms/team/tests/*/*.test.ts* app/src/modules/core-tms/profile/self/tests/*/*.test.ts* app/src/modules/core-tms/profile/public/tests/*/*.test.ts* app/src/modules/core-tms/profile/tests/profile-route.test.ts app/src/modules/core-tms/auth/composition/session/profile/tests/*.test.tsx app/src/modules/core-tms/presentation/navigation-profile/tests/*.test.ts app/src/modules/core-tms/presentation/workspace-stage/tests/profile-access.test.ts",
-    "test:tms-defect-traceability": "tsx --test app/src/modules/core-tms/defects/traceability/tests/*.test.ts app/src/modules/core-tms/defects/traceability/tests/*/*.test.ts* app/src/modules/core-tms/defects/execution-context/tests/provenance/*.test.ts* app/src/modules/core-tms/presentation/reports/tests/traceability/*.test.ts* app/src/modules/core-tms/presentation/dialogs/defect-form/tests/traceability/*.test.ts* app/src/modules/core-tms/runs/tests/snapshot/*.test.ts"
+    "test:tms-defect-traceability": "tsx --test app/src/modules/core-tms/defects/traceability/tests/*.test.ts app/src/modules/core-tms/defects/traceability/tests/*/*.test.ts* app/src/modules/core-tms/defects/execution-context/tests/provenance/*.test.ts* app/src/modules/core-tms/presentation/reports/tests/traceability/*.test.ts* app/src/modules/core-tms/presentation/dialogs/defect-form/tests/traceability/*.test.ts* app/src/modules/core-tms/runs/tests/snapshot/*.test.ts",
+    "lint:tdm": "node scripts/lint-tdm.mjs",
+    "test:tms-test-data": "tsx --test app/src/modules/core-tms/test-data/application/variables/tests/*.test.ts app/src/modules/core-tms/test-data/application/reveal/tests/*.test.ts app/src/modules/core-tms/test-data/tests/*/*.test.* app/src/modules/core-tms/test-data/tests/presentation/*/*.test.tsx app/src/modules/core-tms/test-data/tests/composition/configuration/*.test.tsx"
   },
   "dependencies": {
     "@auth0/auth0-react": "2.24.1",
@@ -137,6 +139,7 @@
     "zod": "3.25.76"
   },
   "devDependencies": {
+    "@eslint/js": "10.0.1",
     "@tailwindcss/postcss": "^4.1.12",
     "@types/mdast": "4.0.4",
     "@types/node": "24.3.0",
@@ -148,6 +151,7 @@
     "@types/swagger-ui-react": "5.18.0",
     "@types/turndown": "5.0.6",
     "autoprefixer": "^10.4.21",
+    "eslint": "10.15.0",
     "openapi-typescript": "7.13.0",
     "parse5": "7.3.0",
     "patch-package": "8.0.1",
@@ -156,6 +160,7 @@
     "tailwindcss": "^4.1.12",
     "tsx": "4.23.12",
     "typescript": "5.9.2",
+    "typescript-eslint": "8.72.2",
     "wrangler": "4.129.0"
   },
   "overrides": {

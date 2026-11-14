@@ -1,3 +1,5 @@
+import { CaseDataProvider } from "../../../test-data/application/editor/CaseDataContext";
+import { TestDataSection } from "../../../test-data/presentation/bindings/TestDataSection";
 import { ScenarioLayoutToggle } from "../../common/scenario/ScenarioLayoutToggle";
 import { useScenarioLayout } from "../../common/scenario/useScenarioLayout";
 import { useEffect, useRef, useState } from "react";
@@ -97,9 +99,13 @@ export function CaseInspectorContent({
   const preconditionsLabel = ru ? "Предусловия" : "Preconditions";
   const savedTestData = value.testData.trim();
   const showSavedTestData = Boolean(savedTestData && savedTestData !== value.preconditions.trim());
-  if (creating && editor) return <CaseCreationSections locale={locale} revision={value}
-    editor={editor} tagSuggestions={tagSuggestions} sharedSteps={sharedSteps} onResolveSharedStep={onResolveSharedStep} />;
-  return <div className={`${css.content} ${css.overviewLayout} ${rail.layout}`}>
+  const dataEditable = Boolean(editor && !readOnly && !linksPending && !editor.submitting && !editor.attachmentsPending);
+  return <CaseDataProvider bindings={value.testDataBindings ?? []} steps={value.steps} editable={dataEditable}
+    savedCase={testCaseId && !creating ? { caseId: testCaseId, revision: revision.revision } : undefined}
+    onRequestEdit={!readOnly && !linksPending && !editor?.submitting && !editor?.attachmentsPending ? onRequestEdit : undefined}
+    onChange={dataEditable ? testDataBindings => patch({ testDataBindings }) : undefined}>
+    {creating && editor ? <CaseCreationSections locale={locale} revision={value}
+      editor={editor} tagSuggestions={tagSuggestions} sharedSteps={sharedSteps} onResolveSharedStep={onResolveSharedStep} /> : <div className={`${css.content} ${css.overviewLayout} ${rail.layout}`}>
     <main className={css.primaryColumn}>
       <InspectorSectionView title={ru ? "Описание" : "Description"} {...controls("description")}>
         <MarkdownField appearance="plain" onRequestEdit={requestField("description")} attachmentKey="description" value={value.description} label={ru ? "Описание" : "Description"}
@@ -114,6 +120,7 @@ export function CaseInspectorContent({
         {showSavedTestData && <MarkdownField attachmentKey="test-data" allowAttachments={false}
           value={value.testData} label={preconditionsLabel} />}
       </InspectorSectionView>
+      <TestDataSection ru={ru} />
       <InspectorSectionView title={ru ? "Сценарий" : "Scenario"}
         headingActions={value.type !== "checklist" && <ScenarioLayoutToggle value={layout} onChange={setLayout} ru={ru} />}
         count={value.type === "checklist" ? value.checklist.length : value.steps.length}
@@ -138,7 +145,8 @@ export function CaseInspectorContent({
       {editor && !readOnly && !linksPending && <FolderPathPicker value={editor.folderPath} folders={editor.folders}
         onChange={editor.onFolderPath} ru={ru} disabled={editor.submitting || editor.attachmentsPending} />}
     </aside>
-  </div>;
+  </div>}
+  </CaseDataProvider>;
 }
 function attachmentBelongsToSection(section: InspectorSection, fieldKey: string) {
   if (section === "description" || section === "preconditions") return fieldKey === section;

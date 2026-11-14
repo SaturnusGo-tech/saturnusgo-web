@@ -3,7 +3,7 @@ import type { SidebarPreferences } from "./sidebar-preferences";
 
 export const SIDEBAR_GROUPS = [
   { id: "overview", ids: ["dashboard"] },
-  { id: "testing", ids: ["cases", "product-docs", "shared-steps", "runs", "suites"] },
+  { id: "testing", ids: ["cases", "product-docs", "shared-steps", "test-data", "runs", "suites"] },
   { id: "management", ids: ["portfolios", "custom-fields", "api", "hooks", "files"] },
   { id: "insights", ids: ["reports"] },
 ] as const;

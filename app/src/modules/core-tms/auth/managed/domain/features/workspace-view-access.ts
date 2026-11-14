@@ -3,6 +3,7 @@ export function workspaceViewAllowed(view: View, userCapabilities: readonly stri
   return view === "hooks" ? managed || userCapabilities.includes("integration:manage")
     : view === "api" ? userCapabilities.includes("integration:read")
     : view === "files" ? userCapabilities.includes("attachment:read")
+    : view === "test-data" ? userCapabilities.includes("test_data:read")
     : view === "custom-fields" ? userCapabilities.includes("project:read") : true;
 }
 

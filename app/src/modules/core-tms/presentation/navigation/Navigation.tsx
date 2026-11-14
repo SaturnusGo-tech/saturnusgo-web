@@ -1,3 +1,4 @@
+import { useTdmAvailability } from "../../test-data/application/availability/TdmAvailability";
 import { useWorkspaceCapabilities } from "../../auth/spaces/capabilities/composition/useWorkspaceCapabilities";
 import { useEffect, useRef, useState } from "react";
 import { FalconBrandMark } from "../../../../shared/components/brand/FalconBrandMark";
@@ -26,6 +27,7 @@ export function Navigation({ view, onChange, disabled, connected, collapsed, onC
   productDocs?: boolean;
   onCollapsedChange: (next: boolean) => void; workspaceId: string; connected: boolean; activeRunCount: number; userCapabilities: readonly string[];
 }) {
+  const testData = useTdmAvailability();
   const { t, locale } = useTmsLocale();
   const session = useOptionalTmsSession();
   const metadata = useWorkspaceCapabilities(workspaceId, !!session);
@@ -39,7 +41,7 @@ export function Navigation({ view, onChange, disabled, connected, collapsed, onC
   const compact = !reveal.revealed;
   const tooltips = collapsed && compact;
   const homeLabel = t("header.dashboardAria");
-  const available = (candidate: View) => (candidate !== "product-docs" || productDocs) && companyViewAvailable(candidate, session?.companyCapabilities, codexAvailable) && workspaceViewAllowed(candidate, userCapabilities, codexAvailable);
+  const available = (candidate: View) => (candidate !== "test-data" || testData.enabled) && (candidate !== "product-docs" || productDocs) && companyViewAvailable(candidate, session?.companyCapabilities, codexAvailable) && workspaceViewAllowed(candidate, userCapabilities, codexAvailable);
   const state = useSidebarPreferences(workspaceId, session?.subject);
   const navigation = getSidebarNavigation({ availableIds: SIDEBAR_NAVIGATION_IDS.filter(available), activeView: view, preferences: state.preferences });
   const navigate = (next: View) => {
