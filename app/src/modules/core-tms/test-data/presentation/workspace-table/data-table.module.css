@@ -5,18 +5,19 @@
 .search :global(input) { font-size:12px!important; font-weight:400!important; line-height:18px!important; outline:0!important; box-shadow:none!important; }
 .metadata { min-inline-size:110px; text-align:end; white-space:nowrap; }
 .metadata,.footer { color:var(--falcon-text-muted); font-size:11px; }
-.scroll { min-block-size:0; flex:1; overflow:auto; border-block-start:1px solid var(--falcon-border); outline:0; scrollbar-gutter:stable; }
+.frame { min-inline-size:0; min-block-size:0; flex:1; display:flex; flex-direction:column; margin:0 16px 12px; border:1px solid var(--falcon-border); border-radius:10px; overflow:hidden; }
+.scroll { min-block-size:0; flex:1; overflow:auto; outline:0; scrollbar-gutter:stable; }
 .scroll:focus-visible { box-shadow:inset 0 0 0 1px var(--falcon-text-muted); }
 .table { border-collapse:separate; border-spacing:0; width:100%; table-layout:fixed; font-size:12px; line-height:20px; font-weight:400; }
-.table th,.table td { text-align:left; vertical-align:top; padding:6px 10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; border-block-end:1px solid var(--falcon-border); }
+.table th,.table td { text-align:left; vertical-align:top; padding:6px 10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; border-block-end:1px solid var(--falcon-border); border-inline-end:1px solid var(--falcon-border); }
 .table th { position:sticky; top:0; z-index:1; background:var(--falcon-elevated); font-weight:500; color:var(--falcon-text); }
 .table td { color:var(--falcon-text-secondary); }
 .table td > span { display:block; overflow:hidden; text-overflow:ellipsis; }
-.table tr:last-child td { border-block-end:0; }
+.table th:last-child,.table td:last-child { border-inline-end:0; }
 .table tbody tr:hover td { background:var(--falcon-hover); }
 .null { color:var(--falcon-text-muted); font-style:italic; }
 .empty { margin:36px 16px; color:var(--falcon-text-muted); text-align:center; font-size:12px; }
-.footer { display:flex; justify-content:space-between; align-items:center; gap:16px; block-size:38px; padding:6px 16px; border-block-start:1px solid var(--falcon-border); flex-shrink:0; }
+.footer { display:flex; justify-content:space-between; align-items:center; gap:16px; block-size:38px; padding:6px 10px; border-block-start:1px solid var(--falcon-border); flex-shrink:0; }
 .pagination { display:flex; align-items:center; gap:10px; }
 .page { width:26px!important; min-width:26px!important; height:26px!important; background:transparent!important; color:var(--falcon-text-secondary)!important; border-radius:6px!important; padding:0!important; }
 .page:hover { background:var(--falcon-hover)!important; }

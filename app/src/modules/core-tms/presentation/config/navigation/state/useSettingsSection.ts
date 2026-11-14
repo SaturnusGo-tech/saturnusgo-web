@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { HISTORY_CHANGE, navigateWorkspace } from "../../../../state/navigation/browser/workspace-history";
+import { HISTORY_CHANGE, navigateWorkspace, visitWorkspace } from "../../../../state/navigation/browser/workspace-history";
 import type { SettingsSection } from "../settings-sections";
 import { readSettingsSection, settingsSectionLink } from "../settings-section-route";
 
@@ -21,5 +21,8 @@ export function useSettingsSection(hasProject: boolean) {
     read(); window.addEventListener("popstate", read); window.addEventListener(HISTORY_CHANGE, read);
     return () => { window.removeEventListener("popstate", read); window.removeEventListener(HISTORY_CHANGE, read); };
   }, [hasProject]);
-  return { section, select: (next: SettingsSection) => navigateWorkspace(settingsSectionLink(window.location.href, next)) };
+  return { section, select: (next: SettingsSection) => {
+    const href = settingsSectionLink(window.location.href, next);
+    return next === "test-data" ? visitWorkspace(href) : navigateWorkspace(href);
+  } };
 }

@@ -68,13 +68,13 @@ test("refresh keeps the last table mounted, including its search and pagination,
   assert.equal(view!.root.findAllByProps({ role: "alert" }).length, 0);
   await act(async () => view!.unmount());
 });
-test("source tables hide the SQL editor and refresh without losing their visible rows", async () => {
+test("source tables include SQL editing and refresh without losing their visible rows", async () => {
   let calls = 0; const context = { permissions: { read: true }, workspace: { query: async () => { calls++; return { columns: [{ name: "name", type: "String" }], rows: [{ name: "Avery" }], hasMore: false, truncated: false, durationMs: 9 }; } } } as unknown as TestDataContextValue;
-  const render = (refreshKey: number) => <TestDataProvider value={context}><Panel sourceIds={["s"]} query="SELECT name" onChange={() => {}} ru={false} autoRun showEditor={false} refreshKey={refreshKey} /></TestDataProvider>;
+  const render = (refreshKey: number) => <TestDataProvider value={context}><Panel sourceIds={["s"]} query="SELECT name" onChange={() => {}} ru={false} autoRun refreshKey={refreshKey} /></TestDataProvider>;
   let view: ReturnType<typeof create>;
   await act(async () => { view = create(render(0)); await pause(); });
-  assert.equal(calls, 1); assert.match(text(view!.root), /Avery/); assert.doesNotMatch(text(view!.root), /9 ms/);
-  assert.equal(view!.root.findAllByProps({ "aria-label": "SQL query" }).length, 0, "the source table has no SQL editor");
+  assert.equal(calls, 1); assert.match(text(view!.root), /Avery/); assert.match(text(view!.root), /9 ms/);
+  assert.ok(view!.root.findAllByProps({ "aria-label": "SQL query" }).length > 0, "source tables retain SQL editing");
   assert.equal(view!.root.findByType("input").props.placeholder, "Search table");
   await act(async () => { view!.update(render(1)); await pause(); });
   assert.equal(calls, 2); assert.match(text(view!.root), /Avery/);

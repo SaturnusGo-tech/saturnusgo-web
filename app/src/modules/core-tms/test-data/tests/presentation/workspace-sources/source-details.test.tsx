@@ -26,19 +26,30 @@ test("opening a database source leaves SQL empty until a real remote table is sp
   const context = { permissions: { read: true }, workspace: { query: async () => { queries++; } } } as unknown as TestDataContextValue;
   await act(async () => { view = create(<TestDataProvider value={context}><Details source={{ ...source, kind: "POSTGRES", tableName: "source_logical_id" }} ru={false} onClose={() => {}} onUpdated={() => {}} /></TestDataProvider>); });
   assert.equal(queries, 0);
-  assert.equal(view!.root.findAllByProps({ label: "SQL query" }).length, 0);
-  assert.equal(view!.root.findAllByProps({ "aria-label": "SQL query" }).length, 0);
+  assert.equal(view!.root.findAllByProps({ label: "SQL query" }).length, 1);
+  assert.ok(view!.root.findAllByProps({ "aria-label": "SQL query" }).length > 0);
   assert.equal(view!.root.findAllByProps({ "aria-label": "Refresh source" }).length, 0);
   await act(async () => view!.unmount());
 });
 
-test("file sources use the compact file toolbar without a redundant status strip or SQL editor", async () => {
+test("file sources retain their compact toolbar and expose an editable SQL query", async () => {
   let view: ReturnType<typeof create>;
   const context = { permissions: { read: true, update: true }, workspace: {} } as unknown as TestDataContextValue;
   await act(async () => { view = create(<TestDataProvider value={context}><Details source={source} ru={false} onClose={() => {}} onUpdated={() => {}} /></TestDataProvider>); });
   assert.ok(view!.root.findAllByType("span").some(node => text(node) === "File"));
   assert.ok(view!.root.findAllByType("button").some(node => text(node) === "Change"));
-  assert.equal(view!.root.findAllByProps({ label: "SQL query" }).length, 0);
+  assert.equal(view!.root.findAllByProps({ label: "SQL query" }).length, 1);
   assert.equal(view!.root.findAllByType("span").some(node => text(node) === "Active"), false);
+  await act(async () => view!.unmount());
+});
+
+test("database source SQL runs against that source without requiring a saved view", async () => {
+  const calls: unknown[] = []; let view: ReturnType<typeof create>;
+  const context = { permissions: { read: true }, workspace: { query: async (request: unknown) => { calls.push(request); return { columns: [], rows: [], hasMore: false, truncated: false }; } } } as unknown as TestDataContextValue;
+  await act(async () => { view = create(<TestDataProvider value={context}><Details source={{ ...source, kind: "POSTGRES" }} ru={false} onClose={() => {}} onUpdated={() => {}} /></TestDataProvider>); });
+  const editor = view!.root.findByProps({ label: "SQL query" });
+  await act(async () => editor.props.onChange('SELECT * FROM "customers"'));
+  await act(async () => { view!.root.findAllByType("button").find(button => text(button) === "Run")!.props.onPress(); await new Promise(resolve => setTimeout(resolve, 10)); });
+  assert.deepEqual(calls, [{ sourceIds: ["s"], sql: 'SELECT * FROM "customers"', limit: 50, offset: 0 }]);
   await act(async () => view!.unmount());
 });

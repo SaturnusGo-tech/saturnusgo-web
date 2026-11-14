@@ -52,8 +52,8 @@ export function SourceDetails({ source, datasetName, ru, onClose, onUpdated }: {
           {editable && <Button type="button" disableRipple className={detail.change} aria-label="Edit source" onPress={() => setEditing(true)}>{ru ? "Изменить" : "Change"}</Button>}</div></>}
       <DataFeedback error={command.error} ru={ru} /></div>
       <SqlQueryPanel key={source.id} sourceIds={source.status === "ACTIVE" ? [source.id] : []} query={query} onChange={setQuery} ru={ru}
-        autoRun={Boolean(defaultSourceQuery(source))} showEditor={false} refreshKey={refreshKey}
-        emptyMessage={fileSource ? undefined : (ru ? "Создайте представление данных и укажите таблицу в запросе." : "Create a data view and specify a table in its query.")} />
+        autoRun={Boolean(defaultSourceQuery(source))} refreshKey={refreshKey}
+        emptyMessage={fileSource ? undefined : (ru ? "Укажите таблицу в SQL-запросе, чтобы посмотреть данные." : "Specify a table in the SQL query to explore its data.")} />
     </div>
     {confirm && <DataModal title={ru ? "Архивировать источник?" : "Archive source?"} onClose={() => { if (!command.pending) setConfirm(false); }}>
       <p className={css.subtitle}>{ru ? "Связанные датасеты сохранят ссылки. Новые запросы к архивированному источнику будут недоступны." : "Dataset links remain intact. Queries against this archived source will be unavailable."}</p>

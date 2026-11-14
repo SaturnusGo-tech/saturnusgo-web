@@ -54,7 +54,7 @@ export function ConfigView(props: ConfigViewProps) {
             const Icon = icons[id];
             return <button key={id} type="button" aria-current={section === id ? "page" : undefined}
               aria-controls={id === "test-data" ? undefined : `settings-${id}`} data-workspace-destination={id === "test-data" ? id : undefined}
-              onClick={() => transitionContent(() => select(id))}><Icon width={18} height={18} aria-hidden="true" />{copy[id][0]}</button>;
+              onClick={() => id === "test-data" ? void select(id) : transitionContent(() => { void select(id); })}><Icon width={18} height={18} aria-hidden="true" />{copy[id][0]}</button>;
           })}
         </div>)}
         {!matching.length && <p className={css.searchEmpty} role="status">{copy.noResults}</p>}

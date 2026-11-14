@@ -5,6 +5,8 @@ import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { useSettingsSection } from "../state/useSettingsSection";
 import { pluginSettingsLink, readPluginSettingsRoute } from "../plugins/plugin-settings-route";
 import { navigateWorkspace } from "../../../../state/navigation/browser/workspace-history";
+import { useWorkspaceHistory } from "../../../../state/navigation/browser/useWorkspaceHistory";
+import type { View } from "../../../../state/types/workspace";
 
 Object.assign(globalThis, { React });
 const flush = () => new Promise(resolve => setTimeout(resolve, 0));
@@ -78,5 +80,42 @@ test("Test Data history restores the workspace only while a project is selected"
   } finally {
     if (tree) act(() => tree.unmount());
     if (descriptor) Object.defineProperty(globalThis, "window", descriptor); else Reflect.deleteProperty(globalThis, "window");
+  }
+});
+
+test("selecting Test Data updates the workspace screen immediately without a reload", async () => {
+  const descriptor = Object.getOwnPropertyDescriptor(globalThis, "window");
+  const eventDescriptor = Object.getOwnPropertyDescriptor(globalThis, "PopStateEvent");
+  Object.defineProperty(globalThis, "PopStateEvent", { configurable: true, value: class extends Event {
+    state: unknown;
+    constructor(type: string, init?: PopStateEventInit) { super(type); this.state = init?.state; }
+  } });
+  const location = { href: "https://falcon.example/work/?workspaceId=w&projectId=p&view=config&settings=general" };
+  const storage = new Map<string, string>();
+  const history = { state: null as unknown, pushState(state: unknown, _title: string, href: string) {
+    history.state = state; location.href = href;
+  }, replaceState(state: unknown, _title: string, href: string) { history.state = state; location.href = href; } };
+  const browser = Object.assign(new EventTarget(), { location, history, sessionStorage: {
+    getItem: (key: string) => storage.get(key) ?? null, setItem: (key: string, value: string) => storage.set(key, value),
+  } });
+  Object.defineProperty(globalThis, "window", { configurable: true, value: browser });
+  let state!: ReturnType<typeof useSettingsSection>, tree!: ReactTestRenderer, view!: View, reloads = 0;
+  function Hook() {
+    const [current, setView] = React.useState<View>("config"); view = current;
+    state = useSettingsSection(true);
+    useWorkspaceHistory({ workspaceId: "w", projectId: "p", view: current, caseId: "", runId: null, ready: true,
+      setView, setCase() {}, setRun() {}, setItem() {}, closeDialog() {}, reload() { reloads += 1; } });
+    return null;
+  }
+  try {
+    await act(async () => { tree = create(<Hook />); await flush(); });
+    await act(async () => { await state.select("test-data"); await flush(); });
+    assert.equal(new URL(location.href).searchParams.get("view"), "test-data");
+    assert.equal(view, "test-data");
+    assert.equal(reloads, 0);
+  } finally {
+    if (tree) act(() => tree.unmount());
+    if (descriptor) Object.defineProperty(globalThis, "window", descriptor); else Reflect.deleteProperty(globalThis, "window");
+    if (eventDescriptor) Object.defineProperty(globalThis, "PopStateEvent", eventDescriptor); else Reflect.deleteProperty(globalThis, "PopStateEvent");
   }
 });
