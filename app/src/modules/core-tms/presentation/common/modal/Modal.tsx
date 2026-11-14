@@ -4,6 +4,7 @@ import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode } from
 import { useEffect, useId, useRef, useState } from "react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import styles from "../../../tms.module.css";
+import interaction from "./native-interaction.module.css";
 
 const FOCUSABLE = [
   "button:not([disabled])",
@@ -155,7 +156,7 @@ export function Modal({
 
   return (
     <div
-      className={`${styles.modalBackdrop} ${drawer ? styles.modalBackdropDrawer : ""} ${sheet ? styles.modalBackdropSheet : ""}`}
+      className={`${styles.modalBackdrop} ${interaction.nativeSafe} ${drawer ? styles.modalBackdropDrawer : ""} ${sheet ? styles.modalBackdropSheet : ""}`}
       role="presentation"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) closeRef.current();

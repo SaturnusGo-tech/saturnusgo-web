@@ -1,0 +1,2 @@
+/* A modal above the desktop title bar must receive pointer input, not window drags. */
+.nativeSafe { -webkit-app-region: no-drag; }
