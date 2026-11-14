@@ -1,8 +1,6 @@
 import { Button } from "@heroui/react";
 import { Archive, ChevronRight, FileSpreadsheet, RefreshCw, X } from "lucide-react";
 import { useState } from "react";
-import { WorkspaceTextField } from "../workspace-fields/WorkspaceTextField";
-import { useFormLeave } from "../../../authoring/leave/state/value/useFormLeave";
 import { useTestData } from "../../application/context/TestDataContext";
 import { useDataCommand } from "../../application/command/useDataCommand";
 import { defaultSourceQuery } from "../../application/workspace-query/default-source-query";
@@ -15,18 +13,8 @@ import detail from "./source-reader.module.css";
 
 export function SourceDetails({ source, datasetName, ru, onClose, onUpdated }: { source: DataSource; datasetName?: string; ru: boolean; onClose(): void; onUpdated(): void }) {
   const feature = useTestData(), command = useDataCommand(), [confirm, setConfirm] = useState(false);
-  const [editing, setEditing] = useState(false), [name, setName] = useState(source.name), [description, setDescription] = useState(source.description);
   const [refreshKey, setRefreshKey] = useState(0), [query, setQuery] = useState(() => defaultSourceQuery(source));
-  const leave = useFormLeave({ name, description }, { busy: command.pending });
-  const editable = Boolean(feature?.workspace && feature.permissions.update && source.status === "ACTIVE");
   const updatedAt = Date.parse(source.updatedAt), refreshed = Number.isFinite(updatedAt) ? new Intl.DateTimeFormat(ru ? "ru-RU" : "en-GB", { dateStyle: "short", timeStyle: "medium" }).format(updatedAt) : "";
-  async function save() {
-    if (!editable || !name.trim()) return;
-    const draft = { name: name.trim(), description: description.trim() };
-    const result = await command.execute((signal, key) => feature!.workspace!.updateSource(source, draft, key, signal), JSON.stringify([source.id, source.revision, draft]));
-    if (result.ok) { leave.reset(draft); setEditing(false); onUpdated(); }
-  }
-  function cancelEdit() { leave.close(() => { setName(source.name); setDescription(source.description); leave.reset({ name: source.name, description: source.description }); setEditing(false); }); }
   async function archive() {
     if (!feature?.workspace || !feature.permissions.archive) return;
     const result = await command.execute((signal, key) => feature.workspace!.archiveSource(source, key, signal), `${source.id}:${source.revision}`);
@@ -35,21 +23,15 @@ export function SourceDetails({ source, datasetName, ru, onClose, onUpdated }: {
   const fileSource = source.kind === "FILE" || source.kind === "POSTMAN";
   return <section className={css.pane} data-source-detail={source.id}>
     <header className={detail.toolbar}><nav className={detail.breadcrumbs} aria-label={ru ? "Расположение источника" : "Source location"}>
-      {datasetName && <><Button type="button" disableRipple className={detail.back} onPress={() => leave.close(onClose)}>{datasetName}</Button><ChevronRight size={12} /></>}
+      {datasetName && <><Button type="button" disableRipple className={detail.back} onPress={onClose}>{datasetName}</Button><ChevronRight size={12} /></>}
       <span>{source.name}</span></nav><div className={detail.actions}>
       {refreshed && <span className={detail.updated}>{ru ? "Обновлено:" : "Last refreshed:"} {refreshed}</span>}
       {source.status === "ACTIVE" && Boolean(defaultSourceQuery(source)) && <Button type="button" isIconOnly disableRipple className={css.close} aria-label={ru ? "Обновить источник" : "Refresh source"} onPress={() => setRefreshKey(value => value + 1)}><RefreshCw size={14} /></Button>}
       {feature?.permissions.archive && source.status === "ACTIVE" && <Button type="button" isIconOnly disableRipple className={css.close} aria-label={ru ? "Архивировать источник" : "Archive source"} onPress={() => setConfirm(true)}><Archive size={14} /></Button>}
-      <Button type="button" isIconOnly disableRipple className={css.close} aria-label="Close source" onPress={() => leave.close(onClose)}><X size={16} /></Button></div></header>
+      <Button type="button" isIconOnly disableRipple className={css.close} aria-label="Close source" onPress={onClose}><X size={16} /></Button></div></header>
     <div className={css.dataBody}><div className={detail.file}>
-      {editing ? <form className={detail.form} onSubmit={event => { event.preventDefault(); void save(); }}>
-        <WorkspaceTextField label={ru ? "Название" : "Name"} ariaLabel="Source name" value={name} onValueChange={setName} maxLength={120} required disabled={command.pending} />
-        <WorkspaceTextField multiline label={ru ? "Описание" : "Description"} ariaLabel="Source description" value={description} onValueChange={setDescription} maxLength={2000} disabled={command.pending} />
-        <div className={detail.actions}><Button type="button" disableRipple className={css.quiet} isDisabled={command.pending} onPress={cancelEdit}>{ru ? "Отмена" : "Cancel"}</Button>
-          <Button type="submit" disableRipple className={css.primary} isLoading={command.pending} isDisabled={!name.trim() || !leave.dirty}>{ru ? "Сохранить" : "Save"}</Button></div>
-      </form> : <><span className={detail.label}>{fileSource ? (ru ? "Файл" : "File") : (ru ? "Подключение" : "Connection")}</span>
-        <div className={detail.fileRow}><FileSpreadsheet size={14} /><span>{fileSource ? source.name : `${source.connection?.host ?? source.name}${source.connection?.database ? ` / ${source.connection.database}` : ""}`}</span>
-          {editable && <Button type="button" disableRipple className={detail.change} aria-label="Edit source" onPress={() => setEditing(true)}>{ru ? "Изменить" : "Change"}</Button>}</div></>}
+      <span className={detail.label}>{fileSource ? (ru ? "Файл" : "File") : (ru ? "Подключение" : "Connection")}</span>
+      <div className={detail.fileRow}><FileSpreadsheet size={14} /><span>{fileSource ? source.name : `${source.connection?.host ?? source.name}${source.connection?.database ? ` / ${source.connection.database}` : ""}`}</span></div>
       <DataFeedback error={command.error} ru={ru} /></div>
       <SqlQueryPanel key={source.id} sourceIds={source.status === "ACTIVE" ? [source.id] : []} query={query} onChange={setQuery} ru={ru}
         autoRun={Boolean(defaultSourceQuery(source))} refreshKey={refreshKey}

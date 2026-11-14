@@ -11,14 +11,15 @@ before(() => { Object.assign(globalThis, { React }); const restore = installRend
 after(() => { if (previous) Object.defineProperty(globalThis, "React", previous); else Reflect.deleteProperty(globalThis, "React"); });
 const text = (node: ReactTestInstance): string => node.children.map(child => typeof child === "string" ? child : text(child)).join("");
 const source = { id: "s", name: "Customers", description: "Synthetic", kind: "FILE" as const, status: "ACTIVE" as const, revision: 4, tableName: "", columns: [], rowCount: 0, createdAt: "now", updatedAt: "now" };
-test("source metadata edits use the current revision and refresh only after the API accepts them", async () => {
-  const calls: unknown[] = []; let updated = 0, view: ReturnType<typeof create>;
-  const context = { permissions: { read: true, update: true }, workspace: { updateSource: async (...args: unknown[]) => { calls.push(args); return { ...source, name: "Boundary customers", revision: 5 }; } } } as unknown as TestDataContextValue;
-  await act(async () => { view = create(<TestDataProvider value={context}><Details source={source} ru={false} onClose={() => {}} onUpdated={() => updated++} /></TestDataProvider>); });
-  await act(async () => view!.root.findAllByType("button").find(button => button.props["aria-label"] === "Edit source")!.props.onPress());
-  await act(async () => view!.root.findAllByType("input").find(input => input.props["aria-label"] === "Source name")!.props.onValueChange("Boundary customers"));
-  await act(async () => { view!.root.findByType("form").props.onSubmit({ preventDefault() {} }); await new Promise(resolve => setTimeout(resolve, 10)); });
-  assert.equal(calls[0] instanceof Array, true); assert.deepEqual((calls[0] as unknown[])[0], source); assert.deepEqual((calls[0] as unknown[])[1], { name: "Boundary customers", description: "Synthetic" }); assert.equal(updated, 1);
+test("source inspection has no misleading metadata-only Change action", async () => {
+  let closed = 0, view: ReturnType<typeof create>;
+  const context = { permissions: { read: true, update: true }, workspace: {} } as unknown as TestDataContextValue;
+  await act(async () => { view = create(<TestDataProvider value={context}><Details source={source} ru={false} onClose={() => closed++} onUpdated={() => {}} /></TestDataProvider>); });
+  assert.equal(view!.root.findAllByType("button").some(button => text(button) === "Change" || button.props["aria-label"] === "Edit source"), false);
+  assert.equal(view!.root.findAllByType("form").length, 0);
+  assert.equal(view!.root.findAllByProps({ label: "SQL query" }).length, 1);
+  await act(async () => view!.root.findAllByType("button").find(button => button.props["aria-label"] === "Close source")!.props.onPress());
+  assert.equal(closed, 1);
   await act(async () => view!.unmount());
 });
 test("opening a database source leaves SQL empty until a real remote table is specified", async () => {
@@ -37,7 +38,7 @@ test("file sources retain their compact toolbar and expose an editable SQL query
   const context = { permissions: { read: true, update: true }, workspace: {} } as unknown as TestDataContextValue;
   await act(async () => { view = create(<TestDataProvider value={context}><Details source={source} ru={false} onClose={() => {}} onUpdated={() => {}} /></TestDataProvider>); });
   assert.ok(view!.root.findAllByType("span").some(node => text(node) === "File"));
-  assert.ok(view!.root.findAllByType("button").some(node => text(node) === "Change"));
+  assert.equal(view!.root.findAllByType("button").some(node => text(node) === "Change"), false);
   assert.equal(view!.root.findAllByProps({ label: "SQL query" }).length, 1);
   assert.equal(view!.root.findAllByType("span").some(node => text(node) === "Active"), false);
   await act(async () => view!.unmount());

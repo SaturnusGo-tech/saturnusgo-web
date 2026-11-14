@@ -75,7 +75,7 @@ test("source tables include SQL editing and refresh without losing their visible
   await act(async () => { view = create(render(0)); await pause(); });
   assert.equal(calls, 1); assert.match(text(view!.root), /Avery/); assert.match(text(view!.root), /9 ms/);
   assert.ok(view!.root.findAllByProps({ "aria-label": "SQL query" }).length > 0, "source tables retain SQL editing");
-  assert.equal(view!.root.findByType("input").props.placeholder, "Search table");
+  assert.equal(view!.root.findByType("input").props.placeholder, "Search this page");
   await act(async () => { view!.update(render(1)); await pause(); });
   assert.equal(calls, 2); assert.match(text(view!.root), /Avery/);
   await act(async () => view!.unmount());

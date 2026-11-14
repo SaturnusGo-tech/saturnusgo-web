@@ -5,8 +5,8 @@
 .search :global(input) { font-size:12px!important; font-weight:400!important; line-height:18px!important; outline:0!important; box-shadow:none!important; }
 .metadata { min-inline-size:110px; text-align:end; white-space:nowrap; }
 .metadata,.footer { color:var(--falcon-text-muted); font-size:11px; }
-.frame { min-inline-size:0; min-block-size:0; flex:1; display:flex; flex-direction:column; margin:0 16px 12px; border:1px solid var(--falcon-border); border-radius:10px; overflow:hidden; }
-.scroll { min-block-size:0; flex:1; overflow:auto; outline:0; scrollbar-gutter:stable; }
+.frame { min-inline-size:0; min-block-size:0; flex:0 1 auto; display:flex; flex-direction:column; margin:0 16px 12px; border:1px solid var(--falcon-border); border-radius:10px; overflow:hidden; }
+.scroll { min-block-size:0; flex:0 1 auto; overflow:auto; outline:0; scrollbar-gutter:stable; }
 .scroll:focus-visible { box-shadow:inset 0 0 0 1px var(--falcon-text-muted); }
 .table { border-collapse:separate; border-spacing:0; width:100%; table-layout:fixed; font-size:12px; line-height:20px; font-weight:400; }
 .table th,.table td { text-align:left; vertical-align:top; padding:6px 10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; border-block-end:1px solid var(--falcon-border); border-inline-end:1px solid var(--falcon-border); }
