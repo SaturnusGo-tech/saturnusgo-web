@@ -3,17 +3,19 @@ import { HISTORY_CHANGE, navigateWorkspace } from "../../../../state/navigation/
 import type { SettingsSection } from "../settings-sections";
 import { readSettingsSection, settingsSectionLink } from "../settings-section-route";
 
+const projectSections: readonly SettingsSection[] = ["general", "environments", "test-data", "exchange"];
+
 export function useSettingsSection(hasProject: boolean) {
   const [section, setSection] = useState<SettingsSection>(() => {
     if (typeof window === "undefined") return hasProject ? "general" : "appearance";
     const selected = readSettingsSection(window.location.href);
-    return !hasProject && ["general", "environments", "exchange"].includes(selected) ? "appearance" : selected;
+    return !hasProject && projectSections.includes(selected) ? "appearance" : selected;
   });
   useEffect(() => {
     const read = () => {
       const current = window.location.href, query = new URL(current).searchParams;
       const selected = readSettingsSection(current);
-      setSection(!hasProject && ["general", "environments", "exchange"].includes(selected) ? "appearance" : selected);
+      setSection(!hasProject && projectSections.includes(selected) ? "appearance" : selected);
       if (query.get("view") === "notifications") navigateWorkspace(settingsSectionLink(current, "notifications"), true);
     };
     read(); window.addEventListener("popstate", read); window.addEventListener(HISTORY_CHANGE, read);

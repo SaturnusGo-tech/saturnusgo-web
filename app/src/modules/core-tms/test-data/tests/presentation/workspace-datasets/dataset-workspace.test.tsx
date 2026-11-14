@@ -1,0 +1,45 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+import { after, before, test } from "node:test";
+import React from "react";
+import { act, create, type ReactTestInstance } from "react-test-renderer";
+import { TestDataProvider, type TestDataContextValue } from "../../../application/context/TestDataContext";
+import type { WorkspaceDataset } from "../../../model/workspace/data-workspace";
+import { installRenderControls } from "../../support/render-controls";
+const require = createRequire(import.meta.url), previous = Object.getOwnPropertyDescriptor(globalThis, "React");
+let Pane: typeof import("../../../presentation/dataset-workspace/DatasetWorkspace")["DatasetWorkspace"];
+before(() => { Object.assign(globalThis, { React }); const restore = installRenderControls(); try { Pane = require("../../../presentation/dataset-workspace/DatasetWorkspace").DatasetWorkspace; } finally { restore(); } });
+after(() => { if (previous) Object.defineProperty(globalThis, "React", previous); else Reflect.deleteProperty(globalThis, "React"); });
+const text = (node: ReactTestInstance): string => node.children.map(child => typeof child === "string" ? child : text(child)).join("");
+const pause = () => new Promise(resolve => setTimeout(resolve, 10));
+const dataset = { id: "dataset", name: "Customers", description: "Boundary inputs", revision: 2, status: "ACTIVE", sources: [{ id: "source-a", name: "customer_source", kind: "FILE", rowCount: 100 }], views: [{ id: "active", name: "Active customers", sourceIds: ["source-a"], query: 'SELECT * FROM "customer_source"', revision: 1 }] } as unknown as WorkspaceDataset;
+test("dataset workspace opens actual source and view identities without a modal", async () => {
+  const open: string[] = [], context = { permissions: { read: true, update: true, create: true }, workspace: {} } as unknown as TestDataContextValue;
+  let view: ReturnType<typeof create>;
+  await act(async () => { view = create(<TestDataProvider value={context}><Pane dataset={dataset} ru={false} onClose={() => {}} onUpdated={() => {}} onOpenSource={id => open.push(id)} onOpenView={id => open.push(id)} /></TestDataProvider>); });
+  assert.equal(view!.root.findAllByType("dialog").length, 0);
+  for (const name of ["customer_source", "Active customers"]) await act(async () => view!.root.findAllByType("button").find(button => text(button).startsWith(name))!.props.onPress());
+  assert.deepEqual(open, ["source-a", "active"]);
+  await act(async () => view!.unmount());
+});
+test("empty workspace creates a real named container before source or view operations", async () => {
+  const calls: unknown[][] = []; let saved: WorkspaceDataset | null = null, view: ReturnType<typeof create>;
+  const context = { permissions: { read: true, create: true }, workspace: { saveDataset: async (...args: unknown[]) => { calls.push(args); return dataset; } } } as unknown as TestDataContextValue;
+  await act(async () => { view = create(<TestDataProvider value={context}><Pane dataset={null} ru={false} onClose={() => {}} onUpdated={value => { saved = value; }} onOpenSource={() => {}} onOpenView={() => {}} /></TestDataProvider>); });
+  await act(async () => view!.root.findByProps({ "aria-label": "Dataset name" }).props.onValueChange("Customers"));
+  await act(async () => { view!.root.findByType("form").props.onSubmit({ preventDefault() {} }); await pause(); });
+  assert.deepEqual(calls[0][0], { name: "Customers", description: "" }); assert.equal(calls[0][1], null); assert.equal(saved, dataset);
+  await act(async () => view!.unmount());
+});
+test("new dataset keeps source and view actions visible without creating a placeholder container", async () => {
+  let creations = 0, view: ReturnType<typeof create>;
+  const context = { permissions: { read: true, create: true }, workspace: { saveDataset: async () => { creations++; return dataset; } } } as unknown as TestDataContextValue;
+  await act(async () => { view = create(<TestDataProvider value={context}><Pane dataset={null} ru={false} onClose={() => {}} onUpdated={() => {}} onOpenSource={() => {}} onOpenView={() => {}} /></TestDataProvider>); });
+  const source = view!.root.findAllByType("button").find(button => text(button) === "Add source");
+  const createView = view!.root.findAllByType("button").find(button => text(button) === "Create view");
+  assert.ok(source); assert.ok(createView);
+  assert.equal(source.props.isDisabled, true); assert.equal(createView.props.isDisabled, true);
+  assert.match(text(view!.root), /Enter a name and choose Create to add sources/);
+  assert.equal(creations, 0);
+  await act(async () => view!.unmount());
+});

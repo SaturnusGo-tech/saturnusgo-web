@@ -5,6 +5,7 @@ import { TdmAvailabilityProvider } from "../application/availability/TdmAvailabi
 import { useTdmConfiguration } from "../application/configuration/useTdmConfiguration";
 import { createConfigurationClient } from "../data/configuration/configuration-client";
 import { createTestDataClient } from "../data/composition/test-data-client";
+import { createWorkspaceDataClient } from "../data/workspace/composition/workspace-data-client";
 import type { DataEnvironment } from "../model/resources/resource";
 export function TdmWorkspaceProvider({ workspaceId, projectId, actorId, active, environments, children }: {
   workspaceId: string; projectId: string; actorId: string; active: boolean; environments: readonly DataEnvironment[]; children: ReactNode;
@@ -14,16 +15,17 @@ export function TdmWorkspaceProvider({ workspaceId, projectId, actorId, active, 
   const loader = useMemo(() => active && http && projectId ? createConfigurationClient(http, base) : null, [active, http, base, projectId, actorId]);
   const config = useTdmConfiguration(loader);
   const port = useMemo(() => http ? createTestDataClient(http, base, workspaceId, projectId) : null, [http, base, workspaceId, projectId]);
+  const workspace = useMemo(() => http ? createWorkspaceDataClient(http, base) : undefined, [http, base]);
   const feature = useMemo<TestDataContextValue | null>(() => {
     const value = config.value; if (!value?.enabled || !port) return null;
     const allowed = (permission: string) => value.permissions.includes(permission);
-    return { port, projectId, actorId, environments, configuration: value, permissions: {
+    return { port, workspace, projectId, actorId, environments, configuration: value, permissions: {
       read: allowed("test_data:read"), bind: allowed("test_data:bind"), create: allowed("test_data:create"), update: allowed("test_data:update"),
       archive: allowed("test_data:archive"), credentialCreate: value.credentialsAvailable && allowed("credential:create"),
       credentialUpdate: allowed("credential:update"), rotate: value.credentialsAvailable && allowed("credential:rotate"), disable: allowed("credential:disable"),
       reveal: value.credentialsAvailable && value.revealVerificationAvailable && allowed("credential:reveal"), use: allowed("credential:use"),
     } };
-  }, [config.value, port, projectId, actorId, environments]);
+  }, [config.value, port, workspace, projectId, actorId, environments]);
   const availability = useMemo(() => ({ enabled: Boolean(feature), pending: config.pending, error: config.error, retry: config.retry }), [feature, config.pending, config.error, config.retry]);
   return <TdmAvailabilityProvider value={availability}><TestDataProvider value={feature}>{children}</TestDataProvider></TdmAvailabilityProvider>;
 }

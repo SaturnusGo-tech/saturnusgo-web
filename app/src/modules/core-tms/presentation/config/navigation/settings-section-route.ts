@@ -11,6 +11,8 @@ export function settingsSectionLink(href: string, section: SettingsSection) {
   for (const key of [...url.searchParams.keys()]) {
     if (key !== "workspaceId" && key !== "projectId") url.searchParams.delete(key);
   }
-  url.searchParams.set("view", "config"); url.searchParams.set("settings", section); url.hash = "";
+  url.searchParams.set("view", section === "test-data" ? "test-data" : "config");
+  if (section !== "test-data") url.searchParams.set("settings", section);
+  url.hash = "";
   return `${url.pathname}${url.search}`;
 }

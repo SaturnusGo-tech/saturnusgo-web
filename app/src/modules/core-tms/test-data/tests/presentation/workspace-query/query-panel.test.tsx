@@ -1,0 +1,44 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+import { after, before, test } from "node:test";
+import React from "react";
+import { act, create, type ReactTestInstance } from "react-test-renderer";
+import { TestDataProvider, type TestDataContextValue } from "../../../application/context/TestDataContext";
+import { installRenderControls } from "../../support/render-controls";
+const require = createRequire(import.meta.url), previous = Object.getOwnPropertyDescriptor(globalThis, "React");
+let Panel: typeof import("../../../presentation/workspace-query/SqlQueryPanel")["SqlQueryPanel"];
+before(() => { Object.assign(globalThis, { React }); const restore = installRenderControls(); try { Panel = require("../../../presentation/workspace-query/SqlQueryPanel").SqlQueryPanel; } finally { restore(); } });
+after(() => { if (previous) Object.defineProperty(globalThis, "React", previous); else Reflect.deleteProperty(globalThis, "React"); });
+const text = (node: ReactTestInstance): string => node.children.map(child => typeof child === "string" ? child : text(child)).join("");
+const pause = () => new Promise(resolve => setTimeout(resolve, 10));
+test("query results originate from the scoped API and pagination retains executed SQL", async () => {
+  const calls: unknown[] = [], context = { permissions: { read: true }, workspace: { query: async (value: unknown) => { calls.push(value); return { columns: [{ name: "name", type: "String" }], rows: [{ name: "Avery" }], rowCount: 1, hasMore: true, offset: 0, limit: 50, truncated: false, durationMs: 9 }; } } } as unknown as TestDataContextValue;
+  let view: ReturnType<typeof create>;
+  await act(async () => { view = create(<TestDataProvider value={context}><Panel sourceIds={["source-a"]} query={'SELECT * FROM "customers"'} onChange={() => {}} ru={false} /></TestDataProvider>); await pause(); });
+  assert.equal(calls.length, 0);
+  await act(async () => { view!.root.findAllByType("button").find(button => text(button) === "Run")!.props.onPress(); await pause(); });
+  assert.deepEqual(calls[0], { sourceIds: ["source-a"], sql: 'SELECT * FROM "customers"', limit: 50, offset: 0 });
+  assert.ok(text(view!.root).includes("Avery"));
+  await act(async () => { view!.root.findAllByType("button").find(button => button.props["aria-label"] === "Next page")!.props.onPress(); await pause(); });
+  assert.deepEqual(calls[1], { sourceIds: ["source-a"], sql: 'SELECT * FROM "customers"', limit: 50, offset: 50 });
+  await act(async () => view!.unmount());
+});
+test("navigation cancels the old query and ignores its response while loading the new source SQL", async () => {
+  const pending: { sql: string; signal: AbortSignal; resolve(value: unknown): void }[] = [];
+  const context = { permissions: { read: true }, workspace: { query: (value: { sql: string }, signal: AbortSignal) => new Promise(resolve => pending.push({ sql: value.sql, signal, resolve })) } } as unknown as TestDataContextValue;
+  const render = (source: string, sql: string) => <TestDataProvider value={context}><Panel sourceIds={[source]} query={sql} onChange={() => {}} ru={false} autoRun /></TestDataProvider>;
+  let view: ReturnType<typeof create>;
+  await act(async () => { view = create(render("source-a", "SELECT a")); await pause(); });
+  await act(async () => { view!.update(render("source-b", "SELECT b")); await pause(); });
+  assert.equal(pending[0].signal.aborted, true); assert.equal(pending[1].sql, "SELECT b");
+  const result = (name: string) => ({ columns: [{ name: "name", type: "String" }], rows: [{ name }], rowCount: 1, hasMore: false, offset: 0, limit: 50, truncated: false, durationMs: 1 });
+  await act(async () => { pending[1].resolve(result("Current result")); pending[0].resolve(result("Stale result")); await pause(); });
+  assert.match(text(view!.root), /Current result/); assert.doesNotMatch(text(view!.root), /Stale result/);
+  await act(async () => view!.unmount());
+});
+test("read-denied panes never auto query a source", async () => {
+  let calls = 0; const context = { permissions: { read: false }, workspace: { query: async () => { calls++; } } } as unknown as TestDataContextValue;
+  let view: ReturnType<typeof create>;
+  await act(async () => { view = create(<TestDataProvider value={context}><Panel sourceIds={["s"]} query="SELECT a" onChange={() => {}} ru={false} autoRun /></TestDataProvider>); await pause(); });
+  assert.equal(calls, 0); await act(async () => view!.unmount());
+});

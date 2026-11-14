@@ -1,0 +1,15 @@
+import type { DataTable } from "./data-table";
+export type DataSource = { readonly id: string; readonly name: string; readonly description: string; readonly kind: "FILE" | "POSTGRES" | "MYSQL" | "POSTMAN";
+  readonly status: "ACTIVE" | "ARCHIVED"; readonly revision: number; readonly tableName: string; readonly columns: readonly { readonly key: string; readonly type: string }[];
+  readonly rowCount: number; readonly connection?: { readonly host?: string; readonly port?: number; readonly database?: string; readonly username?: string; readonly tls?: true; readonly datasetId?: string; readonly region?: "us" | "eu" };
+  readonly provenance?: "DATABASE" | "FILE" | "POSTMAN_CLOUD_STORE"; readonly createdAt: string; readonly updatedAt: string };
+export type SourceConnectionDraft = { readonly name: string; readonly description: string; readonly kind: "POSTGRES" | "MYSQL";
+  readonly connection: { readonly host: string; readonly port: number; readonly database: string; readonly username: string; readonly password: string; readonly tls: true } } | { readonly name: string; readonly description: string; readonly kind: "POSTMAN"; readonly connection: { readonly datasetId: string; readonly region: "us" | "eu"; readonly apiKey: string } };
+export type SourceImportDraft = { readonly name: string; readonly description: string; readonly format: "CSV" | "JSON"; readonly content: string; readonly provenance: "FILE" | "POSTMAN_CLOUD_STORE" };
+export type DatasetView = { readonly id: string; readonly name: string; readonly sourceIds: readonly string[]; readonly query: string; readonly revision: number; readonly createdAt: string; readonly updatedAt: string };
+export type WorkspaceDataset = { readonly id: string; readonly name: string; readonly description: string; readonly status: "ACTIVE" | "ARCHIVED";
+  readonly revision: number; readonly sources: readonly DataSource[]; readonly views: readonly DatasetView[]; readonly createdAt: string; readonly updatedAt: string };
+export type WorkspaceDatasetDraft = { readonly name: string; readonly description: string };
+export type DatasetViewDraft = { readonly name: string; readonly sourceIds: readonly string[]; readonly query: string };
+export type SourceQuery = { readonly sourceIds: readonly string[]; readonly sql: string; readonly limit: number; readonly offset: number };
+export type SourceQueryResult = DataTable & { readonly rowCount: number; readonly hasMore: boolean; readonly limit: number; readonly offset: number };

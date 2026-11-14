@@ -1,0 +1,8 @@
+.editor { flex:1; min-block-size:100px; min-inline-size:0; overflow:hidden; color:var(--falcon-text); background:var(--falcon-surface); }
+.editor :global(.cm-editor) { block-size:100%; background:transparent; outline:none!important; font-size:12px; }
+.editor :global(.cm-scroller) { overflow:auto; block-size:100%; min-block-size:100px; max-block-size:260px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+.editor :global(.cm-content) { padding:10px 0; caret-color:var(--falcon-text); }
+.editor :global(.cm-gutters) { border:none; background:transparent; color:var(--falcon-text-muted); }
+.editor :global(.cm-lineNumbers .cm-gutterElement) { padding:0 16px; }
+.editor :global(.cm-selectionBackground),.editor :global(.cm-focused .cm-selectionBackground) { background:var(--falcon-hover)!important; }
+.editor :global(.cm-cursor) { border-left-color:var(--falcon-text); }

@@ -1,0 +1,16 @@
+.dialog.dialog { inline-size:clamp(360px,24.6vw,530px); max-inline-size:calc(100vw - 32px); border-radius:14px; }
+.dialog.dialog > header { min-block-size:46px; padding:14px 20px 6px; border:0; box-sizing:border-box; }
+.dialog.dialog > header > div > h2 { font-size:14px; line-height:20px; }
+.dialog.dialog > header button { inline-size:26px; block-size:26px; min-inline-size:26px; min-block-size:26px!important; padding:4px; }
+.dialog.dialog > .form { display:flex; flex-direction:column; gap:10px; padding:12px 20px 20px; overflow:visible; }
+.dialog .form :global([data-slot=input-wrapper]),.dialog .form :global([data-slot=trigger]) { min-block-size:28px!important; block-size:28px!important; border:1px solid var(--falcon-border-strong)!important; border-radius:7px!important; padding:0 9px!important; margin-inline:0!important; inline-size:100%!important; background:transparent!important; box-shadow:none!important; }
+.form :global(input),.form :global([data-slot=value]) { font-size:12px!important; }
+.form :global(label),.form :global([data-slot=label]) { font-size:12px!important; line-height:18px; }
+.actions { display:flex; gap:8px; align-items:center; justify-content:flex-end; padding-block-start:4px; }
+.query { display:flex; flex-direction:column; gap:8px; }
+.query > div { block-size:108px; overflow:hidden; border:1px solid var(--falcon-border); border-radius:7px; }
+
+.form > div { gap:4px; }
+.form :global([data-slot=input]) { line-height:20px!important; }
+.actions button { min-block-size:26px; block-size:26px; border-radius:6px; padding:0 10px; }
+:global([role=presentation]):has(> .dialog) { backdrop-filter:none!important; -webkit-backdrop-filter:none!important; background:rgb(0 0 0 / .45); }

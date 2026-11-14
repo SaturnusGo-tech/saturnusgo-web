@@ -1,0 +1,2 @@
+.controls { display:grid; grid-template-columns:minmax(160px,1fr) minmax(200px,1fr); gap:24px; max-inline-size:760px; }
+@media (max-width:700px) { .controls { grid-template-columns:1fr; gap:16px; } }

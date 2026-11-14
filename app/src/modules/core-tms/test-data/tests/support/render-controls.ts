@@ -13,7 +13,7 @@ export function installRenderControls(options: { portals?: boolean } = {}) {
     if (name.endsWith("/select/AnchoredSelect")) return { AnchoredSelect: "select" };
     if (name.endsWith("/popover/AnchoredPopover")) return { AnchoredPopover: "popover" };
     if (name.endsWith("/modal/Modal")) return { Modal: "dialog" };
-    if (name.endsWith("/useFormLeave")) return { useFormLeave: () => ({ close: (action: () => void) => action(), release() {} }) };
+    if (name.endsWith("/useFormLeave")) return { useFormLeave: () => ({ close: (action: () => void) => action(), release() {}, reset() {} }) };
     return previous.call(this, name, parent, main);
   };
   return () => { loader._load = previous; if (css) require.extensions[".css"] = css; else delete require.extensions[".css"]; };

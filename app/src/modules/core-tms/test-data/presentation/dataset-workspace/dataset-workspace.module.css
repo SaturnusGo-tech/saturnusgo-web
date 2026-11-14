@@ -1,0 +1,18 @@
+.header.header { min-block-size:36px; block-size:36px; padding:4px 16px; border-block-end:0; }
+.header h2 { font-size:12px; line-height:20px; }
+.save { min-block-size:26px; block-size:26px; min-inline-size:0; padding:0 9px; border:0; border-radius:6px; background:transparent; color:var(--falcon-text); font-size:12px; box-shadow:none!important; }
+.save[data-hover=true] { background:var(--falcon-hover); }
+.body.body { padding:44px 0 64px; }
+.summary { inline-size:43.3%; min-inline-size:min(400px,calc(100% - 48px)); max-inline-size:760px; margin-inline:auto; }
+.summary > form { gap:24px; }
+.summary :global([data-slot=input-wrapper]) { min-block-size:28px!important; block-size:28px!important; }
+.description :global([data-slot=input-wrapper]) { min-block-size:80px!important; block-size:auto!important; }
+.description textarea { min-block-size:80px!important; }
+.summary > section { margin-block-start:30px; }
+.summary > section h3 { line-height:20px; margin-block-end:4px; }
+.summary > section p { line-height:18px; margin-block-end:8px; }
+.summary > section button { block-size:40px; min-block-size:40px; }
+.summary .actions button { block-size:26px; min-block-size:26px; border-radius:5px; }
+.summary .hint { margin:8px 0 0; font-size:11px; line-height:17px; color:var(--falcon-text-muted); }
+.save:focus-visible { outline:1px solid var(--falcon-text-secondary); outline-offset:1px; }
+@media (max-width:900px) { .summary { inline-size:min(560px,calc(100% - 48px)); } .body.body { padding-block-start:32px; } }

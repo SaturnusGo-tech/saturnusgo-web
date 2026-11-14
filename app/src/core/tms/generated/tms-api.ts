@@ -7958,6 +7958,409 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/sources": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        get: operations["listTdmSources"];
+        put?: never;
+        /** @description Creates a PostgreSQL, MySQL, or Postman connection for the authenticated project. Requires test_data:create and credential:create from a verified human actor. Connection secrets are encrypted with the tenant-bound KMS envelope and are never returned. Database destinations must match the deployment-owned network allowlist; TLS certificate verification is mandatory. */
+        post: operations["createTdmSource"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/sources/import": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Imports a bounded CSV or JSON table into this project. Preserves exact decimal strings, distinguishes null from empty values, rejects duplicate headers, unsupported keys and high-confidence secret formats. No external network connection is created. */
+        post: operations["importTdmSource"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/sources/query": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Executes one parsed read-only SELECT or WITH query over explicitly selected active sources. Imported tables use their returned logical tableName; PostgreSQL/MySQL queries name actual tables in the configured database. Remote connections additionally require test_data:update and credential:use; access is audited without SQL or secret values. Returns at most limit rows, rowCount is the number returned, and hasMore indicates a next page. Enforces row, byte, time, syntax and destination limits; never returns connection secrets. */
+        post: operations["queryTdmSources"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/sources/{sourceId}": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                sourceId: string;
+            };
+            cookie?: never;
+        };
+        get: operations["getTdmSource"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description Updates safe source metadata with optimistic If-Match concurrency and Idempotency-Key replay. Does not change immutable imported table content or connection secret material. */
+        patch: operations["updateTdmSource"];
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/sources/{sourceId}/archive": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                sourceId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Archives the source without deleting historical metadata or dataset references. Archived sources cannot execute new queries. Requires current If-Match and Idempotency-Key. */
+        post: operations["archiveTdmSource"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/dataset-workspaces": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        get: operations["listTdmWorkspaceDatasets"];
+        put?: never;
+        post: operations["createTdmWorkspaceDataset"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/dataset-workspaces/{resourceId}": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                resourceId: string;
+            };
+            cookie?: never;
+        };
+        get: operations["getTdmWorkspaceDataset"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description If-Match must use the current strong ETag: "tdm-catalog:{resourceId}:{revision}". Every command creates one atomic immutable catalog version and audit event. Retrying the same Idempotency-Key and body replays the original result. */
+        patch: operations["updateTdmWorkspaceDataset"];
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/dataset-workspaces/{resourceId}/archive": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                resourceId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description If-Match must use the current strong ETag: "tdm-catalog:{resourceId}:{revision}". Every command creates one atomic immutable catalog version and audit event. Retrying the same Idempotency-Key and body replays the original result. */
+        post: operations["archiveTdmWorkspaceDataset"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/dataset-workspaces/{resourceId}/restore": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                resourceId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description If-Match must use the current strong ETag: "tdm-catalog:{resourceId}:{revision}". Every command creates one atomic immutable catalog version and audit event. Retrying the same Idempotency-Key and body replays the original result. */
+        post: operations["restoreTdmWorkspaceDataset"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/static-resources": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        get: operations["listTdmStaticResources"];
+        put?: never;
+        post: operations["createTdmStaticResource"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/static-resources/{resourceId}": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                resourceId: string;
+            };
+            cookie?: never;
+        };
+        get: operations["getTdmStaticResource"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description If-Match must use the current strong ETag: "tdm-catalog:{resourceId}:{revision}". Every command creates one atomic immutable catalog version and audit event. Retrying the same Idempotency-Key and body replays the original result. */
+        patch: operations["updateTdmStaticResource"];
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/static-resources/{resourceId}/archive": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                resourceId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description If-Match must use the current strong ETag: "tdm-catalog:{resourceId}:{revision}". Every command creates one atomic immutable catalog version and audit event. Retrying the same Idempotency-Key and body replays the original result. */
+        post: operations["archiveTdmStaticResource"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/static-resources/{resourceId}/restore": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                resourceId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description If-Match must use the current strong ETag: "tdm-catalog:{resourceId}:{revision}". Every command creates one atomic immutable catalog version and audit event. Retrying the same Idempotency-Key and body replays the original result. */
+        post: operations["restoreTdmStaticResource"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/dataset-workspaces/{resourceId}/sources": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                resourceId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description If-Match must use the current strong ETag: "tdm-catalog:{resourceId}:{revision}". Every command creates one atomic immutable catalog version and audit event. Retrying the same Idempotency-Key and body replays the original result. */
+        post: operations["linkTdmWorkspaceSource"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/dataset-workspaces/{resourceId}/sources/{sourceId}/unlink": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                resourceId: string;
+                sourceId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description If-Match must use the current strong ETag: "tdm-catalog:{resourceId}:{revision}". Every command creates one atomic immutable catalog version and audit event. Retrying the same Idempotency-Key and body replays the original result. */
+        post: operations["unlinkTdmWorkspaceSource"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/dataset-workspaces/{resourceId}/views": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                resourceId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description If-Match must use the current strong ETag: "tdm-catalog:{resourceId}:{revision}". Every command creates one atomic immutable catalog version and audit event. Retrying the same Idempotency-Key and body replays the original result. */
+        post: operations["createTdmWorkspaceView"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/test-data/dataset-workspaces/{resourceId}/views/{viewId}": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                resourceId: string;
+                viewId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description If-Match must use the current strong ETag: "tdm-catalog:{resourceId}:{revision}". Every command creates one atomic immutable catalog version and audit event. Retrying the same Idempotency-Key and body replays the original result. */
+        patch: operations["updateTdmWorkspaceView"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -14765,6 +15168,220 @@ export interface components {
                 items: components["schemas"]["TestDataPreflightItem"][];
                 nextAfter: number | null;
             };
+        };
+        TestDataSource: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            description: string;
+            /** @enum {string} */
+            kind: "FILE" | "POSTGRES" | "MYSQL" | "POSTMAN";
+            /** @enum {string} */
+            status: "ACTIVE" | "ARCHIVED";
+            revision: number;
+            tableName: string;
+            columns: {
+                key: string;
+                /** @enum {string} */
+                type: "String" | "Integer" | "Decimal" | "Boolean" | "JSON" | "DateTime";
+            }[];
+            rowCount: number;
+            /** @enum {string} */
+            provenance: "FILE" | "POSTMAN_CLOUD_STORE" | "DATABASE";
+            connection?: {
+                host: string;
+                port: number;
+                database: string;
+                username: string;
+                /** @constant */
+                tls: true;
+            } | {
+                /** Format: uuid */
+                datasetId: string;
+                /** @enum {string} */
+                region: "us" | "eu";
+            };
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        TestDataSourceCreate: {
+            name: string;
+            description?: string;
+            /** @constant */
+            kind: "POSTGRES";
+            connection: {
+                host: string;
+                port: number;
+                database: string;
+                username: string;
+                /** @constant */
+                tls: true;
+                password: string;
+            };
+        } | {
+            name: string;
+            description?: string;
+            /** @constant */
+            kind: "MYSQL";
+            connection: {
+                host: string;
+                port: number;
+                database: string;
+                username: string;
+                /** @constant */
+                tls: true;
+                password: string;
+            };
+        } | {
+            name: string;
+            description?: string;
+            /** @constant */
+            kind: "POSTMAN";
+            connection: {
+                /** Format: uuid */
+                datasetId: string;
+                /** @enum {string} */
+                region: "us" | "eu";
+                apiKey: string;
+            };
+        };
+        TestDataSourceImport: {
+            name: string;
+            description?: string;
+            /** @enum {unknown} */
+            format: "CSV" | "JSON";
+            content: string;
+            /** @enum {unknown} */
+            provenance?: "FILE" | "POSTMAN_CLOUD_STORE";
+        };
+        TestDataSourcePatch: {
+            name?: string;
+            description?: string;
+        };
+        TestDataSourceQueryRequest: {
+            sourceIds: string[];
+            sql: string;
+            /** @default 50 */
+            limit: number;
+            /** @default 0 */
+            offset: number;
+        };
+        TestDataSourceQueryResult: {
+            columns: {
+                key: string;
+                type: string;
+            }[];
+            rows: {
+                [key: string]: unknown;
+            }[];
+            /** @description Number of returned rows, not an unbounded total count. */
+            rowCount: number;
+            hasMore: boolean;
+            limit: number;
+            offset: number;
+            truncated: boolean;
+            durationMs: number;
+        };
+        TdmWorkspaceDatasetDraft: {
+            name: string;
+            description?: string;
+        };
+        TdmWorkspaceDatasetPatch: {
+            name?: string;
+            description?: string;
+        };
+        TdmDatasetViewDraft: {
+            name: string;
+            sourceIds: string[];
+            query: string;
+        };
+        TdmDatasetView: {
+            id: string;
+            name: string;
+            sourceIds: string[];
+            query: string;
+            revision: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        TdmCatalogSource: {
+            id: string;
+            name: string;
+            description: string;
+            /** @enum {string} */
+            kind: "FILE" | "POSTGRES" | "MYSQL" | "POSTMAN";
+            /** @enum {string} */
+            status: "ACTIVE" | "ARCHIVED";
+            revision: number;
+            tableName: string;
+            columns: {
+                key: string;
+                type: string;
+            }[];
+            rowCount: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        TdmWorkspaceDataset: {
+            id: string;
+            name: string;
+            description: string;
+            /** @enum {string} */
+            status: "ACTIVE" | "ARCHIVED";
+            revision: number;
+            currentVersionId: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            sources: components["schemas"]["TdmCatalogSource"][];
+            views: components["schemas"]["TdmDatasetView"][];
+        };
+        TdmStaticResourceDraft: {
+            name: string;
+            description?: string;
+            environmentId?: string | null;
+            /** @enum {string} */
+            dataType: "String" | "Integer" | "Decimal" | "Boolean" | "Email" | "URL" | "Date" | "DateTime" | "JSON";
+            value: string | boolean;
+        };
+        TdmStaticResourcePatch: {
+            name?: string;
+            description?: string;
+            environmentId?: string | null;
+            /** @enum {string} */
+            dataType?: "String" | "Integer" | "Decimal" | "Boolean" | "Email" | "URL" | "Date" | "DateTime" | "JSON";
+            value?: string | boolean;
+        };
+        TdmStaticResource: {
+            id: string;
+            name: string;
+            description: string;
+            /** @enum {string} */
+            status: "ACTIVE" | "ARCHIVED";
+            revision: number;
+            currentVersionId: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            environmentId: string | null;
+            /** @enum {string} */
+            dataType: "String" | "Integer" | "Decimal" | "Boolean" | "Email" | "URL" | "Date" | "DateTime" | "JSON";
+            value: string | boolean;
+            warnings: {
+                /** @enum {string} */
+                code: "POTENTIAL_SENSITIVE_VALUE";
+            }[];
+        };
+        TdmWorkspaceSourceLink: {
+            sourceId: string;
         };
     };
     responses: {
@@ -33285,6 +33902,3582 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             500: components["responses"]["InternalError"];
+        };
+    };
+    listTdmSources: {
+        parameters: {
+            query?: {
+                search?: string;
+                status?: "ACTIVE" | "ARCHIVED";
+                limit?: number;
+                cursor?: string;
+                sort?: "name" | "updatedAt";
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    "X-Next-Cursor"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TestDataSource"][];
+                        page: {
+                            nextCursor: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description Safe typed failure */
+            400: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            401: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            403: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            404: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            409: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            412: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            422: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            428: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            500: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            503: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    createTdmSource: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TestDataSourceCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            201: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    "Idempotency-Replayed"?: boolean;
+                    ETag?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TestDataSource"];
+                    };
+                };
+            };
+            /** @description Safe typed failure */
+            400: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            401: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            403: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            404: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            409: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            412: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            422: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            428: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            500: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            503: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    importTdmSource: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TestDataSourceImport"];
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            201: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    "Idempotency-Replayed"?: boolean;
+                    ETag?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TestDataSource"];
+                    };
+                };
+            };
+            /** @description Safe typed failure */
+            400: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            401: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            403: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            404: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            409: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            412: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            422: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            428: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            500: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            503: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    queryTdmSources: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TestDataSourceQueryRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TestDataSourceQueryResult"];
+                    };
+                };
+            };
+            /** @description Safe typed failure */
+            400: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            401: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            403: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            404: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            409: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            412: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            422: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            428: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            500: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            503: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    getTdmSource: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                sourceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    ETag?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TestDataSource"];
+                    };
+                };
+            };
+            /** @description Safe typed failure */
+            400: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            401: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            403: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            404: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            409: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            412: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            422: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            428: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            500: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            503: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    updateTdmSource: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                sourceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TestDataSourcePatch"];
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    "Idempotency-Replayed"?: boolean;
+                    ETag?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TestDataSource"];
+                    };
+                };
+            };
+            /** @description Safe typed failure */
+            400: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            401: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            403: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            404: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            409: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            412: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            422: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            428: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            500: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            503: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    archiveTdmSource: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                sourceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    "Idempotency-Replayed"?: boolean;
+                    ETag?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TestDataSource"];
+                    };
+                };
+            };
+            /** @description Safe typed failure */
+            400: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            401: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            403: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            404: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            409: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            412: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            422: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            428: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            500: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Safe typed failure */
+            503: {
+                headers: {
+                    "X-Request-Id"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    listTdmWorkspaceDatasets: {
+        parameters: {
+            query?: {
+                search?: string;
+                status?: "ACTIVE" | "ARCHIVED";
+                cursor?: string;
+                limit?: number;
+                /** @description Sort by case-insensitive name ascending or last updated descending. Resource ID provides stable tie breaking. Cursors bind the selected order. */
+                sort?: "name" | "updatedAt";
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Safe catalog resource metadata. Static values are type-checked and must not contain secrets. Workspace revisions and saved views are immutable historical definitions. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    "X-Next-Cursor": components["headers"]["XNextCursor"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmWorkspaceDataset"][];
+                        page: components["schemas"]["TdmPage"];
+                    };
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            401: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            404: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            412: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            428: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+        };
+    };
+    createTdmWorkspaceDataset: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TdmWorkspaceDatasetDraft"];
+            };
+        };
+        responses: {
+            /** @description Safe catalog resource metadata. Static values are type-checked and must not contain secrets. Workspace revisions and saved views are immutable historical definitions. */
+            201: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmWorkspaceDataset"];
+                    };
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            401: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            404: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            412: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            428: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+        };
+    };
+    getTdmWorkspaceDataset: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                resourceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Safe catalog resource metadata. Static values are type-checked and must not contain secrets. Workspace revisions and saved views are immutable historical definitions. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmWorkspaceDataset"];
+                    };
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            401: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            404: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            412: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            428: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+        };
+    };
+    updateTdmWorkspaceDataset: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                resourceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TdmWorkspaceDatasetPatch"];
+            };
+        };
+        responses: {
+            /** @description Safe catalog resource metadata. Static values are type-checked and must not contain secrets. Workspace revisions and saved views are immutable historical definitions. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmWorkspaceDataset"];
+                    };
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            401: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            404: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            412: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            428: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+        };
+    };
+    archiveTdmWorkspaceDataset: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                resourceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Safe catalog resource metadata. Static values are type-checked and must not contain secrets. Workspace revisions and saved views are immutable historical definitions. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmWorkspaceDataset"];
+                    };
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            401: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            404: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            412: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            428: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+        };
+    };
+    restoreTdmWorkspaceDataset: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                resourceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Safe catalog resource metadata. Static values are type-checked and must not contain secrets. Workspace revisions and saved views are immutable historical definitions. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmWorkspaceDataset"];
+                    };
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            401: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            404: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            412: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            428: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+        };
+    };
+    listTdmStaticResources: {
+        parameters: {
+            query?: {
+                search?: string;
+                status?: "ACTIVE" | "ARCHIVED";
+                cursor?: string;
+                limit?: number;
+                /** @description Sort by case-insensitive name ascending or last updated descending. Resource ID provides stable tie breaking. Cursors bind the selected order. */
+                sort?: "name" | "updatedAt";
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Safe catalog resource metadata. Static values are type-checked and must not contain secrets. Workspace revisions and saved views are immutable historical definitions. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    "X-Next-Cursor": components["headers"]["XNextCursor"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmStaticResource"][];
+                        page: components["schemas"]["TdmPage"];
+                    };
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            401: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            404: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            412: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            428: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+        };
+    };
+    createTdmStaticResource: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TdmStaticResourceDraft"];
+            };
+        };
+        responses: {
+            /** @description Safe catalog resource metadata. Static values are type-checked and must not contain secrets. Workspace revisions and saved views are immutable historical definitions. */
+            201: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmStaticResource"];
+                    };
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            401: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            404: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            412: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            428: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+        };
+    };
+    getTdmStaticResource: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                resourceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Safe catalog resource metadata. Static values are type-checked and must not contain secrets. Workspace revisions and saved views are immutable historical definitions. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmStaticResource"];
+                    };
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            401: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            404: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            412: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            428: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+        };
+    };
+    updateTdmStaticResource: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                resourceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TdmStaticResourcePatch"];
+            };
+        };
+        responses: {
+            /** @description Safe catalog resource metadata. Static values are type-checked and must not contain secrets. Workspace revisions and saved views are immutable historical definitions. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmStaticResource"];
+                    };
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            401: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            404: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            412: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            428: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+        };
+    };
+    archiveTdmStaticResource: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                resourceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Safe catalog resource metadata. Static values are type-checked and must not contain secrets. Workspace revisions and saved views are immutable historical definitions. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmStaticResource"];
+                    };
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            401: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            404: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            412: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            428: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+        };
+    };
+    restoreTdmStaticResource: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                resourceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Safe catalog resource metadata. Static values are type-checked and must not contain secrets. Workspace revisions and saved views are immutable historical definitions. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmStaticResource"];
+                    };
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            401: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            404: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            412: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            428: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+        };
+    };
+    linkTdmWorkspaceSource: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                resourceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TdmWorkspaceSourceLink"];
+            };
+        };
+        responses: {
+            /** @description Safe catalog resource metadata. Static values are type-checked and must not contain secrets. Workspace revisions and saved views are immutable historical definitions. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmWorkspaceDataset"];
+                    };
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            401: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            404: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            412: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            428: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+        };
+    };
+    unlinkTdmWorkspaceSource: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                resourceId: string;
+                sourceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Safe catalog resource metadata. Static values are type-checked and must not contain secrets. Workspace revisions and saved views are immutable historical definitions. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmWorkspaceDataset"];
+                    };
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            401: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            404: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            412: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            428: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+        };
+    };
+    createTdmWorkspaceView: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                resourceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TdmDatasetViewDraft"];
+            };
+        };
+        responses: {
+            /** @description Safe catalog resource metadata. Static values are type-checked and must not contain secrets. Workspace revisions and saved views are immutable historical definitions. */
+            201: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmWorkspaceDataset"];
+                    };
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            401: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            404: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            412: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            428: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+        };
+    };
+    updateTdmWorkspaceView: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                resourceId: string;
+                viewId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TdmDatasetViewDraft"];
+            };
+        };
+        responses: {
+            /** @description Safe catalog resource metadata. Static values are type-checked and must not contain secrets. Workspace revisions and saved views are immutable historical definitions. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TdmWorkspaceDataset"];
+                    };
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            401: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            403: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            404: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            412: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            428: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            500: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
+            /** @description Typed error containing a safe request ID and no secret material. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TdmError"];
+                };
+            };
         };
     };
 }

@@ -48,3 +48,35 @@ test("settings tabs restore on back/forward and the notifications legacy URL is 
     if (descriptor) Object.defineProperty(globalThis, "window", descriptor); else Reflect.deleteProperty(globalThis, "window");
   }
 });
+
+test("Test Data history restores the workspace only while a project is selected", async () => {
+  const descriptor = Object.getOwnPropertyDescriptor(globalThis, "window");
+  const href = "https://falcon.example/work/?workspaceId=w&projectId=p&view=config&settings=test-data";
+  const location = { href }, storage = new Map<string, string>();
+  const history = { state: null as unknown, pushState(state: unknown, _title: string, next: string) {
+    history.state = state; location.href = next;
+  }, replaceState(state: unknown, _title: string, next: string) { history.state = state; location.href = next; } };
+  const browser = Object.assign(new EventTarget(), { location, history, sessionStorage: {
+    getItem: (key: string) => storage.get(key) ?? null, setItem: (key: string, value: string) => storage.set(key, value),
+  } });
+  Object.defineProperty(globalThis, "window", { configurable: true, value: browser });
+  let hasProject = true, state!: ReturnType<typeof useSettingsSection>, tree!: ReactTestRenderer;
+  function Hook() { state = useSettingsSection(hasProject); return null; }
+  try {
+    await act(async () => { tree = create(<Hook />); await flush(); });
+    assert.equal(state.section, "test-data");
+    await act(async () => { state.select("appearance"); await flush(); });
+    assert.equal(state.section, "appearance");
+    await act(async () => { location.href = href; browser.dispatchEvent(new Event("popstate")); await flush(); });
+    assert.equal(state.section, "test-data");
+    await act(async () => { hasProject = false; tree.update(<Hook />); await flush(); });
+    assert.equal(state.section, "appearance");
+    await act(async () => { browser.dispatchEvent(new Event("popstate")); await flush(); });
+    assert.equal(state.section, "appearance");
+    await act(async () => { hasProject = true; tree.update(<Hook />); await flush(); });
+    assert.equal(state.section, "test-data");
+  } finally {
+    if (tree) act(() => tree.unmount());
+    if (descriptor) Object.defineProperty(globalThis, "window", descriptor); else Reflect.deleteProperty(globalThis, "window");
+  }
+});

@@ -1,4 +1,4 @@
-export const settingsSections = ["general", "environments", "exchange", "billing", "appearance", "notifications", "security", "account", "plugins"] as const;
+export const settingsSections = ["general", "environments", "test-data", "exchange", "billing", "appearance", "notifications", "security", "account", "plugins"] as const;
 export type SettingsSection = typeof settingsSections[number];
 export const settingsCopy = {
   ru: {
@@ -6,6 +6,7 @@ export const settingsCopy = {
     search: "Поиск настроек", clearSearch: "Очистить поиск", noResults: "Настройки не найдены",
     general: ["Общие", "Название, ключ и состояние выбранного проекта."],
     environments: ["Окружения", "Стенды, на которых команда выполняет проверки."],
+    "test-data": ["Тестовые данные", "Статические данные, учётные данные и общие наборы проекта."],
     exchange: ["Импорт и экспорт", "Переносите тестовую базу между проектами Falcon."],
     billing: ["Тариф и оплата", "Тариф, подписка и платежи рабочего пространства."],
     appearance: ["Оформление и язык", "Настройте Falcon под привычный способ работы."],
@@ -23,6 +24,7 @@ export const settingsCopy = {
     search: "Search settings", clearSearch: "Clear search", noResults: "No settings found",
     general: ["General", "Name, key and status of the selected project."],
     environments: ["Environments", "The environments your team uses to run tests."],
+    "test-data": ["Test Data", "Static data, credentials and shared project datasets."],
     exchange: ["Import and export", "Move your test library between Falcon projects."],
     billing: ["Plan and billing", "Workspace plan, subscription and payments."],
     appearance: ["Appearance and language", "Make Falcon fit the way you work."],

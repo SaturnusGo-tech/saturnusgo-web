@@ -1,0 +1,7 @@
+.field { display:flex; flex-direction:column; gap:8px; min-inline-size:0; }
+.label { display:block; color:var(--falcon-text-secondary); font-size:12px; font-weight:500; line-height:20px; }
+.field .shell.shell { border:1px solid transparent!important; border-radius:8px!important; background:transparent!important; padding:0 9px!important; box-shadow:none!important; margin-inline:-10px; inline-size:calc(100% + 20px); }
+.field .shell.shell[data-hover=true] { background:var(--falcon-hover)!important; }
+.field .shell.shell:focus-within { border-color:var(--falcon-border-strong)!important; background:var(--falcon-control)!important; outline:0!important; }
+.field .input.input { font-size:14px!important; line-height:22px!important; outline:0!important; box-shadow:none!important; }
+.field :global([data-slot=description]) { margin-block-start:8px; }

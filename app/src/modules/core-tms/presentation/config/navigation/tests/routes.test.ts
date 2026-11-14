@@ -34,6 +34,20 @@ test("invalid settings targets are ignored and settings state cannot leak into u
   assert.equal(new URL(buildWorkspaceDeepLink(valid, { ...scope, view: "cases" })).searchParams.has("settings"), false);
 });
 
+test("Test Data Settings entry leaves Settings for the standalone project workspace", () => {
+  const href = new URL(settingsSectionLink(`${origin}&projectId=p&caseId=old#old`, "test-data"), origin).href;
+  assert.equal(readWorkspaceDeepLink(href).view, "test-data");
+  assert.equal(new URL(href).searchParams.has("settings"), false);
+  const legacy = "https://falcon.example/work/?workspaceId=w&projectId=p&view=config&settings=test-data";
+  assert.equal(readWorkspaceDeepLink(legacy).view, "test-data");
+  const restored = buildWorkspaceDeepLink(legacy, { ...scope, projectId: "p", view: "test-data" });
+  assert.equal(new URL(restored).searchParams.get("view"), "test-data");
+  assert.equal(new URL(restored).searchParams.has("settings"), false);
+  assert.equal(new URL(restored).searchParams.get("projectId"), "p");
+  assert.equal(new URL(restored).searchParams.has("caseId"), false);
+  assert.equal(readWorkspaceDeepLink("https://falcon.example/work/?workspaceId=w&projectId=p&view=test-data").view, "test-data");
+});
+
 function settingsHarness(locale: "en" | "ru" = "en", hasProject = true, initial = "general") {
   const h = componentHarness();
   let selected = initial;
@@ -43,7 +57,8 @@ function settingsHarness(locale: "en" | "ru" = "en", hasProject = true, initial 
     if (name.endsWith("useSettingsSection")) return { useSettingsSection: () => ({ section: selected, select: (next: string) => { selected = next; } }) };
   });
   const draw = () => nodes(h.render(() => render({ environments: [], project: hasProject ? { id: "p", name: "Falcon project" } : undefined,
-    exchange: { type: "ImportContent", props: {} }, plugins: { type: "PluginsContent", props: {} }, billing: { type: "BillingContent", props: {} } } as never)));
+    exchange: { type: "ImportContent", props: {} }, plugins: { type: "PluginsContent", props: {} }, billing: { type: "BillingContent", props: {} },
+    } as never)));
   return { draw, selected: () => selected };
 }
 
@@ -106,6 +121,24 @@ test("import settings keep category navigation and a single selected content pan
   const active = all.filter(node => node.type === "section" && node.props.hidden === false);
   assert.equal(active.length, 1);
   assert.equal(active[0].props.id, "settings-exchange");
+});
+
+test("Test Data is a navigation entry and never renders a nested Settings panel", () => {
+  for (const locale of ["en", "ru"] as const) {
+    const h = settingsHarness(locale);
+    const button = h.draw().find(node => node.type === "button" && node.props["data-workspace-destination"] === "test-data");
+    assert.ok(button, "project Settings exposes Test Data");
+    invoke(button, "onClick");
+    const all = h.draw();
+    assert.equal(h.selected(), "test-data");
+    assert.equal(all.some(node => node.props.id === "settings-test-data"), false);
+    assert.equal(all.some(node => node.props["data-layout"] === "workspace"), false);
+    assert.equal(all.some(node => node.props.id === "settings-test-data-title"), false);
+    assert.equal(all.filter(node => node.type === "section" && node.props.hidden === false).length, 0);
+  }
+  const personal = settingsHarness("en", false).draw();
+  assert.equal(personal.some(node => node.props["data-workspace-destination"] === "test-data"), false);
+  assert.equal(settingsHarness().draw().some(node => node.props["data-testid"] === "test-data-workspace"), false);
 });
 
 test("appearance radio groups keep animated theme changes, native grouping and no-op selections", () => {
