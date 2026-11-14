@@ -1,5 +1,5 @@
 import { Button } from "@heroui/react";
-import { IntegrationInput as Input } from "../../../presentation/common/integration-controls/input/IntegrationInput";
+import { WorkspaceTextField } from "../workspace-fields/WorkspaceTextField";
 import { useState } from "react";
 import { ResourceEditorFrame } from "../editor-frame/ResourceEditorFrame";
 import { useFormLeave } from "../../../authoring/leave/state/value/useFormLeave";
@@ -20,11 +20,11 @@ export function DatasetForm({ current, version, ru, onSaved, onClose, inline = f
     text: formatDataValue(field.value), isSecret: false })) ?? [{ localId: crypto.randomUUID(), key: "", type: "String", text: "", isSecret: false }]);
   const leave = useFormLeave({ name, description, environmentId, fields }, { busy: command.pending });
   const content = <>
-    <Input autoFocus isRequired label={ru ? "Название" : "Name"} labelPlacement="outside" value={name} onValueChange={setName} maxLength={context?.configuration.limits.nameLength} isDisabled={command.pending} classNames={{ inputWrapper: css.inputShell, input: css.input }} />
-    <Input label={ru ? "Описание" : "Description"} labelPlacement="outside" value={description} onValueChange={setDescription} maxLength={context?.configuration.limits.descriptionLength} isDisabled={command.pending} classNames={{ inputWrapper: css.inputShell, input: css.input }} />
+    <WorkspaceTextField required label={ru ? "Название" : "Name"} ariaLabel="Name" value={name} onValueChange={setName} maxLength={context?.configuration.limits.nameLength} disabled={command.pending} />
+    <WorkspaceTextField multiline label={ru ? "Описание" : "Description"} ariaLabel="Description" value={description} onValueChange={setDescription} placeholder={ru ? "Добавить описание…" : "Add description…"} maxLength={context?.configuration.limits.descriptionLength} disabled={command.pending} />
     <DataEnvironmentSelect value={environmentId} onChange={setEnvironment} ru={ru} disabled={command.pending} />
     <ResourceFields fields={fields} onChange={setFields} ru={ru} disabled={command.pending} />
-    {current && <p className={css.notice}>{ru ? "Сохранение создаст неизменяемую версию. Привязки существующих кейсов останутся прежними." : "Saving creates an immutable version. Existing case bindings keep their selected version."}</p>}
+    {current && <p className={css.formHint}>{ru ? "Сохранение создаст новую версию. Существующие привязки сохранят выбранную версию." : "Saving creates a new version. Existing bindings keep their selected version."}</p>}
     {invalidJson && <p className={css.error} role="alert">{ru ? "Проверьте синтаксис JSON в полях." : "Check the JSON syntax in your fields."}</p>}
     <DataFeedback error={command.error} ru={ru} denied={!context || !(current ? context.permissions.update : context.permissions.create)} />
   </>;

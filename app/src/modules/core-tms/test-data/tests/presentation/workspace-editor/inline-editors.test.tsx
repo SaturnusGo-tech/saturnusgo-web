@@ -23,7 +23,7 @@ const credential = { id: "credential", name: "QA account", description: "", envi
 function context(port: object) { return { actorId: "qa", projectId: "project", configuration, environments: [{ id: "staging", name: "Staging" }],
   permissions: { read: true, create: true, update: true, credentialCreate: true, credentialUpdate: true }, port } as unknown as TestDataContextValue; }
 function setInput(view: ReturnType<typeof create>, label: string, value: string) {
-  view.root.findAllByType("input").find(node => node.props.label === label)!.props.onValueChange(value);
+  view.root.findAllByType("input").find(node => node.props.label === label || node.props["aria-label"] === label)!.props.onValueChange(value);
 }
 
 test("a Settings dataset editor stays in its pane and saves through the existing dataset command", async () => {
@@ -33,6 +33,7 @@ test("a Settings dataset editor stays in its pane and saves through the existing
   await act(async () => { view = create(<TestDataProvider value={value}><DatasetEditor inline ru={false} onSaved={item => { saved = item; }} onClose={() => { closed++; }} /></TestDataProvider>); });
   assert.equal(view.root.findAllByType("dialog").length, 0, "Settings forms must not mount a modal");
   assert.equal(view.root.findByProps({ role: "region" }).findByType("h2").props.children, "Create dataset");
+  assert.equal(view.root.findAllByType("input").find(node => node.props["aria-label"] === "Name")!.props.label, undefined);
   await act(async () => { setInput(view, "Name", "Customers"); setInput(view, "Field name", "email"); });
   await act(async () => { setInput(view, "Value", "qa@example.test"); });
   await act(async () => { view.root.findByType("form").props.onSubmit({ preventDefault() {} }); });
@@ -72,10 +73,11 @@ test("inline credential fields use the protected command and clear their local s
   await act(async () => { view = create(<TestDataProvider value={value}><CredentialEditor inline ru={false} onSaved={item => { saved = item; }} onClose={() => {}} /></TestDataProvider>); });
   assert.equal(view.root.findAllByType("dialog").length, 0);
   await act(async () => { setInput(view, "Name", "QA account"); view.root.findAllByType("input").filter(node => node.props.label === "Value")[0].props.onValueChange("qa@example.test"); });
+  await act(async () => { view.root.findByType("textarea").props.onValueChange("Staging access\nFor release validation"); });
   await act(async () => { view.root.findAllByType("input").filter(node => node.props.label === "Value")[1].props.onValueChange("test-only-password");
     view.root.findAllByType("select").find(node => node.props.label === "Environment")!.props.onSelectionChange(new Set(["staging"])); });
   await act(async () => { view.root.findByType("form").props.onSubmit({ preventDefault() {} }); });
-  assert.deepEqual(submitted, { name: "QA account", description: "", environmentId: "staging", fields: [
+  assert.deepEqual(submitted, { name: "QA account", description: "Staging access\nFor release validation", environmentId: "staging", fields: [
     { key: "email", type: "Email", value: "qa@example.test", isSecret: false }, { key: "password", type: "String", value: "test-only-password", isSecret: true },
   ] });
   assert.equal(saved, credential);

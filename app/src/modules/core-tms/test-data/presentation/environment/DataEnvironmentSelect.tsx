@@ -8,7 +8,7 @@ export function DataEnvironmentSelect({ value, onChange, required, ru, disabled 
   return <Select disableAnimation label={ru ? "Окружение" : "Environment"} labelPlacement="outside" isRequired={required}
     placeholder={ru ? "Выберите окружение" : "Choose environment"} selectedKeys={value ? [value] : required ? [] : ["__none__"]}
     isDisabled={disabled || !context} onSelectionChange={keys => { const selected = String([...keys][0] ?? ""); onChange(selected === "__none__" ? "" : selected); }}
-    classNames={{ trigger: css.inputShell, value: css.input }}>
+    classNames={{ base: css.fieldControl, label: css.controlLabel, trigger: css.inputShell, value: css.input }}>
     {choices.map(item => <SelectItem key={item.id}>{item.name}</SelectItem>)}
   </Select>;
 }

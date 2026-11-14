@@ -9,7 +9,8 @@ import { installRenderControls } from "../../support/render-controls";
 import type { TestDataBinding } from "../../../model/bindings/binding";
 const require = createRequire(import.meta.url);
 const text = (node: ReactTestInstance): string => node.children.map(child => typeof child === "string" ? child : text(child)).join(" ");
-test("binding rows show the pinned version and authoritative credential environment and lifecycle", async () => {
+test("binding rows show the pinned version and authoritative credential environment and lifecycle", async context => {
+  context.mock.timers.enable({ apis: ["setTimeout"] });
   const previous = Object.getOwnPropertyDescriptor(globalThis, "React"); Object.assign(globalThis, { React });
   const restore = installRenderControls();
   let Section: typeof import("../../../presentation/bindings/TestDataSection")["TestDataSection"];
@@ -25,7 +26,8 @@ test("binding rows show the pinned version and authoritative credential environm
     ] }) } } as unknown as TestDataContextValue;
   let view: ReturnType<typeof create>;
   try {
-    await act(async () => { view = create(<TestDataProvider value={feature}><CaseDataProvider bindings={bindings} steps={[]} editable={false}><Section ru={false} /></CaseDataProvider></TestDataProvider>); await new Promise(resolve => setTimeout(resolve, 230)); });
+    await act(async () => { view = create(<TestDataProvider value={feature}><CaseDataProvider bindings={bindings} steps={[]} editable={false}><Section ru={false} /></CaseDataProvider></TestDataProvider>); });
+    await act(async () => { context.mock.timers.tick(200); });
     const content = text(view!.root);
     assert.ok(content.includes("v7")); assert.ok(content.includes("Staging EU")); assert.ok(content.includes("Configured"));
     assert.equal(content.includes("Ready"), false, "active metadata does not assert external account health");

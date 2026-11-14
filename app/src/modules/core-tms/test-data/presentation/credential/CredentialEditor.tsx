@@ -1,5 +1,5 @@
 import { Button } from "@heroui/react";
-import { IntegrationInput as Input } from "../../../presentation/common/integration-controls/input/IntegrationInput";
+import { WorkspaceTextField } from "../workspace-fields/WorkspaceTextField";
 import { useState } from "react";
 import { ResourceEditorFrame } from "../editor-frame/ResourceEditorFrame";
 import { useFormLeave } from "../../../authoring/leave/state/value/useFormLeave";
@@ -20,13 +20,13 @@ export function CredentialEditor({ current, ru, onSaved, onClose, inline = false
   // The authoring coordinator receives only a change counter, never secret form values.
   const leave = useFormLeave({ name, description, environmentId, edited }, { busy: command.pending });
   const content = <>
-    <Input autoFocus isRequired label={ru ? "Название" : "Name"} labelPlacement="outside" value={name} onValueChange={setName} maxLength={context?.configuration.limits.nameLength} isDisabled={command.pending} classNames={{ inputWrapper: css.inputShell, input: css.input }} />
-    <Input label={ru ? "Описание" : "Description"} labelPlacement="outside" value={description} onValueChange={setDescription} maxLength={context?.configuration.limits.descriptionLength} isDisabled={command.pending} classNames={{ inputWrapper: css.inputShell, input: css.input }} />
+    <WorkspaceTextField required label={ru ? "Название" : "Name"} ariaLabel="Name" value={name} onValueChange={setName} maxLength={context?.configuration.limits.nameLength} disabled={command.pending} />
+    <WorkspaceTextField multiline label={ru ? "Описание" : "Description"} ariaLabel="Description" value={description} onValueChange={setDescription} placeholder={ru ? "Добавить описание…" : "Add description…"} maxLength={context?.configuration.limits.descriptionLength} disabled={command.pending} />
     {current ? <div><p className={css.muted}>{ru ? "Схема защищённых полей" : "Protected field schema"}</p><ul className={css.rows}>{current.fields.map(field => <li className={css.row} key={field.key}>
       <span className={css.code}>{field.key}</span><span className={css.muted}>{field.type} · {field.isSecret ? (ru ? "Защищено" : "Protected") : (ru ? "Обычное поле" : "Non-secret")}</span></li>)}</ul></div>
       : <><DataEnvironmentSelect value={environmentId} onChange={setEnvironment} required ru={ru} disabled={command.pending} />
         <ResourceFields fields={fields} onChange={value => { setFields(value); setEdited(count => count + 1); }} credentials ru={ru} disabled={command.pending} />
-        <p className={css.notice}>{ru ? "Отметьте пароли и токены как защищённые. Они сохраняются отдельно и не попадают в сценарий." : "Mark passwords and tokens as protected. Secrets are stored separately and never become scenario text."}</p></>}
+        <p className={css.formHint}>{ru ? "Пароли и токены отмечайте как защищённые. Значения сохраняются отдельно от сценария." : "Protect passwords and tokens. Their values are stored separately from scenario text."}</p></>}
     <DataFeedback error={command.error} ru={ru} denied={!context || !(current ? context.permissions.credentialUpdate : context.permissions.credentialCreate)} />
   </>;
   return <ResourceEditorFrame inline={inline} ru={ru} busy={command.pending} title={current ? (ru ? "Учётные данные" : "Credential details") : (ru ? "Создать учётные данные" : "Create credential")}

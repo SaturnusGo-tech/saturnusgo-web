@@ -17,8 +17,14 @@ export function SqlQueryEditor({ value, onChange, onRun, label, disabled = false
     const language = new Compartment(), view = new EditorView({ parent: host.current, state: EditorState.create({ doc: source.current.value, extensions: [
       history(), lineNumbers(), language.of([]), access.of([]),
       keymap.of([{ key: "Mod-Enter", run: () => { if (!source.current.disabled) source.current.onRun(); return true; } }, ...defaultKeymap, ...historyKeymap]),
-      syntaxHighlighting(HighlightStyle.define([{ tag: tags.keyword, color: "var(--falcon-text)" }, { tag: tags.string, color: "var(--falcon-text-secondary)" },
-        { tag: tags.number, color: "var(--falcon-text-secondary)" }, { tag: tags.comment, color: "var(--falcon-text-muted)", fontStyle: "italic" }])),
+      syntaxHighlighting(HighlightStyle.define([
+        { tag: [tags.keyword, tags.bool, tags.null], color: "light-dark(#b51963, #ff4f9a)" },
+        { tag: tags.string, color: "var(--falcon-success)" },
+        { tag: tags.number, color: "var(--falcon-discovery)" },
+        { tag: tags.typeName, color: "var(--falcon-info)" },
+        { tag: tags.operator, color: "var(--falcon-text-secondary)" },
+        { tag: tags.comment, color: "var(--falcon-text-muted)", fontStyle: "italic" },
+      ])),
       EditorView.updateListener.of(update => { if (update.docChanged && update.state.doc.toString() !== source.current.value) source.current.onChange(update.state.doc.toString()); }),
       EditorView.domEventHandlers({ keydown: event => { event.stopPropagation(); return false; } }),
     ] }) });
