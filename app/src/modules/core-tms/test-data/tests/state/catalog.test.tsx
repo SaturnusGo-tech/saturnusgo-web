@@ -8,9 +8,9 @@ test("changing a resource search cancels earlier requests and ignores a late res
   const requests: Array<{ search: string; signal: AbortSignal; resolve(value: { items: { id: string }[]; cursor: null }): void }> = [];
   const loader = (search: string, _cursor: string | null, signal: AbortSignal) => new Promise<{ items: { id: string }[]; cursor: null }>(resolve => requests.push({ search, signal, resolve }));
   let activeLoader = loader;
-  const renders: Array<{ source: typeof loader; ids: readonly string[] }> = [];
+  const renders: Array<{ source: typeof loader; search: string; ids: readonly string[] }> = [];
   let catalog!: ReturnType<typeof useDataCatalog<{ id: string }>>;
-  function Harness() { catalog = useDataCatalog(activeLoader); renders.push({ source: activeLoader, ids: catalog.items.map(item => item.id) }); return null; }
+  function Harness() { catalog = useDataCatalog(activeLoader); renders.push({ source: activeLoader, search: catalog.search, ids: catalog.items.map(item => item.id) }); return null; }
   let view: ReturnType<typeof create>;
   await act(async () => { view = create(<Harness />); await new Promise(resolve => setTimeout(resolve, 5)); });
   await act(async () => { catalog.setSearch("new"); });
@@ -18,9 +18,50 @@ test("changing a resource search cancels earlier requests and ignores a late res
   await act(async () => { requests[0].resolve({ items: [{ id: "old" }], cursor: null }); await new Promise(resolve => setTimeout(resolve, 200)); });
   await act(async () => { requests[1].resolve({ items: [{ id: "new" }], cursor: null }); });
   assert.deepEqual(catalog.items, [{ id: "new" }]);
+  await act(async () => { catalog.setSearch("another"); });
+  assert.ok(renders.filter(render => render.search === "another").every(render => render.ids.length === 0), "new searches hide the previous results before effects");
   activeLoader = () => new Promise(() => {});
   await act(async () => { view.update(<Harness />); });
   assert.ok(renders.filter(render => render.source === activeLoader).every(render => render.ids.length === 0), "a new catalog cannot render items from the previous scope, even before effects");
+  await act(async () => view.unmount());
+});
+test("same-scope refresh retains the catalog and cursor until reconciliation, including errors", async () => {
+  type Page = { items: { id: string }[]; cursor: string | null };
+  const requests: Array<{ cursor: string | null; signal: AbortSignal; resolve(page: Page): void; reject(error: Error): void }> = [];
+  const loader = (_search: string, cursor: string | null, signal: AbortSignal) => new Promise<Page>((resolve, reject) => requests.push({ cursor, signal, resolve, reject }));
+  let catalog!: ReturnType<typeof useDataCatalog<{ id: string }>>;
+  const renders: Array<{ ids: readonly string[]; loading: boolean; pending: boolean }> = [];
+  function Harness() { catalog = useDataCatalog(loader); renders.push({ ids: catalog.items.map(item => item.id), loading: catalog.loading, pending: catalog.pending }); return null; }
+  let view: ReturnType<typeof create>;
+  await act(async () => { view = create(<Harness />); await new Promise(resolve => setTimeout(resolve, 5)); });
+  await act(async () => { requests[0].resolve({ items: [{ id: "old" }], cursor: "next-page" }); });
+  const refreshingAt = renders.length;
+  await act(async () => { catalog.refresh(); await new Promise(resolve => setTimeout(resolve, 5)); });
+  assert.deepEqual(catalog.items, [{ id: "old" }]);
+  assert.equal(catalog.cursor, "next-page");
+  assert.equal(catalog.loading, false);
+  assert.equal(catalog.pending, true);
+  assert.ok(renders.slice(refreshingAt).every(render => render.ids[0] === "old" && !render.loading && render.pending), "refresh cannot briefly render an empty loading state before effects");
+  await act(async () => { await catalog.more(); });
+  assert.equal(requests.length, 2, "pagination cannot race the first-page refresh");
+  await act(async () => { requests[1].resolve({ items: [{ id: "updated" }], cursor: "updated-page" }); });
+  assert.deepEqual(catalog.items, [{ id: "updated" }]);
+  assert.equal(catalog.cursor, "updated-page");
+  assert.equal(catalog.pending, false);
+  await act(async () => { catalog.refresh(); await new Promise(resolve => setTimeout(resolve, 5)); });
+  await act(async () => { requests[2].reject(new Error("Unavailable")); });
+  assert.deepEqual(catalog.items, [{ id: "updated" }]);
+  assert.equal(catalog.cursor, "updated-page");
+  assert.equal(catalog.loading, false);
+  assert.equal(catalog.pending, false);
+  assert.equal(catalog.error, true);
+  await act(async () => { catalog.refresh(); await new Promise(resolve => setTimeout(resolve, 5)); });
+  assert.equal(catalog.error, false);
+  assert.equal(catalog.pending, true);
+  assert.deepEqual(catalog.items, [{ id: "updated" }]);
+  await act(async () => { requests[3].resolve({ items: [{ id: "recovered" }], cursor: null }); });
+  assert.deepEqual(catalog.items, [{ id: "recovered" }]);
+  assert.equal(catalog.error, false);
   await act(async () => view.unmount());
 });
 test("lost mutation responses retry with the same idempotency key; a changed intent receives a new key", async () => {

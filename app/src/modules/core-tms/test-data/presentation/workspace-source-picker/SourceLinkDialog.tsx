@@ -1,6 +1,7 @@
 import { Button } from "@heroui/react";
-import { Database, FileSpreadsheet, Plus } from "lucide-react";
+import { Cloud, Database, FileSpreadsheet, Plus } from "lucide-react";
 import { useCallback, useState } from "react";
+import { SiMysql, SiPostgresql } from "react-icons/si";
 import { IntegrationInput } from "../../../presentation/common/integration-controls/input/IntegrationInput";
 import { requestAuthoringLeave } from "../../../authoring/leave/application/authoring-leave";
 import local from "./source-picker.module.css";
@@ -21,8 +22,12 @@ export function SourceLinkDialog({ dataset, ru, onClose, onLinked, initialKind }
     const result = await command.execute((signal, key) => feature.workspace!.linkSource(dataset, source.id, key, signal), `${dataset.id}:${dataset.revision}:${source.id}`);
     if (result.ok) onLinked(result.value);
   }
-  return <DataModal wide title={creating ? (ru ? "Новый источник" : "New data source") : (ru ? "Добавить источник" : "Add source")} onClose={() => { if (!command.pending) { if (creating) void requestAuthoringLeave(initialKind ? onClose : () => setCreating(false)); else onClose(); } }}>
-    <div className={local.content}>{creating ? <div className={local.editor}><SourceEditor inline initialKind={initialKind} ru={ru} onClose={initialKind ? onClose : () => setCreating(false)} onSaved={source => { setCreating(false); catalog.refresh(); void link(source); }} /></div> : <div className={`${css.form} ${local.catalog}`}>
+  const provider = initialKind === "MYSQL" ? "MySQL" : initialKind === "POSTGRES" ? "PostgreSQL" : initialKind === "POSTMAN" ? "Postman Cloud Store" : (ru ? "Импорт файла" : "Import file");
+  const providerIcon = initialKind === "MYSQL" ? <SiMysql className={local.mysql} size={22} /> : initialKind === "POSTGRES" ? <SiPostgresql className={local.postgres} size={20} /> : initialKind === "POSTMAN" ? <Cloud size={19} /> : <FileSpreadsheet size={19} />;
+  return <DataModal wide={!creating} panelClassName={creating ? local.connectionDialog : undefined} title={creating ? provider : (ru ? "Добавить источник" : "Add source")}
+    headerActions={creating ? <span className={local.provider} aria-hidden="true">{providerIcon}</span> : undefined}
+    onClose={() => { if (!command.pending) { if (creating) void requestAuthoringLeave(initialKind ? onClose : () => setCreating(false)); else onClose(); } }}>
+    <div className={`${local.content} ${creating ? local.creating : ""}`}>{creating ? <div className={local.editor}><SourceEditor inline initialKind={initialKind} ru={ru} onClose={initialKind ? onClose : () => setCreating(false)} onSaved={source => { setCreating(false); catalog.refresh(); void link(source); }} /></div> : <div className={`${css.form} ${local.catalog}`}>
       <IntegrationInput aria-label={ru ? "Найти источник" : "Find a source"} placeholder={ru ? "Найти источник" : "Find a source"} value={catalog.search} onValueChange={catalog.setSearch} isDisabled={command.pending} />
       <DataFeedback loading={catalog.loading} error={catalog.error || command.error} ru={ru} retry={catalog.refresh} />
       <div className={css.rows}>{catalog.items.map(source => <Button key={source.id} type="button" disableRipple className={css.row}

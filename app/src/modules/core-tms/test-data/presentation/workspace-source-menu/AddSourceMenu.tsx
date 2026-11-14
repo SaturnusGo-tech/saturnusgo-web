@@ -16,8 +16,8 @@ export function AddSourceMenu({ ru, onChoose, isDisabled = false }: { ru: boolea
     <PopoverContent className={css.menu}><Listbox aria-label={ru ? "Выбрать источник данных" : "Choose data source"} disabledKeys={disabled}
       classNames={{ base: css.list }} itemClasses={{ base: css.option, title: css.title }} onAction={key => { if (isDisabled || disabled.includes(String(key))) return; setOpen(false); onChoose(String(key) as DataSource["kind"] | "EXISTING"); }}>
       <ListboxItem key="POSTMAN" startContent={<Cloud size={14} />}>Postman Cloud Store</ListboxItem>
-      <ListboxItem key="MYSQL" startContent={<SiMysql size={14} aria-hidden="true" />}>MySQL</ListboxItem>
-      <ListboxItem key="POSTGRES" startContent={<SiPostgresql size={14} aria-hidden="true" />}>PostgreSQL</ListboxItem>
+      <ListboxItem key="MYSQL" startContent={<SiMysql className={css.mysql} size={15} aria-hidden="true" />}>MySQL</ListboxItem>
+      <ListboxItem key="POSTGRES" startContent={<SiPostgresql className={css.postgres} size={14} aria-hidden="true" />}>PostgreSQL</ListboxItem>
       <ListboxItem key="FILE" startContent={<FileSpreadsheet size={14} />}>{ru ? "Импортировать файл" : "Import file"}</ListboxItem>
       <ListboxItem key="EXISTING" startContent={<Link size={14} />}>{ru ? "Существующий источник" : "Existing source"}</ListboxItem>
     </Listbox></PopoverContent>

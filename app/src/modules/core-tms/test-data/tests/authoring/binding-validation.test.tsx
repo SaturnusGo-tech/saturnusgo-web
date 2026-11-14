@@ -35,7 +35,7 @@ test("Static, Credential and Dataset forms retain invalid alias input, then acce
     await act(async () => { view = create(<TestDataProvider value={value}>{kind === "STATIC"
       ? <StaticEditor ru={false} onSave={binding => { saved = binding; }} onClose={() => {}} />
       : <SourceSelector kind={kind} ru={false} onSave={binding => { saved = binding; }} onClose={() => {}} />}</TestDataProvider>); await new Promise(resolve => setTimeout(resolve, 10)); });
-    const set = (label: string, text: string) => view!.root.findAllByType("input").find(input => input.props.label === label)!.props.onValueChange(text);
+    const set = (label: string, text: string) => view!.root.findAllByType("input").find(input => (input.props["aria-label"] ?? input.props.label) === label)!.props.onValueChange(text);
     if (kind !== "STATIC") await act(async () => { view!.root.findAllByType("button").find(button => button.props["aria-pressed"] === false)!.props.onPress(); });
     await act(async () => { set("Alias", "qa account"); if (kind === "STATIC") { set("Name", "QA data"); set("Value", "Synthetic value"); } });
     await act(async () => { view!.root.findByType("form").props.onSubmit({ preventDefault() {} }); });

@@ -1,1 +1,11 @@
 .content{height:min(68dvh,660px);display:flex;min-height:0}.catalog{width:100%;min-height:0;overflow-y:auto}.editor{width:100%;min-height:0}.editor>section>header{display:none}.editor>section{height:100%}
+.connectionDialog.connectionDialog { width:552px!important; max-width:calc(100vw - 32px)!important; height:auto!important; max-height:calc(100dvh - 40px)!important; overflow:hidden; }
+.connectionDialog.connectionDialog>header { gap:10px; min-height:56px!important; padding:17px 20px 9px!important; border:0!important; }
+.connectionDialog.connectionDialog>header>div:first-child { flex:1; }
+.connectionDialog.connectionDialog>header h2 { font-size:14px!important; line-height:20px; font-weight:500!important; }
+.connectionDialog.connectionDialog>header>button { width:28px; height:28px; min-width:28px; padding:5px; border-radius:7px; }
+.provider { display:flex; align-items:center; justify-content:center; flex:0 0 24px; order:-1; }
+.mysql { color:#417e98; }.postgres { color:#477fa6; }
+.creating { height:auto; max-height:calc(100dvh - 100px); overflow-y:auto; padding:0 20px 20px; }
+.creating .editor>section { height:auto; overflow:visible; }
+.creating .editor>section>div { flex:none; overflow:visible; }

@@ -15,10 +15,11 @@ import { ConnectionFields, type SourceConnectionFields } from "./connection/Conn
 import frame from "../editor-frame/resource-editor.module.css";
 import css from "../workspace-layout/workspace.module.css";
 import form from "../shared/data.module.css";
+import local from "./source-editor.module.css";
 
 export function SourceEditor({ ru, onClose, onSaved, inline = false, initialKind = "FILE" }: { ru: boolean; onClose(): void; onSaved(value: DataSource): void; inline?: boolean; initialKind?: DataSource["kind"] }) {
   const feature = useTestData(), command = useDataCommand(), input = useRef<HTMLInputElement>(null), reading = useRef(0), readController = useRef<AbortController | null>(null);
-  const [kind, setKind] = useState<DataSource["kind"]>(initialKind), [name, setName] = useState(""), [description, setDescription] = useState("");
+  const kind = initialKind, [name, setName] = useState(""), [description, setDescription] = useState("");
   const [connection, setConnection] = useState<SourceConnectionFields>({ host: "", port: initialKind === "MYSQL" ? "3306" : "5432", database: "", username: "", password: "", datasetId: "", region: "us", apiKey: "" });
   const [importFile, setImportFile] = useState<SourceImportFile | null>(null), [sheet, setSheet] = useState(0);
   const [file, setFile] = useState<{ name: string; content: string; format: "CSV" | "JSON" } | null>(null), [fileError, setFileError] = useState(false), [loading, setLoading] = useState(false);
@@ -50,15 +51,13 @@ export function SourceEditor({ ru, onClose, onSaved, inline = false, initialKind
     }, JSON.stringify({ kind, name, description, file, connection }));
     if (result.ok) { setConnection(value => ({ ...value, password: "", apiKey: "" })); setFile(null); leave.release(); onSaved(result.value); }
   }
-  return <ResourceEditorFrame inline={inline} title={ru ? "Новый источник" : "New data source"} ru={ru} busy={command.pending} onClose={() => leave.close(onClose)}>
-    <form className={`${frame.form} ${css.form}`} onSubmit={event => { event.preventDefault(); void save(); }}>
-      <div className={frame.body}><div className={frame.fields}>
+  const title = kind === "MYSQL" ? "MySQL" : kind === "POSTGRES" ? "PostgreSQL" : kind === "POSTMAN" ? "Postman Cloud Store" : (ru ? "Импорт файла" : "Import file");
+  return <ResourceEditorFrame inline={inline} title={title} ru={ru} busy={command.pending} onClose={() => leave.close(onClose)}>
+    <form className={`${frame.form} ${css.form} ${local.form}`} onSubmit={event => { event.preventDefault(); void save(); }}>
+      <div className={`${frame.body} ${local.body}`}><div className={`${frame.fields} ${local.fields}`}>
         <DataFeedback denied={!canCreate} error={command.error} loading={loading} ru={ru} />
         <WorkspaceTextField label={ru ? "Название" : "Name"} ariaLabel="Name" value={name} onValueChange={setName} maxLength={120} required disabled={command.pending || !canAuthor} />
         <WorkspaceTextField multiline label={ru ? "Описание" : "Description"} ariaLabel="Description" value={description} onValueChange={setDescription} placeholder={ru ? "Добавить описание…" : "Add description…"} maxLength={2000} disabled={command.pending || !canAuthor} />
-        <div className={css.field}><span className={css.fieldLabel}>{ru ? "Тип источника" : "Source type"}</span><DataSelect aria-label="Source type" classNames={{ base: form.fieldControl, trigger: form.inputShell, value: form.input }} selectedKeys={[kind]} disabledKeys={canConnect ? [] : ["POSTMAN", "POSTGRES", "MYSQL"]} isDisabled={command.pending || !canAuthor} onSelectionChange={keys => {
-          const next = String(Array.from(keys)[0]) as DataSource["kind"]; readController.current?.abort(); reading.current++; setLoading(false); setFile(null); setImportFile(null); setFileError(false); setKind(next); setConnection(value => ({ ...value, password: "", apiKey: "", port: next === "MYSQL" ? "3306" : "5432" }));
-        }}><SelectItem key="FILE">CSV / JSON / Excel</SelectItem><SelectItem key="POSTMAN">Postman Cloud Store</SelectItem><SelectItem key="POSTGRES">PostgreSQL</SelectItem><SelectItem key="MYSQL">MySQL</SelectItem></DataSelect></div>
         {kind === "FILE" ? <div onDragOver={event => event.preventDefault()} onDrop={event => { event.preventDefault(); if (!command.pending && canCreate) void chooseFile(event.dataTransfer.files[0]); }}>
           <input ref={input} hidden type="file" accept=".csv,.json,.xlsx,.xls,text/csv,application/json" aria-label={ru ? "Импортировать файл" : "Import file"} onChange={event => { void chooseFile(event.currentTarget.files?.[0]); event.currentTarget.value = ""; }} />
           <Button type="button" disableRipple className={css.quiet} startContent={<Upload size={16} />} isDisabled={command.pending || !canCreate} onPress={() => input.current?.click()}>{ru ? "Выбрать файл" : "Choose file"}</Button>
@@ -67,7 +66,7 @@ export function SourceEditor({ ru, onClose, onSaved, inline = false, initialKind
           {fileError && <p role="alert" className={css.subtitle}>{ru ? "Не удалось прочитать файл. Выберите CSV, JSON или Excel до 5 МБ." : "Could not read the file. Choose CSV, JSON or Excel up to 5 MB."}</p>}
         </div> : <ConnectionFields kind={kind} value={connection} onChange={setConnection} ru={ru} disabled={command.pending || !canCreate} />}
       </div></div>
-      <footer className={frame.footer}><Button type="button" disableRipple className={css.quiet} isDisabled={command.pending} onPress={() => leave.close(onClose)}>{ru ? "Отмена" : "Cancel"}</Button>
+      <footer className={`${frame.footer} ${local.footer}`}><Button type="button" disableRipple className={css.quiet} isDisabled={command.pending} onPress={() => leave.close(onClose)}>{ru ? "Отмена" : "Cancel"}</Button>
         <Button type="submit" disableRipple className={css.primary} isDisabled={!canCreate || !valid || loading} isLoading={command.pending}>{kind === "FILE" ? (ru ? "Импортировать" : "Import") : (ru ? "Подключить" : "Connect")}</Button></footer>
     </form>
   </ResourceEditorFrame>;

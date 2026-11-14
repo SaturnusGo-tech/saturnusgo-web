@@ -12,9 +12,10 @@ import { DataSelect } from "../select/DataSelect";
 import { SqlQueryEditor } from "../workspace-query/editor/SqlQueryEditor";
 import css from "../workspace-layout/workspace.module.css";
 import local from "./view-dialog.module.css";
-export function CreateViewDialog({ dataset, ru, onClose, onSaved }: { dataset: WorkspaceDataset; ru: boolean; onClose(): void; onSaved(value: WorkspaceDataset): void }) {
+export function CreateViewDialog({ dataset, ru, onClose, onSaved, onAddSource }: { dataset: WorkspaceDataset; ru: boolean; onClose(): void; onSaved(value: WorkspaceDataset): void; onAddSource?(): void }) {
   const feature = useTestData(), command = useDataCommand(), [name, setName] = useState("");
   const first = dataset.sources.find(source => source.status === "ACTIVE");
+  const sources = dataset.sources.filter(source => source.status === "ACTIVE");
   const [sourceIds, setSourceIds] = useState<readonly string[]>(first ? [first.id] : []);
   const [query, setQuery] = useState(() => defaultSourceQuery(first));
   const needsQuery = sourceIds.some(id => dataset.sources.some(source => source.id === id && (source.kind === "MYSQL" || source.kind === "POSTGRES")));
@@ -29,8 +30,9 @@ export function CreateViewDialog({ dataset, ru, onClose, onSaved }: { dataset: W
   return <DataModal panelClassName={local.dialog} title={ru ? "Создать представление" : "Create view"} onClose={() => leave.close(onClose)}>
     <form className={local.form} onSubmit={event => { event.preventDefault(); void save(); }}>
       <WorkspaceTextField label={ru ? "Название представления" : "View name"} ariaLabel="View name" placeholder="e.g. active_users" value={name} onValueChange={setName} maxLength={120} required disabled={command.pending || !allowed} />
-      <div className={css.field}><span className={css.fieldLabel}>{ru ? "Источники" : "Sources"}</span><DataSelect aria-label="View sources" placeholder={ru ? "Выберите источники" : "Select sources"} selectionMode="multiple" selectedKeys={new Set(sourceIds)} isDisabled={command.pending || !allowed}
-        onSelectionChange={keys => { const ids = Array.from(keys).map(String); setSourceIds(ids); setQuery(defaultSourceQuery(dataset.sources.find(source => source.id === ids[0]))); }}>{dataset.sources.filter(source => source.status === "ACTIVE").map(source => <SelectItem key={source.id}>{source.name}</SelectItem>)}</DataSelect></div>
+      <div className={css.field}><span className={css.fieldLabel}>{ru ? "Источники" : "Sources"}</span><DataSelect aria-label="View sources" placeholder={ru ? "Выберите источники" : "Select sources"} selectionMode="multiple" selectedKeys={new Set(sourceIds)} isDisabled={command.pending || !allowed || !sources.length}
+        onSelectionChange={keys => { const ids = Array.from(keys).map(String); setSourceIds(ids); setQuery(defaultSourceQuery(dataset.sources.find(source => source.id === ids[0]))); }}>{sources.map(source => <SelectItem key={source.id}>{source.name}</SelectItem>)}</DataSelect>
+        {!sources.length && <div className={local.emptySources}><p>{ru ? "Сначала добавьте источник данных, затем создайте представление." : "Add a data source first, then create a view."}</p>{onAddSource && <Button type="button" disableRipple className={css.quiet} isDisabled={command.pending || !allowed} onPress={() => leave.close(onAddSource)}>{ru ? "Добавить источник" : "Add source"}</Button>}</div>}</div>
       {needsQuery && <div className={local.query}><span className={css.fieldLabel}>{ru ? "SQL-запрос" : "SQL query"}</span><SqlQueryEditor value={query} onChange={setQuery} onRun={() => {}} disabled={command.pending || !allowed} label={ru ? "SQL представления" : "View SQL"} /></div>}
       <DataFeedback error={command.error} ru={ru} />
       <div className={local.actions}><Button type="button" disableRipple className={css.quiet} isDisabled={command.pending} onPress={() => leave.close(onClose)}>{ru ? "Отмена" : "Cancel"}</Button>

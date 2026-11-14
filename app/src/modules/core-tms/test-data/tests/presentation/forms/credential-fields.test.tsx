@@ -38,7 +38,7 @@ test("credential rows have individually named controls and keep protected values
   await act(async () => { view = create(<Fields fields={fields} onChange={() => {}} credentials ru={false} />); });
   const values = view!.root.findAllByType("input").filter(node => node.props.label === "Value");
   assert.deepEqual(values.map(node => node.props["aria-label"]), ["Field value 1", "Field value 2"]);
-  assert.deepEqual(values.map(node => node.props.type), ["text", "password"]);
+  assert.deepEqual(values.map(node => node.props.type), ["email", "password"]);
   assert.equal(values[1].props.autoComplete, "off");
   assert.deepEqual(view!.root.findAllByType("switch").map(node => node.props["aria-label"]), ["Protect field 1", "Protect field 2"]);
   assert.equal(view!.root.findAllByType("button").find(node => node.props["aria-label"] === "Remove field 1")!.props.isDisabled, false);

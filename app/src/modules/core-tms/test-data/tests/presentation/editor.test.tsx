@@ -22,7 +22,7 @@ test("inline static editor asks the server to validate exact decimal text before
   } } as unknown as TestDataContextValue;
   let view: ReturnType<typeof create>;
   await act(async () => { view = create(<TestDataProvider value={value}><StaticEditor ru={false} onSave={binding => { saved = binding; }} onClose={() => {}} /></TestDataProvider>); });
-  const set = (label: string, text: string) => view!.root.findAllByType("input").find(input => input.props.label === label)!.props.onValueChange(text);
+  const set = (label: string, text: string) => view!.root.findAllByType("input").find(input => (input.props["aria-label"] ?? input.props.label) === label)!.props.onValueChange(text);
   await act(async () => { set("Name", "Payment amount"); set("Alias", "amount"); view!.root.findByType("select").props.onSelectionChange(new Set(["Decimal"])); set("Value", "9007199254740993.01"); });
   await act(async () => { view!.root.findByType("form").props.onSubmit({ preventDefault() {} }); });
   assert.equal(saved, undefined); assert.equal(view!.root.findAllByProps({ role: "alert" }).length > 0, true);

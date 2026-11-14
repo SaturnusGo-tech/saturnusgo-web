@@ -8,6 +8,9 @@
 .form :global(label),.form :global([data-slot=label]) { font-size:12px!important; line-height:18px; }
 .actions { display:flex; gap:8px; align-items:center; justify-content:flex-end; padding-block-start:4px; }
 .query { display:flex; flex-direction:column; gap:8px; }
+.emptySources { display:flex; align-items:center; justify-content:space-between; gap:8px; color:var(--falcon-text-muted); font-size:12px; line-height:18px; }
+.emptySources p { margin:0; }
+.emptySources button { min-block-size:26px; block-size:26px; padding:0 8px; flex:none; font-size:12px; }
 .query > div { block-size:108px; overflow:hidden; border:1px solid var(--falcon-border); border-radius:7px; }
 
 .form > div { gap:4px; }

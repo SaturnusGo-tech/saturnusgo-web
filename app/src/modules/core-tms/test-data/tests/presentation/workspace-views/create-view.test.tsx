@@ -41,3 +41,15 @@ test("database views require real SQL rather than a made-up Falcon logical table
   assert.deepEqual(calls[0][1], { name: "Customers", sourceIds: ["active"], query: "SELECT id FROM customers" });
   await act(async () => view!.unmount());
 });
+test("a dataset without sources keeps the view form visible and offers Add source", async () => {
+  let additions = 0, view: ReturnType<typeof create>;
+  const context = { permissions: { read: true, update: true }, workspace: {} } as unknown as TestDataContextValue;
+  await act(async () => { view = create(<TestDataProvider value={context}><Dialog dataset={{ ...dataset, sources: [] }} ru={false} onClose={() => {}} onSaved={() => {}} onAddSource={() => additions++} /></TestDataProvider>); });
+  assert.equal(view!.root.findByProps({ "aria-label": "View name" }).props.value, "");
+  const sources = view!.root.findByProps({ "aria-label": "View sources" });
+  assert.deepEqual(Array.from(sources.props.selectedKeys), []); assert.equal(sources.props.isDisabled, true);
+  assert.equal(view!.root.findAllByType("button").find(button => button.props.type === "submit")!.props.isDisabled, true);
+  await act(async () => view!.root.findAllByType("button").find(button => button.children.join("") === "Add source")!.props.onPress());
+  assert.equal(additions, 1);
+  await act(async () => view!.unmount());
+});

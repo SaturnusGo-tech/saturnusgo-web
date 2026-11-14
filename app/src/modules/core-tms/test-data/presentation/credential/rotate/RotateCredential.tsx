@@ -21,10 +21,10 @@ export function RotateCredential({ credential, ru, onSaved, onClose }: { credent
         if (result.ok) { setValues({}); leave.release(); onSaved(); }
       });
     }}>
-      <p className={css.notice}>{ru ? "Укажите новые значения только для нужных полей. Текущие исполнения не переключатся на новую версию автоматически." : "Enter new values for the fields you need to change. Active executions do not switch versions automatically."}</p>
+      <p className={css.formHint}>{ru ? "Укажите новые значения только для нужных полей. Текущие исполнения не переключатся на новую версию автоматически." : "Enter new values for the fields you need to change. Active executions do not switch versions automatically."}</p>
       {credential.fields.filter(field => field.isSecret).map(field => <Input key={field.key} label={field.key} labelPlacement="outside" type="password" autoComplete="new-password"
         value={values[field.key] ?? ""} onValueChange={value => { setValues(current => ({ ...current, [field.key]: value })); setEdited(value => value + 1); }}
-        isDisabled={command.pending} classNames={{ inputWrapper: css.inputShell, input: css.input }} />)}
+        isDisabled={command.pending} classNames={{ base: css.fieldControl, label: css.controlLabel, inputWrapper: css.inputShell, input: css.input }} />)}
       <DataFeedback error={command.error} denied={!feature?.permissions.rotate} ru={ru} />
       <div className={css.footer}><Button className={`${css.button} ${css.quiet}`} isDisabled={command.pending} onPress={() => void leave.close(onClose)}>{ru ? "Отмена" : "Cancel"}</Button>
         <Button type="submit" className={`${css.button} ${css.primary}`} isLoading={command.pending} isDisabled={!feature?.permissions.rotate || !Object.values(values).some(Boolean)}>{ru ? "Обновить" : "Rotate secrets"}</Button></div>

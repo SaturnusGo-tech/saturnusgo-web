@@ -14,8 +14,7 @@ const pause = () => new Promise(resolve => setTimeout(resolve, 10));
 test("Postman source connects through scoped write-only API key fields and clears the submitted secret", async () => {
   const calls: unknown[] = []; let saved = 0, view: ReturnType<typeof create>;
   const context = { permissions: { create: true, credentialCreate: true }, workspace: { connectSource: async (value: unknown) => { calls.push(value); return { id: "source" }; } } } as unknown as TestDataContextValue;
-  await act(async () => { view = create(<TestDataProvider value={context}><Editor inline ru={false} onClose={() => {}} onSaved={() => saved++} /></TestDataProvider>); });
-  await act(async () => view!.root.findAllByType("select").find(select => select.props["aria-label"] === "Source type")!.props.onSelectionChange(new Set(["POSTMAN"])));
+  await act(async () => { view = create(<TestDataProvider value={context}><Editor inline initialKind="POSTMAN" ru={false} onClose={() => {}} onSaved={() => saved++} /></TestDataProvider>); });
   for (const [label, value] of [["Name", "Customers"], ["Dataset ID", "d3c3bcce-8eab-4fa5-8ac2-5e267a53dc0a"], ["API key", "secret-local-only"]]) {
     await act(async () => view!.root.findAllByType("input").find(input => input.props["aria-label"] === label)!.props.onValueChange(value));
   }
@@ -38,10 +37,7 @@ test("workbook source imports the explicitly selected worksheet through the scop
 test("file authors cannot submit credential-backed source connections", async () => {
   let connected = 0, view: ReturnType<typeof create>;
   const context = { permissions: { create: true, credentialCreate: false }, workspace: { connectSource: async () => { connected++; } } } as unknown as TestDataContextValue;
-  await act(async () => { view = create(<TestDataProvider value={context}><Editor inline ru={false} onClose={() => {}} onSaved={() => {}} /></TestDataProvider>); });
-  const type = view!.root.findAllByType("select").find(select => select.props["aria-label"] === "Source type")!;
-  assert.deepEqual(Array.from(type.props.disabledKeys), ["POSTMAN", "POSTGRES", "MYSQL"]);
-  await act(async () => type.props.onSelectionChange(new Set(["POSTMAN"])));
+  await act(async () => { view = create(<TestDataProvider value={context}><Editor inline initialKind="POSTMAN" ru={false} onClose={() => {}} onSaved={() => {}} /></TestDataProvider>); });
   for (const [label, value] of [["Name", "Customers"], ["Dataset ID", "d3c3bcce-8eab-4fa5-8ac2-5e267a53dc0a"], ["API key", "local-only"]]) await act(async () => view!.root.findAllByType("input").find(input => input.props["aria-label"] === label)!.props.onValueChange(value));
   await act(async () => { view!.root.findByType("form").props.onSubmit({ preventDefault() {} }); await pause(); });
   assert.equal(connected, 0); await act(async () => view!.unmount());
@@ -50,8 +46,22 @@ test("choosing MySQL opens its actual connection form with the correct default p
   let view: ReturnType<typeof create>;
   const context = { permissions: { create: true, credentialCreate: true }, workspace: {} } as unknown as TestDataContextValue;
   await act(async () => { view = create(<TestDataProvider value={context}><Editor inline initialKind="MYSQL" ru={false} onClose={() => {}} onSaved={() => {}} /></TestDataProvider>); });
-  assert.deepEqual(view!.root.findAllByType("select").find(select => select.props["aria-label"] === "Source type")!.props.selectedKeys, ["MYSQL"]);
+  assert.equal(view!.root.findAllByType("select").some(select => select.props["aria-label"] === "Source type"), false);
+  assert.match(text(view!.root), /MySQL/);
   assert.equal(view!.root.findAllByType("input").find(input => input.props["aria-label"] === "Port")!.props.value, "3306");
   assert.equal(view!.root.findAllByType("input").some(input => input.props.type === "file"), false);
+  await act(async () => view!.unmount());
+});
+test("database source submits its selected provider and TLS credentials without a second source-type choice", async () => {
+  const calls: unknown[] = []; let view: ReturnType<typeof create>;
+  const context = { permissions: { create: true, credentialCreate: true }, workspace: { connectSource: async (value: unknown) => { calls.push(value); return { id: "source" }; } } } as unknown as TestDataContextValue;
+  await act(async () => { view = create(<TestDataProvider value={context}><Editor inline initialKind="POSTGRES" ru={false} onClose={() => {}} onSaved={() => {}} /></TestDataProvider>); });
+  for (const [label, value] of [["Name", "QA customers"], ["Host", "db.example.test"], ["Database", "customers"], ["Username", "qa_reader"], ["Password", "write-only-secret"]]) {
+    await act(async () => view!.root.findAllByType("input").find(input => input.props["aria-label"] === label)!.props.onValueChange(value));
+  }
+  await act(async () => { view!.root.findByType("form").props.onSubmit({ preventDefault() {} }); await pause(); });
+  assert.deepEqual(calls, [{ name: "QA customers", description: "", kind: "POSTGRES", connection: { host: "db.example.test", port: 5432, database: "customers", username: "qa_reader", password: "write-only-secret", tls: true } }]);
+  assert.equal(view!.root.findAllByType("input").find(input => input.props["aria-label"] === "Password")!.props.value, "");
+  assert.equal(text(view!.root).includes("write-only-secret"), false);
   await act(async () => view!.unmount());
 });

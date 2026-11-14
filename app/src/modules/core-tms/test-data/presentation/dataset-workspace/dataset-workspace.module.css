@@ -13,6 +13,6 @@
 .summary > section p { line-height:18px; margin-block-end:8px; }
 .summary > section button { block-size:40px; min-block-size:40px; }
 .summary .actions button { block-size:26px; min-block-size:26px; border-radius:5px; }
-.summary .hint { margin:8px 0 0; font-size:11px; line-height:17px; color:var(--falcon-text-muted); }
+.summary .validation { margin:0; font-size:12px; line-height:18px; color:var(--falcon-danger,var(--falcon-text)); }
 .save:focus-visible { outline:1px solid var(--falcon-text-secondary); outline-offset:1px; }
 @media (max-width:900px) { .summary { inline-size:min(560px,calc(100% - 48px)); } .body.body { padding-block-start:32px; } }

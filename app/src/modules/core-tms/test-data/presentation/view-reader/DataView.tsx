@@ -1,6 +1,6 @@
 "use client";
 import { Button, SelectItem } from "@heroui/react";
-import { ArrowLeft, Pencil, Save, X } from "lucide-react";
+import { ChevronRight, Pencil, Save, X } from "lucide-react";
 import { useState } from "react";
 import { WorkspaceTextField } from "../workspace-fields/WorkspaceTextField";
 import { useFormLeave } from "../../../authoring/leave/state/value/useFormLeave";
@@ -25,10 +25,11 @@ export function DataView({ dataset, view, ru, onClose, onUpdated, onBack }: { da
     if (result.ok) { leave.reset(draft); onUpdated(result.value); }
   }
   return <section className={css.pane} data-view-detail={view.id}>
-    <header className={css.header}><div><h2>{onBack && <Button type="button" isIconOnly disableRipple className={css.close} aria-label={ru ? "К датасету" : "Back to dataset"} onPress={() => leave.close(onBack)}><ArrowLeft size={16} /></Button>}{dataset.name} › {view.name}</h2>
-      <p>{ru ? "Представление данных" : "Data view"}</p></div><div className={css.actions}>
+    <header className={viewCss.toolbar}><nav className={viewCss.breadcrumbs} aria-label={ru ? "Расположение представления" : "View location"}>
+      {onBack ? <Button type="button" disableRipple className={viewCss.back} aria-label={ru ? "К датасету" : "Back to dataset"} onPress={() => leave.close(onBack)}>{dataset.name}</Button> : <span className={viewCss.parent}>{dataset.name}</span>}
+      <ChevronRight size={12} /><span>{view.name}</span></nav><div className={css.actions}>
         {allowed && <Button type="button" isIconOnly disableRipple className={css.close} aria-label={ru ? "Изменить представление" : "Edit view details"} onPress={() => setEditing(value => !value)}><Pencil size={15} /></Button>}
-        {allowed && <Button type="button" disableRipple startContent={<Save size={15} />} className={css.primary} isDisabled={!leave.dirty || !name.trim() || !query.trim() || !sourceIds.length} isLoading={command.pending} onPress={() => void save()}>{ru ? "Сохранить" : "Save"}</Button>}
+        {allowed && <Button type="button" disableRipple startContent={<Save size={13} />} className={viewCss.save} isDisabled={!leave.dirty || !name.trim() || !query.trim() || !sourceIds.length} isLoading={command.pending} onPress={() => void save()}>{ru ? "Сохранить" : "Save"}</Button>}
         <Button type="button" isIconOnly disableRipple className={css.close} aria-label="Close view" onPress={() => leave.close(onClose)}><X size={18} /></Button></div></header>
     <div className={css.dataBody}>
       {editing && <div className={css.dataSummary}><div className={viewCss.controls}><WorkspaceTextField label={ru ? "Название" : "View name"} ariaLabel="View name" value={name} onValueChange={setName} maxLength={120} disabled={!allowed || command.pending} />

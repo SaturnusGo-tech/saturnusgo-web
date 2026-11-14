@@ -1,0 +1,12 @@
+.root {display:contents}
+.menu.menu {padding:5px;border-radius:10px;box-sizing:border-box;max-inline-size:calc(100vw - 24px)}
+.menu .listbox.listbox {block-size:100%;max-block-size:none;overflow-y:auto;overscroll-behavior:contain}
+.menu .option.option {min-block-size:30px;padding:5px 8px;border-radius:6px}
+.menu .title.title {font-size:12px;line-height:18px;font-weight:400;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+.empty.empty {padding:0;block-size:100%}
+.skeletons {display:grid;gap:12px;padding:10px 8px}
+.skeleton {block-size:18px;border-radius:5px;inline-size:78%}
+.skeleton:nth-child(even) {inline-size:58%}
+.ready {animation:options-in 140ms ease-out both}
+@keyframes options-in {from {opacity:0} to {opacity:1}}
+@media (prefers-reduced-motion:reduce) {.ready,.skeleton {animation:none!important}}

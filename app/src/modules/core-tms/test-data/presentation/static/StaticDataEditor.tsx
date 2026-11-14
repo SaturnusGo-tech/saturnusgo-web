@@ -14,6 +14,7 @@ import { useFormLeave } from "../../../authoring/leave/state/value/useFormLeave"
 import { dataTypes, type TestDataBinding, type DataType } from "../../model/bindings/binding";
 import { formatDataValue, parseDataInput } from "../../application/editor/field-input";
 import { TypedValue } from "../forms/TypedValue";
+import { WorkspaceTextField } from "../workspace-fields/WorkspaceTextField";
 import { bindingFieldMessage } from "../validation/binding-field-message";
 import css from "../shared/data.module.css";
 type Static = Extract<TestDataBinding, { sourceType: "STATIC" }>;
@@ -42,18 +43,18 @@ export function StaticDataEditor({ initial, ru, onSave, onClose }: { initial?: S
       });
     }}>
       <div className={css.formGrid}>
-        <Input label={ru ? "Название" : "Name"} labelPlacement="outside" isRequired value={name} onValueChange={setName} isDisabled={command.pending} maxLength={feature?.configuration.limits.nameLength} classNames={{ inputWrapper: css.inputShell, input: css.input }} />
+        <WorkspaceTextField label={ru ? "Название" : "Name"} ariaLabel="Name" required value={name} onValueChange={setName} disabled={command.pending} maxLength={feature?.configuration.limits.nameLength} />
         <Input label="Alias" labelPlacement="outside" isRequired value={alias} onValueChange={next => { setAlias(next); setFindings([]); }} isDisabled={command.pending}
           isInvalid={findings.some(item => item.alias === alias && item.code === "TEST_DATA_ALIAS_INVALID")}
-          description={bindingFieldMessage("TEST_DATA_ALIAS_INVALID", ru)} maxLength={feature?.configuration.limits.aliasLength} classNames={{ inputWrapper: css.inputShell, input: css.input }} />
+          description={bindingFieldMessage("TEST_DATA_ALIAS_INVALID", ru)} maxLength={feature?.configuration.limits.aliasLength} classNames={{ base: css.fieldControl, label: css.controlLabel, description: css.formHint, inputWrapper: css.inputShell, input: css.input }} />
       </div>
       <Select disableAnimation isDisabled={command.pending} label={ru ? "Тип данных" : "Data type"} labelPlacement="outside" selectedKeys={[type]}
         onSelectionChange={keys => { const next = [...keys][0] as DataType; if (next) { setType(next); if (next === "Boolean") setValue("false"); } }}
         classNames={{ trigger: css.inputShell, value: css.input }}>{dataTypes.map(item => <SelectItem key={item}>{item}</SelectItem>)}</Select>
-      <TypedValue disabled={command.pending} type={type} value={value} onChange={setValue} label={ru ? "Значение" : "Value"} />
-      <Input label={ru ? "Описание" : "Description"} labelPlacement="outside" value={description} onValueChange={setDescription} isDisabled={command.pending} maxLength={feature?.configuration.limits.descriptionLength} classNames={{ inputWrapper: css.inputShell, input: css.input }} />
+      <TypedValue disabled={command.pending} type={type} value={value} onChange={setValue} ru={ru} ariaLabel={ru ? "Значение" : "Value"} />
+      <WorkspaceTextField multiline label={ru ? "Описание" : "Description"} ariaLabel="Description" value={description} onValueChange={setDescription} disabled={command.pending} maxLength={feature?.configuration.limits.descriptionLength} />
       <Switch isDisabled={command.pending} size="sm" color="default" isSelected={required} onValueChange={setRequired}>{ru ? "Обязательно для выполнения" : "Required for execution"}</Switch>
-      <p className={css.muted}>{ru ? "Пароли и токены добавляйте через Secure Credentials." : "Use Secure Credentials for passwords and tokens."}</p>
+      <p className={css.formHint}>{ru ? "Пароли и токены добавляйте через Secure Credentials." : "Use Secure Credentials for passwords and tokens."}</p>
       {error && <p className={css.error} role="alert">{ru ? "Укажите корректный JSON." : "Enter valid JSON."}</p>}
       <DataValidation findings={findings} ru={ru} /><DataFeedback error={command.error} ru={ru} />
       <div className={css.footer}><Button type="button" className={`${css.button} ${css.quiet}`} onPress={() => void leave.close(onClose)}>{ru ? "Отмена" : "Cancel"}</Button>

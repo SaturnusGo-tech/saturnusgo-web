@@ -6,7 +6,7 @@ export function installRenderControls(options: { portals?: boolean } = {}) {
   const previous = loader._load, css = require.extensions[".css"];
   require.extensions[".css"] = module => { module.exports = {}; };
   const controls = { Button: "button", Input: "input", Textarea: "textarea", Select: "select", SelectItem: "option", Switch: "switch", Skeleton: "skeleton",
-    Popover: "popover", PopoverTrigger: "trigger", PopoverContent: "popup", Listbox: "listbox", ListboxItem: "option" };
+    Popover: "popover", PopoverTrigger: "trigger", PopoverContent: "popup", Listbox: "listbox", ListboxItem: "option", Tooltip: "tooltip" };
   loader._load = function(name, parent, main) {
     if (name === "@heroui/react") return controls;
     if (name === "react-dom" && options.portals) return { createPortal: (children: unknown) => children };

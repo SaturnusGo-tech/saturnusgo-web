@@ -29,6 +29,9 @@ export function useResourceWorkspace() {
   const workspaces = useDataCatalog<WorkspaceDataset>(feature?.permissions.read && feature.workspace && open.datasets ? loadWorkspaces : null);
   function search(value: string) { datasets.setSearch(value); credentials.setSearch(value); statics.setSearch(value); workspaces.setSearch(value); }
   const choose = (next: Selection) => void requestAuthoringLeave(() => setSelection(next));
+  function toggle(kind: ResourceKind) {
+    void requestAuthoringLeave(() => { setSelection(null); setOpen(current => ({ ...current, [kind]: !current[kind] })); });
+  }
   function create(kind: ResourceKind) { choose({ mode: "create", kind }); setOpen(current => ({ ...current, [kind]: true })); }
   function refresh() { datasets.refresh(); credentials.refresh(); statics.refresh(); workspaces.refresh(); }
   function saved(resource: Dataset | Credential) { refresh(); setSelection({ mode: "read", resource }); }
@@ -38,7 +41,7 @@ export function useResourceWorkspace() {
   }
   function updated() { refresh(); setSelection(null); }
   return { feature, open, selection, archived, setArchived, sort, setSort, datasets, credentials, statics, workspaces, search, create,
-    toggle: (kind: ResourceKind) => setOpen(current => ({ ...current, [kind]: !current[kind] })),
+    toggle,
     select: (resource: Dataset | Credential) => choose({ mode: "read", resource }),
     selectStatic: (resource: StaticResource) => choose({ mode: "static", resource }),
     selectDataset: (resource: WorkspaceDataset) => choose({ mode: "dataset", resource }),

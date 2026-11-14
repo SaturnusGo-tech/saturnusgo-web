@@ -1,8 +1,8 @@
-.field { display:flex; flex-direction:column; gap:8px; min-inline-size:0; }
-.label { display:block; color:var(--falcon-text-secondary); font-size:12px; font-weight:500; line-height:20px; }
+.field { display:flex; flex-direction:column; gap:4px; min-inline-size:0; }
+.label { display:block; color:var(--falcon-text-secondary); font-size:12px; font-weight:400; line-height:18px; }
 .field .shell.shell,
 .field .shell.shell:is([data-hover=true],[data-focus=true],[data-focus-visible=true],:hover,:focus-within) { min-block-size:24px!important; block-size:24px!important; border:0!important; border-radius:0!important; background:transparent!important; padding:0!important; box-shadow:none!important; outline:0!important; margin:0!important; inline-size:100%; transition:none!important; }
-.field .shell.multiline.multiline { min-block-size:80px!important; block-size:auto!important; align-items:flex-start; }
-.field .input.input { color:var(--falcon-text)!important; font-size:13px!important; line-height:21px!important; background:transparent!important; border:0!important; border-radius:0!important; padding:0!important; outline:0!important; box-shadow:none!important; }
-.field textarea.input { min-block-size:80px!important; resize:vertical; }
-.field :global([data-slot=description]) { margin-block-start:8px; }
+.field .shell.multiline.multiline { min-block-size:48px!important; block-size:auto!important; align-items:flex-start; }
+.field .input.input { color:var(--falcon-text)!important; font-size:13px!important; line-height:20px!important; font-weight:400!important; background:transparent!important; border:0!important; border-radius:0!important; padding:0!important; outline:0!important; box-shadow:none!important; }
+.field textarea.input { min-block-size:48px!important; resize:vertical; }
+.field :global([data-slot=description]) { margin-block-start:4px; font-size:11px; line-height:16px; }

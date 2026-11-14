@@ -1,0 +1,12 @@
+.grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; align-items:start; }
+.address { grid-template-columns:minmax(0,1fr) 104px; }
+.postman { grid-template-columns:minmax(0,1fr) 164px; }
+.control.control { min-inline-size:0; gap:5px; }
+.control .label,.label { position:static; margin:0; padding:0; color:var(--muted); font-size:12px; line-height:18px; font-weight:400; }
+.control.control .shell.shell,.select .selectShell.selectShell { block-size:32px; min-block-size:32px; padding:0 10px; border:1px solid var(--border); border-radius:8px; background:var(--falcon-control,var(--selected)); box-shadow:none; }
+.control.control input.input,.input { font-size:13px; line-height:20px; font-weight:400; }
+.control .description,.hint { margin:0; color:var(--muted); font-size:11px; line-height:16px; font-weight:400; }
+.hint { margin-block-start:-6px; }
+.select { display:flex; flex-direction:column; gap:5px; min-inline-size:0; }
+.selectControl { inline-size:100%; }
+@media(max-width:440px) { .postman { grid-template-columns:minmax(0,1fr) 140px; } }
