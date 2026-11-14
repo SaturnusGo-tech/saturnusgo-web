@@ -14,6 +14,7 @@ export const tdmLintFiles = [
   "app/src/modules/core-tms/presentation/cases/inspector/steps/editor/ScenarioStepEditor.tsx",
   "app/src/modules/core-tms/presentation/cases/inspector/steps/markdown/ScenarioMarkdownInput.tsx",
   "app/src/modules/core-tms/presentation/cases/inspector/tests/scenario/attachments/saved-step-attachments.test.ts",
+  "app/src/modules/core-tms/presentation/cases/inspector/tests/archive/archived-readonly.test.ts",
   "app/src/modules/core-tms/presentation/navigation/Navigation.tsx",
   "app/src/modules/core-tms/presentation/navigation/model/sidebar-navigation.ts",
   "app/src/modules/core-tms/presentation/navigation/sections-menu/SidebarSectionsMenu.tsx",

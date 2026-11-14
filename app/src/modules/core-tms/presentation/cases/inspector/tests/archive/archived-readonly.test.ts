@@ -103,6 +103,9 @@ test("archived inspector refuses edits and draft changes, while active creation 
     onChange: () => { changes++; } };
   const props = { locale: "en", revision, archived: true, editor, sharedSteps: [], onRequestEdit: () => { edits++; } };
   const all = render("../../CaseInspectorContent.tsx", "CaseInspectorContent", props);
+  assert.equal(all[0].type, "CaseDataProvider");
+  assert.equal(all[0].props.editable, false);
+  assert.equal(all[0].props.onChange, undefined);
   const sections = all.filter(node => node.type === "InspectorSectionView");
   assert.equal(sections.length, 6);
   for (const section of sections) {
@@ -118,7 +121,8 @@ test("archived inspector refuses edits and draft changes, while active creation 
   invoke(active.find(node => node.type === "InspectorSectionView")!, "onEdit", "description");
   assert.equal(edits, 1);
   const creation = render("../../CaseInspectorContent.tsx", "CaseInspectorContent", { ...props, editor: { ...editor, mode: "create" } });
-  assert.equal(creation[0].type, "CaseCreationSections");
+  assert.equal(creation[0].type, "CaseDataProvider");
+  assert.equal((creation[0].props.children as Node).type, "CaseCreationSections");
 });
 
 test("saved test data is readable once in Preconditions without a separate editor", () => {
