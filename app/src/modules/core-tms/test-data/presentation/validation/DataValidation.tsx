@@ -1,5 +1,6 @@
 import type { DataFinding } from "../../model/bindings/binding";
 import css from "../shared/data.module.css";
+import { bindingFieldMessage } from "./binding-field-message";
 export function DataValidation({ findings, ru, stepId, warning = false }: { findings: readonly DataFinding[]; ru: boolean; stepId?: string; warning?: boolean }) {
   const visible = stepId ? findings.filter(item => item.stepId === stepId) : findings;
   if (!visible.length) return null;
@@ -9,6 +10,7 @@ export function DataValidation({ findings, ru, stepId, warning = false }: { find
     </li>)}</ul></div>;
 }
 function findingLabel(code: string, ru: boolean) {
+  const input = bindingFieldMessage(code, ru); if (input) return input;
   if (/POTENTIAL_SECRET/.test(code)) return ru ? "Возможно, это чувствительные данные. Для паролей и токенов используйте Secure Credentials." : "This may contain sensitive data. Use Secure Credentials for passwords and tokens.";
   if (/VERSION_CONFLICT/.test(code)) return ru ? "Проверьте зафиксированную версию набора перед выполнением." : "Review the pinned dataset version before execution.";
   if (/ALIAS_CONFLICT/.test(code)) return ru ? "Alias уже используется." : "This alias is already used.";

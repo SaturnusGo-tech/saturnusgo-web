@@ -7,7 +7,7 @@ import type { Dataset, DatasetVersion } from "../../model/resources/resource";
 import { formatDataValue } from "../../application/editor/field-input";
 import { DataFeedback } from "../shared/DataFeedback";
 import css from "../shared/data.module.css";
-export function DatasetVersionPicker({ dataset, selected, onChange, ru }: { dataset: Dataset; selected: string; onChange(value: string): void; ru: boolean }) {
+export function DatasetVersionPicker({ dataset, selected, onChange, ru, disabled }: { dataset: Dataset; selected: string; onChange(value: string): void; ru: boolean; disabled?: boolean }) {
   const feature = useTestData(), [showFields, setShowFields] = useState(false);
   const load = useCallback((_search: string, cursor: string | null, signal: AbortSignal) => feature!.port.versions(dataset.id, cursor, signal), [feature, dataset.id]);
   const versions = useDataCatalog(feature ? load : null);
@@ -22,7 +22,7 @@ export function DatasetVersionPicker({ dataset, selected, onChange, ru }: { data
   const selectedVersion = versions.items.find(item => item.id === selected) ?? pinned;
   const choices = pinned && !versions.items.some(item => item.id === pinned.id) ? [pinned, ...versions.items] : versions.items;
   return <div className={css.form}>
-    <Select disableAnimation label={ru ? "Зафиксированная версия" : "Pinned version"} labelPlacement="outside" selectedKeys={selected ? [selected] : []}
+    <Select disableAnimation isDisabled={disabled} label={ru ? "Зафиксированная версия" : "Pinned version"} labelPlacement="outside" selectedKeys={selected ? [selected] : []}
       isLoading={versions.loading} onSelectionChange={keys => { const value = String([...keys][0] ?? ""); if (value) onChange(value); }}
       classNames={{ trigger: css.inputShell, value: css.input }}>
       {choices.map(version => <SelectItem key={version.id}>{`Version ${version.version}${version.id === dataset.currentVersionId ? (ru ? " · актуальная" : " · latest") : ""}`}</SelectItem>)}

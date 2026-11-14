@@ -4,7 +4,7 @@ import { after, before, test } from "node:test";
 import React from "react";
 import { act, create } from "react-test-renderer";
 import { TestDataProvider, type TestDataContextValue } from "../../application/context/TestDataContext";
-import type { TestDataBinding } from "../../model/bindings/binding";
+import type { BindingValidation, TestDataBinding } from "../../model/bindings/binding";
 import { installRenderControls } from "../support/render-controls";
 const require = createRequire(import.meta.url), previous = Object.getOwnPropertyDescriptor(globalThis, "React");
 let StaticEditor: typeof import("../../presentation/static/StaticDataEditor")["StaticDataEditor"];
@@ -40,6 +40,7 @@ test("reopening a dataset binding retains its pinned historical version until an
   let saved: TestDataBinding | undefined;
   const value = { actorId: "qa", projectId: "project", configuration, permissions: { read: true, bind: true }, port: {
     datasets: async () => ({ items: [dataset], cursor: null }), dataset: async () => dataset,
+    validate: async () => ({ valid: true, errors: [], warnings: [], variables: [], referencedResources: [] }),
     versions: async () => ({ items: [version("v2")], cursor: null }), version: async (_id: string, id: string) => version(id),
   } } as unknown as TestDataContextValue;
   let view: ReturnType<typeof create>;
@@ -66,6 +67,34 @@ test("a pending static validation locks all draft controls until its captured va
   assert.equal(view!.root.findByType("select").props.isDisabled, true);
   await act(async () => { reply({ valid: true, errors: [], warnings: [], variables: [], referencedResources: [] }); });
   await act(async () => view!.unmount());
+});
+test("dataset comparison cannot replace the pinned version while its validation is pending", async () => {
+  const dataset = { id: "d", name: "Boundary", description: "", environmentId: null, currentVersionId: "v2", currentVersion: 2, revision: 2, fieldCount: 1, usedIn: 1, updatedAt: "2026-11-14", archived: false };
+  const version = (id: string) => ({ id, version: id === "v1" ? 1 : 2, fields: [{ key: "amount", type: "Decimal", value: "0.01" }], createdAt: "2026-11-14" });
+  const initial = { id: "binding", alias: "payment", required: true, sourceType: "DATASET", sourceId: "d", sourceVersionId: "v1" } as const;
+  let saved: TestDataBinding | undefined, inspected: readonly TestDataBinding[] = [];
+  let reply!: (value: BindingValidation) => void;
+  const value = { actorId: "qa", projectId: "project", configuration, permissions: { read: true, bind: true }, port: {
+    datasets: async () => ({ items: [dataset], cursor: null }), dataset: async () => dataset,
+    validate: (bindings: readonly TestDataBinding[]) => { inspected = bindings; return new Promise<BindingValidation>(resolve => { reply = resolve; }); },
+    versions: async () => ({ items: [version("v2")], cursor: null }), version: async (_id: string, id: string) => version(id),
+  } } as unknown as TestDataContextValue;
+  let view: ReturnType<typeof create>;
+  await act(async () => { view = create(<TestDataProvider value={value}><SourceSelector initial={initial} kind="DATASET" ru={false} onSave={binding => { saved = binding; }} onClose={() => {}} /></TestDataProvider>); });
+  const picker = () => view!.root.findAllByType("select").find(node => node.props.label === "Pinned version")!;
+  const latest = () => view!.root.findAllByType("button").find(node => node.props.children === "Use latest version")!;
+  try {
+    await act(async () => { view!.root.findAllByType("button").find(node => node.props.children === "View changes")!.props.onPress(); });
+    await act(async () => { view!.root.findByType("form").props.onSubmit({ preventDefault() {} }); });
+    assert.deepEqual(inspected, [initial]);
+    assert.equal(saved, undefined);
+    assert.equal(picker().props.isDisabled, true);
+    await act(async () => { latest().props.onPress(); });
+    assert.deepEqual(picker().props.selectedKeys, ["v1"], "keep the selected version equal to the pending validation input");
+    assert.equal(latest().props.isDisabled, true);
+    await act(async () => { reply({ valid: true, errors: [], warnings: [], variables: [], referencedResources: [] }); });
+    assert.deepEqual(saved, initial);
+  } finally { await act(async () => view!.unmount()); }
 });
 test("TDM dialogs isolate form submission and own Escape from their parent case editor", async () => {
   let closed = 0;

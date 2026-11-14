@@ -29,3 +29,22 @@ test("existing case validation supplies the owned revision context while new dra
   await client.validate([], [], signal);
   assert.deepEqual(requests, [{ bindings: [], steps: [{ id: "step", action: "Enter value", expectedResult: "Accepted" }], caseId: "case", revision: 7 }, { bindings: [], steps: [] }]);
 });
+test("binding field validation returns actionable findings instead of a request/access failure", async () => {
+  const http = createTmsHttpClient({ apiBase: "https://falcon.example.test/api/v1", credentials: "include", fetch: (async () =>
+    new Response(JSON.stringify({ error: { code: "VALIDATION_ERROR", message: "Request validation failed", requestId: "req-alias",
+      details: [{ field: "bindings.0.alias", code: "invalid_format", message: "Request field is invalid." }] } }), { status: 400 })) as typeof fetch });
+  for (const sourceType of ["STATIC", "CREDENTIAL"] as const) {
+    const base = { id: "binding", alias: "qa account", required: true };
+    const binding = sourceType === "STATIC" ? { ...base, sourceType, staticDefinition: { name: "Amount", type: "Decimal" as const, value: "0.01" } }
+      : { ...base, sourceType, sourceId: "credential" };
+    const result = await createExecutionDataClient(http, "project").validate([binding], [], new AbortController().signal);
+    assert.equal(result.valid, false);
+    assert.deepEqual(result.errors, [{ code: "TEST_DATA_ALIAS_INVALID", alias: "qa account", field: "alias" }]);
+    assert.deepEqual(result.referencedResources, []);
+  }
+});
+test("authorization and transport errors stay failures rather than becoming binding findings", async () => {
+  const http = createTmsHttpClient({ apiBase: "https://falcon.example.test/api/v1", credentials: "include", fetch: (async () =>
+    new Response(JSON.stringify({ error: { code: "FORBIDDEN", message: "Not allowed", requestId: "req-denied" } }), { status: 403 })) as typeof fetch });
+  await assert.rejects(() => createExecutionDataClient(http, "project").validate([], [], new AbortController().signal), { status: 403, code: "FORBIDDEN" });
+});

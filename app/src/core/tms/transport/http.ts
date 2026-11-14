@@ -1,6 +1,7 @@
 import { resolveTmsApiBase } from "../config/api-base";
 import { retryAfterSeconds } from "../errors/retry-after/retry-after";
 import type { components } from "../generated/tms-api";
+import { validationField } from "./validation/validation-field";
 type ApiError = components["schemas"]["Error"];
 export type TmsApiErrorCode = ApiError["code"] | "HTTP_ERROR";
 export type MutationMethod = "POST" | "PUT" | "PATCH" | "DELETE";
@@ -72,8 +73,7 @@ async function responseError(response: Response): Promise<TmsApiError> {
     ?? boundedString(response.headers.get("x-request-id"), 128);
   const code = boundedString(error?.code, 128) as ApiError["code"] | null;
   const details = error?.details;
-  const field = details && typeof details === "object" && "field" in details
-    ? boundedString(details.field, 128) : null;
+  const field = validationField(details);
   return new TmsApiError(message, response.status, requestId, code ?? "HTTP_ERROR", field,
     details && typeof details === "object" && !Array.isArray(details) ? details as Readonly<Record<string, unknown>> : null,
     retryAfterSeconds(response.headers.get("retry-after")));

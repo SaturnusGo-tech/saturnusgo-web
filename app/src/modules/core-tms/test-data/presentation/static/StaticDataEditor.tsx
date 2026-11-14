@@ -14,6 +14,7 @@ import { useFormLeave } from "../../../authoring/leave/state/value/useFormLeave"
 import { dataTypes, type TestDataBinding, type DataType } from "../../model/bindings/binding";
 import { formatDataValue, parseDataInput } from "../../application/editor/field-input";
 import { TypedValue } from "../forms/TypedValue";
+import { bindingFieldMessage } from "../validation/binding-field-message";
 import css from "../shared/data.module.css";
 type Static = Extract<TestDataBinding, { sourceType: "STATIC" }>;
 export function StaticDataEditor({ initial, ru, onSave, onClose }: { initial?: Static; ru: boolean; onSave(value: Static): void; onClose(): void }) {
@@ -42,7 +43,9 @@ export function StaticDataEditor({ initial, ru, onSave, onClose }: { initial?: S
     }}>
       <div className={css.formGrid}>
         <Input label={ru ? "Название" : "Name"} labelPlacement="outside" isRequired value={name} onValueChange={setName} isDisabled={command.pending} maxLength={feature?.configuration.limits.nameLength} classNames={{ inputWrapper: css.inputShell, input: css.input }} />
-        <Input label="Alias" labelPlacement="outside" isRequired value={alias} onValueChange={setAlias} isDisabled={command.pending} maxLength={feature?.configuration.limits.aliasLength} classNames={{ inputWrapper: css.inputShell, input: css.input }} />
+        <Input label="Alias" labelPlacement="outside" isRequired value={alias} onValueChange={next => { setAlias(next); setFindings([]); }} isDisabled={command.pending}
+          isInvalid={findings.some(item => item.alias === alias && item.code === "TEST_DATA_ALIAS_INVALID")}
+          description={bindingFieldMessage("TEST_DATA_ALIAS_INVALID", ru)} maxLength={feature?.configuration.limits.aliasLength} classNames={{ inputWrapper: css.inputShell, input: css.input }} />
       </div>
       <Select disableAnimation isDisabled={command.pending} label={ru ? "Тип данных" : "Data type"} labelPlacement="outside" selectedKeys={[type]}
         onSelectionChange={keys => { const next = [...keys][0] as DataType; if (next) { setType(next); if (next === "Boolean") setValue("false"); } }}

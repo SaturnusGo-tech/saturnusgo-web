@@ -5,7 +5,7 @@ import type { Dataset, DatasetVersion } from "../../model/resources/resource";
 import { formatDataValue } from "../../application/editor/field-input";
 import { DataFeedback } from "../shared/DataFeedback";
 import css from "../shared/data.module.css";
-export function DatasetChanges({ dataset, pinnedId, ru, onChooseLatest }: { dataset: Dataset; pinnedId: string; ru: boolean; onChooseLatest(): void }) {
+export function DatasetChanges({ dataset, pinnedId, ru, onChooseLatest, disabled }: { dataset: Dataset; pinnedId: string; ru: boolean; onChooseLatest(): void; disabled?: boolean }) {
   const feature = useTestData(), [expanded, setExpanded] = useState(false), [versions, setVersions] = useState<readonly DatasetVersion[] | null>(null);
   const [error, setError] = useState(false), [retry, setRetry] = useState(0);
   useEffect(() => {
@@ -24,6 +24,6 @@ export function DatasetChanges({ dataset, pinnedId, ru, onChooseLatest }: { data
         const before = versions[0].fields.find(field => field.key === key), after = versions[1].fields.find(field => field.key === key);
         return <tr key={key}><td>{key}</td><td className={css.code}>{before ? `${before.type}: ${formatDataValue(before.value)}` : "—"}</td><td className={css.code}>{after ? `${after.type}: ${formatDataValue(after.value)}` : "—"}</td></tr>;
       })}</tbody></table></div>}
-      <Button type="button" className={css.button} onPress={onChooseLatest}>{ru ? "Выбрать новую версию" : "Use latest version"}</Button></>}
+      <Button type="button" isDisabled={disabled} className={css.button} onPress={onChooseLatest}>{ru ? "Выбрать новую версию" : "Use latest version"}</Button></>}
   </section>;
 }

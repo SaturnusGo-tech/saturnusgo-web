@@ -1,5 +1,5 @@
 import type { components } from "../../../../../core/tms/generated/tms-api";
-import type { TmsHttpClient } from "../../../../../core/tms/transport/http";
+import { TmsApiError, type TmsHttpClient } from "../../../../../core/tms/transport/http";
 import type { TestDataPort } from "../../application/ports/test-data-port";
 type Api = components["schemas"];
 export function createExecutionDataClient(http: TmsHttpClient, projectId: string): Pick<TestDataPort, "validate" | "manifest" | "preflight"> {
@@ -8,7 +8,15 @@ export function createExecutionDataClient(http: TmsHttpClient, projectId: string
     async validate(bindings, steps, signal, savedCase) {
       const request: Api["TestDataValidationRequest"] = { bindings: bindings.map(binding => structuredClone(binding)), steps: steps.map(({ id, action, expectedResult }) => ({ id, action, expectedResult })),
         ...(savedCase ? { caseId: savedCase.caseId, revision: savedCase.revision } : {}) };
-      const value = await http.mutate<Api["TestDataValidationResult"]>(`${project}/test-data/bindings:validate`, "POST", request, signal);
+      let value: Api["TestDataValidationResult"];
+      try { value = await http.mutate<Api["TestDataValidationResult"]>(`${project}/test-data/bindings:validate`, "POST", request, signal); }
+      catch (failure) {
+        if (!(failure instanceof TmsApiError) || failure.status !== 400 || failure.code !== "VALIDATION_ERROR" || !failure.validationField) throw failure;
+        const match = /^bindings\.(\d+)\.(.+)$/.exec(failure.validationField);
+        const field = match?.[2], alias = match ? bindings[Number(match[1])]?.alias : undefined;
+        return { valid: false, errors: [{ code: field === "alias" ? "TEST_DATA_ALIAS_INVALID" : "TEST_DATA_INPUT_INVALID",
+          ...(alias !== undefined ? { alias } : {}), ...(field ? { field } : {}) }], warnings: [], variables: [], referencedResources: [] };
+      }
       return { valid: value.valid, errors: value.errors.map(error => ({ ...error })), warnings: value.warnings.map(warning => ({ ...warning })),
         variables: value.variables.map(variable => ({ token: `${variable.alias}.${variable.field}`, type: variable.type, source: variable.source, secret: variable.secret })),
         referencedResources: value.referencedResources.map(source => ({ ...source })) };
